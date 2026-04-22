@@ -1,0 +1,23 @@
+{
+  "name": "confluence-export-kit",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for Confluence export-only workflows: auth setup, page-tree export, keyword export, and confluence-markdown-exporter bootstrap.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/confluence-export-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "confluence",
+    "export",
+    "atlassian",
+    "markdown-exporter",
+    "cme",
+    "claude-plugin"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}

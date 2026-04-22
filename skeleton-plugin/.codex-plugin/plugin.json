@@ -1,0 +1,45 @@
+{
+  "name": "skeleton-plugin",
+  "version": "0.1.0",
+  "description": "Starter template for building plugins that support both Codex and Claude Code platforms.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/skeleton-plugin",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "skeleton",
+    "template",
+    "plugin",
+    "codex",
+    "claude-code"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "Skeleton Plugin",
+    "shortDescription": "Starter template for Codex and Claude Code plugins",
+    "longDescription": "A dual-platform starter plugin with manifests, commands, hooks, MCP, and asset placeholders for building new plugins.",
+    "developerName": "developjik",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/skeleton-plugin",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "defaultPrompt": [
+      "Set up this skeleton plugin for a new workflow and list the files I should customize first.",
+      "Turn this starter plugin into a minimal local automation for my repo.",
+      "Review this skeleton and suggest which placeholder commands, skills, and hooks I should keep or remove."
+    ],
+    "brandColor": "#3B82F6"
+  }
+}
