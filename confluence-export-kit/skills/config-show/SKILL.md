@@ -1,6 +1,6 @@
 ---
-description: Show the current confluence-markdown-exporter configuration by running cme config list. Invoke manually as /confluence-export-kit:config-show. Add --json to output JSON format.
-disable-model-invocation: true
+name: config-show
+description: Show the current confluence-markdown-exporter configuration by running cme config list. Add --json to output JSON format.
 ---
 
 # Config Show

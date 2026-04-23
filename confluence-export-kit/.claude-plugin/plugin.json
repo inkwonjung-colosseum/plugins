@@ -18,6 +18,5 @@
     "cme",
     "claude-plugin"
   ],
-  "skills": "./skills/",
-  "commands": "./commands/"
+  "skills": "./skills/"
 }

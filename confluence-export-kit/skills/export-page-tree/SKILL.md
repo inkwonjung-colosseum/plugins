@@ -1,6 +1,6 @@
 ---
-description: Export a Confluence page and all descendant pages with confluence-markdown-exporter after verifying that auth is already configured. Invoke manually as /confluence-export-kit:export-page-tree <page-url> [output-path].
-disable-model-invocation: true
+name: export-page-tree
+description: Export a Confluence page and all descendant pages with confluence-markdown-exporter after verifying that auth is already configured.
 ---
 
 # Export Page Tree

@@ -33,6 +33,7 @@ See the Korean document in [README.md](./README.md).
 - `commands/export-by-label.md` — label search export command
 - `commands/config-show.md` — show current configuration command
 - `skills/set-api-key/SKILL.md` — auth setup and token validation
+- `skills/help/SKILL.md` — help response rules and quick-start guidance
 - `skills/set-output-path/SKILL.md` — persist default output path
 - `skills/export-org/SKILL.md` — export all spaces and pages under an org
 - `skills/export-space/SKILL.md` — export all pages in a space

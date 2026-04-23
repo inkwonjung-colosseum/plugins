@@ -71,13 +71,22 @@ The root `.claude-plugin/marketplace.json` catalogs all available plugins. Each 
 
 ```json
 {
-  "owner": "inkwonjung-colosseum",
+  "name": "inkwonjung-colosseum",
+  "owner": {
+    "name": "inkwonjung-colosseum",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "metadata": {
+    "description": "..."
+  },
   "plugins": [
     {
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
       "description": "...",
-      "version": "0.1.0"
+      "version": "0.1.0",
+      "license": "MIT",
+      "tags": ["confluence"]
     }
   ]
 }

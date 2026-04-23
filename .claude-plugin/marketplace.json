@@ -1,5 +1,12 @@
 {
-  "owner": "inkwonjung-colosseum",
+  "name": "inkwonjung-colosseum",
+  "owner": {
+    "name": "inkwonjung-colosseum",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "metadata": {
+    "description": "Claude Code plugins by inkwonjung-colosseum: productivity, documentation, and developer tools."
+  },
   "plugins": [
     {
       "name": "confluence-export-kit",
@@ -7,9 +14,7 @@
       "description": "Claude Code plugin for Confluence export-only workflows: auth setup, page-tree export, keyword export, and confluence-markdown-exporter bootstrap.",
       "version": "0.1.0",
       "license": "MIT",
-      "categories": ["productivity", "documentation", "atlassian"],
-      "tags": ["confluence", "export", "atlassian", "markdown", "cme"],
-      "maintenance": "active"
+      "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },
     {
       "name": "skeleton-plugin",
@@ -17,9 +22,7 @@
       "description": "Starter template for building plugins that support both Codex and Claude Code platforms.",
       "version": "0.1.0",
       "license": "MIT",
-      "categories": ["developer-tools", "templates"],
-      "tags": ["skeleton", "template", "codex", "claude-code", "plugin"],
-      "maintenance": "active"
+      "tags": ["skeleton", "template", "codex", "claude-code", "plugin"]
     }
   ]
 }

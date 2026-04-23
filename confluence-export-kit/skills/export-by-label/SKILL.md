@@ -1,6 +1,6 @@
 ---
-description: Export all Confluence pages that have a specific label by searching with CQL label = "labelname", then passing the matched page URLs to cme pages. Invoke manually as /confluence-export-kit:export-by-label <label> [output-path] [--space-key <KEY>] [--dry-run].
-disable-model-invocation: true
+name: export-by-label
+description: Export all Confluence pages that have a specific label by searching with CQL label = "labelname", then passing the matched page URLs to cme pages.
 ---
 
 # Export By Label

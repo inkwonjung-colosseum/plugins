@@ -1,6 +1,6 @@
 ---
-description: Export all spaces and pages under a Confluence organization with confluence-markdown-exporter. Invoke manually as /confluence-export-kit:export-org <org-url> [output-path].
-disable-model-invocation: true
+name: export-org
+description: Export all spaces and pages under a Confluence organization with confluence-markdown-exporter.
 ---
 
 # Export Org

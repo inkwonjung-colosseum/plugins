@@ -1,6 +1,6 @@
 ---
-description: Export all pages in a Confluence space with confluence-markdown-exporter. Invoke manually as /confluence-export-kit:export-space <space-url> [output-path].
-disable-model-invocation: true
+name: export-space
+description: Export all pages in a Confluence space with confluence-markdown-exporter.
 ---
 
 # Export Space

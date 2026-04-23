@@ -1,6 +1,6 @@
 ---
-description: Export all Confluence pages that match a keyword by searching title and text, then passing the matched page URLs to cme pages. Invoke manually as /confluence-export-kit:export-by-keyword <keyword> [output-path] [--space-key <KEY>] [--dry-run] [--skip-unchanged] [--cleanup-stale] [--jira-enrichment].
-disable-model-invocation: true
+name: export-by-keyword
+description: Export all Confluence pages that match a keyword by searching title and text, then passing the matched page URLs to cme pages.
 ---
 
 # Export By Keyword

@@ -1,6 +1,6 @@
 ---
-description: Set the API token for confluence-markdown-exporter. Invoke manually as /confluence-export-kit:set-api-key <api-key> <email>. Both arguments are required. This skill also validates Python, pip, pipx, and the cme CLI, and bootstraps missing dependencies when possible.
-disable-model-invocation: true
+name: set-api-key
+description: Set the API token for confluence-markdown-exporter. Both arguments are required. Also validates Python, pip, pipx, and the cme CLI, and bootstraps missing dependencies when possible.
 ---
 
 # Set Exporter API Key

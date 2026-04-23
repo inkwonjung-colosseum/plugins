@@ -1,6 +1,6 @@
 ---
-description: Export one or more Confluence pages by URL with confluence-markdown-exporter. Invoke manually as /confluence-export-kit:export-page <page-url> [<page-url2> ...] [--output-path <path>].
-disable-model-invocation: true
+name: export-page
+description: Export one or more Confluence pages by URL with confluence-markdown-exporter.
 ---
 
 # Export Page

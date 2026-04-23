@@ -1,6 +1,6 @@
 ---
-description: Persist the default export output path in the confluence-markdown-exporter config. Invoke manually as /confluence-export-kit:set-output-path <path>. This is the only way to permanently change the output directory without passing [output-path] on every export command.
-disable-model-invocation: true
+name: set-output-path
+description: Persist the default export output path in the confluence-markdown-exporter config. Permanently changes the output directory without passing [output-path] on every export command.
 ---
 
 # Set Output Path
