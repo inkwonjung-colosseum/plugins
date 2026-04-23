@@ -2,7 +2,6 @@
 
 Codex plugin과 Claude Code plugin을 모두 지원하는 통합 스켈레톤입니다. 필요한 구성요소는 모두 포함하지만, 실제 동작 로직은 넣지 않은 최소 형태를 기본으로 둡니다.
 
-영문 문서는 [README.en.md](./README.en.md)를 참고하세요.
 
 ## 목적
 
