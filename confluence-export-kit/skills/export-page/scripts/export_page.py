@@ -22,7 +22,7 @@ from scripts.cme_runtime import resolve_config_path
 from scripts.cme_runtime import run_command
 
 
-DEFAULT_OUTPUT_PATH = "raw/articles"
+DEFAULT_OUTPUT_PATH = "confluence"
 
 
 def parse_args() -> argparse.Namespace:

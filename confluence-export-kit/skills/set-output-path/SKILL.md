@@ -1,6 +1,6 @@
 ---
 name: set-output-path
-description: Persist the default export output path in the confluence-markdown-exporter config. Permanently changes the output directory without passing [output-path] on every export command.
+description: "Set default export output directory. Usage: /confluence-export-kit:set-output-path <path>"
 ---
 
 # Set Output Path
@@ -24,12 +24,31 @@ Primary usage:
 /confluence-export-kit:set-output-path <path>
 ```
 
-3. Before updating config, validate that Python, `pip`, `pipx`, and `cme` are usable.
+3. Before updating config, validate that Python, `pipx`, and `cme` are usable.
 4. Write the value to `export.output_path` in the CME config file.
 5. Report the previous value and the new value; do not silently overwrite.
 6. This setting is persistent — all future exports use this path unless overridden at runtime with `[output-path]`.
 
 ## Execution
+
+### Step 1 — Python availability check
+
+Before running any script, verify Python is installed:
+
+```bash
+python3 --version
+```
+
+If this fails, stop and tell the user:
+
+> **Python is not installed.** Install Python 3.10+ before continuing:
+> - **macOS**: `brew install python` or download from https://www.python.org/downloads/
+> - **Windows**: Download from https://www.python.org/downloads/ (check "Add to PATH" during install)
+> - **Linux**: `sudo apt install python3` (Debian/Ubuntu) or `sudo dnf install python3` (Fedora)
+
+Do not proceed to Step 2 until Python is available.
+
+### Step 2 — Run the helper script
 
 Run the helper script in this skill directory:
 

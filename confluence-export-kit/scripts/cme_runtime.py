@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import shutil
 import site
 import subprocess
@@ -15,6 +16,7 @@ from urllib.parse import urlparse
 
 
 PACKAGE_NAME = "confluence-markdown-exporter"
+IS_WINDOWS = platform.system() == "Windows"
 
 
 def run_command(
@@ -33,10 +35,18 @@ def run_command(
     )
 
 
+def platform_label() -> str:
+    return f"{platform.system()} {platform.release()}"
+
+
 def ensure_python_preflight() -> str:
     python_path = Path(sys.executable).resolve()
     if not python_path.exists():
-        raise RuntimeError(f"Python executable not found: {python_path}")
+        raise RuntimeError(
+            f"Python executable not found at {python_path}. "
+            f"Install Python 3.10+ from https://www.python.org/downloads/ "
+            f"(detected platform: {platform_label()})."
+        )
     return str(python_path)
 
 
@@ -45,20 +55,29 @@ def ensure_pip_preflight() -> None:
         run_command([sys.executable, "-m", "pip", "--version"])
     except subprocess.CalledProcessError as exc:
         raise RuntimeError(
-            "Python is available, but `pip` is not. Install pip for this Python interpreter first."
+            "Python is available, but `pip` is not. "
+            f"Install pip for this Python interpreter first "
+            f"(detected platform: {platform_label()})."
         ) from exc
 
 
 def candidate_bin_dirs() -> list[Path]:
-    candidates = []
+    candidates: list[Path] = []
 
     pipx_bin_dir = os.environ.get("PIPX_BIN_DIR")
     if pipx_bin_dir:
         candidates.append(Path(pipx_bin_dir).expanduser())
 
     user_base = Path(site.getuserbase()).expanduser()
-    candidates.append(user_base / "bin")
-    candidates.append(Path.home() / ".local" / "bin")
+
+    if IS_WINDOWS:
+        candidates.append(user_base / "Scripts")
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            candidates.append(Path(appdata) / "Python" / "Scripts")
+    else:
+        candidates.append(user_base / "bin")
+        candidates.append(Path.home() / ".local" / "bin")
 
     seen: set[Path] = set()
     unique: list[Path] = []
@@ -70,15 +89,24 @@ def candidate_bin_dirs() -> list[Path]:
     return unique
 
 
+def _executable_names(base: str) -> list[str]:
+    names = [base]
+    if IS_WINDOWS:
+        names.append(base + ".exe")
+    return names
+
+
 def find_named_executable(name: str) -> str | None:
     direct = shutil.which(name)
     if direct:
         return direct
 
     for bin_dir in candidate_bin_dirs():
-        candidate = bin_dir / name
-        if candidate.exists() and os.access(candidate, os.X_OK):
-            return str(candidate)
+        for variant in _executable_names(name):
+            candidate = bin_dir / variant
+            if candidate.exists():
+                if IS_WINDOWS or os.access(candidate, os.X_OK):
+                    return str(candidate)
 
     return None
 
@@ -103,14 +131,18 @@ def install_pipx() -> list[str]:
     except subprocess.CalledProcessError as exc:
         stderr = exc.stderr or ""
         if "externally-managed-environment" not in stderr:
-            raise RuntimeError(f"Failed to install pipx: {stderr.strip() or exc}") from exc
+            raise RuntimeError(
+                f"Failed to install pipx: {stderr.strip() or exc} "
+                f"(detected platform: {platform_label()})."
+            ) from exc
         retry_cmd = install_cmd + ["--break-system-packages"]
         try:
             run_command(retry_cmd, capture_output=True)
         except subprocess.CalledProcessError as retry_exc:
             retry_stderr = retry_exc.stderr or ""
             raise RuntimeError(
-                f"Failed to install pipx after PEP 668 retry: {retry_stderr.strip() or retry_exc}"
+                f"Failed to install pipx after PEP 668 retry: {retry_stderr.strip() or retry_exc} "
+                f"(detected platform: {platform_label()})."
             ) from retry_exc
 
     module_cmd = [sys.executable, "-m", "pipx"]
@@ -168,13 +200,15 @@ def cme_path_from_pipx_metadata(pipx_cmd: list[str]) -> str | None:
         if not isinstance(raw_path, str):
             continue
         path = Path(raw_path)
-        if path.name == "cme" and path.exists() and os.access(path, os.X_OK):
+        if path.name not in _executable_names("cme"):
+            continue
+        if path.exists() and (IS_WINDOWS or os.access(path, os.X_OK)):
             return str(path)
     return None
 
 
 def validate_cme(cme_path: str) -> None:
-    run_command([cme_path, "version"])
+    run_command([cme_path, "--help"])
 
 
 def install_or_upgrade_cme(pipx_cmd: list[str]) -> str:

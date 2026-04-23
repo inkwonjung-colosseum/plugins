@@ -31,7 +31,7 @@ DEFAULT_SITE = os.environ.get(
     "CONFLUENCE_EXPORT_KIT_BASE_URL",
     "https://colosseum.atlassian.net",
 ).rstrip("/")
-DEFAULT_OUTPUT_PATH = "raw/articles"
+DEFAULT_OUTPUT_PATH = "confluence"
 SEARCH_LIMIT = 100
 EXPORT_BATCH_SIZE = 25
 

@@ -1,6 +1,6 @@
 ---
 name: export-by-keyword
-description: Export all Confluence pages that match a keyword by searching title and text, then passing the matched page URLs to cme pages.
+description: "Export Confluence pages matching a keyword. Usage: /confluence-export-kit:export-by-keyword <keyword> [output-path] [--space-key <KEY>] [--dry-run]"
 ---
 
 # Export By Keyword
@@ -38,7 +38,7 @@ Preview matched pages without exporting:
 1. Treat `$ARGUMENTS[0]` as the keyword or phrase to search.
 2. Treat `$ARGUMENTS[1]` as an optional export output path override.
 3. Default target is `CONFLUENCE_EXPORT_KIT_BASE_URL`, then `https://colosseum.atlassian.net`. Override via `--site`.
-4. Before export, validate that Python, `pip`, `pipx`, and `cme` are usable.
+4. Before export, validate that Python, `pipx`, and `cme` are usable.
 5. Read the `cme` config file and verify that the fixed site already has a configured `auth.confluence` entry with both `username` and `api_token`.
 6. If auth is missing or incomplete, stop and tell the user to run:
 
@@ -57,6 +57,25 @@ Preview matched pages without exporting:
 15. Do not print stored secrets.
 
 ## Execution
+
+### Step 1 — Python availability check
+
+Before running any script, verify Python is installed:
+
+```bash
+python3 --version
+```
+
+If this fails, stop and tell the user:
+
+> **Python is not installed.** Install Python 3.10+ before continuing:
+> - **macOS**: `brew install python` or download from https://www.python.org/downloads/
+> - **Windows**: Download from https://www.python.org/downloads/ (check "Add to PATH" during install)
+> - **Linux**: `sudo apt install python3` (Debian/Ubuntu) or `sudo dnf install python3` (Fedora)
+
+Do not proceed to Step 2 until Python is available.
+
+### Step 2 — Run the helper script
 
 If no keyword argument was provided, stop and tell the user to run:
 

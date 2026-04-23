@@ -1,6 +1,6 @@
 ---
 name: set-api-key
-description: Set the API token for confluence-markdown-exporter. Both arguments are required. Also validates Python, pip, pipx, and the cme CLI, and bootstraps missing dependencies when possible.
+description: "Set Confluence/Jira API token. Usage: /confluence-export-kit:set-api-key <api-key> <email>"
 ---
 
 # Set Exporter API Key
@@ -23,11 +23,30 @@ Primary usage:
 4. Default target is `CONFLUENCE_EXPORT_KIT_BASE_URL`, then `https://colosseum.atlassian.net`. Override via `--url`.
 5. Update both `auth.confluence` and `auth.jira` for that URL so Jira enrichment stays aligned.
 6. Do not reuse a stored username implicitly. Always write the email provided in the command.
-7. Before updating config, validate that Python, `pip`, `pipx`, and `cme` are usable.
+7. Before updating config, validate that Python, `pipx`, and `cme` are usable.
 8. If `pipx` is missing but `pip` exists, bootstrap `pipx` with the current Python interpreter.
 9. If `cme` is missing, install or upgrade `confluence-markdown-exporter` through `pipx`.
 
 ## Execution
+
+### Step 1 — Python availability check
+
+Before running any script, verify Python is installed:
+
+```bash
+python3 --version
+```
+
+If this fails, stop and tell the user:
+
+> **Python is not installed.** Install Python 3.10+ before continuing:
+> - **macOS**: `brew install python` or download from https://www.python.org/downloads/
+> - **Windows**: Download from https://www.python.org/downloads/ (check "Add to PATH" during install)
+> - **Linux**: `sudo apt install python3` (Debian/Ubuntu) or `sudo dnf install python3` (Fedora)
+
+Do not proceed to Step 2 until Python is available.
+
+### Step 2 — Run the helper script
 
 If either required argument is missing, stop and tell the user to run:
 
@@ -49,9 +68,17 @@ Token probe runs by default. Add `--skip-validate` to skip the `/rest/api/user/c
 
 After the script finishes:
 
+- report detected platform (macOS / Windows / Linux)
 - report Python/pipx/cme preflight status
 - confirm that the config was updated
 - report the config file path
 - say that the username was set from the required email argument
 - report the token probe status (skipped or ok)
 - do not echo the token
+
+## Screen Feedback
+
+When showing results to the user, explain platform-specific behavior:
+
+- **macOS / Linux**: Paths use forward slashes. `pipx` installs to `~/.local/bin/`. Terminal renders ANSI output directly.
+- **Windows**: Paths use backslashes. `pipx` installs to `%APPDATA%\\Python\\Scripts`. If `pipx` or `cme` not found, suggest adding `%APPDATA%\\Python\\Scripts` to PATH. PowerShell may need execution policy adjustment (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`).

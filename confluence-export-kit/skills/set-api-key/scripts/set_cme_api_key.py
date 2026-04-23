@@ -7,6 +7,7 @@ import argparse
 import base64
 import json
 import os
+import platform
 import sys
 import tempfile
 import urllib.error
@@ -23,6 +24,7 @@ from scripts.cme_runtime import ensure_dict
 from scripts.cme_runtime import ensure_python_preflight
 from scripts.cme_runtime import load_json
 from scripts.cme_runtime import normalize_nonempty
+from scripts.cme_runtime import platform_label
 from scripts.cme_runtime import resolve_config_path
 
 
@@ -142,6 +144,7 @@ def main() -> int:
 
     write_json_atomic(config_path, data)
 
+    print(f"Platform: {platform_label()}")
     print(f"Python executable: {python_path}")
     print(f"Pipx status: {pipx_status}")
     print(f"CME status: {cme_status}")
