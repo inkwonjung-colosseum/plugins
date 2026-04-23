@@ -1,6 +1,7 @@
 ---
 name: set-output-path
 description: "Set default export output directory. Usage: /confluence-export-kit:set-output-path <path>"
+argument-hint: "<path>"
 ---
 
 # Set Output Path

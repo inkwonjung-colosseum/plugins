@@ -1,6 +1,6 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Claude Code plugin for Confluence export-only workflows: auth setup, page-tree export, keyword export, and confluence-markdown-exporter bootstrap.",
   "author": {
     "name": "developjik",

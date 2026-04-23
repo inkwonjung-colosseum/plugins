@@ -1,6 +1,7 @@
 ---
 name: export-space
 description: "Export all pages in a Confluence space. Usage: /confluence-export-kit:export-space <space-url> [output-path]"
+argument-hint: "<space-url> [output-path]"
 ---
 
 # Export Space

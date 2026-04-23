@@ -1,6 +1,7 @@
 ---
 name: export-page
 description: "Export one or more Confluence pages by URL. Usage: /confluence-export-kit:export-page <page-url> [<page-url2> ...] [--output-path <path>]"
+argument-hint: "<page-url> [<page-url2> ...] [--output-path <path>]"
 ---
 
 # Export Page

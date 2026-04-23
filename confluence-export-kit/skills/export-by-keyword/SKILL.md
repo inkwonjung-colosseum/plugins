@@ -1,6 +1,7 @@
 ---
 name: export-by-keyword
 description: "Export Confluence pages matching a keyword. Usage: /confluence-export-kit:export-by-keyword <keyword> [output-path] [--space-key <KEY>] [--dry-run]"
+argument-hint: "<keyword> [output-path] [--space-key <KEY>] [--dry-run]"
 ---
 
 # Export By Keyword

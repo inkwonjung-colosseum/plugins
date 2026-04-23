@@ -1,6 +1,7 @@
 ---
 name: set-api-key
 description: "Set Confluence/Jira API token. Usage: /confluence-export-kit:set-api-key <api-key> <email>"
+argument-hint: "<api-key> <email>"
 ---
 
 # Set Exporter API Key

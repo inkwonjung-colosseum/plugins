@@ -1,6 +1,7 @@
 ---
 name: export-by-label
 description: "Export Confluence pages by label. Usage: /confluence-export-kit:export-by-label <label> [output-path] [--space-key <KEY>] [--dry-run]"
+argument-hint: "<label> [output-path] [--space-key <KEY>] [--dry-run]"
 ---
 
 # Export By Label

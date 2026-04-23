@@ -1,6 +1,7 @@
 ---
 name: export-page-tree
 description: "Export a Confluence page and all descendants. Usage: /confluence-export-kit:export-page-tree <page-url> [output-path]"
+argument-hint: "<page-url> [output-path]"
 ---
 
 # Export Page Tree

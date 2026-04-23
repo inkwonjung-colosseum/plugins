@@ -1,6 +1,7 @@
 ---
 name: export-org
 description: "Export all spaces/pages under a Confluence org. Usage: /confluence-export-kit:export-org <org-url> [output-path]"
+argument-hint: "<org-url> [output-path]"
 ---
 
 # Export Org
