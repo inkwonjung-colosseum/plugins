@@ -51,8 +51,8 @@ Preview matched pages without exporting:
 9. If `--dry-run` is set, print the matched page URLs and stop without running the export.
 10. Export only the matched pages. Do not export descendants.
 11. If an output path was supplied, apply it only for this export via environment override. Do not persistently rewrite the user's `cme` config.
-12. `--skip-unchanged` skips pages whose version matches the lockfile.
-13. `--cleanup-stale` removes local files for pages deleted or moved in Confluence.
+12. `--skip-unchanged` / `--no-skip-unchanged` — skips pages whose version matches the lockfile (incremental export). **Default: on.**
+13. `--cleanup-stale` / `--no-cleanup-stale` — removes local files for pages deleted or moved in Confluence. **Default: on.**
 14. `--jira-enrichment` fetches Jira issue summaries and includes them in the exported Markdown.
 15. Do not print stored secrets.
 
@@ -67,7 +67,7 @@ If no label argument was provided, stop and tell the user to run:
 Otherwise run the helper script in this skill directory:
 
 ```bash
-python3 "${CLAUDE_SKILL_DIR}/scripts/export_by_label.py" "<label>" ["<output-path>"] [--space-key "<SPACEKEY>"] [--dry-run] [--skip-unchanged] [--cleanup-stale] [--jira-enrichment]
+python3 "${CLAUDE_SKILL_DIR}/scripts/export_by_label.py" "<label>" ["<output-path>"] [--space-key "<SPACEKEY>"] [--dry-run] [--no-skip-unchanged] [--no-cleanup-stale] [--jira-enrichment]
 ```
 
 ## Response Format

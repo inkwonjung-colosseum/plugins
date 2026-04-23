@@ -69,13 +69,15 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--skip-unchanged",
-        action="store_true",
-        help="Skip pages whose version matches the lockfile (incremental export).",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Skip pages whose version matches the lockfile (incremental export). Default: on.",
     )
     parser.add_argument(
         "--cleanup-stale",
-        action="store_true",
-        help="Remove local files for pages deleted or moved in Confluence.",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Remove local files for pages deleted or moved in Confluence. Default: on.",
     )
     parser.add_argument(
         "--jira-enrichment",

@@ -44,8 +44,8 @@ Optional output override:
 8. Do not print the stored API token.
 9. Run `cme pages <url1> [url2 ...]` with all supplied URLs in a single call.
 10. If `--output-path` was supplied, apply it only for this export via environment override. Do not persistently rewrite the user's `cme` config.
-11. `--skip-unchanged` skips pages whose version matches the lockfile (incremental export).
-12. `--cleanup-stale` removes local files for pages deleted or moved in Confluence.
+11. `--skip-unchanged` / `--no-skip-unchanged` — skips pages whose version matches the lockfile (incremental export). **Default: on.**
+12. `--cleanup-stale` / `--no-cleanup-stale` — removes local files for pages deleted or moved in Confluence. **Default: on.**
 13. `--jira-enrichment` fetches Jira issue summaries and includes them in the exported Markdown.
 14. `--dry-run` validates auth and config without running the export; prints "skipped" and returns.
 
