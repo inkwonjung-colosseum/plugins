@@ -1,1 +1,1 @@
-"""Shared runtime helpers for the Plan Kit plugin."""
+"""Shared runtime helpers for the Confluence Export Kit plugin."""

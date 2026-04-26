@@ -1,0 +1,8 @@
+interface:
+  display_name: "Planning Intake"
+  short_description: "Structure rough ideas into aligned draft planning context before document generation."
+  brand_color: "#0F766E"
+  default_prompt: "Turn this rough planning input into a structured planning context before creating documents."
+
+policy:
+  allow_implicit_invocation: true

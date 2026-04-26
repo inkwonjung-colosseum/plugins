@@ -1,0 +1,43 @@
+{
+  "name": "diagram-design",
+  "version": "1.0.0",
+  "description": "Codex plugin for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/diagram-design",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "svg",
+    "architecture",
+    "flowchart",
+    "visualization",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "diagram-design",
+    "shortDescription": "Create brand-aware technical diagrams as standalone HTML/SVG",
+    "longDescription": "diagram-design helps create architecture, flowchart, sequence, state machine, ER/data model, timeline, swimlane, quadrant, nested, tree, layer stack, venn, and pyramid diagrams with an editorial design system and project style guide.",
+    "developerName": "developjik",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/diagram-design",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "defaultPrompt": [
+      "Create an architecture diagram for this system.",
+      "Turn this workflow into a flowchart.",
+      "Make a sequence diagram for this API flow."
+    ],
+    "brandColor": "#B5523A"
+  }
+}

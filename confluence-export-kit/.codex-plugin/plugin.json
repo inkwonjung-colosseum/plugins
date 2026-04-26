@@ -1,0 +1,42 @@
+{
+  "name": "confluence-export-kit",
+  "version": "0.2.1",
+  "description": "Codex plugin for Confluence export-only workflows: unified config setup, page, space, org, page-with-descendants export, and confluence-markdown-exporter bootstrap.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/confluence-export-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "confluence",
+    "export",
+    "atlassian",
+    "markdown-exporter",
+    "cme",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "confluence-export-kit",
+    "shortDescription": "Export Confluence pages, spaces, and descendants to Markdown",
+    "longDescription": "confluence-export-kit provides export-only Confluence workflows powered by confluence-markdown-exporter. Configure auth and output defaults, then export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files.",
+    "developerName": "developjik",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/confluence-export-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "defaultPrompt": [
+      "Set my Confluence API key and default export output path so I can start exporting pages.",
+      "Export the Confluence space at <space-url> to a local Markdown folder.",
+      "Export one or more Confluence pages at <page-url> [<page-url> ...] to ./docs/."
+    ],
+    "brandColor": "#0052CC"
+  }
+}

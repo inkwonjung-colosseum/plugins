@@ -1,0 +1,8 @@
+interface:
+  display_name: "Export Confluence Page"
+  short_description: "Export one or more individual Confluence pages by URL to local Markdown."
+  brand_color: "#0052CC"
+  default_prompt: "Export one or more Confluence pages to ./docs/confluence: <page-url> [<page-url> ...]"
+
+policy:
+  allow_implicit_invocation: true

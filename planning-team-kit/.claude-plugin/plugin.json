@@ -1,0 +1,22 @@
+{
+  "name": "planning-team-kit",
+  "version": "0.1.0",
+  "description": "Claude Code and Codex compatible planning document quality kit for structured brainstorming, artifact generation, review, and handoff drafts.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-team-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "product",
+    "prd",
+    "documentation",
+    "quality",
+    "claude-plugin"
+  ],
+  "skills": "./skills/"
+}

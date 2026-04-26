@@ -1,6 +1,6 @@
 ---
 name: help
-description: Show a concise help summary for Confluence Export Kit.
+description: Show a concise help summary for confluence-export-kit.
 ---
 
 # Help
@@ -13,22 +13,29 @@ Explain the plugin's current command surface without implying that every upstrea
 
 ## Coverage
 
-1. State that this is an export-only Confluence plugin.
-2. Group commands under these buckets:
-   - Setup: `/confluence-export-kit:set-api-key`, `/confluence-export-kit:set-output-path`
-   - Export: `/confluence-export-kit:export-org`, `/confluence-export-kit:export-space`, `/confluence-export-kit:export-page-tree`, `/confluence-export-kit:export-page`
-   - Search export: `/confluence-export-kit:export-by-keyword`, `/confluence-export-kit:export-by-label`
-   - Config: `/confluence-export-kit:config-show`
+1. State that this is an export-only Confluence plugin that works with both Claude Code and Codex.
+2. Show command invocation for both agents. Claude Code uses `/confluence-export-kit:<skill>`, Codex uses `$<skill>` (per Codex's official plugin spec, which does not support colon-namespaced slash commands). Group commands under these buckets:
+   - Setup: `set-config`
+   - Export: `export-org`, `export-space`, `export-page-with-descendant`, `export-page`
+   - Config: `show-config`
+
+   When listing examples, show both forms, e.g.:
+   - Claude Code: `/confluence-export-kit:set-config --api-key <api-key> --email <email>`
+   - Codex: `$set-config --api-key <api-key> --email <email>`
 3. Mention these common export flags:
    - `--skip-unchanged`
    - `--cleanup-stale`
    - `--jira-enrichment`
    - `--dry-run`
    - `--max-workers N`
-4. Include a short quick start sequence that begins with:
+4. Include a short quick start sequence that begins with the agent-appropriate form:
 
 ```text
-/confluence-export-kit:set-api-key <api-key> <email>
+# Claude Code
+/confluence-export-kit:set-config --api-key <api-key> --email <email> --output-path <path>
+
+# Codex
+$set-config --api-key <api-key> --email <email> --output-path <path>
 ```
 
 5. Mention the explicit non-goals:

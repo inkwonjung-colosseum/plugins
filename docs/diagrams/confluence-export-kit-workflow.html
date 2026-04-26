@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>confluence-export-kit workflow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f5f5;
+      --ink: #2d3142;
+      --muted: #4f5d75;
+      --soft: #7a8399;
+      --accent: #eb6c36;
+      --accent-tint: rgba(235,108,54,0.08);
+      --link: #2e5aa8;
+      --rule: rgba(45,49,66,0.12);
+      --sans: 'Geist', system-ui, sans-serif;
+      --serif: 'Instrument Serif', serif;
+      --mono: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      padding: 48px 32px;
+    }
+
+    .frame {
+      width: min(100%, 1200px);
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(28px, 3vw, 36px);
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin-bottom: 24px;
+    }
+
+    svg {
+      display: block;
+      min-width: 960px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <p class="eyebrow">Flowchart · confluence-export-kit</p>
+    <h1>Confluence export-only workflow</h1>
+
+    <svg viewBox="0 0 1000 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+      <title id="title">confluence-export-kit 주요 workflow</title>
+      <desc id="desc">Confluence export 요청이 preflight, auth 확인, 범위 선택, cme 실행을 거쳐 로컬 Markdown으로 저장되는 흐름.</desc>
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
+        </marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/>
+        </marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/>
+        </marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <line x1="500" y1="88" x2="500" y2="120" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="500" y1="168" x2="500" y2="192" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="600" y1="240" x2="728" y2="240" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="500" y1="288" x2="500" y2="328" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <path d="M 808 264 C 808 308, 620 308, 620 352" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <line x1="500" y1="376" x2="500" y2="416" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <line x1="500" y1="464" x2="500" y2="504" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <rect x="640" y="228" width="40" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="660" y="240" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">NO</text>
+      <rect x="480" y="300" width="40" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="500" y="312" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">YES</text>
+      <rect x="480" y="388" width="40" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="500" y="400" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">RUN</text>
+
+      <rect x="400" y="40" width="200" height="48" rx="24" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="500" y="68" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Export 요청</text>
+
+      <rect x="388" y="120" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="500" y="140" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Runtime preflight</text>
+      <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">python / pipx / cme</text>
+
+      <polygon points="500,192 600,240 500,288 400,240" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Auth 설정됨?</text>
+      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">site credentials</text>
+
+      <rect x="728" y="216" width="160" height="48" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="808" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">set-config</text>
+      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">token probe + path</text>
+
+      <rect x="388" y="328" width="224" height="48" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+      <text x="500" y="348" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Export scope 선택</text>
+      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">org / space / tree / page</text>
+
+      <rect x="388" y="416" width="224" height="48" rx="6" fill="#ffffff" stroke="#2e5aa8" stroke-width="1"/>
+      <text x="500" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">cme 명령 실행</text>
+      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">skip / cleanup / dry-run</text>
+
+      <rect x="400" y="504" width="200" height="56" rx="28" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="500" y="528" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Local Markdown</text>
+      <text x="500" y="544" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">workspace output</text>
+
+      <line x1="40" y1="588" x2="960" y2="588" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="608" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">LEGEND</text>
+      <rect x="112" y="600" width="24" height="12" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="148" y="610" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Start / output</text>
+      <rect x="268" y="600" width="24" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="304" y="610" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Required step</text>
+      <polygon points="452,606 464,600 476,606 464,612" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="488" y="610" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Decision</text>
+      <line x1="620" y1="608" x2="652" y2="608" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <text x="664" y="610" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Happy path</text>
+      <line x1="792" y1="608" x2="824" y2="608" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <text x="836" y="610" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Config branch</text>
+    </svg>
+  </main>
+</body>
+</html>

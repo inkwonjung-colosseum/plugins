@@ -7,16 +7,16 @@
 
 ## 확인 기준
 
-- 확인 일자: 2026-04-22
+- 확인 일자: 2026-04-23
 - upstream 패키지 최신 확인 버전: `confluence-markdown-exporter 4.0.8`
-- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.0`
+- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.2.1`
 
 ## 한눈에 보기
 
 | 구분 | 범위 |
 | --- | --- |
 | `confluence-markdown-exporter` 본체 | Confluence page/space/org export CLI, config/auth 관리, Markdown 변환, attachment export, 증분 export, stale cleanup, Jira enrichment |
-| `confluence-export-kit` 래퍼 | auth 설정, page tree export, keyword 검색 후 matched page export, `python`/`pipx`/`cme` bootstrap |
+| `confluence-export-kit` 래퍼 | auth 설정, page/space/org/page-with-descendants export, `python`/`pipx`/`cme` bootstrap |
 
 ## 1. upstream `confluence-markdown-exporter` 본체 기능
 
@@ -59,7 +59,7 @@
 본체가 직접 지원하는 export 범위는 네 단계입니다.
 
 1. page 단건 또는 다건 export
-2. page tree export
+2. page-with-descendants export
 3. space 전체 export
 4. organization 전체 export
 
@@ -300,15 +300,12 @@ diagram 관련 기능은 다음과 같습니다.
 | 명령 | 설명 |
 | --- | --- |
 | `/confluence-export-kit:help` | 사용법 안내 |
-| `/confluence-export-kit:set-api-key <api-key> <email>` | `cme` auth 설정 (토큰 검증 기본 on, `--skip-validate` 로 생략 가능) |
-| `/confluence-export-kit:set-output-path <path>` | 기본 export 출력 경로를 `cme` config에 영구 저장 |
-| `/confluence-export-kit:export-page <page-url> [...]` | 하나 이상의 page URL export |
-| `/confluence-export-kit:export-page-tree <page-url> [output-path]` | page tree export |
-| `/confluence-export-kit:export-space <space-url> [output-path]` | space 전체 export |
-| `/confluence-export-kit:export-org <org-url> [output-path]` | org 전체 export |
-| `/confluence-export-kit:export-by-keyword <keyword> [output-path]` | keyword 검색 후 matched page만 export |
-| `/confluence-export-kit:export-by-label <label> [output-path]` | label 검색 후 matched page만 export |
-| `/confluence-export-kit:config-show [--json]` | 현재 `cme` 설정 출력 (`cme config list` 래퍼) |
+| `/confluence-export-kit:set-config [--api-key <api-key> --email <email>] [--output-path <path>] [--url <base-url>] [--skip-jira] [--skip-validate] [--config-path <path>]` | auth와 기본 export 출력 경로 통합 설정 |
+| `/confluence-export-kit:export-page <page-url> [<page-url> ...] [output-path]` | 하나 이상의 page URL export |
+| `/confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]` | 하나 이상의 page와 모든 descendant export |
+| `/confluence-export-kit:export-space <space-url> [<space-url> ...] [output-path]` | 하나 이상의 space 전체 export |
+| `/confluence-export-kit:export-org <org-url> [<org-url> ...] [output-path]` | 하나 이상의 org 전체 export |
+| `/confluence-export-kit:show-config [--json]` | 현재 `cme` 설정 출력 (`cme config list` 래퍼) |
 
 모든 export 명령은 다음 공통 플래그를 지원합니다.
 
@@ -317,7 +314,7 @@ diagram 관련 기능은 다음과 같습니다.
 | `--skip-unchanged` | lockfile 기반 증분 export — 변경 없는 page skip |
 | `--cleanup-stale` | Confluence에서 삭제/이동된 page의 로컬 파일 cleanup |
 | `--jira-enrichment` | Jira issue summary를 export된 Markdown에 포함 |
-| `--dry-run` | auth/config 검증만 수행, cme 실행 생략 (`export-page-tree`, `export-space`, `export-org`, `export-page`, `export-by-keyword`, `export-by-label`) |
+| `--dry-run` | auth/config 검증만 수행, cme 실행 생략 (`export-page-with-descendant`, `export-space`, `export-org`, `export-page`) |
 | `--max-workers N` | `CME_CONNECTION_CONFIG__MAX_WORKERS` 설정으로 병렬 worker 수 제어 |
 
 ### 3.2 래퍼가 추가하는 기능
@@ -327,19 +324,16 @@ diagram 관련 기능은 다음과 같습니다.
 - `python` / `pip` / `pipx` / `cme` preflight 확인
 - `pipx` 가 없으면 bootstrap
 - `cme` 가 없으면 `confluence-markdown-exporter` install 또는 upgrade
-- `set-api-key` 실행 시 `/wiki/rest/api/user/current` 로 토큰을 기본 검증 (opt-out: `--skip-validate`)
-- `export-by-keyword` 에서 CQL `title ~ ... or text ~ ...` 검색 수행
-- `export-by-label` 에서 CQL `label = "..."` 검색 수행
-- keyword/label search 결과를 `cme pages` batch 호출로 export
+- `set-config` 실행 시 `/wiki/rest/api/user/current` 로 토큰을 기본 검증 (opt-out: `--skip-validate`)
+- `set-config` 실행 시 기본적으로 `auth.jira` 도 같은 URL로 맞춤 (`--skip-jira` 로 생략 가능)
 - 모든 export 명령에서 `output-path` 를 환경변수 override로만 적용하고 config는 영구 수정하지 않음
-- `set-output-path` 명령으로 기본 output path를 `export.output_path` 에 영구 저장
+- `set-config` 명령으로 기본 output path를 `export.output_path` 에 영구 저장
 - 모든 export 명령에서 `--skip-unchanged` 플래그로 `CME_EXPORT__SKIP_UNCHANGED=true` 설정 가능
 - 모든 export 명령에서 `--cleanup-stale` 플래그로 `CME_EXPORT__CLEANUP_STALE=true` 설정 가능
 - 모든 export 명령에서 `--jira-enrichment` 플래그로 `CME_EXPORT__ENABLE_JIRA_ENRICHMENT=true` 설정 가능
 - 모든 export 명령에서 `--dry-run` 플래그로 cme 실행 없이 auth/config만 검증 가능
 - 모든 export 명령에서 `--max-workers N` 플래그로 `CME_CONNECTION_CONFIG__MAX_WORKERS` 설정 가능
-- `config-show` 명령으로 `cme config list` 결과를 Claude workflow에서 직접 확인 가능
-- `set-api-key` 실행 시 `auth.confluence` 뿐 아니라 `auth.jira` 도 같은 URL로 같이 맞춤
+- `show-config` 명령으로 `cme config list` 결과를 Claude Code / Codex workflow에서 직접 확인 가능
 
 ### 3.3 래퍼가 의도적으로 제외한 범위
 
@@ -355,19 +349,20 @@ diagram 관련 기능은 다음과 같습니다.
 | 기능 | upstream 본체 | `confluence-export-kit` 래퍼 |
 | --- | --- | --- |
 | page export | 지원 | 직접 노출 (`export-page`) |
-| page tree export | 지원 | 직접 노출 (`export-page-tree`) |
+| page-with-descendants export | 지원 | 직접 노출 (`export-page-with-descendant`) |
 | space export | 지원 | 직접 노출 (`export-space`) |
 | org export | 지원 | 직접 노출 (`export-org`) |
 | 증분 export (`skip_unchanged`) | 지원 | 모든 export 명령에 `--skip-unchanged` 플래그로 노출 |
-| 기본 출력 경로 설정 | config set으로 가능 | `set-output-path` 명령으로 직접 노출 |
+| 기본 출력 경로 설정 | config set으로 가능 | `set-config` 명령으로 직접 노출 |
 | config interactive menu | 지원 | 미노출 |
-| config list/get/set/edit/reset/path | 지원 | 미노출 |
+| config list | 지원 | `show-config` 명령으로 제한 노출 |
+| config set | 지원 | `set-config` workflow로 제한 노출 |
+| config get/edit/reset/path | 지원 | 미노출 |
 | version/bugreport | 지원 | 미노출 |
 | multi-instance auth | 지원 | helper script로 일부 지원 |
 | token validation | 본체 표준 기능은 아님 | 기본 동작으로 추가 (opt-out: `--skip-validate`) |
-| keyword search export | 표준 CLI 없음 | 래퍼가 추가 (`export-by-keyword`) |
-| label search export | 표준 CLI 없음 | 래퍼가 추가 (`export-by-label`) |
-| config 조회 | `cme config list` 지원 | `config-show` 명령으로 노출 |
+| keyword search export | 표준 CLI 없음 | 미노출 |
+| label search export | 표준 CLI 없음 | 미노출 |
 | 병렬 worker 수 제어 | `connection_config.max_workers` 지원 | 모든 export 명령에 `--max-workers N` 플래그로 노출 |
 | dry-run (export 전 검증) | 표준 CLI 없음 | 모든 export 명령에 `--dry-run` 플래그로 추가 |
 | stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` 플래그로 노출 |
@@ -390,20 +385,25 @@ diagram 관련 기능은 다음과 같습니다.
 ### 로컬 래퍼
 
 - `confluence-export-kit/README.md`
-- `confluence-export-kit/README.en.md`
 - `confluence-export-kit/.claude-plugin/plugin.json`
-- `confluence-export-kit/commands/help.md`
-- `confluence-export-kit/commands/set-api-key.md`
-- `confluence-export-kit/commands/set-output-path.md`
-- `confluence-export-kit/commands/export-page.md`
-- `confluence-export-kit/commands/export-page-tree.md`
-- `confluence-export-kit/commands/export-space.md`
-- `confluence-export-kit/commands/export-org.md`
-- `confluence-export-kit/commands/export-by-keyword.md`
-- `confluence-export-kit/commands/export-by-label.md`
-- `confluence-export-kit/commands/config-show.md`
+- `confluence-export-kit/.codex-plugin/plugin.json`
 - `confluence-export-kit/scripts/cme_runtime.py`
-- `confluence-export-kit/skills/set-api-key/scripts/set_cme_api_key.py`
-- `confluence-export-kit/skills/export-page-tree/scripts/export_page_tree.py`
-- `confluence-export-kit/skills/export-by-keyword/scripts/export_by_keyword.py`
-
+- `confluence-export-kit/skills/help/SKILL.md`
+- `confluence-export-kit/skills/set-config/SKILL.md`
+- `confluence-export-kit/skills/set-config/scripts/set_config.py`
+- `confluence-export-kit/skills/export-page/SKILL.md`
+- `confluence-export-kit/skills/export-page/scripts/export_page.py`
+- `confluence-export-kit/skills/export-page-with-descendant/SKILL.md`
+- `confluence-export-kit/skills/export-page-with-descendant/scripts/export_page_with_descendant.py`
+- `confluence-export-kit/skills/export-space/SKILL.md`
+- `confluence-export-kit/skills/export-space/scripts/export_space.py`
+- `confluence-export-kit/skills/export-org/SKILL.md`
+- `confluence-export-kit/skills/export-org/scripts/export_org.py`
+- `confluence-export-kit/skills/show-config/SKILL.md`
+- `confluence-export-kit/skills/show-config/scripts/show_config.py`
+- `confluence-export-kit/tests/test_export_page.py`
+- `confluence-export-kit/tests/test_export_page_with_descendant.py`
+- `confluence-export-kit/tests/test_export_space.py`
+- `confluence-export-kit/tests/test_export_org.py`
+- `confluence-export-kit/tests/test_set_config.py`
+- `confluence-export-kit/tests/test_show_config.py`
