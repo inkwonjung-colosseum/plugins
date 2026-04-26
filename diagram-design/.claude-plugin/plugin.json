@@ -1,0 +1,22 @@
+{
+  "name": "diagram-design",
+  "version": "1.0.0",
+  "description": "Claude Code and Codex compatible diagram design kit for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/diagram-design",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "svg",
+    "architecture",
+    "flowchart",
+    "visualization",
+    "claude-plugin"
+  ],
+  "skills": "./skills/"
+}
