@@ -1,37 +1,37 @@
 ---
-name: export-space
-description: "Export all pages in one or more Confluence spaces. Usage: /confluence-export-kit:export-space <space-url> [<space-url> ...] [output-path]"
-argument-hint: "<space-url> [<space-url> ...] [output-path]"
+name: export-page-with-descendant
+description: "Export one or more Confluence pages with descendants. Usage: /confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]"
+argument-hint: "<page-url> [<page-url> ...] [output-path]"
 ---
 
-# Export Space
+# Export Page With Descendant
 
-Export every page in one or more Confluence spaces with `cme spaces`.
+Export one or more Confluence root pages and every descendant beneath each root with `cme pages-with-descendants`.
 
 ## Invocation
 
 Claude Code:
 
 ```text
-/confluence-export-kit:export-space <space-url>
-/confluence-export-kit:export-space <space-url> <output-path>
-/confluence-export-kit:export-space <space-url> <space-url2> [output-path]
+/confluence-export-kit:export-page-with-descendant <page-url>
+/confluence-export-kit:export-page-with-descendant <page-url> <output-path>
+/confluence-export-kit:export-page-with-descendant <page-url> <page-url2> [output-path]
 ```
 
 Codex:
 
 ```text
-$export-space <space-url>
-$export-space <space-url> <output-path>
-$export-space <space-url> <space-url2> [output-path]
+$export-page-with-descendant <page-url>
+$export-page-with-descendant <page-url> <output-path>
+$export-page-with-descendant <page-url> <page-url2> [output-path]
 ```
 
 ## Rules
 
-1. Treat the arguments as one or more Confluence space URLs (e.g. `https://company.atlassian.net/wiki/spaces/SPACEKEY`).
+1. Treat the arguments as one or more Confluence root page URLs.
 2. If the final argument is not URL-like, treat it as an optional export output path override.
 3. Before export, validate that Python, `pipx`, and `cme` are usable.
-4. Extract the base site from each space URL (`scheme://netloc`) and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for every site.
+4. Read the `cme` config file and verify that every page URL's base site already has a configured `auth.confluence` entry with both `username` and `api_token`.
 5. If auth is missing or incomplete, stop and tell the user to run one of:
 
 ```text
@@ -43,7 +43,7 @@ $set-config --api-key <api-key> --email <email>
 ```
 
 6. Do not print the stored API token.
-7. Run `cme spaces <space-url> [<space-url2> ...]` once auth is confirmed.
+7. Run `cme pages-with-descendants <page-url> [<page-url2> ...]` once auth is confirmed.
 8. If an output path was supplied, apply it only for this export via environment override. Do not persistently rewrite the user's `cme` config.
 9. `--skip-unchanged` / `--no-skip-unchanged` — skips pages whose version matches the lockfile (incremental export). **Default: on.**
 10. `--cleanup-stale` / `--no-cleanup-stale` — removes local files for pages deleted or moved in Confluence. **Default: on.**
@@ -123,36 +123,36 @@ Do not proceed to Step 2 until `PYTHON_BIN` (Bash) or `$PythonCommand` (PowerShe
 
 ### Step 2 — Run the helper script
 
-If no space URL argument was provided, stop and tell the user to run one of:
+If no page URL argument was provided, stop and tell the user to run one of:
 
 ```text
 # Claude Code
-/confluence-export-kit:export-space <space-url> [<space-url> ...] [output-path]
+/confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]
 
 # Codex
-$export-space <space-url> [<space-url> ...] [output-path]
+$export-page-with-descendant <page-url> [<page-url> ...] [output-path]
 ```
 
-Otherwise run the helper script in this skill directory. The resolver handles both Claude Code (`CLAUDE_SKILL_DIR` injected) and Codex (falls back to the documented install cache `~/.codex/plugins/cache/*/confluence-export-kit/*/skills/export-space`, since Codex does not inject a skill-dir env var per its official plugin spec):
+Otherwise run the helper script in this skill directory. The resolver handles both Claude Code (`CLAUDE_SKILL_DIR` injected) and Codex (falls back to the documented install cache `~/.codex/plugins/cache/*/confluence-export-kit/*/skills/export-page-with-descendant`, since Codex does not inject a skill-dir env var per its official plugin spec):
 
 macOS / Linux Bash:
 
 ```bash
 SKILL_DIR="${CLAUDE_SKILL_DIR:-${CODEX_SKILL_DIR:-}}"
-if [ ! -f "$SKILL_DIR/scripts/export_space.py" ]; then
+if [ ! -f "$SKILL_DIR/scripts/export_page_with_descendant.py" ]; then
   for c in \
-    "$HOME/.codex/plugins/cache/"*"/confluence-export-kit/"*"/skills/export-space" \
-    "./skills/export-space" \
-    "./export-space" \
+    "$HOME/.codex/plugins/cache/"*"/confluence-export-kit/"*"/skills/export-page-with-descendant" \
+    "./skills/export-page-with-descendant" \
+    "./export-page-with-descendant" \
     "."; do
-    if [ -f "$c/scripts/export_space.py" ]; then
+    if [ -f "$c/scripts/export_page_with_descendant.py" ]; then
       SKILL_DIR="$c"
       break
     fi
   done
 fi
 
-"$PYTHON_BIN" "$SKILL_DIR/scripts/export_space.py" "<space-url>" ["<space-url2>" ...] ["<output-path>"]
+"$PYTHON_BIN" "$SKILL_DIR/scripts/export_page_with_descendant.py" "<page-url>" ["<page-url2>" ...] ["<output-path>"]
 ```
 
 Windows PowerShell:
@@ -161,13 +161,13 @@ Windows PowerShell:
 $SkillDir = $env:CLAUDE_SKILL_DIR
 if (-not $SkillDir) { $SkillDir = $env:CODEX_SKILL_DIR }
 
-$ScriptRelativePath = "scripts/export_space.py".Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+$ScriptRelativePath = "scripts/export_page_with_descendant.py".Replace('/', [System.IO.Path]::DirectorySeparatorChar)
 $SkillCandidates = @()
 if ($SkillDir) { $SkillCandidates += $SkillDir }
 $SkillCandidates += @(
-  "$HOME/.codex/plugins/cache/*/confluence-export-kit/*/skills/export-space",
-  "./skills/export-space",
-  "./export-space",
+  "$HOME/.codex/plugins/cache/*/confluence-export-kit/*/skills/export-page-with-descendant",
+  "./skills/export-page-with-descendant",
+  "./export-page-with-descendant",
   "."
 )
 
@@ -184,11 +184,11 @@ foreach ($Candidate in $SkillCandidates) {
 }
 
 if (-not $ResolvedSkillDir) {
-  Write-Error "Could not locate scripts/export_space.py for confluence-export-kit export-space."
+  Write-Error "Could not locate scripts/export_page_with_descendant.py for confluence-export-kit export-page-with-descendant."
   exit 1
 }
 
-& $PythonCommand @PythonArgs (Join-Path $ResolvedSkillDir $ScriptRelativePath) "<space-url>" ["<space-url2>" ...] ["<output-path>"]
+& $PythonCommand @PythonArgs (Join-Path $ResolvedSkillDir $ScriptRelativePath) "<page-url>" ["<page-url2>" ...] ["<output-path>"]
 ```
 
 ## Response Format
@@ -198,6 +198,6 @@ After the script finishes:
 - report Python/pipx/cme preflight status
 - report which Confluence site(s) were matched
 - confirm that auth was already configured
-- report the space URL(s) being exported
+- report how many root pages are being exported and list their URLs
 - report the effective export output path
-- confirm that the space export command completed
+- confirm that the page-with-descendants export command completed

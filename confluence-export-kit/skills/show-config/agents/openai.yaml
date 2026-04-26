@@ -1,0 +1,8 @@
+interface:
+  display_name: "Show cme Configuration"
+  short_description: "Print the current confluence-markdown-exporter configuration (text or JSON)."
+  brand_color: "#0052CC"
+  default_prompt: "Show me the current confluence-markdown-exporter configuration."
+
+policy:
+  allow_implicit_invocation: true

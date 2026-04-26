@@ -16,7 +16,7 @@ from scripts.cme_runtime import ensure_python_preflight
 from scripts.cme_runtime import run_command
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Show the current confluence-markdown-exporter configuration."
     )
@@ -25,7 +25,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Output config as JSON instead of the default human-readable format.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def main() -> int:

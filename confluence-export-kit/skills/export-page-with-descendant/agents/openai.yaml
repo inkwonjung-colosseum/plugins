@@ -1,0 +1,8 @@
+interface:
+  display_name: "Export Confluence Page With Descendant"
+  short_description: "Export one or more Confluence root pages and every descendant under them to local Markdown."
+  brand_color: "#0052CC"
+  default_prompt: "Export the Confluence page roots at <page-url> [<page-url> ...] to ./docs/confluence."
+
+policy:
+  allow_implicit_invocation: true

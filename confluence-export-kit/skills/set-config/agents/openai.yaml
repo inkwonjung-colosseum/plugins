@@ -1,0 +1,8 @@
+interface:
+  display_name: "Set Confluence Export Config"
+  short_description: "Configure Confluence auth and default export output path for confluence-export-kit."
+  brand_color: "#0052CC"
+  default_prompt: "Set my Confluence API key and default export output path for confluence-export-kit."
+
+policy:
+  allow_implicit_invocation: true

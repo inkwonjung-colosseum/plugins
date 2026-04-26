@@ -4,83 +4,60 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[3]
 if str(PLUGIN_ROOT) not in sys.path:
     sys.path.insert(0, str(PLUGIN_ROOT))
 
-from scripts.cme_runtime import auth_entry_is_complete
-from scripts.cme_runtime import ensure_cme_available
-from scripts.cme_runtime import ensure_python_preflight
-from scripts.cme_runtime import extract_base_url
-from scripts.cme_runtime import get_configured_auth_entry
-from scripts.cme_runtime import load_json
-from scripts.cme_runtime import resolve_config_path
-from scripts.cme_runtime import run_command
+from scripts.cme_runtime import (
+    add_export_args,
+    build_export_env,
+    effective_output_path,
+    ensure_cme_available,
+    ensure_python_preflight,
+    extract_base_url,
+    load_json,
+    print_export_flags,
+    require_auth,
+    resolve_config_path,
+    run_cme_and_report,
+)
 
 
-DEFAULT_OUTPUT_PATH = "confluence"
+def is_url_like(value: str) -> bool:
+    parsed = urlparse(value)
+    return bool(parsed.scheme or parsed.netloc)
 
 
-def parse_args() -> argparse.Namespace:
+def split_org_targets(targets: list[str]) -> tuple[list[str], str | None]:
+    if len(targets) > 1 and not is_url_like(targets[-1]):
+        return targets[:-1], targets[-1]
+    return targets, None
+
+
+def unique_preserving_order(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(values))
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Export all spaces and pages under a Confluence org with confluence-markdown-exporter."
     )
     parser.add_argument(
-        "org_url",
-        help="Confluence instance root URL (e.g. https://company.atlassian.net)",
+        "org_targets",
+        nargs="+",
+        help=(
+            "One or more Confluence instance root URLs "
+            "(e.g. https://company.atlassian.net), optionally followed by an output path."
+        ),
     )
-    parser.add_argument(
-        "output_path",
-        nargs="?",
-        help="Optional one-off export output path override. Does not persist to cme config.",
-    )
-    parser.add_argument(
-        "--config-path",
-        help="Optional explicit path to the confluence-markdown-exporter config file",
-    )
-    parser.add_argument(
-        "--skip-unchanged",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Skip pages whose version matches the lockfile (incremental export). Default: on.",
-    )
-    parser.add_argument(
-        "--cleanup-stale",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Remove local files for pages deleted or moved in Confluence. Default: on.",
-    )
-    parser.add_argument(
-        "--jira-enrichment",
-        action="store_true",
-        help="Fetch Jira issue summaries and include them in exported Markdown.",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Validate auth and config without running the export.",
-    )
-    parser.add_argument(
-        "--max-workers",
-        type=int,
-        metavar="N",
-        help="Override the number of parallel export workers.",
-    )
-    return parser.parse_args()
-
-
-def effective_output_path(config_data: dict, override: str | None) -> str:
-    if override:
-        return override
-    export = config_data.get("export", {})
-    if not isinstance(export, dict):
-        return DEFAULT_OUTPUT_PATH
-    current = export.get("output_path")
-    return current if isinstance(current, str) and current.strip() else DEFAULT_OUTPUT_PATH
+    add_export_args(parser)
+    args = parser.parse_args(argv)
+    args.org_urls, args.output_path = split_org_targets(args.org_targets)
+    return args
 
 
 def main() -> int:
@@ -90,57 +67,32 @@ def main() -> int:
     config_path = resolve_config_path(args.config_path, cme_path)
     config_data = load_json(config_path)
 
-    base_url = extract_base_url(args.org_url)
-    auth_entry = get_configured_auth_entry(config_data, base_url)
-    if not auth_entry_is_complete(auth_entry):
-        raise RuntimeError(
-            "Confluence auth is not configured for this site. "
-            "Run `/confluence-export-kit:set-api-key <api-key> <email>` first."
-        )
-
+    base_urls = unique_preserving_order(
+        [extract_base_url(org_url) for org_url in args.org_urls]
+    )
+    for base_url in base_urls:
+        require_auth(config_data, base_url)
     output_path = effective_output_path(config_data, args.output_path)
-    env = os.environ.copy()
-    if args.output_path:
-        env["CME_EXPORT__OUTPUT_PATH"] = args.output_path
-    if args.skip_unchanged:
-        env["CME_EXPORT__SKIP_UNCHANGED"] = "true"
-    if args.cleanup_stale:
-        env["CME_EXPORT__CLEANUP_STALE"] = "true"
-    if args.jira_enrichment:
-        env["CME_EXPORT__ENABLE_JIRA_ENRICHMENT"] = "true"
-    if args.max_workers is not None:
-        env["CME_CONNECTION_CONFIG__MAX_WORKERS"] = str(args.max_workers)
 
     print(f"Python executable: {python_path}")
     print(f"Pipx status: {pipx_status}")
     print(f"CME status: {cme_status}")
     print(f"CME executable: {cme_path}")
     print(f"Config path: {config_path}")
-    print(f"Matched site: {base_url}")
+    print(f"Matched sites: {', '.join(base_urls)}")
     print("Auth status: configured")
-    print(f"Org URL: {args.org_url}")
+    print(f"Org URLs: {', '.join(args.org_urls)}")
     print(f"Effective output path: {output_path}")
-    print(f"Skip unchanged: {'yes' if args.skip_unchanged else 'no'}")
-    print(f"Cleanup stale: {'yes' if args.cleanup_stale else 'no'}")
-    print(f"Jira enrichment: {'yes' if args.jira_enrichment else 'no'}")
-    print(f"Max workers: {args.max_workers if args.max_workers is not None else '(default)'}")
+    print_export_flags(args)
     if args.dry_run:
         print("Export command: skipped (dry-run mode)")
         return 0
 
-    result = run_command([cme_path, "orgs", args.org_url], env=env)
-
-    stdout = result.stdout.strip()
-    if stdout:
-        print("--- cme stdout ---")
-        print(stdout)
-
-    stderr = result.stderr.strip()
-    if stderr:
-        print("--- cme stderr ---")
-        print(stderr)
-
-    print("Export command: completed")
+    run_cme_and_report(
+        cme_path,
+        ["orgs", *args.org_urls],
+        build_export_env(args, config_path=config_path, output_path=output_path),
+    )
     return 0
 
 

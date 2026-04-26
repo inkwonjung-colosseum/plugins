@@ -1,0 +1,8 @@
+interface:
+  display_name: "confluence-export-kit Help"
+  short_description: "Show a concise operational help summary for confluence-export-kit commands and flags."
+  brand_color: "#0052CC"
+  default_prompt: "Show confluence-export-kit help — what commands are available?"
+
+policy:
+  allow_implicit_invocation: true
