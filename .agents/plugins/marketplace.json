@@ -1,0 +1,56 @@
+{
+  "name": "inkwonjung-colosseum",
+  "interface": {
+    "displayName": "inkwonjung-colosseum plugins"
+  },
+  "plugins": [
+    {
+      "name": "confluence-export-kit",
+      "source": {
+        "source": "local",
+        "path": "./confluence-export-kit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "skeleton-plugin",
+      "source": {
+        "source": "local",
+        "path": "./skeleton-plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "planning-team-kit",
+      "source": {
+        "source": "local",
+        "path": "./planning-team-kit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "diagram-design",
+      "source": {
+        "source": "local",
+        "path": "./diagram-design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

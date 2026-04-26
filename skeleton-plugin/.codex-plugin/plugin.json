@@ -1,6 +1,6 @@
 {
   "name": "skeleton-plugin",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Starter template for building plugins that support both Codex and Claude Code platforms.",
   "author": {
     "name": "developjik",
