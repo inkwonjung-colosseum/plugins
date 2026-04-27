@@ -1,7 +1,7 @@
 {
   "name": "confluence-export-kit",
   "version": "0.1.2",
-  "description": "Codex plugin for Confluence export and local export-index workflows: unified config setup, page, space, org, page-with-descendants export, export indexing, and confluence-markdown-exporter bootstrap.",
+  "description": "Codex plugin for Confluence export and local export-index workflows: config setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "confluence-export-kit",
     "shortDescription": "Export Confluence content and index local Markdown exports",
-    "longDescription": "confluence-export-kit provides Confluence export and local export-index workflows powered by confluence-markdown-exporter. Configure auth and output defaults, export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files, then index already-exported Markdown for agent-friendly reading.",
+    "longDescription": "confluence-export-kit provides Confluence export and local export-index workflows powered by confluence-markdown-exporter. Configure auth and output defaults, export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files, then automatically index the exported output for agent-friendly reading. You can also re-index an already-exported Markdown folder.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

@@ -339,11 +339,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=["AGENTS.md", "CLAUDE.md"],
         help="Agent guidance files to create or update. Default: AGENTS.md CLAUDE.md",
     )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Print planned writes without creating or modifying files.",
-    )
     return parser.parse_args(argv)
 
 
@@ -392,14 +387,6 @@ def main(argv: list[str] | None = None) -> int:
     ]
     if not args.no_agent_rules:
         planned_files.extend(Path(file_name) for file_name in args.agent_files)
-
-    if args.dry_run:
-        print(f"Source ID: {source_id}")
-        print(f"Markdown files: {len(entries)}")
-        print("Planned writes:")
-        for path in planned_files:
-            print(f"- {path}")
-        return 0
 
     source_root.mkdir(parents=True, exist_ok=True)
     write_jsonl(source_index_path, entries)

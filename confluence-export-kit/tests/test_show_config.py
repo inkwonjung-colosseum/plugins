@@ -33,30 +33,18 @@ class ShowConfigTests(unittest.TestCase):
         completed = mock.Mock(stdout="export.output_path = confluence\n", stderr="")
         with (
             mock.patch.object(sys, "argv", ["show_config.py"]),
-            mock.patch.object(self.module, "ensure_python_preflight", return_value="/python"),
-            mock.patch.object(
-                self.module,
-                "ensure_cme_available",
-                return_value=("/usr/local/bin/cme", "already available", "already available"),
-            ),
             mock.patch.object(self.module, "run_command", return_value=completed) as run_command,
             mock.patch("builtins.print"),
         ):
             exit_code = self.module.main()
 
         self.assertEqual(exit_code, 0)
-        run_command.assert_called_once_with(["/usr/local/bin/cme", "config", "list"])
+        run_command.assert_called_once_with(["cme", "config", "list"])
 
     def test_main_runs_cme_config_list_json(self) -> None:
         completed = mock.Mock(stdout='{"export": {}}\n', stderr="")
         with (
             mock.patch.object(sys, "argv", ["show_config.py", "--json"]),
-            mock.patch.object(self.module, "ensure_python_preflight", return_value="/python"),
-            mock.patch.object(
-                self.module,
-                "ensure_cme_available",
-                return_value=("/usr/local/bin/cme", "already available", "already available"),
-            ),
             mock.patch.object(self.module, "run_command", return_value=completed) as run_command,
             mock.patch("builtins.print"),
         ):
@@ -64,7 +52,7 @@ class ShowConfigTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         run_command.assert_called_once_with(
-            ["/usr/local/bin/cme", "config", "list", "-o", "json"]
+            ["cme", "config", "list", "-o", "json"]
         )
 
 

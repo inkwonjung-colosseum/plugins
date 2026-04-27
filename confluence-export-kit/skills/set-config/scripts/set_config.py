@@ -15,12 +15,10 @@ from scripts.cme_runtime import (
     DEFAULT_SITE,
     canonicalize_base_url,
     chmod_config_private,
-    ensure_cme_available,
-    ensure_python_preflight,
+    ensure_exporter_installed_with_pip,
     load_json,
     normalize_nonempty,
     platform_label,
-    probe_atlassian_token,
     resolve_config_path,
     set_auth_credentials,
     set_default_output_path,
@@ -52,11 +50,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Do not mirror credentials into auth.jira for the same site.",
     )
-    parser.add_argument(
-        "--skip-validate",
-        action="store_true",
-        help="Skip probing Atlassian /rest/api/user/current before writing config.",
-    )
     args = parser.parse_args(argv)
 
     wants_auth = bool(args.api_key or args.email)
@@ -70,23 +63,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    python_path = ensure_python_preflight()
-    cme_path, cme_status, installer_status = ensure_cme_available()
-    config_path = resolve_config_path(args.config_path, cme_path)
+    exporter_status = ensure_exporter_installed_with_pip()
+    config_path = resolve_config_path(args.config_path, "cme")
     data = load_json(config_path)
 
     auth_updated = False
     jira_updated = False
-    probe_status = "not requested"
     site = "(not updated)"
     if args.api_key:
         api_token = normalize_nonempty(args.api_key, "API token")
         username = normalize_nonempty(args.email, "Email")
         site = canonicalize_base_url(args.url)
-        probe_status = "skipped"
-        if not args.skip_validate:
-            probe_identity = probe_atlassian_token(site, username, api_token)
-            probe_status = f"ok ({probe_identity})"
         jira_updated = set_auth_credentials(
             data,
             site,
@@ -108,17 +95,13 @@ def main() -> int:
         chmod_config_private(config_path)
 
     print(f"Platform: {platform_label()}")
-    print(f"Python executable: {python_path}")
-    print(f"Installer status: {installer_status}")
-    print(f"CME status: {cme_status}")
-    print(f"CME executable: {cme_path}")
+    print(f"Exporter status: {exporter_status}")
     print(f"Updated config: {config_path}")
     print(f"Auth updated: {'yes' if auth_updated else 'no'}")
     if auth_updated:
         print(f"Site: {site}")
         print("Username status: set from required email argument")
         print(f"Jira mirror updated: {'yes' if jira_updated else 'no'}")
-        print(f"Token probe: {probe_status}")
     print(f"Output path updated: {'yes' if output_updated else 'no'}")
     if output_updated:
         print(f"Previous output path: {output_previous}")

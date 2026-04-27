@@ -49,23 +49,23 @@ class SetConfigTests(unittest.TestCase):
                 "https://alpha.atlassian.net/wiki/spaces/ENG",
                 "--output-path",
                 "./docs/confluence",
-                "--skip-validate",
             ]
 
             with (
                 mock.patch.object(sys, "argv", argv),
-                mock.patch.object(self.module, "ensure_python_preflight", return_value="/python"),
                 mock.patch.object(
                     self.module,
-                    "ensure_cme_available",
-                    return_value=("/usr/local/bin/cme", "already available", "already available"),
-                ),
+                    "ensure_exporter_installed_with_pip",
+                    return_value="already installed",
+                ) as ensure_exporter,
                 mock.patch.object(self.module, "resolve_config_path", return_value=config_path),
                 mock.patch("builtins.print") as print_mock,
             ):
                 exit_code = self.module.main()
 
             self.assertEqual(exit_code, 0)
+            ensure_exporter.assert_called_once_with()
+            self.assertFalse(hasattr(self.module, "probe_atlassian_token"))
             config_data = json.loads(config_path.read_text())
             self.assertEqual(
                 config_data["auth"]["confluence"]["https://alpha.atlassian.net"]["username"],

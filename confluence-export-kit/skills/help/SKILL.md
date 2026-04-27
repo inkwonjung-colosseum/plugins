@@ -14,6 +14,7 @@ Explain the plugin's current command surface without implying that every upstrea
 ## Coverage
 
 1. State that this is a Confluence export and local export-index plugin that works with both Claude Code and Codex. Clarify that `index-export` only indexes local Markdown files that were already exported from Confluence.
+   Also mention that export commands automatically index the effective output path after a successful `cme` export.
 2. Show command invocation for both agents. Claude Code uses `/confluence-export-kit:<skill>`, Codex uses `$<skill>` (per Codex's official plugin spec, which does not support colon-namespaced slash commands). Group commands under these buckets:
    - Setup: `set-config`
    - Export: `export-org`, `export-space`, `export-page-with-descendant`, `export-page`
@@ -27,7 +28,6 @@ Explain the plugin's current command surface without implying that every upstrea
    - `--skip-unchanged`
    - `--cleanup-stale`
    - `--jira-enrichment`
-   - `--dry-run`
    - `--max-workers N`
 4. Include a short quick start sequence that begins with the agent-appropriate form:
 

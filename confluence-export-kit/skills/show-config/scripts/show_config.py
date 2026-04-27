@@ -11,8 +11,6 @@ PLUGIN_ROOT = Path(__file__).resolve().parents[3]
 if str(PLUGIN_ROOT) not in sys.path:
     sys.path.insert(0, str(PLUGIN_ROOT))
 
-from scripts.cme_runtime import ensure_cme_available
-from scripts.cme_runtime import ensure_python_preflight
 from scripts.cme_runtime import run_command
 
 
@@ -30,20 +28,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    python_path = ensure_python_preflight()
-    cme_path, cme_status, installer_status = ensure_cme_available()
 
-    cmd = [cme_path, "config", "list"]
+    cmd = ["cme", "config", "list"]
     if args.json:
         cmd += ["-o", "json"]
 
     result = run_command(cmd)
 
-    print(f"Python executable: {python_path}")
-    print(f"Installer status: {installer_status}")
-    print(f"CME status: {cme_status}")
-    print(f"CME executable: {cme_path}")
-    print()
     print("--- cme config list ---")
     output = result.stdout.strip()
     if output:

@@ -69,49 +69,43 @@ class CmeRuntimeTests(unittest.TestCase):
         self.assertEqual(env["CME_EXPORT__ENABLE_JIRA_ENRICHMENT"], "true")
         self.assertEqual(env["CME_CONNECTION_CONFIG__MAX_WORKERS"], "3")
 
-    def test_python_preflight_rejects_python_below_310(self) -> None:
-        with mock.patch.object(self.module.sys, "version_info", (3, 9, 6)):
-            with self.assertRaisesRegex(RuntimeError, "Python 3.10\\+"):
-                self.module.ensure_python_preflight()
+    def test_exporter_install_check_uses_pip_show_when_present(self) -> None:
+        with mock.patch.object(self.module, "run_command") as run_command:
+            status = self.module.ensure_exporter_installed_with_pip()
 
-    def test_cme_preflight_does_not_bootstrap_pipx_when_cme_already_exists(self) -> None:
-        with (
-            mock.patch.object(self.module, "find_named_executable", return_value="/usr/local/bin/cme"),
-            mock.patch.object(self.module, "validate_cme") as validate_mock,
-            mock.patch.object(self.module, "ensure_pipx_available") as pipx_mock,
-        ):
-            cme_path, cme_status, installer_status = self.module.ensure_cme_available()
-
-        self.assertEqual(cme_path, "/usr/local/bin/cme")
-        self.assertEqual(cme_status, "already available")
-        self.assertEqual(installer_status, "not needed (cme already available)")
-        validate_mock.assert_called_once_with("/usr/local/bin/cme")
-        pipx_mock.assert_not_called()
-
-    def test_load_cme_config_reads_json_from_cme_command_with_resolved_config_path(self) -> None:
-        config_path = Path("/tmp/cme-app-data.json")
-        result = subprocess.CompletedProcess(
-            ["/usr/local/bin/cme", "config", "list", "-o", "json"],
-            0,
-            stdout='{"auth":{"confluence":{"https://alpha.atlassian.net":{"username":"user@example.com","api_token":"token"}}}}',
-            stderr="",
+        self.assertEqual(status, "already installed")
+        run_command.assert_called_once_with(
+            [
+                self.module.sys.executable,
+                "-m",
+                "pip",
+                "show",
+                "confluence-markdown-exporter",
+            ]
         )
 
-        with mock.patch.object(self.module, "run_command", return_value=result) as run_command:
-            config = self.module.load_cme_config("/usr/local/bin/cme", config_path)
+    def test_exporter_install_check_installs_with_pip_when_missing(self) -> None:
+        with mock.patch.object(
+            self.module,
+            "run_command",
+            side_effect=[
+                subprocess.CalledProcessError(1, ["pip", "show"]),
+                subprocess.CompletedProcess(["pip", "install"], 0, "", ""),
+            ],
+        ) as run_command:
+            status = self.module.ensure_exporter_installed_with_pip()
 
+        self.assertEqual(status, "installed via pip")
+        self.assertEqual(run_command.call_count, 2)
         self.assertEqual(
-            config["auth"]["confluence"]["https://alpha.atlassian.net"]["username"],
-            "user@example.com",
-        )
-        run_command.assert_called_once()
-        self.assertEqual(
-            run_command.call_args.args[0],
-            ["/usr/local/bin/cme", "config", "list", "-o", "json"],
-        )
-        self.assertEqual(
-            run_command.call_args.kwargs["env"]["CME_CONFIG_PATH"],
-            str(config_path),
+            run_command.call_args_list[1].args[0],
+            [
+                self.module.sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "confluence-markdown-exporter",
+            ],
         )
 
 

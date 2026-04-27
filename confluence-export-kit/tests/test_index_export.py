@@ -157,25 +157,6 @@ class IndexExportTests(unittest.TestCase):
         )
         self.assertEqual(entries[0]["title"], "One")
 
-    def test_dry_run_does_not_write_index_or_agent_files(self) -> None:
-        export_root = self.tmp / "Product Team Space"
-        self.write_source("Product Team Space", "Feature List.md", "# Feature List\n")
-
-        exit_code = self.module.main(
-            [
-                str(export_root),
-                "--index-root",
-                str(self.tmp / ".confluence-index"),
-                "--agent-files",
-                str(self.tmp / "AGENTS.md"),
-                "--dry-run",
-            ]
-        )
-
-        self.assertEqual(exit_code, 0)
-        self.assertFalse((self.tmp / ".confluence-index").exists())
-        self.assertFalse((self.tmp / "AGENTS.md").exists())
-
 
 if __name__ == "__main__":
     unittest.main()

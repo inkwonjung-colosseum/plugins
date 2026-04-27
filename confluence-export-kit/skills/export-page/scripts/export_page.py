@@ -15,16 +15,11 @@ if str(PLUGIN_ROOT) not in sys.path:
 from scripts.cme_runtime import (
     add_export_args,
     build_export_env,
-    canonicalize_base_url,
+    DEFAULT_OUTPUT_PATH,
     effective_output_path,
-    ensure_cme_available,
-    ensure_python_preflight,
-    load_cme_config,
     print_export_flags,
-    print_preflight,
-    require_auth,
-    resolve_config_path,
     run_cme_and_report,
+    run_index_export_and_report,
 )
 
 
@@ -62,43 +57,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return args
 
 
-def validate_same_site(urls: list[str]) -> str:
-    """Ensure all URLs belong to the same site and return the common base URL."""
-    base_urls = {canonicalize_base_url(u) for u in urls}
-    if len(base_urls) > 1:
-        raise RuntimeError(
-            f"All page URLs must belong to the same Confluence site. "
-            f"Found multiple sites: {', '.join(sorted(base_urls))}"
-        )
-    return base_urls.pop()
-
-
 def main() -> int:
     args = parse_args()
-    python_path = ensure_python_preflight()
-    cme_path, cme_status, installer_status = ensure_cme_available()
-    config_path = resolve_config_path(args.config_path, cme_path)
-    config_data = load_cme_config(cme_path, config_path)
+    output_path = effective_output_path({}, args.output_path or DEFAULT_OUTPUT_PATH)
 
-    base_url = validate_same_site(args.page_urls)
-    require_auth(config_data, base_url)
-    output_path = effective_output_path(config_data, args.output_path)
-
-    print_preflight(python_path, installer_status, cme_status, cme_path, config_path, base_url)
+    print("Config/auth status: assumed configured")
     print(f"Page count: {len(args.page_urls)}")
     for url in args.page_urls:
         print(f"  {url}")
     print(f"Effective output path: {output_path}")
     print_export_flags(args)
-    if args.dry_run:
-        print("Export command: skipped (dry-run mode)")
-        return 0
 
     run_cme_and_report(
-        cme_path,
+        "cme",
         ["pages", *args.page_urls],
-        build_export_env(args, config_path=config_path, output_path=output_path),
+        build_export_env(args, output_path=output_path),
     )
+    run_index_export_and_report(output_path)
     return 0
 
 

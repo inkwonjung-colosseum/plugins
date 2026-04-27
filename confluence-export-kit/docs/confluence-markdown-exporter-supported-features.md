@@ -16,7 +16,7 @@
 | 구분 | 범위 |
 | --- | --- |
 | `confluence-markdown-exporter` 본체 | Confluence page/space/org export CLI, config/auth 관리, Markdown 변환, attachment export, 증분 export, stale cleanup, Jira enrichment |
-| `confluence-export-kit` 래퍼 | auth 설정, page/space/org/page-with-descendants export, `python`/`cme` bootstrap (`cme`가 없을 때만 installer 사용) |
+| `confluence-export-kit` 래퍼 | auth 설정, page/space/org/page-with-descendants export, export 후 자동 local index, exported Markdown local index |
 
 ## 1. upstream `confluence-markdown-exporter` 본체 기능
 
@@ -300,43 +300,43 @@ diagram 관련 기능은 다음과 같습니다.
 | 명령 | 설명 |
 | --- | --- |
 | `/confluence-export-kit:help` | 사용법 안내 |
-| `/confluence-export-kit:set-config [--api-key <api-key> --email <email>] [--output-path <path>] [--url <base-url>] [--skip-jira] [--skip-validate] [--config-path <path>]` | auth와 기본 export 출력 경로 통합 설정 |
+| `/confluence-export-kit:set-config [--api-key <api-key> --email <email>] [--output-path <path>] [--url <base-url>] [--skip-jira] [--config-path <path>]` | auth와 기본 export 출력 경로 통합 설정 |
 | `/confluence-export-kit:export-page <page-url> [<page-url> ...] [output-path]` | 하나 이상의 page URL export |
 | `/confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]` | 하나 이상의 page와 모든 descendant export |
 | `/confluence-export-kit:export-space <space-url> [<space-url> ...] [output-path]` | 하나 이상의 space 전체 export |
 | `/confluence-export-kit:export-org <org-url> [<org-url> ...] [output-path]` | 하나 이상의 org 전체 export |
-| `/confluence-export-kit:index-export <export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--dry-run]` | 이미 export된 로컬 Markdown 폴더 색인 및 Reading Rule 설치 |
+| `/confluence-export-kit:index-export <export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]` | 이미 export된 로컬 Markdown 폴더 색인 및 Reading Rule 설치 |
 | `/confluence-export-kit:show-config [--json]` | 현재 `cme` 설정 출력 (`cme config list` 래퍼) |
 
 모든 export 명령은 다음 공통 플래그를 지원합니다.
 
 | 플래그 | 설명 |
 | --- | --- |
-| `--skip-unchanged` | lockfile 기반 증분 export — 변경 없는 page skip |
-| `--cleanup-stale` | Confluence에서 삭제/이동된 page의 로컬 파일 cleanup |
+| `--skip-unchanged` / `--no-skip-unchanged` | lockfile 기반 증분 export 제어. 기본값은 on |
+| `--cleanup-stale` / `--no-cleanup-stale` | Confluence에서 삭제/이동된 page의 로컬 파일 cleanup 제어. 기본값은 on |
 | `--jira-enrichment` | Jira issue summary를 export된 Markdown에 포함 |
-| `--dry-run` | auth/config 검증만 수행, cme 실행 생략 (`export-page-with-descendant`, `export-space`, `export-org`, `export-page`) |
 | `--max-workers N` | `CME_CONNECTION_CONFIG__MAX_WORKERS` 설정으로 병렬 worker 수 제어 |
 
 ### 3.2 래퍼가 추가하는 기능
 
 래퍼는 upstream에 없는 workflow 기능도 일부 추가합니다.
 
-- `python` / `cme` preflight 확인
-- `cme` 가 이미 있으면 installer를 건드리지 않고 바로 사용
-- `cme` 가 없으면 installer를 준비해 `confluence-markdown-exporter` install 또는 upgrade
-- `set-config` 실행 시 `/wiki/rest/api/user/current` 로 토큰을 기본 검증 (opt-out: `--skip-validate`)
+- export 명령은 `cme`와 config/auth가 이미 준비되어 있다고 가정
+- `set-config` 명령은 `pip` 기준으로 `confluence-markdown-exporter` 설치 여부를 확인하고, 없으면 설치
+- `set-config` 실행 시 token probe 없이 credential 저장
 - `set-config` 실행 시 기본적으로 `auth.jira` 도 같은 URL로 맞춤 (`--skip-jira` 로 생략 가능)
 - 모든 export 명령에서 `output-path` 를 환경변수 override로만 적용하고 config는 영구 수정하지 않음
-- `set-config` 명령으로 기본 output path를 `export.output_path` 에 영구 저장
-- 모든 export 명령에서 `--skip-unchanged` 플래그로 `CME_EXPORT__SKIP_UNCHANGED=true` 설정 가능
-- 모든 export 명령에서 `--cleanup-stale` 플래그로 `CME_EXPORT__CLEANUP_STALE=true` 설정 가능
+- 명시적 output path가 없으면 현재 helper는 `confluence` 를 effective output path로 사용
+- 모든 export 명령은 `cme` export 성공 후 같은 effective output path를 자동으로 `index-export` 처리
+- post-export `index-export` 는 기본적으로 `AGENTS.md` / `CLAUDE.md` Reading Rule 관리 블록도 설치 또는 갱신
+- `set-config` 명령으로 `cme` config의 `export.output_path` 를 영구 저장
+- 모든 export 명령에서 `--skip-unchanged` / `--no-skip-unchanged` 플래그로 `CME_EXPORT__SKIP_UNCHANGED` 설정 가능
+- 모든 export 명령에서 `--cleanup-stale` / `--no-cleanup-stale` 플래그로 `CME_EXPORT__CLEANUP_STALE` 설정 가능
 - 모든 export 명령에서 `--jira-enrichment` 플래그로 `CME_EXPORT__ENABLE_JIRA_ENRICHMENT=true` 설정 가능
-- 모든 export 명령에서 `--dry-run` 플래그로 cme 실행 없이 auth/config만 검증 가능
 - 모든 export 명령에서 `--max-workers N` 플래그로 `CME_CONNECTION_CONFIG__MAX_WORKERS` 설정 가능
 - `show-config` 명령으로 `cme config list` 결과를 Claude Code / Codex workflow에서 직접 확인 가능
 - `index-export` 명령으로 이미 export된 로컬 Markdown을 `.confluence-index/sources/<source-id>/` 로 색인 가능
-- `index-export` 명령으로 현재 작업 폴더의 `AGENTS.md` / `CLAUDE.md` Reading Rule 관리 블록 설치 가능
+- `index-export` 명령으로 현재 작업 폴더의 `AGENTS.md` / `CLAUDE.md` 또는 `--agent-files` 로 지정한 guidance 파일에 Reading Rule 관리 블록 설치 가능
 
 ### 3.3 래퍼가 의도적으로 제외한 범위
 
@@ -355,24 +355,22 @@ diagram 관련 기능은 다음과 같습니다.
 | page-with-descendants export | 지원 | 직접 노출 (`export-page-with-descendant`) |
 | space export | 지원 | 직접 노출 (`export-space`) |
 | org export | 지원 | 직접 노출 (`export-org`) |
-| 증분 export (`skip_unchanged`) | 지원 | 모든 export 명령에 `--skip-unchanged` 플래그로 노출 |
-| 기본 출력 경로 설정 | config set으로 가능 | `set-config` 명령으로 직접 노출 |
+| 증분 export (`skip_unchanged`) | 지원 | 모든 export 명령에 `--skip-unchanged` / `--no-skip-unchanged` 플래그로 노출 |
+| 기본 출력 경로 설정 | config set으로 가능 | `set-config` 명령으로 config 저장 노출. 현재 export helper의 no-override 기본값은 `confluence` |
 | config interactive menu | 지원 | 미노출 |
 | config list | 지원 | `show-config` 명령으로 제한 노출 |
 | config set | 지원 | `set-config` workflow로 제한 노출 |
 | config get/edit/reset/path | 지원 | 미노출 |
 | version/bugreport | 지원 | 미노출 |
 | multi-instance auth | 지원 | helper script로 일부 지원 |
-| token validation | 본체 표준 기능은 아님 | 기본 동작으로 추가 (opt-out: `--skip-validate`) |
 | keyword search export | 표준 CLI 없음 | 미노출 |
 | label search export | 표준 CLI 없음 | 미노출 |
 | 병렬 worker 수 제어 | `connection_config.max_workers` 지원 | 모든 export 명령에 `--max-workers N` 플래그로 노출 |
-| dry-run (export 전 검증) | 표준 CLI 없음 | 모든 export 명령에 `--dry-run` 플래그로 추가 |
-| stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` 플래그로 노출 |
+| stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` / `--no-cleanup-stale` 플래그로 노출 |
 | Jira enrichment toggle | `export.enable_jira_enrichment` 지원 | 모든 export 명령에 `--jira-enrichment` 플래그로 노출 |
-| runtime bootstrap | 본체 설치 문서만 제공 | 래퍼가 bootstrap 자동화 |
-| exported Markdown local index | 표준 CLI 없음 | `index-export` 명령으로 `.confluence-index/` 생성 |
-| AGENTS.md / CLAUDE.md Reading Rule 설치 | 표준 CLI 없음 | `index-export` 명령으로 관리 블록 설치 |
+| `confluence-markdown-exporter` 설치 확인 | 본체 설치 문서만 제공 | `set-config` 가 pip 기준으로 확인하고 없으면 설치 |
+| exported Markdown local index | 표준 CLI 없음 | export 후 자동 실행 및 `index-export` 명령으로 `.confluence-index/` 생성 |
+| AGENTS.md / CLAUDE.md Reading Rule 설치 | 표준 CLI 없음 | export 후 자동 실행 및 `index-export` 명령으로 관리 블록 설치 |
 
 ## 5. 문서 해석 가이드
 
@@ -404,6 +402,8 @@ diagram 관련 기능은 다음과 같습니다.
 - `confluence-export-kit/skills/export-space/scripts/export_space.py`
 - `confluence-export-kit/skills/export-org/SKILL.md`
 - `confluence-export-kit/skills/export-org/scripts/export_org.py`
+- `confluence-export-kit/skills/index-export/SKILL.md`
+- `confluence-export-kit/skills/index-export/scripts/index_export.py`
 - `confluence-export-kit/skills/show-config/SKILL.md`
 - `confluence-export-kit/skills/show-config/scripts/show_config.py`
 - `confluence-export-kit/tests/test_export_page.py`

@@ -43,7 +43,7 @@ codex marketplace add /absolute/path/to/colo-plugins
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `confluence-export-kit` | `0.1.2` | Confluence export 및 local export-index workflow. auth/config 설정, page/space/org/page-with-descendants export, 로컬 Markdown 색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export`, `help` | [README](./confluence-export-kit/README.md) |
+| `confluence-export-kit` | `0.1.2` | Confluence export 및 local export-index workflow. auth/config 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export`, `help` | [README](./confluence-export-kit/README.md) |
 | `planning-team-kit` | `0.1.1` | 기획 문서 품질 workflow. intake, optional stress-test, draft 생성, multi-agent 품질 검수까지 draft-only로 처리합니다. | `help`, `planning-intake`, `planning-grill`, `planning-drafts`, `quality-review` | [README](./planning-team-kit/README.md) |
 | `diagram-design` | `1.0.0` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 
@@ -128,7 +128,7 @@ claude plugin validate ./diagram-design
 문서만 수정한 경우에도 Markdown diff에 공백 문제가 없는지 확인합니다.
 
 ```bash
-git diff --check README.md .claude-plugin/marketplace.json .agents/plugins/marketplace.json
+git diff --check
 ```
 
 ## 작업 원칙

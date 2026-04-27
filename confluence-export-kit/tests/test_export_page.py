@@ -106,16 +106,6 @@ class ExportPageArgumentTests(unittest.TestCase):
             )
 
     def test_main_passes_all_page_urls_to_cme_pages(self) -> None:
-        config_data = {
-            "auth": {
-                "confluence": {
-                    "https://alpha.atlassian.net": {
-                        "username": "user@example.com",
-                        "api_token": "alpha-token",
-                    },
-                }
-            }
-        }
         argv = [
             "export_page.py",
             "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
@@ -125,26 +115,15 @@ class ExportPageArgumentTests(unittest.TestCase):
 
         with (
             mock.patch.object(sys, "argv", argv),
-            mock.patch.object(self.module, "ensure_python_preflight", return_value="/python"),
-            mock.patch.object(
-                self.module,
-                "ensure_cme_available",
-                return_value=("/usr/local/bin/cme", "already available", "already available"),
-            ),
-            mock.patch.object(
-                self.module, "resolve_config_path", return_value=Path("/tmp/cme-config.json")
-            ),
-            mock.patch.object(self.module, "load_cme_config", return_value=config_data) as load_cme_config,
             mock.patch.object(self.module, "run_cme_and_report") as run_cme,
+            mock.patch.object(self.module, "run_index_export_and_report") as run_index,
             mock.patch("builtins.print"),
         ):
             exit_code = self.module.main()
 
         self.assertEqual(exit_code, 0)
-        load_cme_config.assert_called_once_with(
-            "/usr/local/bin/cme", Path("/tmp/cme-config.json")
-        )
         run_cme.assert_called_once()
+        self.assertEqual(run_cme.call_args.args[0], "cme")
         self.assertEqual(
             run_cme.call_args.args[1],
             [
@@ -157,6 +136,7 @@ class ExportPageArgumentTests(unittest.TestCase):
             run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"],
             "./docs/confluence",
         )
+        run_index.assert_called_once_with("./docs/confluence")
 
 
 if __name__ == "__main__":

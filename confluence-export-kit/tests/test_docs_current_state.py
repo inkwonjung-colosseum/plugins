@@ -37,10 +37,26 @@ class CurrentDocumentationStateTests(unittest.TestCase):
         self.assertIn("page 단건/다건 export", readme)
         self.assertIn("local export-index", readme)
         self.assertIn("--skip-jira", readme)
+        self.assertIn("현재 helper의 기본 output path는", readme)
 
     def test_set_config_documents_config_path_override(self) -> None:
         skill_doc = (PLUGIN_ROOT / "skills" / "set-config" / "SKILL.md").read_text()
         self.assertIn("--config-path", skill_doc)
+        self.assertNotIn("--skip-validate", skill_doc)
+
+    def test_index_export_documents_agent_file_override(self) -> None:
+        skill_doc = (PLUGIN_ROOT / "skills" / "index-export" / "SKILL.md").read_text()
+        supported_features_doc = SUPPORTED_FEATURES_DOC.read_text()
+
+        self.assertIn("--agent-files <file> ...", skill_doc)
+        self.assertIn("--agent-files <file> ...", supported_features_doc)
+
+    def test_export_docs_explain_current_flag_defaults(self) -> None:
+        supported_features_doc = SUPPORTED_FEATURES_DOC.read_text()
+
+        self.assertIn("--no-skip-unchanged", supported_features_doc)
+        self.assertIn("--no-cleanup-stale", supported_features_doc)
+        self.assertIn("no-override 기본값은 `confluence`", supported_features_doc)
 
     def test_agent_metadata_reflects_plural_export_support(self) -> None:
         export_space = (
@@ -67,7 +83,7 @@ class CurrentDocumentationStateTests(unittest.TestCase):
         self.assertNotIn("<page-url-1> <page-url-2>", export_page)
         self.assertNotIn("<page-url> and <page-url>", codex_manifest)
 
-    def test_executable_skills_use_python_310_aware_runner(self) -> None:
+    def test_executable_skills_do_not_document_preflight_runner(self) -> None:
         executable_skills = [
             "export-org",
             "export-page",
@@ -81,38 +97,10 @@ class CurrentDocumentationStateTests(unittest.TestCase):
         for skill_name in executable_skills:
             with self.subTest(skill=skill_name):
                 skill_doc = (PLUGIN_ROOT / "skills" / skill_name / "SKILL.md").read_text()
-                self.assertIn("PYTHON_BIN", skill_doc)
-                self.assertIn("Python 3.10+", skill_doc)
-                self.assertNotRegex(
-                    skill_doc,
-                    r"\npython3 \"\$SKILL_DIR/scripts/",
-                )
-
-    def test_executable_skills_document_windows_powershell_runner(self) -> None:
-        executable_skills = {
-            "export-org": "export_org.py",
-            "export-page": "export_page.py",
-            "export-page-with-descendant": "export_page_with_descendant.py",
-            "export-space": "export_space.py",
-            "index-export": "index_export.py",
-            "set-config": "set_config.py",
-            "show-config": "show_config.py",
-        }
-
-        for skill_name, script_name in executable_skills.items():
-            with self.subTest(skill=skill_name):
-                skill_doc = (PLUGIN_ROOT / "skills" / skill_name / "SKILL.md").read_text()
-                self.assertIn("Windows PowerShell", skill_doc)
-                self.assertIn("Get-Command", skill_doc)
-                self.assertIn('"py"', skill_doc)
-                self.assertIn("$env:CLAUDE_SKILL_DIR", skill_doc)
-                self.assertIn("Get-Item -Path", skill_doc)
-                self.assertIn(f"scripts/{script_name}", skill_doc)
-                self.assertIn(
-                    f'"scripts/{script_name}".Replace('
-                    "'/', [System.IO.Path]::DirectorySeparatorChar)",
-                    skill_doc,
-                )
+                self.assertNotIn("PYTHON_BIN", skill_doc)
+                self.assertNotIn("Python 3.10+", skill_doc)
+                self.assertNotIn("Get-Command", skill_doc)
+                self.assertNotIn("$env:CLAUDE_SKILL_DIR", skill_doc)
 
 
 if __name__ == "__main__":
