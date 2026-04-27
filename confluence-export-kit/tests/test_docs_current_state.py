@@ -11,7 +11,7 @@ PLUGIN_ROOT = WORKSPACE_ROOT / "confluence-export-kit"
 SUPPORTED_FEATURES_DOC = (
     PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md"
 )
-EXPECTED_PLUGIN_VERSION = "0.2.1"
+EXPECTED_PLUGIN_VERSION = "0.3.0"
 
 
 class CurrentDocumentationStateTests(unittest.TestCase):

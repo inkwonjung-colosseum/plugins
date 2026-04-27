@@ -1,6 +1,6 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Codex plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
   "author": {
     "name": "developjik",
