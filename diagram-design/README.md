@@ -118,7 +118,19 @@ claude plugin install diagram-design@inkwonjung-colosseum
 
 ### Codex
 
-Codex에서는 이 플러그인 폴더를 로컬 marketplace 또는 개인 플러그인 경로에 배치한 뒤 `/plugins`에서 설치합니다. 이 플러그인은 `.codex-plugin/plugin.json`과 동일한 `skills/` 디렉터리를 사용합니다.
+Codex에서는 repository marketplace를 추가한 뒤 `/plugins`에서 설치합니다.
+
+```bash
+codex marketplace add https://github.com/inkwonjung-colosseum/plugins
+```
+
+로컬 개발 중에는 저장소 루트를 marketplace로 추가할 수 있습니다.
+
+```bash
+codex marketplace add /absolute/path/to/colo-plugins
+```
+
+이 플러그인은 `.codex-plugin/plugin.json`과 동일한 `skills/` 디렉터리를 사용합니다.
 
 ## 사용 예
 

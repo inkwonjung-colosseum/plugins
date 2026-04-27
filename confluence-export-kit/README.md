@@ -79,64 +79,19 @@ claude plugin install confluence-export-kit@inkwonjung-colosseum
 
 ### Codex
 
-Codex 공식 플러그인 스펙은 로컬 marketplace 파일 기반 설치를 사용합니다 ([Build plugins 문서 참고](https://developers.openai.com/codex/plugins/build)). repo 범위 또는 개인 범위 중 하나를 선택합니다.
+Codex는 `codex marketplace add`로 GitHub repository marketplace 또는 로컬 marketplace root를 추가한 뒤, Codex 앱의 `/plugins`에서 설치/활성화합니다.
 
-**Repo 범위 (팀 공유)**
+```bash
+codex marketplace add https://github.com/inkwonjung-colosseum/plugins
+```
 
-1. confluence-export-kit 폴더를 repo 의 `plugins/` 아래로 복사합니다.
+로컬 개발 중에는 저장소 루트를 marketplace로 추가할 수 있습니다.
 
-   ```bash
-   mkdir -p ./plugins
-   cp -R /absolute/path/to/confluence-export-kit ./plugins/confluence-export-kit
-   ```
+```bash
+codex marketplace add /absolute/path/to/colo-plugins
+```
 
-   Windows PowerShell:
-
-   ```powershell
-   New-Item -ItemType Directory -Force -Path .\plugins | Out-Null
-   Copy-Item -Recurse -Force C:\absolute\path\to\confluence-export-kit .\plugins\confluence-export-kit
-   ```
-
-2. `$REPO_ROOT/.agents/plugins/marketplace.json` 을 만들거나 갱신합니다.
-
-   ```json
-   {
-     "name": "inkwonjung-colosseum",
-     "interface": { "displayName": "inkwonjung-colosseum" },
-     "plugins": [
-       {
-         "name": "confluence-export-kit",
-         "source": { "source": "local", "path": "./plugins/confluence-export-kit" },
-         "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
-         "category": "Productivity"
-       }
-     ]
-   }
-   ```
-
-3. Codex 를 재시작하고 `/plugins` 를 열어 `inkwonjung-colosseum` marketplace 에서 confluence-export-kit 을 설치합니다.
-
-**개인 범위**
-
-1. confluence-export-kit 폴더를 `~/.codex/plugins/confluence-export-kit` 으로 복사합니다.
-
-   ```bash
-   mkdir -p ~/.codex/plugins
-   cp -R /absolute/path/to/confluence-export-kit ~/.codex/plugins/confluence-export-kit
-   ```
-
-   Windows PowerShell:
-
-   ```powershell
-   New-Item -ItemType Directory -Force -Path "$HOME\.codex\plugins" | Out-Null
-   Copy-Item -Recurse -Force C:\absolute\path\to\confluence-export-kit "$HOME\.codex\plugins\confluence-export-kit"
-   ```
-
-2. `~/.agents/plugins/marketplace.json` 에 동일한 구조의 marketplace 파일을 만들되 `source.path` 를 `./confluence-export-kit` 로 지정합니다 (marketplace 파일 루트 기준).
-
-3. Codex 를 재시작하고 `/plugins` 에서 confluence-export-kit 을 설치합니다.
-
-> Codex 는 설치한 플러그인을 `~/.codex/plugins/cache/<marketplace>/confluence-export-kit/local/` 로 복사해 실제 로드 경로로 사용합니다.
+이 저장소의 Codex catalog는 `.agents/plugins/marketplace.json`이며, `source.path`가 각 플러그인 디렉터리를 가리킵니다.
 
 ### 양쪽 에이전트 공통
 
