@@ -48,4 +48,4 @@ List questions that must be answered before review or handoff.
 
 ## Recommended Next Skill
 
-Use `/planning-team-kit:quality-review` or `$quality-review` after this suite is ready for review.
+Use `/planning-team-kit:planning-review` or `$planning-review` after this suite is ready for review.

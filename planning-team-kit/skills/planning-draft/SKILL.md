@@ -1,10 +1,10 @@
 ---
-name: planning-drafts
+name: planning-draft
 description: "Generate and save the core draft planning artifact suite from aligned planning context."
 argument-hint: "[planning context or source notes]"
 ---
 
-# Planning Drafts
+# Planning Draft
 
 Use this skill after planning context exists. It drafts and saves the core standard planning artifact suite.
 
@@ -13,18 +13,18 @@ Use this skill after planning context exists. It drafts and saves the core stand
 Claude Code:
 
 ```text
-/planning-team-kit:planning-drafts <planning-context>
+/planning-team-kit:planning-draft <planning-context>
 ```
 
 Codex:
 
 ```text
-$planning-drafts <planning-context>
+$planning-draft <planning-context>
 ```
 
 ## Purpose
 
-Generate and locally save a slim draft-only planning artifact suite from structured context. The suite is optimized for planning-team review before deeper handoff artifacts are split out.
+Generate and locally save a slim draft-only planning artifact suite from structured context. The suite is optimized for planning-team review and manual Confluence update planning.
 
 ## Readiness Check
 
@@ -32,7 +32,7 @@ Before generating documents, check whether the input has a usable `planning_cont
 
 Do not generate draft artifacts when the core planning context is missing or too ambiguous.
 
-If there is no usable context, route to `planning-intake` first. Missing core context includes:
+If there is no usable context, route to `planning-start` first. Missing core context includes:
 
 - unclear problem statement
 - missing users, stakeholders, or decision makers
@@ -41,7 +41,7 @@ If there is no usable context, route to `planning-intake` first. Missing core co
 - missing success or failure criteria
 - mixed confirmed facts, assumptions, risks, and constraints
 
-If the context exists but a specific document-quality gap remains, route back to `planning-intake` before generating artifacts. Examples include:
+If the context exists but a specific document-quality gap remains, route back to `planning-start` before generating artifacts. Examples include:
 
 - missing policy detail
 - unclear edge case
@@ -60,7 +60,7 @@ Always generate the core standard suite:
 - `requirements`
 - `behavior-spec`
 
-The bundled reserved and legacy templates are reference resources. Do not generate them from `planning-drafts` unless a later skill explicitly asks for a conditional add-on.
+The bundled reserved and legacy templates are reference resources. Do not generate them from `planning-draft` unless a later skill explicitly asks for a conditional add-on.
 
 ## Draft Generation Orchestration
 
@@ -68,7 +68,7 @@ Act as the suite orchestrator.
 
 After the readiness check passes, generate `01-planning-brief.md` first as the canonical planning context and decision brief.
 
-Before generating dependent artifacts, derive a trace contract from `01-planning-brief.md`, including requirement ID registry, scope boundaries, non-goals, source map, assumptions, confidence, sensitivity, owner, and approval state.
+Before generating dependent artifacts, derive a trace contract from `01-planning-brief.md`, including requirement ID registry, scope boundaries, non-goals, source map, evidence sources, source confidence, assumptions, sensitivity, owner, and approval state.
 
 When the execution environment supports subagents or parallel task execution, generate `02-requirements.md` and `03-behavior-spec.md` in parallel from `01-planning-brief.md` and the trace contract.
 
@@ -85,13 +85,13 @@ Always save generated artifacts to the current workspace. Do not ask whether to 
 Use this directory format:
 
 ```text
-planning/topic-slug--YYYY-MM-DD-HHMMSS/
+planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/
 ```
 
 Example:
 
 ```text
-planning/login-onboarding--2026-04-24-143205/
+planning/drafts/login-onboarding--2026-04-24-143205/
 ```
 
 Rules:
@@ -112,7 +112,7 @@ Save this file set:
 03-behavior-spec.md
 ```
 
-`01-planning-brief.md` is the canonical planning context and decision brief. It must preserve the planning-intake fields that matter for downstream review.
+`01-planning-brief.md` is the canonical planning context and decision brief. It must preserve the planning-start fields that matter for downstream review, including `evidence_sources`, `confirmed_facts`, `source_conflicts`, `excluded_sources`, and source confidence.
 
 `00-index.md` must list reading order, generated artifacts, source map, traceability notes, assumptions, open questions, and recommended next skill.
 
@@ -149,11 +149,11 @@ Reserved and legacy templates remain available for compatibility and future cond
 - Keep all outputs draft-only.
 - Run the readiness check before selecting or generating artifacts.
 - Always generate the core standard suite after the readiness check passes.
-- Always save generated artifacts to `planning/topic-slug--YYYY-MM-DD-HHMMSS/`.
+- Always save generated artifacts to `planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`.
 - Save the canonical planning context inside `01-planning-brief.md`, not as a separate YAML file.
 - Do not generate draft artifacts from unclear rough input unless the user explicitly asks to proceed with `approval_state: needs_review`.
 - Use templates from this skill's local `templates/` directory.
-- Preserve source, assumption, confidence, sensitivity, owner, and approval state metadata.
+- Preserve source, source confidence, assumption, sensitivity, owner, and approval state metadata.
 - Do not generate every bundled template.
 - Do not invent missing requirements, metrics, owners, or dates.
 - If source evidence is missing, label the statement as an assumption.
@@ -174,4 +174,4 @@ Return:
 
 Use `parallel` or `sequential fallback` for `Generation Execution Mode`.
 
-The recommended next skill is usually `/planning-team-kit:quality-review` or `$quality-review`.
+The recommended next skill is usually `/planning-team-kit:planning-review` or `$planning-review`.

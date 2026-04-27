@@ -9,7 +9,7 @@ import unittest
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
 PLUGIN_ROOT = WORKSPACE_ROOT / "planning-team-kit"
-PLANNING_DRAFTS_TEMPLATES_ROOT = PLUGIN_ROOT / "skills" / "planning-drafts" / "templates"
+PLANNING_DRAFTS_TEMPLATES_ROOT = PLUGIN_ROOT / "skills" / "planning-draft" / "templates"
 GENERATED_SUITE_FIXTURE_ROOT = PLUGIN_ROOT / "tests" / "fixtures" / "generated-core-suite"
 PLATFORM_KEYWORDS = {"claude-plugin", "codex-plugin"}
 CORE_TEMPLATE_NAMES = [
@@ -37,6 +37,10 @@ CORE_GENERATED_FILES = [
     "01-planning-brief.md",
     "02-requirements.md",
     "03-behavior-spec.md",
+]
+REVIEW_AND_HANDOFF_FILES = [
+    "04-planning-review.md",
+    "99-confluence-update-plan.md",
 ]
 
 
@@ -168,10 +172,11 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
     def test_required_skills_and_agent_metadata_exist(self) -> None:
         skill_names = [
             "help",
-            "planning-intake",
-            "planning-grill",
-            "planning-drafts",
-            "quality-review",
+            "planning-start",
+            "planning-check",
+            "planning-draft",
+            "planning-review",
+            "confluence-update-plan",
         ]
 
         for skill_name in skill_names:
@@ -204,10 +209,45 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
                     self.assertIn(key, interface)
                     self.assertTrue(interface[key])
 
-    def test_planning_coach_is_not_exposed_as_v0_1_skill(self) -> None:
+    def test_old_public_skill_names_are_not_exposed(self) -> None:
+        old_skill_names = (
+            "planning-intake",
+            "planning-grill",
+            "planning-drafts",
+            "quality-review",
+        )
+        public_files = [
+            WORKSPACE_ROOT / "README.md",
+            WORKSPACE_ROOT / "docs" / "diagrams" / "planning-team-kit-workflow.html",
+            PLUGIN_ROOT / "README.md",
+            PLUGIN_ROOT / "docs" / "examples.md",
+            PLUGIN_ROOT / "docs" / "privacy-policy.md",
+            PLUGIN_ROOT / "docs" / "terms-of-service.md",
+            PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "confluence-update-plan" / "SKILL.md",
+        ]
+
+        for skill_name in old_skill_names:
+            with self.subTest(skill=skill_name):
+                self.assertFalse((PLUGIN_ROOT / "skills" / skill_name).exists())
+
+            for public_file in public_files:
+                with self.subTest(skill=skill_name, path=public_file):
+                    if not public_file.exists():
+                        continue
+                    text = public_file.read_text()
+                    self.assertNotIn(skill_name, text)
+                    self.assertNotIn(f"${skill_name}", text)
+                    self.assertNotIn(f"/planning-team-kit:{skill_name}", text)
+
+    def test_planning_coach_is_not_exposed_as_v0_2_skill(self) -> None:
         self.assertFalse((PLUGIN_ROOT / "skills" / "planning-coach").exists())
 
-    def test_handoff_summary_is_not_exposed_as_v0_1_skill(self) -> None:
+    def test_handoff_summary_is_not_exposed_as_v0_2_skill(self) -> None:
         self.assertFalse((PLUGIN_ROOT / "skills" / "handoff-summary").exists())
 
     def test_legacy_doc_suite_skill_name_is_not_exposed(self) -> None:
@@ -232,10 +272,10 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
             PLUGIN_ROOT / "docs" / "privacy-policy.md",
             PLUGIN_ROOT / "docs" / "terms-of-service.md",
             PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-intake" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-drafts" / "agents" / "openai.yaml",
+            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-draft" / "agents" / "openai.yaml",
         ]
 
         for public_file in public_files:
@@ -249,8 +289,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
                 self.assertNotIn(legacy_skill_path, text)
                 self.assertNotIn(legacy_title, text)
 
-    def test_handoff_summary_is_not_a_v0_1_document_contract(self) -> None:
-        planning_drafts = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+    def test_handoff_summary_is_not_a_v0_2_document_contract(self) -> None:
+        planning_drafts = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
         header_schema = json.loads(
             (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
         )
@@ -263,21 +303,42 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertNotIn("handoff-summary", header_schema["properties"]["doc_type"]["enum"])
         self.assertNotIn("handoff-summary", section_map)
 
-    def test_planning_intake_requires_iterative_clarification_until_ready(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-intake" / "SKILL.md").read_text()
+    def test_planning_start_requires_iterative_clarification_until_ready(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md").read_text()
 
         self.assertIn("## Clarification Loop", text)
         self.assertIn("Ask one question per turn", text)
         self.assertIn("as many turns as needed", text)
         self.assertIn("Required readiness criteria", text)
-        self.assertIn("before recommending `planning-drafts`", text)
+        self.assertIn("before recommending `planning-draft`", text)
         self.assertIn("approval_state` to `needs_review`", text)
+
+    def test_planning_start_selects_indexed_confluence_evidence_safely(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md").read_text()
+
+        for required in (
+            "## Evidence Selection",
+            ".confluence-index/registry.json",
+            "source-index.jsonl",
+            "tree.md",
+            "at most 12 indexed candidate records",
+            "at most 6 raw Markdown source files",
+            "Prefer `current` documents",
+            "`archive` and `draft` documents only as historical context",
+            "Do not load a whole exported space",
+            "evidence_sources:",
+            "confirmed_facts:",
+            "source_conflicts:",
+            "excluded_sources:",
+            "`confidence`: high | medium | low",
+        ):
+            self.assertIn(required, text)
 
     def test_questioning_skills_prefer_interactive_choice_tools_with_fallback(self) -> None:
         skill_paths = (
-            PLUGIN_ROOT / "skills" / "planning-intake" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "quality-review" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md",
         )
 
         for skill_path in skill_paths:
@@ -288,27 +349,27 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
                 self.assertIn("askUserQuestion", text)
                 self.assertIn("plain Markdown", text)
 
-    def test_planning_drafts_requires_readiness_check_before_generating_artifacts(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+    def test_planning_draft_requires_readiness_check_before_generating_artifacts(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
 
         self.assertIn("## Readiness Check", text)
         self.assertIn("Do not generate draft artifacts", text)
-        self.assertIn("route to `planning-intake`", text)
+        self.assertIn("route to `planning-start`", text)
         self.assertNotIn("planning-coach", text)
         self.assertIn("approval_state: needs_review", text)
 
-    def test_planning_grill_is_optional_and_one_question_at_a_time(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md").read_text()
+    def test_planning_check_is_optional_and_one_question_at_a_time(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md").read_text()
 
         self.assertIn("not a required workflow gate", text)
         self.assertIn("optional pre-draft or pre-handoff", text)
         self.assertIn("Ask one question at a time", text)
         self.assertIn("recommended answer", text)
         self.assertIn("If a question can be answered", text)
-        self.assertIn("must not generate the standard draft suite", text)
+        self.assertIn("must not generate the standard draft suite or Confluence update plan", text)
 
-    def test_planning_drafts_is_standard_only_for_now(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+    def test_planning_draft_is_standard_only_for_now(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
 
         self.assertNotIn("--mode", text)
         self.assertNotIn("## Modes", text)
@@ -332,15 +393,17 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertNotIn("`handoff-summary`", generated_artifacts)
         self.assertNotIn("`engineering-brief`", generated_artifacts)
 
-    def test_planning_drafts_always_saves_generated_standard_suite(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+    def test_planning_draft_always_saves_generated_standard_suite(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
 
         self.assertIn("## Local Draft Persistence", text)
         self.assertIn("Always save generated artifacts", text)
-        self.assertIn("planning/topic-slug--YYYY-MM-DD-HHMMSS/", text)
-        self.assertIn("planning/login-onboarding--2026-04-24-143205/", text)
+        self.assertIn("planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/", text)
+        self.assertIn("planning/drafts/login-onboarding--2026-04-24-143205/", text)
         self.assertIn("Do not overwrite existing suite directories", text)
         self.assertIn("append `-2`, `-3`, or the next available numeric suffix", text)
+        self.assertIn("`evidence_sources`", text)
+        self.assertIn("source confidence", text)
 
         for relative_path in CORE_GENERATED_FILES:
             self.assertIn(relative_path, text)
@@ -361,8 +424,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         ):
             self.assertNotIn(removed_path, text)
 
-    def test_planning_drafts_orchestrates_parallel_generation_safely(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+    def test_planning_draft_orchestrates_parallel_generation_safely(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
 
         self.assertIn("## Draft Generation Orchestration", text)
         self.assertIn("Act as the suite orchestrator", text)
@@ -386,8 +449,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
 
         self.assertIn("Write", codex_manifest["interface"]["capabilities"])
 
-    def test_quality_review_uses_multi_agent_review_contract(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "quality-review" / "SKILL.md").read_text()
+    def test_planning_review_uses_multi_agent_review_contract(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md").read_text()
 
         for section_name in (
             "## Input Contract",
@@ -396,6 +459,7 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
             "## Gate Results",
             "## Quality Scores",
             "## Consolidation Rules",
+            "## Local Review Persistence",
             "## Fallback Mode",
         ):
             self.assertIn(section_name, text)
@@ -437,6 +501,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
 
         for verdict in ("`pass`", "`conditional pass`", "`needs revision`"):
             self.assertIn(verdict, text)
+        self.assertIn("04-planning-review.md", text)
+        self.assertIn("confluence-update-plan", text)
 
         for score_rule in (
             "`0`",
@@ -468,8 +534,27 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         ):
             self.assertIn(guardrail, text)
 
+    def test_confluence_update_plan_is_manual_only_contract(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "confluence-update-plan" / "SKILL.md").read_text()
+
+        for required in (
+            "/planning-team-kit:confluence-update-plan",
+            "$confluence-update-plan",
+            "manual Confluence add/update plan",
+            "does not call Confluence APIs",
+            "99-confluence-update-plan.md",
+            "`create`",
+            "`update`",
+            "`manual-review`",
+            "`skip`",
+            "Use `update` only when the user provides an explicit page URL or page ID",
+            "Do not infer update targets from title similarity alone",
+            "No External Write Confirmation",
+        ):
+            self.assertIn(required, text)
+
     def test_planning_drafts_owns_template_resources(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
 
         for template_name in ALL_TEMPLATE_NAMES:
             with self.subTest(template=template_name):
@@ -755,6 +840,9 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("01-planning-brief.md", readme)
         self.assertIn("02-requirements.md", readme)
         self.assertIn("03-behavior-spec.md", readme)
+        self.assertIn("04-planning-review.md", readme)
+        self.assertIn("99-confluence-update-plan.md", readme)
+        self.assertIn("planning/drafts/", readme)
         self.assertNotIn("00-suite-index.md", readme)
         self.assertNotIn("00-planning-context.md", readme)
         self.assertNotIn("03-user-stories.md", readme)
@@ -782,11 +870,13 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("Cross-Artifact Consistency Reviewer", help_text)
         self.assertIn("Handoff Governance Reviewer", help_text)
 
-    def test_workflow_diagram_ends_at_quality_review(self) -> None:
+    def test_workflow_diagram_ends_at_confluence_update_plan(self) -> None:
         diagram = (WORKSPACE_ROOT / "docs" / "diagrams" / "planning-team-kit-workflow.html").read_text()
 
-        self.assertIn("quality-review", diagram)
+        self.assertIn("planning-review", diagram)
         self.assertIn("multi-agent review gate", diagram)
+        self.assertIn("confluence-update-plan", diagram)
+        self.assertIn("manual add/update instructions", diagram)
         self.assertNotIn("handoff-summary", diagram)
         self.assertNotIn("Handoff Summary", diagram)
 

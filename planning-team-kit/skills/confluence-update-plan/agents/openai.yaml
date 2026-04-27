@@ -1,0 +1,8 @@
+interface:
+  display_name: "Confluence 반영 계획"
+  short_description: "Create a manual Confluence add/update plan from reviewed planning drafts without changing Confluence."
+  brand_color: "#0F766E"
+  default_prompt: "Create a manual Confluence add/update plan for this reviewed planning draft suite."
+
+policy:
+  allow_implicit_invocation: true

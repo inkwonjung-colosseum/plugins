@@ -77,6 +77,18 @@ Scope remains draft-only.
 
 Planning input.
 
+## Confirmed Facts
+
+Planning input is the only confirmed source.
+
+## Source Conflicts
+
+No fixture source conflicts.
+
+## Excluded Sources
+
+No fixture sources were excluded.
+
 ## Open Questions
 
 Confirm final owner.
