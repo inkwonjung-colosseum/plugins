@@ -1,199 +1,127 @@
-# Plugins 작업공간
+# COLO plugins
 
-이 저장소는 Claude Code와 Codex 플러그인 배포가 가능한 작업공간입니다. 각 플러그인 디렉터리는 매니페스트, 스킬, 훅, 스크립트, 문서를 자체적으로 관리하고, 루트 `.claude-plugin/marketplace.json`과 `.agents/plugins/marketplace.json`이 플랫폼별 카탈로그 역할을 합니다.
+Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs, tests를 관리합니다.
 
 ## 빠른 시작
 
-### Claude Code marketplace 추가
+### Claude Code
+
+GitHub repository marketplace를 추가한 뒤 필요한 플러그인을 설치합니다.
 
 ```bash
-# GitHub 저장소로 추가
 claude plugin marketplace add inkwonjung-colosseum/plugins
-
-# 로컬 클론 경로로 추가
-claude plugin marketplace add /path/to/plugins
-```
-
-### Claude Code 플러그인 설치
-
-```bash
-# 특정 플러그인 설치
 claude plugin install confluence-export-kit@inkwonjung-colosseum
 claude plugin install planning-team-kit@inkwonjung-colosseum
 claude plugin install diagram-design@inkwonjung-colosseum
+```
 
-# 설치된 플러그인 목록 확인
+로컬 checkout을 marketplace로 추가해서 개발 중인 버전을 확인할 수도 있습니다.
+
+```bash
+claude plugin marketplace add /absolute/path/to/colo-plugins
+claude plugin marketplace update inkwonjung-colosseum
 claude plugin list
 ```
 
-### Claude Code 대안: 로컬 플러그인 직접 추가
+현재 Claude Code CLI 기준으로 plugin 관리 명령은 `marketplace add`, `marketplace update`, `install`, `update`, `list`, `enable`, `disable`, `uninstall`, `validate`, `tag`입니다. 예전 문서에 있던 `claude plugin add ./<plugin-dir>` 형식은 사용하지 않습니다.
 
-```bash
-claude plugin add ./confluence-export-kit
-claude plugin add ./planning-team-kit
-claude plugin add ./diagram-design
+### Codex
+
+Codex는 repo-local marketplace인 `.agents/plugins/marketplace.json`과 각 플러그인의 `.codex-plugin/plugin.json`을 기준으로 discovery합니다. Codex 앱에서 marketplace를 다시 읽은 뒤 플러그인을 설치/활성화하고, 스킬은 `$planning-intake`, `$quality-review`, `$diagram-design` 같은 skill invocation으로 사용합니다.
+
+## 플러그인
+
+| 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
+|---|---:|---|---|---|
+| `confluence-export-kit` | `0.1.0` | Confluence export-only workflow. auth/config 설정, page/space/org/page-with-descendants export, `confluence-markdown-exporter` bootstrap을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `help` | [README](./confluence-export-kit/README.md) |
+| `planning-team-kit` | `0.1.0` | 기획 문서 품질 workflow. intake, draft 생성, multi-agent 품질 검수까지 draft-only로 처리합니다. | `help`, `planning-intake`, `planning-drafts`, `quality-review` | [README](./planning-team-kit/README.md) |
+| `diagram-design` | `1.0.0` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
+
+## 사용 문법
+
+Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용합니다.
+
+```text
+/confluence-export-kit:set-config --api-key <api-key> --email <email>
+/planning-team-kit:planning-intake
+/diagram-design:diagram-design
 ```
 
-### Codex marketplace 발견
+Codex는 설치된 플러그인의 skill invocation을 사용합니다.
 
-Codex는 repo marketplace인 `.agents/plugins/marketplace.json`을 읽어 플러그인 목록을 표시할 수 있습니다. 각 Codex 플러그인은 자체 `.codex-plugin/plugin.json`을 가지고 있으며, marketplace entry는 `source.path`, `policy.installation`, `policy.authentication`, `category`를 명시합니다.
+```text
+$set-config --api-key <api-key> --email <email>
+$planning-intake
+$diagram-design
+```
 
-현재 Codex marketplace에 등록된 로컬 플러그인:
-
-| 플러그인 | Codex 매니페스트 | source.path |
-|---|---|---|
-| `confluence-export-kit` | `confluence-export-kit/.codex-plugin/plugin.json` | `./confluence-export-kit` |
-| `skeleton-plugin` | `skeleton-plugin/.codex-plugin/plugin.json` | `./skeleton-plugin` |
-| `planning-team-kit` | `planning-team-kit/.codex-plugin/plugin.json` | `./planning-team-kit` |
-| `diagram-design` | `diagram-design/.codex-plugin/plugin.json` | `./diagram-design` |
-
-Codex에서 marketplace를 다시 읽은 뒤 플러그인을 설치/활성화하고, 각 플러그인의 스킬을 `$planning-intake`, `$quality-review`, `$diagram-design` 같은 Codex skill invocation으로 사용할 수 있습니다. 여러 플러그인이 같은 스킬 이름을 제공하는 경우, Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
-
-## 플러그인 디렉터리
-
-| 플러그인 | 목적 | 문서 |
-|---|---|---|
-| `confluence-export-kit` | Confluence export 전용 플러그인: auth 설정, page/space/org/page-with-descendants export, `confluence-markdown-exporter` bootstrap | [README](./confluence-export-kit/README.md) |
-| `skeleton-plugin` | Codex와 Claude Code를 모두 지원하는 플러그인 제작 시작 템플릿 | [README](./skeleton-plugin/README.md) |
-| `planning-team-kit` | 기획 문서 품질 플러그인: 정의/정렬, 문서 생성, multi-agent 품질 검수 | [README](./planning-team-kit/README.md) |
-| `diagram-design` | 기술/제품 다이어그램 제작 플러그인: architecture, flowchart, sequence, ER, timeline 등 14종을 standalone HTML/SVG로 생성 | [README](./diagram-design/README.md) |
-
-`planning-team-kit/snippets/`에는 재사용 가능한 의사결정 표와 source/assumption/confidence 블록이 포함됩니다.
+여러 플러그인이 같은 스킬 이름을 제공하는 경우에는 Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
 
 ## 저장소 구조
 
 ```text
-plugins/
+colo-plugins/
 ├── .agents/
 │   └── plugins/
-│       └── marketplace.json  # Codex marketplace 카탈로그
+│       └── marketplace.json        # Codex marketplace catalog
 ├── .claude-plugin/
-│   └── marketplace.json     # marketplace 카탈로그
+│   └── marketplace.json            # Claude Code marketplace catalog
 ├── confluence-export-kit/
-│   ├── .claude-plugin/
-│   │   └── plugin.json      # 플러그인 매니페스트
-│   ├── skills/              # 스킬 (폴더별 SKILL.md)
-│   ├── scripts/             # 보조 스크립트
-│   └── docs/                # 플러그인 문서
-├── skeleton-plugin/
-│   ├── .claude-plugin/
-│   │   └── plugin.json      # 플러그인 매니페스트
-│   ├── .codex-plugin/       # Codex 매니페스트 (선택)
-│   ├── commands/
+│   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
 │   ├── skills/
-│   ├── hooks/
 │   ├── scripts/
-│   └── assets/
+│   ├── docs/
+│   └── tests/
 ├── planning-team-kit/
-│   ├── .claude-plugin/
-│   │   └── plugin.json      # 플러그인 매니페스트
-│   ├── .codex-plugin/
-│   │   └── plugin.json      # Codex 플러그인 매니페스트
-│   ├── skills/              # planning workflow skills
-│   │   └── planning-drafts/
-│   │       └── templates/   # 기획 문서 템플릿
-│   ├── schemas/             # 문서 구조 스키마
-│   ├── snippets/            # 재사용 가능한 표/메타데이터 블록
-│   ├── docs/                # 품질 기준과 예시
-│   └── tests/               # 구조/회귀 테스트
-├── diagram-design/
-│   ├── .claude-plugin/
-│   │   └── plugin.json      # Claude Code 플러그인 매니페스트
-│   ├── .codex-plugin/
-│   │   └── plugin.json      # Codex 플러그인 매니페스트
+│   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
 │   ├── skills/
-│   │   └── diagram-design/  # 다이어그램 생성 스킬, 레퍼런스, HTML 템플릿
-│   └── docs/screenshots/    # README 및 갤러리용 예시 이미지
+│   ├── schemas/
+│   ├── snippets/
+│   ├── docs/
+│   └── tests/
+├── diagram-design/
+│   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
+│   └── skills/
 └── README.md
 ```
 
-## marketplace 구조
+## Marketplace 파일
 
-루트 `.claude-plugin/marketplace.json`은 Claude Code용 카탈로그입니다. 각 항목은 플러그인 이름과 소스 디렉터리, 메타데이터를 매핑합니다.
+Claude Code catalog는 `.claude-plugin/marketplace.json`입니다. 각 entry는 plugin name, source directory, description, version, license, tags를 가집니다.
 
-```json
-{
-  "name": "inkwonjung-colosseum",
-  "owner": {
-    "name": "inkwonjung-colosseum",
-    "url": "https://github.com/inkwonjung-colosseum"
-  },
-  "metadata": {
-    "description": "..."
-  },
-  "plugins": [
-    {
-      "name": "confluence-export-kit",
-      "source": "./confluence-export-kit",
-      "description": "...",
-      "version": "0.2.1",
-      "license": "MIT",
-      "tags": ["confluence"]
-    },
-    {
-      "name": "planning-team-kit",
-      "source": "./planning-team-kit",
-      "description": "...",
-      "version": "0.1.0",
-      "license": "MIT",
-      "tags": ["planning", "documentation"]
-    },
-    {
-      "name": "diagram-design",
-      "source": "./diagram-design",
-      "description": "...",
-      "version": "1.0.0",
-      "license": "MIT",
-      "tags": ["diagrams", "svg", "architecture"]
-    }
-  ]
-}
+Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `source.path`, `policy.installation`, `policy.authentication`, `category`를 가집니다.
+
+새 플러그인을 추가할 때는 다음을 함께 맞춥니다.
+
+1. Claude Code 지원: `<plugin>/.claude-plugin/plugin.json`
+2. Codex 지원: `<plugin>/.codex-plugin/plugin.json`
+3. Claude Code catalog: `.claude-plugin/marketplace.json`
+4. Codex catalog: `.agents/plugins/marketplace.json`
+5. 플러그인 README와 루트 README의 목록/설치 안내
+
+## 검증
+
+배포 전에는 manifest와 대표 플러그인을 검증합니다.
+
+```bash
+claude plugin validate ./.claude-plugin/marketplace.json
+claude plugin validate ./confluence-export-kit
+claude plugin validate ./planning-team-kit
+claude plugin validate ./diagram-design
 ```
 
-루트 `.agents/plugins/marketplace.json`은 Codex용 카탈로그입니다. Codex entry는 플러그인 디렉터리의 `.codex-plugin/plugin.json`을 로드할 수 있도록 `source.path`를 지정하고, 설치 정책과 카테고리를 함께 명시합니다.
+문서만 수정한 경우에도 Markdown diff에 공백 문제가 없는지 확인합니다.
 
-```json
-{
-  "name": "inkwonjung-colosseum",
-  "interface": {
-    "displayName": "inkwonjung-colosseum plugins"
-  },
-  "plugins": [
-    {
-      "name": "planning-team-kit",
-      "source": {
-        "source": "local",
-        "path": "./planning-team-kit"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    }
-  ]
-}
+```bash
+git diff --check README.md .claude-plugin/marketplace.json .agents/plugins/marketplace.json
 ```
 
-### 새 플러그인을 marketplace에 추가하기
+## 작업 원칙
 
-1. Claude Code용이면 `.claude-plugin/plugin.json`이 포함된 플러그인 디렉터리를 만듭니다.
-2. Codex용이면 `.codex-plugin/plugin.json`이 포함된 플러그인 디렉터리를 만듭니다.
-3. Claude Code 카탈로그에는 `.claude-plugin/marketplace.json` 항목을 추가합니다.
-4. Codex 카탈로그에는 `.agents/plugins/marketplace.json` 항목을 추가하고 `policy.installation`, `policy.authentication`, `category`를 명시합니다.
-5. Claude Code는 `claude plugin marketplace update inkwonjung-colosseum`으로 갱신하고, Codex는 marketplace를 다시 읽어 설치/활성화 상태를 확인합니다.
-
-## 이 저장소에서 작업하는 방법
-
-1. 작업할 플러그인 디렉터리로 이동합니다.
-2. 매니페스트, 훅, 스킬, 스크립트를 수정하기 전에 해당 플러그인의 README를 먼저 읽습니다.
-3. 플러그인별 상태와 에셋은 각 플러그인 디렉터리 안에 유지합니다.
-4. 변경 후 배포 전에 Claude Code는 `claude plugin add ./<plugin-dir>`로, Codex는 `.agents/plugins/marketplace.json`과 `<plugin-dir>/.codex-plugin/plugin.json`의 discovery metadata로 테스트합니다.
-
-## 메모
-
-- 저장소 루트는 설치 가능한 플러그인이 아니라 marketplace 카탈로그입니다.
-- 루트 `.claude-plugin/marketplace.json`은 GitHub 저장소 또는 정적 URL로 배포 가능합니다.
-- 루트 `.agents/plugins/marketplace.json`은 Codex가 읽는 repo marketplace 카탈로그입니다.
-- `.claude-plugin/plugin.json`이 없는 디렉터리는 marketplace에서 인식되지 않습니다.
-- `.codex-plugin/plugin.json`이 없는 디렉터리는 Codex 플러그인으로 인식되지 않습니다.
+- 루트는 marketplace catalog이고, 기능 구현은 각 플러그인 디렉터리 안에서 관리합니다.
+- 플러그인을 수정하기 전에는 해당 플러그인의 README와 `skills/*/SKILL.md`를 먼저 확인합니다.
+- Claude Code와 Codex가 같은 `skills/`를 공유하므로, 스킬 설명과 manifest의 이름/버전/경로를 함께 갱신합니다.
+- 설치법은 README 기억이 아니라 현재 `claude plugin --help`와 `claude plugin marketplace --help` 기준으로 확인합니다.
