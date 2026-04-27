@@ -361,6 +361,24 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         ):
             self.assertNotIn(removed_path, text)
 
+    def test_planning_drafts_orchestrates_parallel_generation_safely(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
+
+        self.assertIn("## Draft Generation Orchestration", text)
+        self.assertIn("Act as the suite orchestrator", text)
+        self.assertIn("generate `01-planning-brief.md` first", text)
+        self.assertIn("canonical planning context and decision brief", text)
+        self.assertIn("trace contract", text)
+        self.assertIn("requirement ID registry", text)
+        self.assertIn("`02-requirements.md` and `03-behavior-spec.md` in parallel", text)
+        self.assertIn("subagents", text)
+        self.assertIn("sequential fallback", text)
+        self.assertIn("reconciliation gate", text)
+        self.assertIn("behavior without matching requirements", text)
+        self.assertIn("Generate `00-index.md` last", text)
+        self.assertIn("Generation Execution Mode", text)
+        self.assertIn("Use `parallel` or `sequential fallback`", text)
+
     def test_codex_manifest_declares_write_capability_for_saved_drafts(self) -> None:
         codex_manifest = json.loads(
             (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text()

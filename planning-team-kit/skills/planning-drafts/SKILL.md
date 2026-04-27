@@ -62,6 +62,22 @@ Always generate the core standard suite:
 
 The bundled reserved and legacy templates are reference resources. Do not generate them from `planning-drafts` unless a later skill explicitly asks for a conditional add-on.
 
+## Draft Generation Orchestration
+
+Act as the suite orchestrator.
+
+After the readiness check passes, generate `01-planning-brief.md` first as the canonical planning context and decision brief.
+
+Before generating dependent artifacts, derive a trace contract from `01-planning-brief.md`, including requirement ID registry, scope boundaries, non-goals, source map, assumptions, confidence, sensitivity, owner, and approval state.
+
+When the execution environment supports subagents or parallel task execution, generate `02-requirements.md` and `03-behavior-spec.md` in parallel from `01-planning-brief.md` and the trace contract.
+
+If subagents or parallel task execution are not available, do not skip the lane split. Run the same lanes sequentially and label the generation mode as `sequential fallback`.
+
+Before saving files, run a reconciliation gate to align requirement IDs, cross-links, assumptions, open questions, non-goal boundaries, and behavior without matching requirements.
+
+Generate `00-index.md` last from the final artifact map.
+
 ## Local Draft Persistence
 
 Always save generated artifacts to the current workspace. Do not ask whether to save, and do not provide response-only output after artifacts are generated.
@@ -151,8 +167,11 @@ Return:
 - `Saved Draft Directory`
 - `Saved Files`
 - `Generated Drafts`
+- `Generation Execution Mode`
 - `Traceability Notes`
 - `Assumptions and Open Questions`
 - `Recommended Next Skill`
+
+Use `parallel` or `sequential fallback` for `Generation Execution Mode`.
 
 The recommended next skill is usually `/planning-team-kit:quality-review` or `$quality-review`.
