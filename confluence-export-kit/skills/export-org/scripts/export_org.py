@@ -15,11 +15,13 @@ if str(PLUGIN_ROOT) not in sys.path:
 from scripts.cme_runtime import (
     add_export_args,
     build_export_env,
+    cleanup_renamed_page_exports,
     DEFAULT_OUTPUT_PATH,
     effective_output_path,
     print_export_flags,
     run_cme_and_report,
     run_index_export_and_report,
+    snapshot_lockfile_export_paths,
 )
 
 
@@ -62,11 +64,15 @@ def main() -> int:
     print(f"Effective output path: {output_path}")
     print_export_flags(args)
 
+    previous_export_paths = snapshot_lockfile_export_paths(output_path)
     run_cme_and_report(
         "cme",
         ["orgs", *args.org_urls],
         build_export_env(args, output_path=output_path),
     )
+    removed_count = cleanup_renamed_page_exports(output_path, previous_export_paths)
+    if removed_count:
+        print(f"Renamed page cleanup: removed {removed_count} stale path(s)")
     run_index_export_and_report(output_path)
     return 0
 

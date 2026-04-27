@@ -260,7 +260,8 @@ diagram 관련 기능은 다음과 같습니다.
 - page version, export path, attachment version을 기록
 - unchanged page skip
 - output file이 사라졌으면 재export
-- export path가 바뀌면 old path file 삭제
+- 본체는 export path가 바뀐 page의 old path file 삭제 로직을 포함
+- 단건/descendant export처럼 이번 실행에서 lockfile page가 모두 seen 처리되어 `unseen` page가 없으면 본체의 moved-path cleanup이 실행되지 않을 수 있음
 - Confluence에서 삭제된 page는 local file과 lock entry를 cleanup
 - stale check는 v2 API 또는 v1 CQL 방식으로 batch 수행
 
@@ -328,6 +329,7 @@ diagram 관련 기능은 다음과 같습니다.
 - 모든 export 명령에서 `output-path` 를 환경변수 override로만 적용하고 config는 영구 수정하지 않음
 - 명시적 output path가 없으면 현재 helper는 `confluence` 를 effective output path로 사용
 - 모든 export 명령은 `cme` export 성공 후 같은 effective output path를 자동으로 `index-export` 처리
+- 모든 export 명령은 `index-export` 전에 export 전후 lockfile을 비교해 같은 page ID의 export path가 바뀐 경우 이전 Markdown 파일을 삭제
 - post-export `index-export` 는 기본적으로 `AGENTS.md` / `CLAUDE.md` Reading Rule 관리 블록도 설치 또는 갱신
 - `set-config` 명령으로 `cme` config의 `export.output_path` 를 영구 저장
 - 모든 export 명령에서 `--skip-unchanged` / `--no-skip-unchanged` 플래그로 `CME_EXPORT__SKIP_UNCHANGED` 설정 가능
@@ -366,7 +368,7 @@ diagram 관련 기능은 다음과 같습니다.
 | keyword search export | 표준 CLI 없음 | 미노출 |
 | label search export | 표준 CLI 없음 | 미노출 |
 | 병렬 worker 수 제어 | `connection_config.max_workers` 지원 | 모든 export 명령에 `--max-workers N` 플래그로 노출 |
-| stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` / `--no-cleanup-stale` 플래그로 노출 |
+| stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` / `--no-cleanup-stale` 플래그로 노출. 래퍼는 제목/ancestor 변경으로 export path가 바뀐 이전 Markdown 파일도 post-export로 정리 |
 | Jira enrichment toggle | `export.enable_jira_enrichment` 지원 | 모든 export 명령에 `--jira-enrichment` 플래그로 노출 |
 | `confluence-markdown-exporter` 설치 확인 | 본체 설치 문서만 제공 | `set-config` 가 pip 기준으로 확인하고 없으면 설치 |
 | exported Markdown local index | 표준 CLI 없음 | export 후 자동 실행 및 `index-export` 명령으로 `.confluence-index/` 생성 |

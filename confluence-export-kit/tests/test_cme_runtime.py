@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 from unittest import mock
 
@@ -107,6 +109,73 @@ class CmeRuntimeTests(unittest.TestCase):
                 "confluence-markdown-exporter",
             ],
         )
+
+    def test_cleanup_renamed_page_exports_removes_previous_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            old_file = root / "Space" / "Page 0.9.md"
+            new_file = root / "Space" / "Page 0.91.md"
+            old_file.parent.mkdir(parents=True)
+            old_file.write_text("# Page 0.9\n", encoding="utf-8")
+
+            lockfile_path = root / "confluence-lock.json"
+            lockfile_path.write_text(
+                json.dumps(
+                    {
+                        "lockfile_version": 2,
+                        "orgs": {
+                            "https://example.atlassian.net": {
+                                "spaces": {
+                                    "DOC": {
+                                        "pages": {
+                                            "123": {
+                                                "title": "Page 0.9",
+                                                "version": 1,
+                                                "export_path": "Space/Page 0.9.md",
+                                                "attachments": {},
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            previous = self.module.snapshot_lockfile_export_paths(root)
+
+            new_file.write_text("# Page 0.91\n", encoding="utf-8")
+            lockfile_path.write_text(
+                json.dumps(
+                    {
+                        "lockfile_version": 2,
+                        "orgs": {
+                            "https://example.atlassian.net": {
+                                "spaces": {
+                                    "DOC": {
+                                        "pages": {
+                                            "123": {
+                                                "title": "Page 0.91",
+                                                "version": 2,
+                                                "export_path": "Space/Page 0.91.md",
+                                                "attachments": {},
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            removed = self.module.cleanup_renamed_page_exports(root, previous)
+
+            self.assertEqual(removed, 1)
+            self.assertFalse(old_file.exists())
+            self.assertTrue(new_file.exists())
 
 
 if __name__ == "__main__":

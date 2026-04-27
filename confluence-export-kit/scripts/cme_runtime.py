@@ -112,6 +112,7 @@ def canonicalize_base_url(url: str, *, error_label: str = "Confluence base URL")
 # ---------------------------------------------------------------------------
 
 DEFAULT_OUTPUT_PATH = "confluence"
+DEFAULT_LOCKFILE_NAME = "confluence-lock.json"
 DEFAULT_SITE: str = os.environ.get(
     "CONFLUENCE_EXPORT_KIT_BASE_URL",
     "https://colosseum.atlassian.net",
@@ -232,6 +233,97 @@ def print_export_flags(args: argparse.Namespace) -> None:
     print(f"Cleanup stale: {'yes' if args.cleanup_stale else 'no'}")
     print(f"Jira enrichment: {'yes' if args.jira_enrichment else 'no'}")
     print(f"Max workers: {args.max_workers if args.max_workers is not None else '(default)'}")
+
+
+def _read_lockfile_export_paths(
+    output_path: str | Path,
+    *,
+    lockfile_name: str = DEFAULT_LOCKFILE_NAME,
+) -> dict[str, str]:
+    lockfile_path = Path(output_path).expanduser() / lockfile_name
+    if not lockfile_path.exists():
+        return {}
+
+    try:
+        data = json.loads(lockfile_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+    page_paths: dict[str, str] = {}
+    orgs = data.get("orgs")
+    if not isinstance(orgs, dict):
+        return page_paths
+
+    for org in orgs.values():
+        if not isinstance(org, dict):
+            continue
+        spaces = org.get("spaces")
+        if not isinstance(spaces, dict):
+            continue
+        for space in spaces.values():
+            if not isinstance(space, dict):
+                continue
+            pages = space.get("pages")
+            if not isinstance(pages, dict):
+                continue
+            for page_id, entry in pages.items():
+                if not isinstance(entry, dict):
+                    continue
+                export_path = entry.get("export_path")
+                if isinstance(page_id, str) and isinstance(export_path, str):
+                    page_paths[page_id] = export_path
+    return page_paths
+
+
+def snapshot_lockfile_export_paths(output_path: str | Path) -> dict[str, str]:
+    return _read_lockfile_export_paths(output_path)
+
+
+def _is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
+
+
+def _prune_empty_parents(start: Path, stop: Path) -> None:
+    current = start
+    while current != stop and _is_within(current, stop):
+        try:
+            current.rmdir()
+        except OSError:
+            return
+        current = current.parent
+
+
+def cleanup_renamed_page_exports(
+    output_path: str | Path,
+    previous_export_paths: dict[str, str],
+) -> int:
+    if not previous_export_paths:
+        return 0
+
+    current_export_paths = _read_lockfile_export_paths(output_path)
+    if not current_export_paths:
+        return 0
+
+    output_root = Path(output_path).expanduser().resolve()
+    removed = 0
+    for page_id, previous_path in previous_export_paths.items():
+        current_path = current_export_paths.get(page_id)
+        if not current_path or current_path == previous_path:
+            continue
+
+        previous_file = (output_root / previous_path).resolve()
+        current_file = (output_root / current_path).resolve()
+        if previous_file == current_file or not _is_within(previous_file, output_root):
+            continue
+        if previous_file.exists() and previous_file.is_file():
+            previous_file.unlink()
+            removed += 1
+            _prune_empty_parents(previous_file.parent, output_root)
+    return removed
 
 
 def run_cme_and_report(cme_path: str, cmd_args: list[str], env: dict[str, str]) -> None:

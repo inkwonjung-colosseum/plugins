@@ -66,7 +66,7 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
 | 플래그 | 설명 |
 |---|---|
 | `--skip-unchanged` / `--no-skip-unchanged` | lockfile 기반 증분 export 제어. 기본값은 on |
-| `--cleanup-stale` / `--no-cleanup-stale` | Confluence에서 삭제/이동된 page의 로컬 파일 cleanup 제어. 기본값은 on |
+| `--cleanup-stale` / `--no-cleanup-stale` | Confluence에서 삭제/이동된 page의 로컬 파일 cleanup 제어. 기본값은 on. 래퍼는 export 전후 lockfile도 비교해 제목 변경 등으로 경로가 바뀐 기존 Markdown 파일을 추가 정리합니다. |
 | `--jira-enrichment` | Jira issue summary를 export된 Markdown에 포함 |
 | `--max-workers N` | 병렬 export worker 수 제어 |
 
