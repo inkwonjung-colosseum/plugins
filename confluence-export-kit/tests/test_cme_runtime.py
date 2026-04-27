@@ -73,6 +73,20 @@ class CmeRuntimeTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Python 3.10\\+"):
                 self.module.ensure_python_preflight()
 
+    def test_cme_preflight_does_not_bootstrap_pipx_when_cme_already_exists(self) -> None:
+        with (
+            mock.patch.object(self.module, "find_named_executable", return_value="/usr/local/bin/cme"),
+            mock.patch.object(self.module, "validate_cme") as validate_mock,
+            mock.patch.object(self.module, "ensure_pipx_available") as pipx_mock,
+        ):
+            cme_path, cme_status, installer_status = self.module.ensure_cme_available()
+
+        self.assertEqual(cme_path, "/usr/local/bin/cme")
+        self.assertEqual(cme_status, "already available")
+        self.assertEqual(installer_status, "not needed (cme already available)")
+        validate_mock.assert_called_once_with("/usr/local/bin/cme")
+        pipx_mock.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

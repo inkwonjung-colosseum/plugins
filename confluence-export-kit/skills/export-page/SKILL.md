@@ -35,7 +35,7 @@ $export-page <page-url> [<page-url2> ...] --output-path <path>
 3. `--output-path <path>` is still supported as an explicit output path override. Do not combine it with a trailing positional output path.
 4. At least one page URL is required.
 5. All supplied URLs must belong to the same Confluence site (`scheme://netloc`). Mixed-site exports are not supported.
-6. Before export, validate that Python, `pipx`, and `cme` are usable.
+6. Before export, validate that Python and `cme` are usable; install `confluence-markdown-exporter` only when `cme` is missing.
 7. Extract the base site from the first page URL and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for that site.
 8. If auth is missing or incomplete, stop and tell the user to run one of:
 
@@ -126,7 +126,7 @@ If no Python 3.10+ interpreter is found, stop and tell the user:
 
 Do not proceed to Step 2 until `PYTHON_BIN` (Bash) or `$PythonCommand` (PowerShell) is set.
 
-### Step 2 — Run the helper script
+### Step 2 — Run the helper script and ensure `cme`
 
 If no page URL argument was provided, stop and tell the user to run one of:
 
@@ -200,7 +200,7 @@ if (-not $ResolvedSkillDir) {
 
 After the script finishes:
 
-- report Python/pipx/cme preflight status
+- report Python/cme preflight status and installer status when installation was needed
 - report which Confluence site was matched
 - confirm that auth was already configured
 - report how many pages are being exported and list their URLs

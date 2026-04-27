@@ -1,6 +1,6 @@
 # confluence-export-kit
 
-confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export-only 플러그인입니다 (v0.2.1). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, Python/pipx/`cme` bootstrap을 다룹니다.
+confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export-only 플러그인입니다 (v0.1.0). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, Python/`cme` bootstrap을 다룹니다.
 
 두 에이전트의 플러그인 매니페스트(`.claude-plugin/`, `.codex-plugin/`)가 하나의 `skills/` 디렉터리와 `scripts/` 런타임을 공유합니다. 스킬 호출 문법은 에이전트별로 다릅니다 — Claude Code는 `/confluence-export-kit:<skill>` 콜론 네임스페이스, Codex는 공식 플러그인 스펙에 따라 `$<skill>` 형태를 사용합니다. helper 스크립트 경로는 각 SKILL.md 안에서 직접 해결합니다: Claude Code가 주입하는 `CLAUDE_SKILL_DIR` 을 우선 시도하고, Codex에는 해당하는 env 주입이 공식 문서에 없으므로 Codex 설치 캐시(`~/.codex/plugins/cache/*/confluence-export-kit/*/skills/<skill>`)와 로컬 개발 경로를 순서대로 탐지합니다.
 
@@ -8,7 +8,7 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
 
 - Confluence auth 설정 및 token 검증
 - org / space / page-with-descendants / page 단건/다건 export
-- export runtime bootstrap (`python`, `pip`, `pipx`, `cme`)
+- export runtime bootstrap (`python`, `cme`; `cme`가 없을 때만 installer 사용)
 - 기본 출력 경로 영구 설정
 
 지원하지 않는 범위는 다음과 같습니다.

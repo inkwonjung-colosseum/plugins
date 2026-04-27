@@ -25,7 +25,7 @@ $show-config --json
 
 ## Rules
 
-1. Before running, validate that Python, `pipx`, and `cme` are usable.
+1. Before running, validate that Python and `cme` are usable; install `confluence-markdown-exporter` only when `cme` is missing.
 2. Run `cme config list` and capture its full output.
 3. If `--json` is passed, run `cme config list -o json` instead.
 4. Print the output verbatim — do not summarize or truncate it.
@@ -102,7 +102,9 @@ If no Python 3.10+ interpreter is found, stop and tell the user:
 
 Do not proceed to Step 2 until `PYTHON_BIN` (Bash) or `$PythonCommand` (PowerShell) is set.
 
-### Step 2 — Run the helper script
+### Step 2 — Run the helper script and ensure `cme`
+
+The helper checks `cme` first. If `cme` is already available, it does not check or install `pipx`; if `cme` is missing, it prepares the installer path and installs `confluence-markdown-exporter`.
 
 Run the helper script in this skill directory. The resolver handles both Claude Code (`CLAUDE_SKILL_DIR` injected) and Codex (falls back to the documented install cache `~/.codex/plugins/cache/*/confluence-export-kit/*/skills/show-config`, since Codex does not inject a skill-dir env var per its official plugin spec):
 
@@ -166,7 +168,7 @@ if (-not $ResolvedSkillDir) {
 
 After the script finishes:
 
-- report Python/pipx/cme preflight status
+- report Python/cme preflight status and installer status when installation was needed
 - print the full `cme config list` output
 
 ## Screen Feedback

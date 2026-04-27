@@ -172,8 +172,8 @@ def install_pipx() -> list[str]:
 def ensure_pipx_available() -> tuple[list[str], str]:
     pipx_cmd = pipx_command_from_environment()
     if pipx_cmd:
-        return pipx_cmd, "already available"
-    return install_pipx(), "installed via pip --user"
+        return pipx_cmd, "pipx already available"
+    return install_pipx(), "pipx installed via pip --user"
 
 
 def pipx_list_json(pipx_cmd: list[str]) -> dict[str, Any]:
@@ -243,8 +243,7 @@ def ensure_cme_available() -> tuple[str, str, str]:
     cme_path = find_named_executable("cme")
     if cme_path:
         validate_cme(cme_path)
-        pipx_cmd, pipx_status = ensure_pipx_available()
-        return cme_path, "already available", pipx_status
+        return cme_path, "already available", "not needed (cme already available)"
 
     pipx_cmd, pipx_status = ensure_pipx_available()
     cme_path = cme_path_from_pipx_metadata(pipx_cmd)
@@ -510,11 +509,11 @@ def require_auth(config_data: dict[str, Any], base_url: str) -> dict[str, Any]:
 
 
 def print_preflight(
-    python_path: str, pipx_status: str, cme_status: str,
+    python_path: str, installer_status: str, cme_status: str,
     cme_path: str, config_path: Path, base_url: str,
 ) -> None:
     print(f"Python executable: {python_path}")
-    print(f"Pipx status: {pipx_status}")
+    print(f"Installer status: {installer_status}")
     print(f"CME status: {cme_status}")
     print(f"CME executable: {cme_path}")
     print(f"Config path: {config_path}")

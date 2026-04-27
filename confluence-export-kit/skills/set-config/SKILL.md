@@ -115,7 +115,9 @@ If no Python 3.10+ interpreter is found, stop and tell the user:
 
 Do not proceed to Step 2 until `PYTHON_BIN` (Bash) or `$PythonCommand` (PowerShell) is set.
 
-### Step 2 — Run the helper script
+### Step 2 — Run the helper script and ensure `cme`
+
+The helper checks `cme` first. If `cme` is already available, it does not check or install `pipx`; if `cme` is missing, it prepares the installer path and installs `confluence-markdown-exporter`.
 
 Run the helper script in this skill directory. The resolver handles both Claude Code (`CLAUDE_SKILL_DIR` injected) and Codex (falls back to the documented install cache `~/.codex/plugins/cache/*/confluence-export-kit/*/skills/set-config`, since Codex does not inject a skill-dir env var per its official plugin spec):
 
@@ -180,7 +182,7 @@ if (-not $ResolvedSkillDir) {
 After the script finishes:
 
 - report detected platform
-- report Python/pipx/cme preflight status
+- report Python/cme preflight status and installer status when installation was needed
 - report the config file path
 - report whether auth was updated and which site was targeted
 - report token probe status without echoing the token

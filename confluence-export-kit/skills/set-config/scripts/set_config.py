@@ -71,7 +71,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     python_path = ensure_python_preflight()
-    cme_path, cme_status, pipx_status = ensure_cme_available()
+    cme_path, cme_status, installer_status = ensure_cme_available()
     config_path = resolve_config_path(args.config_path, cme_path)
     data = load_json(config_path)
 
@@ -109,7 +109,7 @@ def main() -> int:
 
     print(f"Platform: {platform_label()}")
     print(f"Python executable: {python_path}")
-    print(f"Pipx status: {pipx_status}")
+    print(f"Installer status: {installer_status}")
     print(f"CME status: {cme_status}")
     print(f"CME executable: {cme_path}")
     print(f"Updated config: {config_path}")

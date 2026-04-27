@@ -76,7 +76,7 @@ def validate_same_site(urls: list[str]) -> str:
 def main() -> int:
     args = parse_args()
     python_path = ensure_python_preflight()
-    cme_path, cme_status, pipx_status = ensure_cme_available()
+    cme_path, cme_status, installer_status = ensure_cme_available()
     config_path = resolve_config_path(args.config_path, cme_path)
     config_data = load_json(config_path)
 
@@ -84,7 +84,7 @@ def main() -> int:
     require_auth(config_data, base_url)
     output_path = effective_output_path(config_data, args.output_path)
 
-    print_preflight(python_path, pipx_status, cme_status, cme_path, config_path, base_url)
+    print_preflight(python_path, installer_status, cme_status, cme_path, config_path, base_url)
     print(f"Page count: {len(args.page_urls)}")
     for url in args.page_urls:
         print(f"  {url}")

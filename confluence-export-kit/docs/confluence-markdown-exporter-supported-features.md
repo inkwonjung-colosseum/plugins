@@ -9,14 +9,14 @@
 
 - 확인 일자: 2026-04-23
 - upstream 패키지 최신 확인 버전: `confluence-markdown-exporter 4.0.8`
-- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.2.1`
+- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.0`
 
 ## 한눈에 보기
 
 | 구분 | 범위 |
 | --- | --- |
 | `confluence-markdown-exporter` 본체 | Confluence page/space/org export CLI, config/auth 관리, Markdown 변환, attachment export, 증분 export, stale cleanup, Jira enrichment |
-| `confluence-export-kit` 래퍼 | auth 설정, page/space/org/page-with-descendants export, `python`/`pipx`/`cme` bootstrap |
+| `confluence-export-kit` 래퍼 | auth 설정, page/space/org/page-with-descendants export, `python`/`cme` bootstrap (`cme`가 없을 때만 installer 사용) |
 
 ## 1. upstream `confluence-markdown-exporter` 본체 기능
 
@@ -321,9 +321,9 @@ diagram 관련 기능은 다음과 같습니다.
 
 래퍼는 upstream에 없는 workflow 기능도 일부 추가합니다.
 
-- `python` / `pip` / `pipx` / `cme` preflight 확인
-- `pipx` 가 없으면 bootstrap
-- `cme` 가 없으면 `confluence-markdown-exporter` install 또는 upgrade
+- `python` / `cme` preflight 확인
+- `cme` 가 이미 있으면 installer를 건드리지 않고 바로 사용
+- `cme` 가 없으면 installer를 준비해 `confluence-markdown-exporter` install 또는 upgrade
 - `set-config` 실행 시 `/wiki/rest/api/user/current` 로 토큰을 기본 검증 (opt-out: `--skip-validate`)
 - `set-config` 실행 시 기본적으로 `auth.jira` 도 같은 URL로 맞춤 (`--skip-jira` 로 생략 가능)
 - 모든 export 명령에서 `output-path` 를 환경변수 override로만 적용하고 config는 영구 수정하지 않음

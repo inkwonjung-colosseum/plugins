@@ -30,7 +30,7 @@ $export-page-with-descendant <page-url> <page-url2> [output-path]
 
 1. Treat the arguments as one or more Confluence root page URLs.
 2. If the final argument is not URL-like, treat it as an optional export output path override.
-3. Before export, validate that Python, `pipx`, and `cme` are usable.
+3. Before export, validate that Python and `cme` are usable; install `confluence-markdown-exporter` only when `cme` is missing.
 4. Read the `cme` config file and verify that every page URL's base site already has a configured `auth.confluence` entry with both `username` and `api_token`.
 5. If auth is missing or incomplete, stop and tell the user to run one of:
 
@@ -121,7 +121,7 @@ If no Python 3.10+ interpreter is found, stop and tell the user:
 
 Do not proceed to Step 2 until `PYTHON_BIN` (Bash) or `$PythonCommand` (PowerShell) is set.
 
-### Step 2 — Run the helper script
+### Step 2 — Run the helper script and ensure `cme`
 
 If no page URL argument was provided, stop and tell the user to run one of:
 
@@ -195,7 +195,7 @@ if (-not $ResolvedSkillDir) {
 
 After the script finishes:
 
-- report Python/pipx/cme preflight status
+- report Python/cme preflight status and installer status when installation was needed
 - report which Confluence site(s) were matched
 - confirm that auth was already configured
 - report how many root pages are being exported and list their URLs

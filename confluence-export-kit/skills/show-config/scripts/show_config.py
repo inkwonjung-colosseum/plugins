@@ -31,7 +31,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     python_path = ensure_python_preflight()
-    cme_path, cme_status, pipx_status = ensure_cme_available()
+    cme_path, cme_status, installer_status = ensure_cme_available()
 
     cmd = [cme_path, "config", "list"]
     if args.json:
@@ -40,7 +40,7 @@ def main() -> int:
     result = run_command(cmd)
 
     print(f"Python executable: {python_path}")
-    print(f"Pipx status: {pipx_status}")
+    print(f"Installer status: {installer_status}")
     print(f"CME status: {cme_status}")
     print(f"CME executable: {cme_path}")
     print()
