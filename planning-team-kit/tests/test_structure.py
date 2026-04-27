@@ -10,7 +10,34 @@ import unittest
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
 PLUGIN_ROOT = WORKSPACE_ROOT / "planning-team-kit"
 PLANNING_DRAFTS_TEMPLATES_ROOT = PLUGIN_ROOT / "skills" / "planning-drafts" / "templates"
+GENERATED_SUITE_FIXTURE_ROOT = PLUGIN_ROOT / "tests" / "fixtures" / "generated-core-suite"
 PLATFORM_KEYWORDS = {"claude-plugin", "codex-plugin"}
+CORE_TEMPLATE_NAMES = [
+    "index",
+    "planning-brief",
+    "requirements",
+    "behavior-spec",
+]
+RESERVED_TEMPLATE_NAMES = [
+    "metrics-brief",
+    "option-memo",
+    "qa-scenario",
+    "stakeholder-brief",
+]
+LEGACY_TEMPLATE_NAMES = [
+    "planning-context",
+    "brief",
+    "prd",
+    "user-stories",
+    "feature-spec",
+]
+ALL_TEMPLATE_NAMES = CORE_TEMPLATE_NAMES + RESERVED_TEMPLATE_NAMES + LEGACY_TEMPLATE_NAMES
+CORE_GENERATED_FILES = [
+    "00-index.md",
+    "01-planning-brief.md",
+    "02-requirements.md",
+    "03-behavior-spec.md",
+]
 
 
 def _parse_scalar(raw: str) -> object:
@@ -246,6 +273,21 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("before recommending `planning-drafts`", text)
         self.assertIn("approval_state` to `needs_review`", text)
 
+    def test_questioning_skills_prefer_interactive_choice_tools_with_fallback(self) -> None:
+        skill_paths = (
+            PLUGIN_ROOT / "skills" / "planning-intake" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "quality-review" / "SKILL.md",
+        )
+
+        for skill_path in skill_paths:
+            with self.subTest(skill=skill_path):
+                text = skill_path.read_text()
+                self.assertIn("## Question Delivery", text)
+                self.assertIn("request_user_input", text)
+                self.assertIn("askUserQuestion", text)
+                self.assertIn("plain Markdown", text)
+
     def test_planning_drafts_requires_readiness_check_before_generating_artifacts(self) -> None:
         text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
 
@@ -273,26 +315,19 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertNotIn("`lite`", text)
         self.assertNotIn("`full`", text)
         self.assertIn("## Standard Suite", text)
-        self.assertIn("Always generate the standard suite", text)
+        self.assertIn("Always generate the core standard suite", text)
 
-        for artifact_name in (
-            "brief",
-            "prd",
-            "user-stories",
-            "feature-spec",
-            "metrics-brief",
-        ):
+        for artifact_name in CORE_TEMPLATE_NAMES:
             self.assertIn(f"`{artifact_name}`", text)
 
         generated_artifacts = text.split("## Generated Artifact Types", 1)[1].split(
             "## Template Map",
             1,
         )[0]
-        self.assertIn("`brief`", generated_artifacts)
-        self.assertIn("`prd`", generated_artifacts)
-        self.assertIn("`user-stories`", generated_artifacts)
-        self.assertIn("`feature-spec`", generated_artifacts)
-        self.assertIn("`metrics-brief`", generated_artifacts)
+        for artifact_name in CORE_TEMPLATE_NAMES:
+            self.assertIn(f"`{artifact_name}`", generated_artifacts)
+        for artifact_name in RESERVED_TEMPLATE_NAMES + LEGACY_TEMPLATE_NAMES:
+            self.assertNotIn(f"`{artifact_name}`", generated_artifacts)
         self.assertNotIn("`qa-scenario`", generated_artifacts)
         self.assertNotIn("`handoff-summary`", generated_artifacts)
         self.assertNotIn("`engineering-brief`", generated_artifacts)
@@ -302,25 +337,24 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
 
         self.assertIn("## Local Draft Persistence", text)
         self.assertIn("Always save generated artifacts", text)
-        self.assertIn("docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/", text)
-        self.assertIn("docs/planning/drafts/2026-04-24-143205-login-onboarding/", text)
+        self.assertIn("docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/", text)
+        self.assertIn("docs/planning/drafts/login-onboarding--2026-04-24-143205/", text)
         self.assertIn("Do not overwrite existing suite directories", text)
         self.assertIn("append `-2`, `-3`, or the next available numeric suffix", text)
 
-        for relative_path in (
+        for relative_path in CORE_GENERATED_FILES:
+            self.assertIn(relative_path, text)
+
+        for removed_path in (
             "00-suite-index.md",
             "00-planning-context.md",
+            "00-planning-context.yaml",
             "01-brief.md",
             "02-prd.md",
             "03-user-stories.md",
             "04-feature-spec.md",
-            "05-metrics-brief.md",
-        ):
-            self.assertIn(relative_path, text)
-
-        for removed_path in (
-            "00-planning-context.yaml",
             "03-metrics-brief.md",
+            "05-metrics-brief.md",
             "04-engineering-brief.md",
             "03-qa-scenario.md",
             "05-handoff-summary.md",
@@ -362,12 +396,10 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
             "`full standard suite`",
             "`partial suite`",
             "`single document`",
-            "`00-planning-context.md`",
-            "`01-brief.md`",
-            "`02-prd.md`",
-            "`03-user-stories.md`",
-            "`04-feature-spec.md`",
-            "`05-metrics-brief.md`",
+            "`00-index.md`",
+            "`01-planning-brief.md`",
+            "`02-requirements.md`",
+            "`03-behavior-spec.md`",
         ):
             self.assertIn(input_contract_term, text)
 
@@ -420,19 +452,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
 
     def test_planning_drafts_owns_template_resources(self) -> None:
         text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
-        template_names = [
-            "planning-context",
-            "brief",
-            "option-memo",
-            "prd",
-            "user-stories",
-            "feature-spec",
-            "qa-scenario",
-            "metrics-brief",
-            "stakeholder-brief",
-        ]
 
-        for template_name in template_names:
+        for template_name in ALL_TEMPLATE_NAMES:
             with self.subTest(template=template_name):
                 template_path = PLANNING_DRAFTS_TEMPLATES_ROOT / f"{template_name}.md"
                 self.assertTrue(template_path.exists())
@@ -449,6 +470,10 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
             (PLUGIN_ROOT / "schemas" / "section-map.yaml").read_text()
         )
         expected_defaults = {
+            "index": {"decision_required": True},
+            "planning-brief": {"decision_required": True},
+            "requirements": {"decision_required": True},
+            "behavior-spec": {"decision_required": True},
             "planning-context": {"decision_required": True},
             "brief": {"decision_required": True},
             "option-memo": {"decision_required": True},
@@ -462,19 +487,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         expected_subheadings = {
             "option-memo": ["Option A", "Option B", "Option C"],
         }
-        template_names = [
-            "planning-context",
-            "brief",
-            "option-memo",
-            "prd",
-            "user-stories",
-            "feature-spec",
-            "qa-scenario",
-            "metrics-brief",
-            "stakeholder-brief",
-        ]
 
-        for template_name in template_names:
+        for template_name in ALL_TEMPLATE_NAMES:
             with self.subTest(template=template_name):
                 template = PLANNING_DRAFTS_TEMPLATES_ROOT / f"{template_name}.md"
                 header, body = parse_front_matter(template.read_text())
@@ -513,12 +527,35 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
                         expected_subheadings[template_name],
                     )
 
+                if template_name == "index":
+                    self.assertIn("How to Read This Suite", body)
+                    self.assertIn("01-planning-brief.md", body)
+                    self.assertIn("02-requirements.md", body)
+                    self.assertIn("03-behavior-spec.md", body)
+
+                if template_name == "planning-brief":
+                    self.assertIn("Current State", body)
+                    self.assertIn("Failure Criteria", body)
+                    self.assertIn("Options Considered", body)
+
+                if template_name == "requirements":
+                    self.assertIn("Requirement ID", body)
+                    self.assertIn("Acceptance Criteria", body)
+                    self.assertIn("Source", body)
+                    self.assertIn("Assumption", body)
+
+                if template_name == "behavior-spec":
+                    self.assertIn("Requirement ID", body)
+                    self.assertIn("Surface/Flow", body)
+                    self.assertIn("State/Permission Rule", body)
+                    self.assertIn("Failure Case", body)
+
                 if template_name == "prd":
                     self.assertIn("- Must have:", body)
                     self.assertIn("- Should have:", body)
                     self.assertIn("- Could have:", body)
                     self.assertIn("- Out of scope:", body)
-                    self.assertIn("03-user-stories.md", body)
+                    self.assertIn("story-level detail", body)
                     self.assertNotIn("acceptance criteria", body)
 
                 if template_name == "user-stories":
@@ -564,6 +601,47 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         for relative_path in expected_files:
             with self.subTest(path=relative_path):
                 self.assertTrue((PLUGIN_ROOT / relative_path).exists())
+
+    def test_generated_core_suite_fixture_matches_contract(self) -> None:
+        header_schema = json.loads(
+            (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
+        )
+        section_map = parse_simple_yaml(
+            (PLUGIN_ROOT / "schemas" / "section-map.yaml").read_text()
+        )
+        expected_doc_types = {
+            "00-index.md": "index",
+            "01-planning-brief.md": "planning-brief",
+            "02-requirements.md": "requirements",
+            "03-behavior-spec.md": "behavior-spec",
+        }
+
+        self.assertEqual(
+            sorted(path.name for path in GENERATED_SUITE_FIXTURE_ROOT.glob("*.md")),
+            CORE_GENERATED_FILES,
+        )
+
+        for file_name, doc_type in expected_doc_types.items():
+            with self.subTest(file=file_name):
+                header, body = parse_front_matter(
+                    (GENERATED_SUITE_FIXTURE_ROOT / file_name).read_text()
+                )
+                self.assertEqual(header["doc_type"], doc_type)
+
+                for required_key in header_schema["required"]:
+                    self.assertIn(required_key, header)
+
+                for key, property_schema in header_schema["properties"].items():
+                    if key in header and "enum" in property_schema:
+                        self.assertIn(header[key], property_schema["enum"])
+
+                self.assertEqual(header["mode"], "standard")
+                self.assertIn(header["approval_state"], {"draft", "needs_review"})
+                self.assertEqual(extract_headings(body), section_map[doc_type]["required"])
+
+        index_text = (GENERATED_SUITE_FIXTURE_ROOT / "00-index.md").read_text()
+        for file_name in CORE_GENERATED_FILES[1:]:
+            self.assertIn(f"]({file_name})", index_text)
 
     def test_plugin_is_registered_in_workspace_docs_and_marketplace(self) -> None:
         claude_manifest = json.loads(
@@ -630,9 +708,20 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn(".claude-plugin/marketplace.json", readme)
         self.assertIn(".agents/plugins/marketplace.json", readme)
         self.assertIn("├── snippets/", readme)
+        self.assertIn("https://github.com/inkwonjung-colosseum/plugins", readme)
+        self.assertIn(
+            "claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins",
+            readme,
+        )
+        self.assertIn(
+            "codex marketplace add https://github.com/inkwonjung-colosseum/plugins",
+            readme,
+        )
         self.assertIn("claude plugin install planning-team-kit@inkwonjung-colosseum", readme)
         self.assertIn("claude plugin marketplace add", readme)
         self.assertNotIn("claude plugin add ./planning-team-kit", readme)
+        self.assertNotIn("claude plugin marketplace add /absolute/path/to/colo-plugins", readme)
+        self.assertNotIn("codex marketplace add /absolute/path/to/colo-plugins", readme)
         self.assertIn("Codex", readme)
         self.assertIn(".codex-plugin/plugin.json", readme)
         self.assertIn("policy.installation", readme)
@@ -644,10 +733,15 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("## Start Here", readme)
         self.assertIn("/planning-team-kit:help", readme)
         self.assertIn("$help", readme)
-        self.assertIn("00-planning-context.md", readme)
-        self.assertIn("03-user-stories.md", readme)
-        self.assertIn("04-feature-spec.md", readme)
-        self.assertIn("05-metrics-brief.md", readme)
+        self.assertIn("00-index.md", readme)
+        self.assertIn("01-planning-brief.md", readme)
+        self.assertIn("02-requirements.md", readme)
+        self.assertIn("03-behavior-spec.md", readme)
+        self.assertNotIn("00-suite-index.md", readme)
+        self.assertNotIn("00-planning-context.md", readme)
+        self.assertNotIn("03-user-stories.md", readme)
+        self.assertNotIn("04-feature-spec.md", readme)
+        self.assertNotIn("05-metrics-brief.md", readme)
         self.assertNotIn("00-planning-context.yaml", readme)
         self.assertNotIn("03-metrics-brief.md", readme)
         self.assertNotIn("04-engineering-brief.md", readme)

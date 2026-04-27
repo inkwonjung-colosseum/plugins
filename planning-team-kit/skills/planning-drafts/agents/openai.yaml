@@ -1,6 +1,6 @@
 interface:
   display_name: "Planning Drafts"
-  short_description: "Generate draft planning artifacts such as brief, PRD, user stories, feature spec, and metrics brief."
+  short_description: "Generate a core draft planning suite with index, planning brief, requirements, and behavior spec."
   brand_color: "#0F766E"
   default_prompt: "Generate the right draft planning artifact suite from this planning context."
 

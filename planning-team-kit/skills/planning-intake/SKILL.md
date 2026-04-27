@@ -56,6 +56,16 @@ If any readiness criterion is missing, ask the single highest-impact missing que
 
 If the user cannot answer or asks to proceed anyway, keep the unresolved item in `open_questions`, mark related claims as assumptions, set `approval_state` to `needs_review`, and only then recommend the next skill.
 
+## Question Delivery
+
+When asking a user-facing clarification question, prefer an interactive choice tool if the runtime provides one.
+
+- In Codex Plan mode, use `request_user_input` when the question can be answered with 2-3 mutually exclusive choices.
+- In Claude Code, use `askUserQuestion` when that tool is available and the question can be answered with 2-3 mutually exclusive choices.
+- Put the recommended option first and mark it as recommended.
+- If no interactive question tool is available, ask the same question in plain Markdown with a compact option table.
+- Use plain Markdown for open-ended questions that cannot be reduced to useful choices.
+
 ## Question Order
 
 Ask only what is missing:

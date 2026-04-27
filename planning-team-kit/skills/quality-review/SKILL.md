@@ -36,12 +36,10 @@ Accept these input shapes:
 
 The standard suite files are:
 
-- `00-planning-context.md`
-- `01-brief.md`
-- `02-prd.md`
-- `03-user-stories.md`
-- `04-feature-spec.md`
-- `05-metrics-brief.md`
+- `00-index.md`
+- `01-planning-brief.md`
+- `02-requirements.md`
+- `03-behavior-spec.md`
 
 Rules:
 
@@ -70,8 +68,8 @@ Report Gate 0-3 as `pass`, `warn`, or `fail`. Use `warn` when the draft is revie
 
 - Gate 0: scope fit. Check that the input is a planning artifact, the input type is clear, required documents are present or explicitly missing, and draft-only status is preserved.
 - Gate 1: basic completeness. Check for problem, audience, goals, non-goals, requirements, success criteria, and separated open questions.
-- Gate 2: consistency and execution. Check that PRD requirements, user stories, feature behavior, metrics, non-goals, owners, and next actions do not conflict and can support handoff without guessing.
-- Gate 3: evidence and governance. Check that unsupported claims are marked as assumptions, metrics are measurable, sensitivity and approval state are explicit, and the draft does not imply final approval.
+- Gate 2: consistency and execution. Check that requirements, acceptance criteria, behavior rules, non-goals, owners, and next actions do not conflict and can support handoff without guessing.
+- Gate 3: evidence and governance. Check that unsupported claims are marked as assumptions, validation expectations are reviewable, sensitivity and approval state are explicit, and the draft does not imply final approval.
 
 Gate outcomes inform the final verdict:
 
@@ -88,7 +86,7 @@ Score each rubric axis with the shared 0/1/2 model:
 - `1`: present but vague, partial, weak, or requires interpretation.
 - `2`: explicit, verifiable, aligned, and usable for draft handoff.
 
-Do not use average score alone to determine the verdict. A critical failure, final-approval implication, missing core planning context, unsupported decision-driving claim, or unmeasurable primary success metric forces `needs revision` even when most scores are high.
+Do not use average score alone to determine the verdict. A critical failure, final-approval implication, missing core planning context, unsupported decision-driving claim, or unreviewable validation expectation forces `needs revision` even when most scores are high.
 
 ## Review Orchestration
 
@@ -105,11 +103,11 @@ Act as the review orchestrator.
 
 Use these fixed reviewer roles:
 
-- Product Context Reviewer: review `00-planning-context.md`, `01-brief.md`, and `02-prd.md` for problem clarity, audience clarity, goal/non-goal separation, requirement completeness, and decision traceability.
-- Story & Testability Reviewer: review `02-prd.md` and `03-user-stories.md` for requirement testability, story clarity, acceptance criteria quality, and edge or negative case coverage.
-- Feature Behavior & Policy Reviewer: review `02-prd.md` and `04-feature-spec.md` for user flow, screen or surface behavior, state and policy rules, permission rules, rollout expectations, reversibility, and error states.
-- Metrics & Evidence Reviewer: review `00-planning-context.md`, `02-prd.md`, and `05-metrics-brief.md` for metric verifiability, guardrails, observation window, segment, decision rule, evidence quality, and assumption separation.
-- Cross-Artifact Consistency Reviewer: review the full suite for PRD requirement to user story to feature spec to metrics traceability, non-goal leakage, conflicting scope, and contradictory decisions.
+- Product Context Reviewer: review `00-index.md` and `01-planning-brief.md` for problem clarity, audience clarity, goal/non-goal separation, decision traceability, and open question quality.
+- Story & Testability Reviewer: review `02-requirements.md` for requirement testability, acceptance criteria quality, and edge or negative case coverage.
+- Feature Behavior & Policy Reviewer: review `02-requirements.md` and `03-behavior-spec.md` for user flow, screen or surface behavior, state and policy rules, permission rules, reversibility, and error states.
+- Metrics & Evidence Reviewer: review `00-index.md`, `01-planning-brief.md`, and `02-requirements.md` for evidence quality, validation expectations, source quality, and assumption separation.
+- Cross-Artifact Consistency Reviewer: review the full suite for planning brief to requirements to behavior spec traceability, non-goal leakage, conflicting scope, and contradictory decisions.
 - Handoff Governance Reviewer: review the full suite for owners, unresolved issues, dependencies, risks, next actions, sensitivity, approval state, decision-required consistency, and handoff blockers.
 
 Each critical finding must use this shape:
@@ -144,6 +142,16 @@ Use these severity values:
 ## Fallback Mode
 
 If the execution environment cannot create subagents, do not skip the role split. Run the same six reviewer roles sequentially as a checklist and set `Review Execution Mode` to `sequential fallback`.
+
+## Question Delivery
+
+When asking the highest-impact follow-up question, prefer an interactive choice tool if the runtime provides one.
+
+- In Codex Plan mode, use `request_user_input` when the question can be answered with 2-3 mutually exclusive choices.
+- In Claude Code, use `askUserQuestion` when that tool is available and the question can be answered with 2-3 mutually exclusive choices.
+- Put the recommended answer first and mark it as recommended.
+- If no interactive question tool is available, ask the same question in plain Markdown with a compact option table.
+- Use plain Markdown for open-ended questions that cannot be reduced to useful choices.
 
 ## Rules
 

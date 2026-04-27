@@ -1,6 +1,6 @@
 {
   "name": "planning-team-kit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Claude Code and Codex compatible planning document quality kit for structured brainstorming, artifact generation, review, and handoff drafts.",
   "author": {
     "name": "developjik",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "planning-team-kit",
     "shortDescription": "Create consistent draft planning artifacts with lightweight quality gates",
-    "longDescription": "planning-team-kit helps planning teams define and align rough ideas, generate and locally save standard draft planning artifacts, review quality gaps, and prepare handoff summaries. v0.1 is draft-only and does not write to external systems.",
+    "longDescription": "planning-team-kit helps planning teams define and align rough ideas, generate and locally save a core draft planning suite, review quality gaps, and prepare handoff summaries. v0.1 is draft-only and does not write to external systems.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

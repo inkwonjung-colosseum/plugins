@@ -1,5 +1,5 @@
 ---
-doc_type: feature-spec
+doc_type: behavior-spec
 title: ""
 status: draft
 owner: ""
@@ -14,21 +14,21 @@ sensitivity: internal
 approval_state: draft
 ---
 
-# Feature Spec
+# Behavior Spec
 
-> Draft-only. This describes expected feature behavior, not an implementation design.
+> Draft-only. This describes user-visible behavior and policy rules, not backend implementation design.
 
 ## Summary
 
-Summarize the feature, user value, and intended outcome.
+Summarize the behavior, user value, and intended outcome.
 
 ## Source Artifacts
 
-List the planning brief, requirements, behavior notes, designs, tickets, and source notes used.
+List the planning brief, requirements, designs, tickets, and source notes used.
 
 ## Feature Scope
 
-Define what the feature includes and excludes for the current release.
+Define what behavior is included and excluded for the current release.
 
 ## User Flow
 
@@ -44,7 +44,7 @@ List business rules, lifecycle states, eligibility rules, limits, defaults, and 
 
 ## Permission Rules
 
-List who can view, create, update, approve, cancel, or recover the feature state.
+List who can view, create, update, approve, cancel, or recover each state.
 
 ## Edge Cases and Error States
 
@@ -54,9 +54,11 @@ List empty states, invalid states, blocked flows, recovery behavior, and user-fa
 
 Describe what must be checked by product, design, QA, data, or operations before release.
 
-## Rollout Expectations
+## Traceability
 
-Describe launch scope, phased rollout expectations, communication needs, and rollback triggers at the product level.
+| Requirement ID | Surface/Flow | State/Permission Rule | Failure Case |
+|----------------|--------------|-----------------------|--------------|
+| REQ-01 | Name the screen or flow. | State the governing rule. | State the blocked or failed behavior. |
 
 ## Open Questions
 

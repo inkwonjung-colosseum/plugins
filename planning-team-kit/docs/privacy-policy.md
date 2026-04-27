@@ -5,7 +5,7 @@
 ## What this plugin stores
 
 - Draft planning artifacts created in the local workspace
-- Timestamped `planning-drafts` drafts saved under `docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/`
+- Timestamped `planning-drafts` drafts saved under `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`
 - Plugin manifests, templates, schemas, and examples stored in the repository
 - User-provided planning inputs that are included in generated drafts
 

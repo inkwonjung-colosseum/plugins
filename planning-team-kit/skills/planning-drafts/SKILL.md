@@ -1,12 +1,12 @@
 ---
 name: planning-drafts
-description: "Generate and save the standard draft planning artifact suite from aligned planning context."
+description: "Generate and save the core draft planning artifact suite from aligned planning context."
 argument-hint: "[planning context or source notes]"
 ---
 
 # Planning Drafts
 
-Use this skill after planning context exists. It drafts and saves the standard planning artifact suite.
+Use this skill after planning context exists. It drafts and saves the core standard planning artifact suite.
 
 ## Invocation
 
@@ -24,7 +24,7 @@ $planning-drafts <planning-context>
 
 ## Purpose
 
-Generate and locally save the standard draft-only planning artifact suite from structured context. PRD is only one output in the suite.
+Generate and locally save a slim draft-only planning artifact suite from structured context. The suite is optimized for planning-team review before deeper handoff artifacts are split out.
 
 ## Readiness Check
 
@@ -53,15 +53,14 @@ If the user explicitly asks to proceed despite gaps, keep the output draft-only,
 
 ## Standard Suite
 
-Always generate the standard suite:
+Always generate the core standard suite:
 
-- `brief`
-- `prd`
-- `user-stories`
-- `feature-spec`
-- `metrics-brief`
+- `index`
+- `planning-brief`
+- `requirements`
+- `behavior-spec`
 
-The bundled `qa-scenario`, `option-memo`, and `stakeholder-brief` templates are reserved resources. Do not generate them from `planning-drafts` until the suite contract is expanded later.
+The bundled reserved and legacy templates are reference resources. Do not generate them from `planning-drafts` unless a later skill explicitly asks for a conditional add-on.
 
 ## Local Draft Persistence
 
@@ -70,13 +69,13 @@ Always save generated artifacts to the current workspace. Do not ask whether to 
 Use this directory format:
 
 ```text
-docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/
+docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/
 ```
 
 Example:
 
 ```text
-docs/planning/drafts/2026-04-24-143205-login-onboarding/
+docs/planning/drafts/login-onboarding--2026-04-24-143205/
 ```
 
 Rules:
@@ -91,30 +90,33 @@ Rules:
 Save this file set:
 
 ```text
-00-suite-index.md
-00-planning-context.md
-01-brief.md
-02-prd.md
-03-user-stories.md
-04-feature-spec.md
-05-metrics-brief.md
+00-index.md
+01-planning-brief.md
+02-requirements.md
+03-behavior-spec.md
 ```
 
-`00-planning-context.md` is the canonical planning context. It must include YAML front matter plus human-readable Markdown sections.
+`01-planning-brief.md` is the canonical planning context and decision brief. It must preserve the planning-intake fields that matter for downstream review.
 
-`00-suite-index.md` must list the generated artifacts, traceability notes, assumptions, open questions, and recommended next skill.
+`00-index.md` must list reading order, generated artifacts, source map, traceability notes, assumptions, open questions, and recommended next skill.
 
 ## Generated Artifact Types
 
-- `brief`
-- `prd`
-- `user-stories`
-- `feature-spec`
-- `metrics-brief`
+- `index`
+- `planning-brief`
+- `requirements`
+- `behavior-spec`
 
 ## Template Map
 
-Use the templates bundled with this skill:
+Use the core templates bundled with this skill:
+
+- `index` -> `templates/index.md`
+- `planning-brief` -> `templates/planning-brief.md`
+- `requirements` -> `templates/requirements.md`
+- `behavior-spec` -> `templates/behavior-spec.md`
+
+Reserved and legacy templates remain available for compatibility and future conditional skills:
 
 - `planning-context` -> `templates/planning-context.md`
 - `brief` -> `templates/brief.md`
@@ -130,9 +132,9 @@ Use the templates bundled with this skill:
 
 - Keep all outputs draft-only.
 - Run the readiness check before selecting or generating artifacts.
-- Always generate the standard suite after the readiness check passes.
-- Always save generated artifacts to `docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/`.
-- Save planning context as `00-planning-context.md`, not as a separate YAML file.
+- Always generate the core standard suite after the readiness check passes.
+- Always save generated artifacts to `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`.
+- Save the canonical planning context inside `01-planning-brief.md`, not as a separate YAML file.
 - Do not generate draft artifacts from unclear rough input unless the user explicitly asks to proceed with `approval_state: needs_review`.
 - Use templates from this skill's local `templates/` directory.
 - Preserve source, assumption, confidence, sensitivity, owner, and approval state metadata.

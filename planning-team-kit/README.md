@@ -10,7 +10,7 @@
 
 - 구조화된 brainstorming과 planning intake
 - `planning-drafts` 전 선택적으로 계획/결정안을 압박 질문으로 검증하는 `planning-grill`
-- 모드 선택 없는 standard 문서 묶음 생성 및 로컬 저장: planning context, 기획 브리프, PRD, user stories, feature spec, 지표 브리프
+- 모드 선택 없는 core standard 문서 묶음 생성 및 로컬 저장: index, planning brief, requirements, behavior spec
 - Product Context Reviewer, Story & Testability Reviewer, Feature Behavior & Policy Reviewer, Metrics & Evidence Reviewer, Cross-Artifact Consistency Reviewer, Handoff Governance Reviewer 관점의 multi-agent review gate
 - `planning-drafts` 실행 전 부족한 맥락을 `planning-intake`로 다시 보완하는 readiness 흐름
 - Claude Code와 Codex 공통 `skills/` 기반 사용
@@ -67,7 +67,7 @@ $quality-review
 
 1. `planning-intake`로 아이디어의 문제, 대상, 목표, 비목표, 성공 기준, 제약을 정리합니다.
 2. 필요하면 `planning-grill`로 계획/결정안을 한 번에 하나의 질문으로 stress-test합니다.
-3. `planning-drafts`로 standard 문서 묶음 초안을 만들고 `docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/`에 저장합니다.
+3. `planning-drafts`로 core standard 문서 묶음 초안을 만들고 `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`에 저장합니다.
 4. `planning-drafts`가 맥락 부족을 발견하면 생성하지 않고 `planning-intake`로 돌아가 보완합니다.
 5. `quality-review`의 multi-agent review gate로 누락, 모호함, 근거 부족, 핸드오프 리스크를 검토합니다.
 
@@ -80,17 +80,14 @@ $quality-review
 
 ## 저장 위치
 
-`planning-drafts`는 생성된 standard 문서 묶음을 항상 현재 workspace 아래에 저장합니다.
+`planning-drafts`는 생성된 core standard 문서 묶음을 항상 현재 workspace 아래에 저장합니다.
 
 ```text
-docs/planning/drafts/2026-04-24-143205-login-onboarding/
-├── 00-suite-index.md
-├── 00-planning-context.md
-├── 01-brief.md
-├── 02-prd.md
-├── 03-user-stories.md
-├── 04-feature-spec.md
-└── 05-metrics-brief.md
+docs/planning/drafts/login-onboarding--2026-04-24-143205/
+├── 00-index.md
+├── 01-planning-brief.md
+├── 02-requirements.md
+└── 03-behavior-spec.md
 ```
 
 동일한 경로가 이미 있으면 덮어쓰지 않고 `-2`, `-3` 같은 숫자 suffix를 붙입니다.

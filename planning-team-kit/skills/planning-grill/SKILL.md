@@ -35,7 +35,7 @@ Accept these input shapes:
 - `planning_context`: structured context from `planning-intake`
 - `rough plan`: early proposal, meeting note, or product idea
 - `decision request`: an unresolved option or tradeoff
-- `draft artifact`: PRD, brief, user stories, feature spec, metrics brief, or a saved draft suite
+- `draft artifact`: planning brief, requirements, behavior spec, PRD, brief, or a saved draft suite
 - `source notes`: pasted evidence, links, meeting notes, or raw requirements
 
 Always state the inferred input type before asking the first question.
@@ -67,6 +67,16 @@ Continue until one of these stop conditions is met:
 - the user asks to stop
 - the next question would be lower value than summarizing the state
 
+## Question Delivery
+
+When asking a user-facing grill question, prefer an interactive choice tool if the runtime provides one.
+
+- In Codex Plan mode, use `request_user_input` when the question can be answered with 2-3 mutually exclusive choices.
+- In Claude Code, use `askUserQuestion` when that tool is available and the question can be answered with 2-3 mutually exclusive choices.
+- Put the recommended answer first and mark it as recommended.
+- If no interactive question tool is available, ask the same question in plain Markdown with a compact option table.
+- Use plain Markdown for open-ended questions that cannot be reduced to useful choices.
+
 ## Question Selection
 
 Ask the highest-impact unresolved question first. Prefer questions in this order:
@@ -94,7 +104,7 @@ Do not run a broad questionnaire. Ask only the next question that changes the pl
 ## Relationship To Other Skills
 
 - Use `planning-intake` when the core problem, audience, intended outcome, non-goals, or success criteria are missing.
-- Use `planning-drafts` when the plan has enough context to generate the standard draft artifact suite.
+- Use `planning-drafts` when the plan has enough context to generate the core draft artifact suite.
 - Use `quality-review` when draft artifacts already exist and need a review gate.
 
 `planning-grill` may recommend any of those skills, but it must not generate the standard draft suite itself.

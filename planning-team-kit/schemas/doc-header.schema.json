@@ -20,6 +20,10 @@
   "properties": {
     "doc_type": {
       "enum": [
+        "index",
+        "planning-brief",
+        "requirements",
+        "behavior-spec",
         "planning-context",
         "brief",
         "option-memo",
@@ -40,7 +44,7 @@
       "pattern": "^(YYYY-MM-DD|\\d{4}-\\d{2}-\\d{2})$"
     },
     "version": { "type": "string" },
-    "mode": { "enum": ["lite", "standard", "full"] },
+    "mode": { "enum": ["standard"] },
     "source_of_truth": { "type": "string" },
     "related_docs": {
       "type": "array",

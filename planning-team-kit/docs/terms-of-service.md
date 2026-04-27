@@ -5,7 +5,7 @@
 ## Acceptable use
 
 - Use the plugin to create and review draft planning materials.
-- Expect `planning-drafts` to save generated standard draft suites as local workspace files.
+- Expect `planning-drafts` to save generated core standard draft suites as local workspace files.
 - Keep a human owner responsible for final approval, publication, and operational decisions.
 - Verify claims, metrics, and requirements before treating generated content as final.
 

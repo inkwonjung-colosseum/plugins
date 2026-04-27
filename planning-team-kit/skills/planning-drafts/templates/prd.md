@@ -40,7 +40,7 @@ Describe target users, contexts, and primary scenarios.
 
 ## Requirements
 
-Separate product requirements into stable requirement rows or bullets. Include requirement ID, priority, owner, source, and link to `03-user-stories.md` for story-level detail.
+Separate product requirements into stable requirement rows or bullets. Include requirement ID, priority, owner, source, and related story-level detail when this legacy template is used.
 
 - Must have:
 - Should have:

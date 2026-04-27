@@ -26,17 +26,14 @@
 
 ## Saved Planning Drafts
 
-`planning-drafts` always saves the generated standard draft suite under a timestamped local workspace path.
+`planning-drafts` always saves the generated core standard draft suite under a timestamped local workspace path.
 
 ```text
-docs/planning/drafts/2026-04-24-143205-login-onboarding/
-├── 00-suite-index.md
-├── 00-planning-context.md
-├── 01-brief.md
-├── 02-prd.md
-├── 03-user-stories.md
-├── 04-feature-spec.md
-└── 05-metrics-brief.md
+docs/planning/drafts/login-onboarding--2026-04-24-143205/
+├── 00-index.md
+├── 01-planning-brief.md
+├── 02-requirements.md
+└── 03-behavior-spec.md
 ```
 
 ## Weak Output Recovery

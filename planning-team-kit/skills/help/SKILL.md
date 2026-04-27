@@ -32,10 +32,10 @@ $help
 ## Must Explain
 
 - The plugin creates draft planning artifacts, not final decisions.
-- `planning-drafts` always saves generated standard draft artifacts under `docs/planning/drafts/YYYY-MM-DD-HHMMSS-topic-slug/`.
+- `planning-drafts` always saves generated core standard draft artifacts under `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`.
 - v0.1 does not write to Jira, Confluence, Slack, Google Drive, or Notion.
 - Unsupported facts must be marked as assumptions.
-- PRD is one artifact type, not the only output.
+- Requirements are one artifact type, not the only output.
 - `planning-grill` is optional. It stress-tests a plan or decision with one question at a time before draft generation or handoff.
 - `quality-review` is a multi-agent review gate with Product Context Reviewer, Story & Testability Reviewer, Feature Behavior & Policy Reviewer, Metrics & Evidence Reviewer, Cross-Artifact Consistency Reviewer, and Handoff Governance Reviewer perspectives.
 - Claude Code uses `/planning-team-kit:<skill>`.
@@ -45,7 +45,7 @@ $help
 
 - `planning-intake`: structure the idea before writing documents.
 - `planning-grill`: stress-test a plan, planning context, or decision before writing or handoff.
-- `planning-drafts`: generate and save the standard draft planning artifact suite.
+- `planning-drafts`: generate and save the core draft planning artifact suite.
 - `quality-review`: inspect documents with the shared multi-agent review gate.
 
 ## Response Format

@@ -1,3 +1,59 @@
+index:
+  required:
+    - How to Read This Suite
+    - Generated Artifacts
+    - Source Map
+    - Traceability Notes
+    - Assumptions
+    - Open Questions
+    - Recommended Next Skill
+planning-brief:
+  required:
+    - Summary
+    - One-Line Problem
+    - Current State
+    - Intended Outcome
+    - Users or Stakeholders
+    - Goals
+    - Non-goals
+    - Success Criteria
+    - Failure Criteria
+    - Constraints
+    - Options Considered
+    - Recommended Direction
+    - Risks
+    - Assumptions
+    - Evidence and Sources
+    - Open Questions
+    - Next Actions
+requirements:
+  required:
+    - Summary
+    - Scope
+    - Users and Scenarios
+    - Requirements
+    - Acceptance Criteria
+    - Negative and Edge Cases
+    - Dependencies
+    - Risks
+    - Assumptions
+    - Evidence and Sources
+    - Open Questions
+    - Next Actions
+behavior-spec:
+  required:
+    - Summary
+    - Source Artifacts
+    - Feature Scope
+    - User Flow
+    - Screen or Surface Behavior
+    - State and Policy Rules
+    - Permission Rules
+    - Edge Cases and Error States
+    - Validation Expectations
+    - Traceability
+    - Open Questions
+    - Owners and Next Actions
 planning-context:
   required:
     - One-Line Problem
