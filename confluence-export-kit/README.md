@@ -1,6 +1,6 @@
 # confluence-export-kit
 
-confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.1.2). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
+confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.1.3). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
 
 두 에이전트의 플러그인 매니페스트(`.claude-plugin/`, `.codex-plugin/`)가 하나의 `skills/` 디렉터리와 `scripts/` 런타임을 공유합니다. 스킬 호출 문법은 에이전트별로 다릅니다 — Claude Code는 `/confluence-export-kit:<skill>` 콜론 네임스페이스, Codex는 공식 플러그인 스펙에 따라 `$<skill>` 형태를 사용합니다.
 

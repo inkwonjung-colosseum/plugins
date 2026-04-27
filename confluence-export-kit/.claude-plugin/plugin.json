@@ -1,6 +1,6 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Claude Code plugin for Confluence export and local export-index workflows: config setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
   "author": {
     "name": "developjik",
