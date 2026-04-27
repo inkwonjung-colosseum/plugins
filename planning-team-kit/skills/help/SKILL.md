@@ -32,7 +32,7 @@ $help
 ## Must Explain
 
 - The plugin creates draft planning artifacts, not final decisions.
-- `planning-drafts` always saves generated core standard draft artifacts under `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`.
+- `planning-drafts` always saves generated core standard draft artifacts under `planning/topic-slug--YYYY-MM-DD-HHMMSS/`.
 - v0.1 does not write to Jira, Confluence, Slack, Google Drive, or Notion.
 - Unsupported facts must be marked as assumptions.
 - Requirements are one artifact type, not the only output.

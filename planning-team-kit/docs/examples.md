@@ -29,7 +29,7 @@
 `planning-drafts` always saves the generated core standard draft suite under a timestamped local workspace path.
 
 ```text
-docs/planning/drafts/login-onboarding--2026-04-24-143205/
+planning/login-onboarding--2026-04-24-143205/
 ├── 00-index.md
 ├── 01-planning-brief.md
 ├── 02-requirements.md

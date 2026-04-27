@@ -69,13 +69,13 @@ Always save generated artifacts to the current workspace. Do not ask whether to 
 Use this directory format:
 
 ```text
-docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/
+planning/topic-slug--YYYY-MM-DD-HHMMSS/
 ```
 
 Example:
 
 ```text
-docs/planning/drafts/login-onboarding--2026-04-24-143205/
+planning/login-onboarding--2026-04-24-143205/
 ```
 
 Rules:
@@ -133,7 +133,7 @@ Reserved and legacy templates remain available for compatibility and future cond
 - Keep all outputs draft-only.
 - Run the readiness check before selecting or generating artifacts.
 - Always generate the core standard suite after the readiness check passes.
-- Always save generated artifacts to `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`.
+- Always save generated artifacts to `planning/topic-slug--YYYY-MM-DD-HHMMSS/`.
 - Save the canonical planning context inside `01-planning-brief.md`, not as a separate YAML file.
 - Do not generate draft artifacts from unclear rough input unless the user explicitly asks to proceed with `approval_state: needs_review`.
 - Use templates from this skill's local `templates/` directory.

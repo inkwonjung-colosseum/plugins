@@ -67,7 +67,7 @@ $quality-review
 
 1. `planning-intake`로 아이디어의 문제, 대상, 목표, 비목표, 성공 기준, 제약을 정리합니다.
 2. 필요하면 `planning-grill`로 계획/결정안을 한 번에 하나의 질문으로 stress-test합니다.
-3. `planning-drafts`로 core standard 문서 묶음 초안을 만들고 `docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`에 저장합니다.
+3. `planning-drafts`로 core standard 문서 묶음 초안을 만들고 `planning/topic-slug--YYYY-MM-DD-HHMMSS/`에 저장합니다.
 4. `planning-drafts`가 맥락 부족을 발견하면 생성하지 않고 `planning-intake`로 돌아가 보완합니다.
 5. `quality-review`의 multi-agent review gate로 누락, 모호함, 근거 부족, 핸드오프 리스크를 검토합니다.
 
@@ -83,7 +83,7 @@ $quality-review
 `planning-drafts`는 생성된 core standard 문서 묶음을 항상 현재 workspace 아래에 저장합니다.
 
 ```text
-docs/planning/drafts/login-onboarding--2026-04-24-143205/
+planning/login-onboarding--2026-04-24-143205/
 ├── 00-index.md
 ├── 01-planning-brief.md
 ├── 02-requirements.md

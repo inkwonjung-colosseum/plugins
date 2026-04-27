@@ -20,7 +20,7 @@
       "name": "planning-team-kit",
       "source": "./planning-team-kit",
       "description": "Claude Code and Codex compatible planning document quality kit for structured brainstorming, artifact generation, review, and handoff drafts.",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "license": "MIT",
       "tags": ["planning", "prd", "documentation", "quality", "product"]
     },

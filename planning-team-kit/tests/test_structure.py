@@ -337,8 +337,8 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
 
         self.assertIn("## Local Draft Persistence", text)
         self.assertIn("Always save generated artifacts", text)
-        self.assertIn("docs/planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/", text)
-        self.assertIn("docs/planning/drafts/login-onboarding--2026-04-24-143205/", text)
+        self.assertIn("planning/topic-slug--YYYY-MM-DD-HHMMSS/", text)
+        self.assertIn("planning/login-onboarding--2026-04-24-143205/", text)
         self.assertIn("Do not overwrite existing suite directories", text)
         self.assertIn("append `-2`, `-3`, or the next available numeric suffix", text)
 
