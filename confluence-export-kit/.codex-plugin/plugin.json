@@ -1,7 +1,7 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.1.0",
-  "description": "Codex plugin for Confluence export-only workflows: unified config setup, page, space, org, page-with-descendants export, and confluence-markdown-exporter bootstrap.",
+  "version": "0.1.1",
+  "description": "Codex plugin for Confluence export and local export-index workflows: unified config setup, page, space, org, page-with-descendants export, export indexing, and confluence-markdown-exporter bootstrap.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -21,8 +21,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "confluence-export-kit",
-    "shortDescription": "Export Confluence pages, spaces, and descendants to Markdown",
-    "longDescription": "confluence-export-kit provides export-only Confluence workflows powered by confluence-markdown-exporter. Configure auth and output defaults, then export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files.",
+    "shortDescription": "Export Confluence content and index local Markdown exports",
+    "longDescription": "confluence-export-kit provides Confluence export and local export-index workflows powered by confluence-markdown-exporter. Configure auth and output defaults, export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files, then index already-exported Markdown for agent-friendly reading.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -35,7 +35,8 @@
     "defaultPrompt": [
       "Set my Confluence API key and default export output path so I can start exporting pages.",
       "Export the Confluence space at <space-url> to a local Markdown folder.",
-      "Export one or more Confluence pages at <page-url> [<page-url> ...] to ./docs/."
+      "Export one or more Confluence pages at <page-url> [<page-url> ...] to ./docs/.",
+      "Index a local Confluence export folder and install Reading Rules: <export-path>"
     ],
     "brandColor": "#0052CC"
   }

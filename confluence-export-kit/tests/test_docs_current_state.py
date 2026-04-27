@@ -35,6 +35,7 @@ class CurrentDocumentationStateTests(unittest.TestCase):
     def test_readme_scope_mentions_single_and_multiple_page_export(self) -> None:
         readme = (PLUGIN_ROOT / "README.md").read_text()
         self.assertIn("page 단건/다건 export", readme)
+        self.assertIn("local export-index", readme)
         self.assertIn("--skip-jira", readme)
 
     def test_set_config_documents_config_path_override(self) -> None:
@@ -72,6 +73,7 @@ class CurrentDocumentationStateTests(unittest.TestCase):
             "export-page",
             "export-page-with-descendant",
             "export-space",
+            "index-export",
             "set-config",
             "show-config",
         ]
@@ -92,6 +94,7 @@ class CurrentDocumentationStateTests(unittest.TestCase):
             "export-page": "export_page.py",
             "export-page-with-descendant": "export_page_with_descendant.py",
             "export-space": "export_space.py",
+            "index-export": "index_export.py",
             "set-config": "set_config.py",
             "show-config": "show_config.py",
         }

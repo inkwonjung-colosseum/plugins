@@ -1,6 +1,6 @@
 # confluence-export-kit
 
-confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export-only 플러그인입니다 (v0.1.0). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, Python/`cme` bootstrap을 다룹니다.
+confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.1.1). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, Python/`cme` bootstrap, export된 로컬 Markdown 색인을 다룹니다.
 
 두 에이전트의 플러그인 매니페스트(`.claude-plugin/`, `.codex-plugin/`)가 하나의 `skills/` 디렉터리와 `scripts/` 런타임을 공유합니다. 스킬 호출 문법은 에이전트별로 다릅니다 — Claude Code는 `/confluence-export-kit:<skill>` 콜론 네임스페이스, Codex는 공식 플러그인 스펙에 따라 `$<skill>` 형태를 사용합니다. helper 스크립트 경로는 각 SKILL.md 안에서 직접 해결합니다: Claude Code가 주입하는 `CLAUDE_SKILL_DIR` 을 우선 시도하고, Codex에는 해당하는 env 주입이 공식 문서에 없으므로 Codex 설치 캐시(`~/.codex/plugins/cache/*/confluence-export-kit/*/skills/<skill>`)와 로컬 개발 경로를 순서대로 탐지합니다.
 
@@ -8,13 +8,15 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
 
 - Confluence auth 설정 및 token 검증
 - org / space / page-with-descendants / page 단건/다건 export
+- 이미 export된 로컬 Markdown 폴더의 `.confluence-index/` 생성
+- 현재 작업 폴더의 `AGENTS.md` / `CLAUDE.md` Reading Rule 관리 블록 설치
 - export runtime bootstrap (`python`, `cme`; `cme`가 없을 때만 installer 사용)
 - 기본 출력 경로 영구 설정
 
 지원하지 않는 범위는 다음과 같습니다.
 
+- remote Confluence/Jira write 작업
 - planning brief 작성
-- Jira write 작업
 - 범용 CQL 콘솔
 - `cme config` interactive menu
 
@@ -28,6 +30,7 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
 - `skills/export-space/SKILL.md` — space 전체 export
 - `skills/export-page-with-descendant/SKILL.md` — page with descendants export
 - `skills/export-page/SKILL.md` — 단건/다건 page export
+- `skills/index-export/SKILL.md` — 이미 export된 로컬 Markdown 색인 및 Reading Rule 설치
 - `skills/show-config/SKILL.md` — 현재 cme 설정 출력
 - `scripts/cme_runtime.py` — preflight, bootstrap, config/auth helper 공통 처리
 
@@ -48,8 +51,11 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
     ├─► /confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]
     │       하나 이상의 page URL과 하위 전체 문서 export
     │
-    └─► /confluence-export-kit:export-page <page-url> [<page-url> ...] [output-path]
-            특정 page URL 단건/다건 export
+    ├─► /confluence-export-kit:export-page <page-url> [<page-url> ...] [output-path]
+    │       특정 page URL 단건/다건 export
+    │
+    └─► /confluence-export-kit:index-export <export-path>
+            이미 export된 로컬 Markdown 폴더를 .confluence-index/ 로 색인
 ```
 
 ## 공통 export 플래그
@@ -163,6 +169,13 @@ $set-config --api-key <api-key> --email <email> --output-path ./docs/confluence
 $export-page-with-descendant https://colosseum.atlassian.net/wiki/spaces/KEY/pages/123456789/Root
 ```
 
+```text
+# Claude Code
+/confluence-export-kit:index-export ./Product\ Team\ Space
+# Codex
+$index-export ./Product\ Team\ Space
+```
+
 ## 환경변수
 
 | 환경변수 | 기본값 | 설명 |
@@ -181,3 +194,8 @@ $export-page-with-descendant https://colosseum.atlassian.net/wiki/spaces/KEY/pag
 - export 명령 공통
   - auth가 없으면 export를 막고 `set-config` 실행을 안내합니다.
   - `[output-path]` 는 env override로만 적용하고 config를 영구 수정하지 않습니다.
+- `index-export`
+  - Confluence/Jira remote write를 하지 않고, 이미 export된 로컬 Markdown만 읽습니다.
+  - 기본 출력은 현재 작업 폴더의 `.confluence-index/` 입니다.
+  - 여러 export 폴더를 반복 색인할 수 있도록 `.confluence-index/sources/<source-id>/` namespace를 사용합니다.
+  - 기본적으로 `AGENTS.md` 와 `CLAUDE.md` 에 Reading Rule 관리 블록을 설치합니다. `--no-agent-rules` 로 생략할 수 있습니다.

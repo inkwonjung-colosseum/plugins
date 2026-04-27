@@ -9,7 +9,7 @@
 
 - 확인 일자: 2026-04-23
 - upstream 패키지 최신 확인 버전: `confluence-markdown-exporter 4.0.8`
-- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.0`
+- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.1`
 
 ## 한눈에 보기
 
@@ -293,7 +293,7 @@ diagram 관련 기능은 다음과 같습니다.
 
 ## 3. 이 저장소의 `confluence-export-kit` 래퍼가 제공하는 기능
 
-`confluence-export-kit` 는 upstream 전체를 노출하지 않고 export-only workflow만 좁게 감쌉니다.
+`confluence-export-kit` 는 upstream 전체를 노출하지 않고 Confluence export와 local export-index workflow만 좁게 감쌉니다.
 
 ### 3.1 래퍼 명령
 
@@ -305,6 +305,7 @@ diagram 관련 기능은 다음과 같습니다.
 | `/confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...] [output-path]` | 하나 이상의 page와 모든 descendant export |
 | `/confluence-export-kit:export-space <space-url> [<space-url> ...] [output-path]` | 하나 이상의 space 전체 export |
 | `/confluence-export-kit:export-org <org-url> [<org-url> ...] [output-path]` | 하나 이상의 org 전체 export |
+| `/confluence-export-kit:index-export <export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--dry-run]` | 이미 export된 로컬 Markdown 폴더 색인 및 Reading Rule 설치 |
 | `/confluence-export-kit:show-config [--json]` | 현재 `cme` 설정 출력 (`cme config list` 래퍼) |
 
 모든 export 명령은 다음 공통 플래그를 지원합니다.
@@ -334,13 +335,15 @@ diagram 관련 기능은 다음과 같습니다.
 - 모든 export 명령에서 `--dry-run` 플래그로 cme 실행 없이 auth/config만 검증 가능
 - 모든 export 명령에서 `--max-workers N` 플래그로 `CME_CONNECTION_CONFIG__MAX_WORKERS` 설정 가능
 - `show-config` 명령으로 `cme config list` 결과를 Claude Code / Codex workflow에서 직접 확인 가능
+- `index-export` 명령으로 이미 export된 로컬 Markdown을 `.confluence-index/sources/<source-id>/` 로 색인 가능
+- `index-export` 명령으로 현재 작업 폴더의 `AGENTS.md` / `CLAUDE.md` Reading Rule 관리 블록 설치 가능
 
 ### 3.3 래퍼가 의도적으로 제외한 범위
 
 로컬 README 기준 non-goal은 다음과 같습니다.
 
 - planning brief 작성
-- Jira write workflow
+- remote Confluence/Jira write workflow
 - 범용 CQL console
 - `cme config` interactive menu 노출
 
@@ -368,6 +371,8 @@ diagram 관련 기능은 다음과 같습니다.
 | stale page cleanup | `export.cleanup_stale` 지원 | 모든 export 명령에 `--cleanup-stale` 플래그로 노출 |
 | Jira enrichment toggle | `export.enable_jira_enrichment` 지원 | 모든 export 명령에 `--jira-enrichment` 플래그로 노출 |
 | runtime bootstrap | 본체 설치 문서만 제공 | 래퍼가 bootstrap 자동화 |
+| exported Markdown local index | 표준 CLI 없음 | `index-export` 명령으로 `.confluence-index/` 생성 |
+| AGENTS.md / CLAUDE.md Reading Rule 설치 | 표준 CLI 없음 | `index-export` 명령으로 관리 블록 설치 |
 
 ## 5. 문서 해석 가이드
 

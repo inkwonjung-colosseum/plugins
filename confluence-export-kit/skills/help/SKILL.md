@@ -13,10 +13,11 @@ Explain the plugin's current command surface without implying that every upstrea
 
 ## Coverage
 
-1. State that this is an export-only Confluence plugin that works with both Claude Code and Codex.
+1. State that this is a Confluence export and local export-index plugin that works with both Claude Code and Codex. Clarify that `index-export` only indexes local Markdown files that were already exported from Confluence.
 2. Show command invocation for both agents. Claude Code uses `/confluence-export-kit:<skill>`, Codex uses `$<skill>` (per Codex's official plugin spec, which does not support colon-namespaced slash commands). Group commands under these buckets:
    - Setup: `set-config`
    - Export: `export-org`, `export-space`, `export-page-with-descendant`, `export-page`
+   - Local index: `index-export`
    - Config: `show-config`
 
    When listing examples, show both forms, e.g.:
@@ -40,6 +41,7 @@ $set-config --api-key <api-key> --email <email> --output-path <path>
 
 5. Mention the explicit non-goals:
    - Jira write workflows
+   - remote Confluence write workflows
    - planning briefs
    - general-purpose CQL console
    - interactive `cme config` menu
