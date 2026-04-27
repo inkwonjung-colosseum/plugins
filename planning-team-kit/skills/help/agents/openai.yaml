@@ -1,8 +1,0 @@
-interface:
-  display_name: "planning-team-kit Help"
-  short_description: "Explain planning-team-kit workflows, skills, and draft-only safety rules."
-  brand_color: "#0F766E"
-  default_prompt: "Show how to start using planning-team-kit for a draft planning artifact."
-
-policy:
-  allow_implicit_invocation: true

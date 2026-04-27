@@ -1,902 +1,475 @@
-from __future__ import annotations
+"""
+planning-team-kit v0.3.0 구조 테스트
+"""
 
-import ast
 import json
-from pathlib import Path
-import re
+import os
 import unittest
 
-
-WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-PLUGIN_ROOT = WORKSPACE_ROOT / "planning-team-kit"
-PLANNING_DRAFTS_TEMPLATES_ROOT = PLUGIN_ROOT / "skills" / "planning-draft" / "templates"
-GENERATED_SUITE_FIXTURE_ROOT = PLUGIN_ROOT / "tests" / "fixtures" / "generated-core-suite"
-PLATFORM_KEYWORDS = {"claude-plugin", "codex-plugin"}
-CORE_TEMPLATE_NAMES = [
-    "index",
-    "planning-brief",
-    "requirements",
-    "behavior-spec",
-]
-RESERVED_TEMPLATE_NAMES = [
-    "metrics-brief",
-    "option-memo",
-    "qa-scenario",
-    "stakeholder-brief",
-]
-LEGACY_TEMPLATE_NAMES = [
-    "planning-context",
-    "brief",
-    "prd",
-    "user-stories",
-    "feature-spec",
-]
-ALL_TEMPLATE_NAMES = CORE_TEMPLATE_NAMES + RESERVED_TEMPLATE_NAMES + LEGACY_TEMPLATE_NAMES
-CORE_GENERATED_FILES = [
-    "00-index.md",
-    "01-planning-brief.md",
-    "02-requirements.md",
-    "03-behavior-spec.md",
-]
-REVIEW_AND_HANDOFF_FILES = [
-    "04-planning-review.md",
-    "99-confluence-update-plan.md",
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKSPACE_ROOT = os.path.dirname(BASE)
+SKILLS = os.path.join(BASE, "skills")
+SCHEMAS = os.path.join(BASE, "schemas")
+DOCS = os.path.join(BASE, "docs")
+CLAUDE_PLUGIN = os.path.join(BASE, ".claude-plugin", "plugin.json")
+CODEX_PLUGIN = os.path.join(BASE, ".codex-plugin", "plugin.json")
+PUBLIC_DOCS = [
+    os.path.join(BASE, "README.md"),
+    os.path.join(WORKSPACE_ROOT, "README.md"),
 ]
 
 
-def _parse_scalar(raw: str) -> object:
-    value = raw.strip()
-    if value == "true":
-        return True
-    if value == "false":
-        return False
-    if value in {"[]", "[ ]"}:
-        return []
-    if value in {"{}", "{ }"}:
-        return {}
-    if value and value[0] in {'"', "'"}:
-        return ast.literal_eval(value)
-    return value
+# ---------------------------------------------------------------------------
+# 헬퍼
+# ---------------------------------------------------------------------------
+
+def skill_path(skill_name, *parts):
+    return os.path.join(SKILLS, skill_name, *parts)
 
 
-def _parse_mapping(lines: list[str], start: int, indent: int) -> tuple[dict[str, object], int]:
-    mapping: dict[str, object] = {}
-    index = start
-
-    while index < len(lines):
-        line = lines[index]
-        current_indent = len(line) - len(line.lstrip(" "))
-        stripped = line.strip()
-
-        if not stripped or stripped.startswith("#"):
-            index += 1
-            continue
-        if current_indent < indent:
-            break
-        if current_indent != indent:
-            raise AssertionError(f"Unexpected indent in line: {line!r}")
-        if stripped.startswith("- "):
-            raise AssertionError(f"Unexpected list item at mapping level: {line!r}")
-
-        key, separator, raw_value = stripped.partition(":")
-        if not separator:
-            raise AssertionError(f"Expected key/value pair: {line!r}")
-
-        value = raw_value.lstrip()
-        index += 1
-
-        if value:
-            mapping[key] = _parse_scalar(value)
-            continue
-
-        while index < len(lines) and not lines[index].strip():
-            index += 1
-
-        if index >= len(lines):
-            mapping[key] = {}
-            break
-
-        next_line = lines[index]
-        next_indent = len(next_line) - len(next_line.lstrip(" "))
-        next_stripped = next_line.strip()
-
-        if next_indent <= current_indent:
-            mapping[key] = {}
-            continue
-        if next_stripped.startswith("- "):
-            items: list[object] = []
-            while index < len(lines):
-                list_line = lines[index]
-                list_indent = len(list_line) - len(list_line.lstrip(" "))
-                list_stripped = list_line.strip()
-                if not list_stripped:
-                    index += 1
-                    continue
-                if list_indent != next_indent or not list_stripped.startswith("- "):
-                    break
-                items.append(_parse_scalar(list_stripped[2:]))
-                index += 1
-            mapping[key] = items
-            continue
-
-        nested, index = _parse_mapping(lines, index, next_indent)
-        mapping[key] = nested
-
-    return mapping, index
+def read_text(path):
+    with open(path, encoding="utf-8") as f:
+        return f.read()
 
 
-def parse_simple_yaml(text: str) -> dict[str, object]:
-    parsed, index = _parse_mapping(text.splitlines(), 0, 0)
-    if index < len(text.splitlines()):
-        remaining = [line for line in text.splitlines()[index:] if line.strip()]
-        if remaining:
-            raise AssertionError(f"Unexpected trailing YAML lines: {remaining!r}")
-    return parsed
+def load_json(path):
+    return json.loads(read_text(path))
 
 
-def parse_front_matter(markdown: str) -> tuple[dict[str, object], str]:
-    if not markdown.startswith("---\n"):
-        raise AssertionError("Markdown file is missing front matter")
+# ---------------------------------------------------------------------------
+# 스킬 존재
+# ---------------------------------------------------------------------------
 
-    _, front_matter, body = markdown.split("---\n", 2)
-    return parse_simple_yaml(front_matter), body
+class TestSkillsExist(unittest.TestCase):
 
+    REQUIRED_SKILLS = ["plan-draft", "plan-review", "plan-publish"]
 
-def extract_headings(markdown_body: str) -> list[str]:
-    return re.findall(r"^##\s+(.+)$", markdown_body, re.MULTILINE)
-
-
-def extract_subheadings(markdown_body: str) -> list[str]:
-    return re.findall(r"^###\s+(.+)$", markdown_body, re.MULTILINE)
-
-
-class PlanningTeamKitStructureTests(unittest.TestCase):
-    def test_manifests_are_dual_platform_and_synchronized(self) -> None:
-        claude_manifest = json.loads(
-            (PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text()
-        )
-        codex_manifest = json.loads(
-            (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text()
-        )
-
-        self.assertEqual(claude_manifest["name"], "planning-team-kit")
-        self.assertEqual(codex_manifest["name"], "planning-team-kit")
-        self.assertEqual(claude_manifest["version"], codex_manifest["version"])
-        self.assertEqual(claude_manifest["description"], codex_manifest["description"])
-        self.assertEqual(claude_manifest["skills"], "./skills/")
-        self.assertEqual(codex_manifest["skills"], "./skills/")
-        self.assertNotIn("interface", claude_manifest)
-        self.assertIn("interface", codex_manifest)
-        self.assertIn("defaultPrompt", codex_manifest["interface"])
-
-    def test_required_skills_and_agent_metadata_exist(self) -> None:
-        skill_names = [
-            "help",
-            "planning-start",
-            "planning-check",
-            "planning-draft",
-            "planning-review",
-            "confluence-update-plan",
-        ]
-
-        for skill_name in skill_names:
-            with self.subTest(skill=skill_name):
-                skill_doc = PLUGIN_ROOT / "skills" / skill_name / "SKILL.md"
-                agent_meta = PLUGIN_ROOT / "skills" / skill_name / "agents" / "openai.yaml"
-
-                self.assertTrue(skill_doc.exists())
-                self.assertTrue(agent_meta.exists())
-                text = skill_doc.read_text()
-                self.assertIn(f"/planning-team-kit:{skill_name}", text)
-                self.assertIn(f"${skill_name}", text)
-                self.assertIn("draft-only", text)
-
-                agent_config = parse_simple_yaml(agent_meta.read_text())
-                self.assertIn("interface", agent_config)
-                self.assertIn("policy", agent_config)
-                self.assertEqual(
-                    agent_config["policy"]["allow_implicit_invocation"],
-                    True,
+    def test_required_skills_exist(self):
+        for skill in self.REQUIRED_SKILLS:
+            with self.subTest(skill=skill):
+                self.assertTrue(
+                    os.path.isdir(skill_path(skill)),
+                    f"skills/{skill}/ 디렉토리 없음",
                 )
 
-                interface = agent_config["interface"]
-                for key in (
-                    "display_name",
-                    "short_description",
-                    "brand_color",
-                    "default_prompt",
-                ):
-                    self.assertIn(key, interface)
-                    self.assertTrue(interface[key])
+    def test_each_skill_has_skill_md(self):
+        for skill in self.REQUIRED_SKILLS:
+            with self.subTest(skill=skill):
+                p = skill_path(skill, "SKILL.md")
+                self.assertTrue(os.path.isfile(p), f"{p} 없음")
 
-    def test_old_public_skill_names_are_not_exposed(self) -> None:
-        old_skill_names = (
-            "planning-intake",
-            "planning-grill",
-            "planning-drafts",
-            "quality-review",
-        )
-        public_files = [
-            WORKSPACE_ROOT / "README.md",
-            WORKSPACE_ROOT / "docs" / "diagrams" / "planning-team-kit-workflow.html",
-            PLUGIN_ROOT / "README.md",
-            PLUGIN_ROOT / "docs" / "examples.md",
-            PLUGIN_ROOT / "docs" / "privacy-policy.md",
-            PLUGIN_ROOT / "docs" / "terms-of-service.md",
-            PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "confluence-update-plan" / "SKILL.md",
-        ]
+    def test_each_skill_has_openai_yaml(self):
+        for skill in self.REQUIRED_SKILLS:
+            with self.subTest(skill=skill):
+                p = skill_path(skill, "agents", "openai.yaml")
+                self.assertTrue(os.path.isfile(p), f"{p} 없음")
 
-        for skill_name in old_skill_names:
-            with self.subTest(skill=skill_name):
-                self.assertFalse((PLUGIN_ROOT / "skills" / skill_name).exists())
+    def test_each_skill_has_frontmatter_metadata(self):
+        for skill in self.REQUIRED_SKILLS:
+            with self.subTest(skill=skill):
+                content = read_text(skill_path(skill, "SKILL.md"))
+                self.assertTrue(content.startswith("---\n"), f"{skill} frontmatter 없음")
+                self.assertIn(f"name: {skill}", content)
+                self.assertIn("description:", content)
 
-            for public_file in public_files:
-                with self.subTest(skill=skill_name, path=public_file):
-                    if not public_file.exists():
-                        continue
-                    text = public_file.read_text()
-                    self.assertNotIn(skill_name, text)
-                    self.assertNotIn(f"${skill_name}", text)
-                    self.assertNotIn(f"/planning-team-kit:{skill_name}", text)
 
-    def test_planning_coach_is_not_exposed_as_v0_2_skill(self) -> None:
-        self.assertFalse((PLUGIN_ROOT / "skills" / "planning-coach").exists())
+# ---------------------------------------------------------------------------
+# 구버전 스킬 노출 안 됨
+# ---------------------------------------------------------------------------
 
-    def test_handoff_summary_is_not_exposed_as_v0_2_skill(self) -> None:
-        self.assertFalse((PLUGIN_ROOT / "skills" / "handoff-summary").exists())
+class TestOldSkillsRemoved(unittest.TestCase):
 
-    def test_legacy_doc_suite_skill_name_is_not_exposed(self) -> None:
-        legacy_name = "doc" + "-suite"
-        legacy_codex_invocation = "$" + legacy_name
-        legacy_claude_invocation = "planning-team-kit:" + legacy_name
-        legacy_skill_path = "skills/" + legacy_name
-        legacy_title = "Doc" + " Suite"
+    OLD_SKILLS = [
+        "plan",
+        "planning-start",
+        "planning-check",
+        "planning-draft",
+        "planning-review",
+        "confluence-update-plan",
+    ]
 
-        self.assertFalse((PLUGIN_ROOT / "skills" / legacy_name).exists())
-
-        public_files = [
-            WORKSPACE_ROOT / "README.md",
-            WORKSPACE_ROOT / "docs" / "diagrams" / "planning-team-kit-workflow.html",
-            WORKSPACE_ROOT
-            / "docs"
-            / "superpowers"
-            / "specs"
-            / "2026-04-24-planning-team-kit-design.md",
-            PLUGIN_ROOT / "README.md",
-            PLUGIN_ROOT / "docs" / "examples.md",
-            PLUGIN_ROOT / "docs" / "privacy-policy.md",
-            PLUGIN_ROOT / "docs" / "terms-of-service.md",
-            PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-draft" / "agents" / "openai.yaml",
-        ]
-
-        for public_file in public_files:
-            with self.subTest(path=public_file):
-                if not public_file.exists():
-                    continue
-                text = public_file.read_text()
-                self.assertNotIn(legacy_name, text)
-                self.assertNotIn(legacy_codex_invocation, text)
-                self.assertNotIn(legacy_claude_invocation, text)
-                self.assertNotIn(legacy_skill_path, text)
-                self.assertNotIn(legacy_title, text)
-
-    def test_handoff_summary_is_not_a_v0_2_document_contract(self) -> None:
-        planning_drafts = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-        header_schema = json.loads(
-            (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
-        )
-        section_map = parse_simple_yaml(
-            (PLUGIN_ROOT / "schemas" / "section-map.yaml").read_text()
-        )
-
-        self.assertFalse((PLANNING_DRAFTS_TEMPLATES_ROOT / "handoff-summary.md").exists())
-        self.assertNotIn("handoff-summary", planning_drafts)
-        self.assertNotIn("handoff-summary", header_schema["properties"]["doc_type"]["enum"])
-        self.assertNotIn("handoff-summary", section_map)
-
-    def test_planning_start_requires_iterative_clarification_until_ready(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md").read_text()
-
-        self.assertIn("## Clarification Loop", text)
-        self.assertIn("Ask one question per turn", text)
-        self.assertIn("as many turns as needed", text)
-        self.assertIn("Required readiness criteria", text)
-        self.assertIn("before recommending `planning-draft`", text)
-        self.assertIn("approval_state` to `needs_review`", text)
-
-    def test_planning_start_selects_indexed_confluence_evidence_safely(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md").read_text()
-
-        for required in (
-            "## Evidence Selection",
-            ".confluence-index/registry.json",
-            "source-index.jsonl",
-            "tree.md",
-            "at most 12 indexed candidate records",
-            "at most 6 raw Markdown source files",
-            "Prefer `current` documents",
-            "`archive` and `draft` documents only as historical context",
-            "Do not load a whole exported space",
-            "evidence_sources:",
-            "confirmed_facts:",
-            "source_conflicts:",
-            "excluded_sources:",
-            "`confidence`: high | medium | low",
-        ):
-            self.assertIn(required, text)
-
-    def test_questioning_skills_prefer_interactive_choice_tools_with_fallback(self) -> None:
-        skill_paths = (
-            PLUGIN_ROOT / "skills" / "planning-start" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md",
-            PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md",
-        )
-
-        for skill_path in skill_paths:
-            with self.subTest(skill=skill_path):
-                text = skill_path.read_text()
-                self.assertIn("## Question Delivery", text)
-                self.assertIn("request_user_input", text)
-                self.assertIn("askUserQuestion", text)
-                self.assertIn("plain Markdown", text)
-
-    def test_planning_draft_requires_readiness_check_before_generating_artifacts(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-
-        self.assertIn("## Readiness Check", text)
-        self.assertIn("Do not generate draft artifacts", text)
-        self.assertIn("route to `planning-start`", text)
-        self.assertNotIn("planning-coach", text)
-        self.assertIn("approval_state: needs_review", text)
-
-    def test_planning_check_is_optional_and_one_question_at_a_time(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-check" / "SKILL.md").read_text()
-
-        self.assertIn("not a required workflow gate", text)
-        self.assertIn("optional pre-draft or pre-handoff", text)
-        self.assertIn("Ask one question at a time", text)
-        self.assertIn("recommended answer", text)
-        self.assertIn("If a question can be answered", text)
-        self.assertIn("must not generate the standard draft suite or Confluence update plan", text)
-
-    def test_planning_draft_is_standard_only_for_now(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-
-        self.assertNotIn("--mode", text)
-        self.assertNotIn("## Modes", text)
-        self.assertNotIn("`lite`", text)
-        self.assertNotIn("`full`", text)
-        self.assertIn("## Standard Suite", text)
-        self.assertIn("Always generate the core standard suite", text)
-
-        for artifact_name in CORE_TEMPLATE_NAMES:
-            self.assertIn(f"`{artifact_name}`", text)
-
-        generated_artifacts = text.split("## Generated Artifact Types", 1)[1].split(
-            "## Template Map",
-            1,
-        )[0]
-        for artifact_name in CORE_TEMPLATE_NAMES:
-            self.assertIn(f"`{artifact_name}`", generated_artifacts)
-        for artifact_name in RESERVED_TEMPLATE_NAMES + LEGACY_TEMPLATE_NAMES:
-            self.assertNotIn(f"`{artifact_name}`", generated_artifacts)
-        self.assertNotIn("`qa-scenario`", generated_artifacts)
-        self.assertNotIn("`handoff-summary`", generated_artifacts)
-        self.assertNotIn("`engineering-brief`", generated_artifacts)
-
-    def test_planning_draft_always_saves_generated_standard_suite(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-
-        self.assertIn("## Local Draft Persistence", text)
-        self.assertIn("Always save generated artifacts", text)
-        self.assertIn("planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/", text)
-        self.assertIn("planning/drafts/login-onboarding--2026-04-24-143205/", text)
-        self.assertIn("Do not overwrite existing suite directories", text)
-        self.assertIn("append `-2`, `-3`, or the next available numeric suffix", text)
-        self.assertIn("`evidence_sources`", text)
-        self.assertIn("source confidence", text)
-
-        for relative_path in CORE_GENERATED_FILES:
-            self.assertIn(relative_path, text)
-
-        for removed_path in (
-            "00-suite-index.md",
-            "00-planning-context.md",
-            "00-planning-context.yaml",
-            "01-brief.md",
-            "02-prd.md",
-            "03-user-stories.md",
-            "04-feature-spec.md",
-            "03-metrics-brief.md",
-            "05-metrics-brief.md",
-            "04-engineering-brief.md",
-            "03-qa-scenario.md",
-            "05-handoff-summary.md",
-        ):
-            self.assertNotIn(removed_path, text)
-
-    def test_planning_draft_orchestrates_parallel_generation_safely(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-
-        self.assertIn("## Draft Generation Orchestration", text)
-        self.assertIn("Act as the suite orchestrator", text)
-        self.assertIn("generate `01-planning-brief.md` first", text)
-        self.assertIn("canonical planning context and decision brief", text)
-        self.assertIn("trace contract", text)
-        self.assertIn("requirement ID registry", text)
-        self.assertIn("`02-requirements.md` and `03-behavior-spec.md` in parallel", text)
-        self.assertIn("subagents", text)
-        self.assertIn("sequential fallback", text)
-        self.assertIn("reconciliation gate", text)
-        self.assertIn("behavior without matching requirements", text)
-        self.assertIn("Generate `00-index.md` last", text)
-        self.assertIn("Generation Execution Mode", text)
-        self.assertIn("Use `parallel` or `sequential fallback`", text)
-
-    def test_codex_manifest_declares_write_capability_for_saved_drafts(self) -> None:
-        codex_manifest = json.loads(
-            (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text()
-        )
-
-        self.assertIn("Write", codex_manifest["interface"]["capabilities"])
-
-    def test_planning_review_uses_multi_agent_review_contract(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-review" / "SKILL.md").read_text()
-
-        for section_name in (
-            "## Input Contract",
-            "## Review Orchestration",
-            "## Reviewer Agents",
-            "## Gate Results",
-            "## Quality Scores",
-            "## Consolidation Rules",
-            "## Local Review Persistence",
-            "## Fallback Mode",
-        ):
-            self.assertIn(section_name, text)
-
-        for reviewer_name in (
-            "Product Context Reviewer",
-            "Story & Testability Reviewer",
-            "Feature Behavior & Policy Reviewer",
-            "Metrics & Evidence Reviewer",
-            "Cross-Artifact Consistency Reviewer",
-            "Handoff Governance Reviewer",
-        ):
-            self.assertIn(reviewer_name, text)
-
-        for input_contract_term in (
-            "`full standard suite`",
-            "`partial suite`",
-            "`single document`",
-            "`00-index.md`",
-            "`01-planning-brief.md`",
-            "`02-requirements.md`",
-            "`03-behavior-spec.md`",
-        ):
-            self.assertIn(input_contract_term, text)
-
-        for gate_status in ("`pass`", "`warn`", "`fail`"):
-            self.assertIn(gate_status, text)
-
-        for response_field in (
-            "`Input Type`",
-            "`Documents Reviewed`",
-            "`Documents Missing`",
-            "`Gate Results`",
-            "`Review Execution Mode`",
-            "`Agent Review Summary`",
-            "`Conflict Resolution`",
-        ):
-            self.assertIn(response_field, text)
-
-        for verdict in ("`pass`", "`conditional pass`", "`needs revision`"):
-            self.assertIn(verdict, text)
-        self.assertIn("04-planning-review.md", text)
-        self.assertIn("confluence-update-plan", text)
-
-        for score_rule in (
-            "`0`",
-            "`1`",
-            "`2`",
-            "critical failure",
-            "`needs revision`",
-        ):
-            self.assertIn(score_rule, text)
-
-        for finding_field in (
-            "`reviewer`",
-            "`severity`",
-            "`document`",
-            "`location`",
-            "`section`",
-            "`evidence`",
-            "`issue`",
-            "`why it matters`",
-            "`suggested fix`",
-        ):
-            self.assertIn(finding_field, text)
-
-        for guardrail in (
-            "API endpoint",
-            "DB schema",
-            "concrete query",
-            "instrumentation event",
-        ):
-            self.assertIn(guardrail, text)
-
-    def test_confluence_update_plan_is_manual_only_contract(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "confluence-update-plan" / "SKILL.md").read_text()
-
-        for required in (
-            "/planning-team-kit:confluence-update-plan",
-            "$confluence-update-plan",
-            "manual Confluence add/update plan",
-            "does not call Confluence APIs",
-            "99-confluence-update-plan.md",
-            "`create`",
-            "`update`",
-            "`manual-review`",
-            "`skip`",
-            "Use `update` only when the user provides an explicit page URL or page ID",
-            "Do not infer update targets from title similarity alone",
-            "No External Write Confirmation",
-        ):
-            self.assertIn(required, text)
-
-    def test_planning_drafts_owns_template_resources(self) -> None:
-        text = (PLUGIN_ROOT / "skills" / "planning-draft" / "SKILL.md").read_text()
-
-        for template_name in ALL_TEMPLATE_NAMES:
-            with self.subTest(template=template_name):
-                template_path = PLANNING_DRAFTS_TEMPLATES_ROOT / f"{template_name}.md"
-                self.assertTrue(template_path.exists())
-                self.assertIn(
-                    f"`{template_name}` -> `templates/{template_name}.md`",
-                    text,
+    def test_old_skill_dirs_removed(self):
+        for skill in self.OLD_SKILLS:
+            with self.subTest(skill=skill):
+                self.assertFalse(
+                    os.path.isdir(skill_path(skill)),
+                    f"구버전 skills/{skill}/ 아직 존재함",
                 )
 
-    def test_templates_match_header_schema_and_section_map(self) -> None:
-        header_schema = json.loads(
-            (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
-        )
-        section_map = parse_simple_yaml(
-            (PLUGIN_ROOT / "schemas" / "section-map.yaml").read_text()
-        )
-        expected_defaults = {
-            "index": {"decision_required": True},
-            "planning-brief": {"decision_required": True},
-            "requirements": {"decision_required": True},
-            "behavior-spec": {"decision_required": True},
-            "planning-context": {"decision_required": True},
-            "brief": {"decision_required": True},
-            "option-memo": {"decision_required": True},
-            "prd": {"decision_required": True},
-            "user-stories": {"decision_required": True},
-            "feature-spec": {"decision_required": True},
-            "qa-scenario": {"decision_required": False},
-            "metrics-brief": {"decision_required": True},
-            "stakeholder-brief": {"decision_required": True},
-        }
-        expected_subheadings = {
-            "option-memo": ["Option A", "Option B", "Option C"],
-        }
+    LEGACY_PUBLIC_PHRASES = OLD_SKILLS[1:] + [
+        "v0.2.1",
+        "draft-only",
+    ]
 
-        for template_name in ALL_TEMPLATE_NAMES:
-            with self.subTest(template=template_name):
-                template = PLANNING_DRAFTS_TEMPLATES_ROOT / f"{template_name}.md"
-                header, body = parse_front_matter(template.read_text())
-
-                self.assertEqual(header["doc_type"], template_name)
-
-                for required_key in header_schema["required"]:
-                    self.assertIn(required_key, header)
-
-                for key, property_schema in header_schema["properties"].items():
-                    if key not in header:
-                        continue
-                    if "enum" in property_schema:
-                        self.assertIn(header[key], property_schema["enum"])
-
-                self.assertIsInstance(header["title"], str)
-                self.assertIsInstance(header["related_docs"], list)
-                self.assertIsInstance(header["decision_required"], bool)
-                self.assertEqual(header["last_updated"], "YYYY-MM-DD")
-                self.assertEqual(header["mode"], "standard")
-                self.assertEqual(header["status"], "draft")
-                self.assertEqual(header["sensitivity"], "internal")
-                self.assertEqual(header["approval_state"], "draft")
-                self.assertIsInstance(header["source_of_truth"], str)
-                self.assertEqual(
-                    header["decision_required"],
-                    expected_defaults[template_name]["decision_required"],
-                )
-
-                headings = extract_headings(body)
-                self.assertEqual(headings, section_map[template_name]["required"])
-
-                if template_name in expected_subheadings:
-                    self.assertEqual(
-                        extract_subheadings(body),
-                        expected_subheadings[template_name],
+    def test_old_skill_names_not_in_public_docs(self):
+        for doc in PUBLIC_DOCS:
+            content = read_text(doc)
+            for phrase in self.LEGACY_PUBLIC_PHRASES:
+                with self.subTest(doc=doc, phrase=phrase):
+                    self.assertNotIn(
+                        phrase,
+                        content,
+                        f"{doc}에 구버전 표현 '{phrase}' 노출됨",
                     )
 
-                if template_name == "index":
-                    self.assertIn("How to Read This Suite", body)
-                    self.assertIn("01-planning-brief.md", body)
-                    self.assertIn("02-requirements.md", body)
-                    self.assertIn("03-behavior-spec.md", body)
+    def test_plain_plan_command_not_in_public_docs(self):
+        forbidden_commands = [
+            "/planning-team-kit:plan ",
+            "/planning-team-kit:plan\n",
+            "$plan ",
+            "$plan\n",
+        ]
+        for doc in PUBLIC_DOCS:
+            content = read_text(doc)
+            for command in forbidden_commands:
+                with self.subTest(doc=doc, command=command):
+                    self.assertNotIn(command, content)
 
-                if template_name == "planning-brief":
-                    self.assertIn("Current State", body)
-                    self.assertIn("Failure Criteria", body)
-                    self.assertIn("Options Considered", body)
+    def test_current_plan_draft_command_is_documented(self):
+        workspace_readme = read_text(os.path.join(WORKSPACE_ROOT, "README.md"))
+        package_readme = read_text(os.path.join(BASE, "README.md"))
+        for content in [workspace_readme, package_readme]:
+            with self.subTest():
+                self.assertIn("/planning-team-kit:plan-draft", content)
+                self.assertIn("$plan-draft", content)
 
-                if template_name == "requirements":
-                    self.assertIn("Requirement ID", body)
-                    self.assertIn("Acceptance Criteria", body)
-                    self.assertIn("Source", body)
-                    self.assertIn("Assumption", body)
-
-                if template_name == "behavior-spec":
-                    self.assertIn("Requirement ID", body)
-                    self.assertIn("Surface/Flow", body)
-                    self.assertIn("State/Permission Rule", body)
-                    self.assertIn("Failure Case", body)
-
-                if template_name == "prd":
-                    self.assertIn("- Must have:", body)
-                    self.assertIn("- Should have:", body)
-                    self.assertIn("- Could have:", body)
-                    self.assertIn("- Out of scope:", body)
-                    self.assertIn("story-level detail", body)
-                    self.assertNotIn("acceptance criteria", body)
-
-                if template_name == "user-stories":
-                    self.assertIn("As a", body)
-                    self.assertIn("Acceptance Criteria", body)
-                    self.assertIn("Priority and Release Scope", body)
-
-                if template_name == "feature-spec":
-                    self.assertIn("State and Policy Rules", body)
-                    self.assertIn("Validation Expectations", body)
-                    self.assertNotIn("API endpoints", body)
-                    self.assertNotIn("schemas", body)
-                    self.assertNotIn("dashboard or query", body)
-
-                if template_name == "metrics-brief":
-                    self.assertIn("measurement source", body)
-                    self.assertIn("observation window", body)
-                    self.assertIn("decision rule", body)
-                    self.assertNotIn("event name", body)
-                    self.assertNotIn("trigger point", body)
-                    self.assertNotIn("instrumentation owner", body)
-
-                if template_name == "qa-scenario":
-                    self.assertIn(
-                        "Use `not run`, `pass`, `fail`, or `blocked`.",
-                        body,
-                    )
-
-    def test_shared_quality_assets_exist(self) -> None:
-        expected_files = [
-            "schemas/doc-header.schema.json",
-            "schemas/section-map.yaml",
-            "snippets/decision-table.md",
-            "snippets/risk-table.md",
-            "snippets/source-assumption-confidence.md",
-            "docs/style-guide.md",
-            "docs/quality-rubric.md",
-            "docs/examples.md",
-            "docs/privacy-policy.md",
-            "docs/terms-of-service.md",
+    def test_public_docs_do_not_hardcode_workspace_confluence_values(self):
+        public_paths = [
+            os.path.join(BASE, "README.md"),
+            os.path.join(BASE, ".codex-plugin", "plugin.json"),
+            os.path.join(BASE, "docs", "examples.md"),
+            skill_path("plan-draft", "SKILL.md"),
+            skill_path("plan-draft", "agents", "openai.yaml"),
+            skill_path("plan-publish", "SKILL.md"),
+            skill_path("plan-publish", "references", "publish-runbook.md"),
+        ]
+        forbidden_phrases = [
+            "OMS",
+            "WMS",
+            "Platform Admin",
+            "Colonova Product",
+            "Product Team Space",
+            "Product Department",
+            "colosseum.atlassian.net",
+            "PROD",
+            'spaceId: "PROD"',
         ]
 
-        for relative_path in expected_files:
-            with self.subTest(path=relative_path):
-                self.assertTrue((PLUGIN_ROOT / relative_path).exists())
+        for path in public_paths:
+            content = read_text(path)
+            for phrase in forbidden_phrases:
+                with self.subTest(path=path, phrase=phrase):
+                    self.assertNotIn(phrase, content)
 
-    def test_generated_core_suite_fixture_matches_contract(self) -> None:
-        header_schema = json.loads(
-            (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
-        )
-        section_map = parse_simple_yaml(
-            (PLUGIN_ROOT / "schemas" / "section-map.yaml").read_text()
-        )
-        expected_doc_types = {
-            "00-index.md": "index",
-            "01-planning-brief.md": "planning-brief",
-            "02-requirements.md": "requirements",
-            "03-behavior-spec.md": "behavior-spec",
-        }
 
-        self.assertEqual(
-            sorted(path.name for path in GENERATED_SUITE_FIXTURE_ROOT.glob("*.md")),
-            CORE_GENERATED_FILES,
-        )
+# ---------------------------------------------------------------------------
+# 매니페스트 동기화
+# ---------------------------------------------------------------------------
 
-        for file_name, doc_type in expected_doc_types.items():
-            with self.subTest(file=file_name):
-                header, body = parse_front_matter(
-                    (GENERATED_SUITE_FIXTURE_ROOT / file_name).read_text()
-                )
-                self.assertEqual(header["doc_type"], doc_type)
+class TestManifests(unittest.TestCase):
 
-                for required_key in header_schema["required"]:
-                    self.assertIn(required_key, header)
+    def _claude(self):
+        return load_json(CLAUDE_PLUGIN)
 
-                for key, property_schema in header_schema["properties"].items():
-                    if key in header and "enum" in property_schema:
-                        self.assertIn(header[key], property_schema["enum"])
+    def _codex(self):
+        return load_json(CODEX_PLUGIN)
 
-                self.assertEqual(header["mode"], "standard")
-                self.assertIn(header["approval_state"], {"draft", "needs_review"})
-                self.assertEqual(extract_headings(body), section_map[doc_type]["required"])
+    def test_version_is_0_3_0(self):
+        self.assertEqual(self._claude()["version"], "0.3.0")
+        self.assertEqual(self._codex()["version"], "0.3.0")
 
-        index_text = (GENERATED_SUITE_FIXTURE_ROOT / "00-index.md").read_text()
-        for file_name in CORE_GENERATED_FILES[1:]:
-            self.assertIn(f"]({file_name})", index_text)
+    def test_name_synced(self):
+        self.assertEqual(self._claude()["name"], self._codex()["name"])
 
-    def test_plugin_is_registered_in_workspace_docs_and_marketplace(self) -> None:
-        claude_manifest = json.loads(
-            (PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text()
-        )
-        codex_manifest = json.loads(
-            (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text()
-        )
-        marketplace = json.loads(
-            (WORKSPACE_ROOT / ".claude-plugin" / "marketplace.json").read_text()
-        )
-        codex_marketplace = json.loads(
-            (WORKSPACE_ROOT / ".agents" / "plugins" / "marketplace.json").read_text()
-        )
-        plugin_entry = next(
-            plugin
-            for plugin in marketplace["plugins"]
-            if plugin["name"] == "planning-team-kit"
-        )
-        codex_plugin_entry = next(
-            plugin
-            for plugin in codex_marketplace["plugins"]
-            if plugin["name"] == "planning-team-kit"
-        )
+    def test_version_synced(self):
+        self.assertEqual(self._claude()["version"], self._codex()["version"])
 
-        self.assertEqual(plugin_entry["source"], "./planning-team-kit")
-        self.assertEqual(plugin_entry["version"], claude_manifest["version"])
-        self.assertEqual(plugin_entry["license"], claude_manifest["license"])
-        self.assertEqual(plugin_entry["description"], claude_manifest["description"])
-        self.assertEqual(plugin_entry["description"], codex_manifest["description"])
+    def test_skills_path_set(self):
+        self.assertEqual(self._claude()["skills"], "./skills/")
+        self.assertEqual(self._codex()["skills"], "./skills/")
 
-        claude_keywords = set(claude_manifest["keywords"]) - PLATFORM_KEYWORDS
-        codex_keywords = set(codex_manifest["keywords"]) - PLATFORM_KEYWORDS
-        self.assertTrue(set(plugin_entry["tags"]).issubset(claude_keywords))
-        self.assertTrue(set(plugin_entry["tags"]).issubset(codex_keywords))
+    def test_codex_has_default_prompts(self):
+        prompts = self._codex()["interface"]["defaultPrompt"]
+        self.assertIsInstance(prompts, list)
+        self.assertGreaterEqual(len(prompts), 1)
 
-        self.assertEqual(codex_marketplace["name"], "inkwonjung-colosseum")
-        self.assertEqual(
-            codex_marketplace["interface"]["displayName"],
-            "inkwonjung-colosseum plugins",
-        )
-        self.assertEqual(
-            codex_plugin_entry["source"],
-            {"source": "local", "path": "./planning-team-kit"},
-        )
-        self.assertEqual(
-            codex_plugin_entry["policy"],
-            {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
-        )
-        self.assertEqual(
-            codex_plugin_entry["category"],
-            codex_manifest["interface"]["category"],
-        )
-
-        interface = codex_manifest["interface"]
-        self.assertNotEqual(interface["privacyPolicyURL"], codex_manifest["repository"])
-        self.assertNotEqual(interface["termsOfServiceURL"], codex_manifest["repository"])
+    def test_codex_links_policy_docs(self):
+        interface = self._codex()["interface"]
         self.assertIn("privacy-policy.md", interface["privacyPolicyURL"])
         self.assertIn("terms-of-service.md", interface["termsOfServiceURL"])
 
-        readme = (WORKSPACE_ROOT / "README.md").read_text()
-        self.assertIn("planning-team-kit", readme)
-        self.assertIn("기획 문서", readme)
-        self.assertIn(".claude-plugin/marketplace.json", readme)
-        self.assertIn(".agents/plugins/marketplace.json", readme)
-        self.assertIn("├── snippets/", readme)
-        self.assertIn("https://github.com/inkwonjung-colosseum/plugins", readme)
-        self.assertIn(
-            "claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins",
-            readme,
+
+# ---------------------------------------------------------------------------
+# 템플릿
+# ---------------------------------------------------------------------------
+
+class TestTemplates(unittest.TestCase):
+
+    REQUIRED_TEMPLATES = ["상위설계서.md", "기능설계서.md", "정책서.md"]
+
+    def test_templates_exist(self):
+        for tmpl in self.REQUIRED_TEMPLATES:
+            with self.subTest(template=tmpl):
+                p = skill_path("plan-draft", "templates", tmpl)
+                self.assertTrue(os.path.isfile(p), f"템플릿 {p} 없음")
+
+    def test_templates_not_empty(self):
+        for tmpl in self.REQUIRED_TEMPLATES:
+            with self.subTest(template=tmpl):
+                p = skill_path("plan-draft", "templates", tmpl)
+                content = read_text(p)
+                self.assertGreater(len(content.strip()), 100, f"템플릿 {tmpl} 내용 너무 짧음")
+
+    def test_상위설계서_has_required_sections(self):
+        content = read_text(skill_path("plan-draft", "templates", "상위설계서.md"))
+        for section in ["배경 및 문제", "목표", "비목표", "핵심 요구사항", "제약사항 및 가정", "관련 문서"]:
+            self.assertIn(section, content, f"상위설계서 템플릿에 '{section}' 없음")
+
+    def test_기능설계서_has_required_sections(self):
+        content = read_text(skill_path("plan-draft", "templates", "기능설계서.md"))
+        for section in ["기능 설명", "전체 흐름", "권한 정책", "기능 상세 설계", "예외 처리", "QA 체크리스트"]:
+            self.assertIn(section, content, f"기능설계서 템플릿에 '{section}' 없음")
+
+    def test_정책서_has_required_sections(self):
+        content = read_text(skill_path("plan-draft", "templates", "정책서.md"))
+        for section in ["정책 개요", "적용 범위", "정책 규칙", "예외 케이스", "상태 전이", "미결 사항"]:
+            self.assertIn(section, content, f"정책서 템플릿에 '{section}' 없음")
+
+
+# ---------------------------------------------------------------------------
+# schemas
+# ---------------------------------------------------------------------------
+
+class TestSchemas(unittest.TestCase):
+
+    def test_doc_types_yaml_exists(self):
+        p = os.path.join(SCHEMAS, "doc-types.yaml")
+        self.assertTrue(os.path.isfile(p))
+
+    def test_doc_types_has_three_types(self):
+        content = read_text(os.path.join(SCHEMAS, "doc-types.yaml"))
+        for doc_type in ["상위설계서", "기능설계서", "정책서"]:
+            self.assertIn(doc_type, content, f"doc-types.yaml에 '{doc_type}' 없음")
+
+    def test_doc_types_uses_plan_draft_templates(self):
+        content = read_text(os.path.join(SCHEMAS, "doc-types.yaml"))
+        self.assertIn("skills/plan-draft/templates/", content)
+        self.assertNotIn("skills/plan/templates/", content)
+
+    def test_old_schemas_removed(self):
+        self.assertFalse(
+            os.path.isfile(os.path.join(SCHEMAS, "doc-header.schema.json")),
+            "구버전 doc-header.schema.json 아직 존재함",
         )
-        self.assertIn(
-            "codex marketplace add https://github.com/inkwonjung-colosseum/plugins",
-            readme,
-        )
-        self.assertIn("claude plugin install planning-team-kit@inkwonjung-colosseum", readme)
-        self.assertIn("claude plugin marketplace add", readme)
-        self.assertNotIn("claude plugin add ./planning-team-kit", readme)
-        self.assertNotIn("claude plugin marketplace add /absolute/path/to/colo-plugins", readme)
-        self.assertNotIn("codex marketplace add /absolute/path/to/colo-plugins", readme)
-        self.assertIn("Codex", readme)
-        self.assertIn(".codex-plugin/plugin.json", readme)
-        self.assertIn("policy.installation", readme)
-        self.assertIn("policy.authentication", readme)
-
-    def test_package_readme_exposes_start_here_and_full_workflow(self) -> None:
-        readme = (PLUGIN_ROOT / "README.md").read_text()
-
-        self.assertIn("## Start Here", readme)
-        self.assertIn("/planning-team-kit:help", readme)
-        self.assertIn("$help", readme)
-        self.assertIn("00-index.md", readme)
-        self.assertIn("01-planning-brief.md", readme)
-        self.assertIn("02-requirements.md", readme)
-        self.assertIn("03-behavior-spec.md", readme)
-        self.assertIn("04-planning-review.md", readme)
-        self.assertIn("99-confluence-update-plan.md", readme)
-        self.assertIn("planning/drafts/", readme)
-        self.assertNotIn("00-suite-index.md", readme)
-        self.assertNotIn("00-planning-context.md", readme)
-        self.assertNotIn("03-user-stories.md", readme)
-        self.assertNotIn("04-feature-spec.md", readme)
-        self.assertNotIn("05-metrics-brief.md", readme)
-        self.assertNotIn("00-planning-context.yaml", readme)
-        self.assertNotIn("03-metrics-brief.md", readme)
-        self.assertNotIn("04-engineering-brief.md", readme)
-        self.assertNotIn("03-qa-scenario.md", readme)
-        self.assertNotIn("05-handoff-summary.md", readme)
-        self.assertNotIn("/planning-team-kit:planning-coach", readme)
-        self.assertNotIn("$planning-coach", readme)
-        self.assertNotIn("/planning-team-kit:handoff-summary", readme)
-        self.assertNotIn("$handoff-summary", readme)
-
-    def test_package_readme_explains_multi_agent_quality_review(self) -> None:
-        readme = (PLUGIN_ROOT / "README.md").read_text()
-        help_text = (PLUGIN_ROOT / "skills" / "help" / "SKILL.md").read_text()
-
-        self.assertIn("multi-agent review gate", readme)
-        self.assertIn("Product Context Reviewer", readme)
-        self.assertIn("Cross-Artifact Consistency Reviewer", readme)
-        self.assertIn("Handoff Governance Reviewer", readme)
-        self.assertIn("Product Context Reviewer", help_text)
-        self.assertIn("Cross-Artifact Consistency Reviewer", help_text)
-        self.assertIn("Handoff Governance Reviewer", help_text)
-
-    def test_workflow_diagram_ends_at_confluence_update_plan(self) -> None:
-        diagram = (WORKSPACE_ROOT / "docs" / "diagrams" / "planning-team-kit-workflow.html").read_text()
-
-        self.assertIn("planning-review", diagram)
-        self.assertIn("multi-agent review gate", diagram)
-        self.assertIn("confluence-update-plan", diagram)
-        self.assertIn("manual add/update instructions", diagram)
-        self.assertNotIn("handoff-summary", diagram)
-        self.assertNotIn("Handoff Summary", diagram)
-
-    def test_header_schema_is_strict_enough_for_template_contract(self) -> None:
-        header_schema = json.loads(
-            (PLUGIN_ROOT / "schemas" / "doc-header.schema.json").read_text()
+        self.assertFalse(
+            os.path.isfile(os.path.join(SCHEMAS, "section-map.yaml")),
+            "구버전 section-map.yaml 아직 존재함",
         )
 
-        self.assertEqual(header_schema["additionalProperties"], False)
-        self.assertEqual(
-            header_schema["properties"]["last_updated"]["pattern"],
-            r"^(YYYY-MM-DD|\d{4}-\d{2}-\d{2})$",
+
+# ---------------------------------------------------------------------------
+# docs
+# ---------------------------------------------------------------------------
+
+class TestDocs(unittest.TestCase):
+
+    REQUIRED_DOCS = [
+        "examples.md",
+        "privacy-policy.md",
+        "quality-rubric.md",
+        "style-guide.md",
+        "terms-of-service.md",
+    ]
+
+    def test_required_docs_exist(self):
+        for doc in self.REQUIRED_DOCS:
+            with self.subTest(doc=doc):
+                self.assertTrue(os.path.isfile(os.path.join(DOCS, doc)))
+
+    def test_docs_reflect_v0_3_publish_gate(self):
+        for doc in ["examples.md", "quality-rubric.md", "style-guide.md", "terms-of-service.md"]:
+            with self.subTest(doc=doc):
+                content = read_text(os.path.join(DOCS, doc))
+                self.assertIn("plan", content)
+                self.assertIn("publish", content.lower())
+        quality = read_text(os.path.join(DOCS, "quality-rubric.md"))
+        self.assertIn("[미정]", quality)
+        self.assertIn("[가정]", quality)
+        self.assertIn("Publish Gate", quality)
+
+
+# ---------------------------------------------------------------------------
+# plan-publish SKILL.md 핵심 내용 검증
+# ---------------------------------------------------------------------------
+
+class TestPlanPublishSkill(unittest.TestCase):
+
+    def _content(self):
+        return read_text(skill_path("plan-publish", "SKILL.md"))
+
+    def test_stale_check_documented(self):
+        self.assertIn("stale", self._content().lower(), "plan-publish SKILL.md에 stale 체크 없음")
+
+    def test_lock_json_path_documented(self):
+        self.assertIn("confluence-lock.json", self._content())
+
+    def test_mcp_tool_discovery_documented(self):
+        content = self._content()
+        self.assertNotIn("mcp__", content, "plan-publish SKILL.md에 고정 MCP 서버 ID가 남아 있음")
+        self.assertIn("MCP tool discovery", content)
+
+    def test_create_page_documented(self):
+        self.assertIn("createConfluencePage", self._content())
+
+    def test_update_page_documented(self):
+        self.assertIn("updateConfluencePage", self._content())
+
+    def test_user_confirmation_required(self):
+        self.assertIn("yes", self._content(), "plan-publish SKILL.md에 사용자 확인 절차 없음")
+
+    def test_direct_local_sync_not_documented(self):
+        content = self._content()
+        forbidden = [
+            "로컬 파일 동기화",
+            "로컬 마크다운 파일 생성",
+            "기존 로컬 파일 내용 업데이트",
+            "confluence-lock.json 업데이트",
+        ]
+        for phrase in forbidden:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
+
+    def test_parent_lookup_documented(self):
+        content = self._content()
+        for phrase in ["parent 후보", "중복", "없음", "page_id 또는 URL"]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_review_gate_documented(self):
+        content = self._content()
+        for phrase in ["Review gate", "[미정]", "[가정]", "충돌 경고", "review 없이 publish 진행"]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_schema_aware_mcp_mapping_documented(self):
+        content = self._content()
+        self.assertIn("references/publish-runbook.md", content)
+        self.assertNotIn("spaceKey", content)
+        self.assertNotIn("version: N+1", content)
+
+
+# ---------------------------------------------------------------------------
+# plan-draft SKILL.md 핵심 내용 검증
+# ---------------------------------------------------------------------------
+
+class TestPlanDraftSkill(unittest.TestCase):
+
+    def _content(self):
+        return read_text(skill_path("plan-draft", "SKILL.md"))
+
+    def test_question_loop_documented(self):
+        self.assertIn("질문", self._content())
+
+    def test_assumption_tag_documented(self):
+        self.assertIn("[가정]", self._content())
+
+    def test_diff_output_documented(self):
+        content = self._content()
+        self.assertTrue(
+            "[기존]" in content or "diff" in content.lower(),
+            "plan-draft SKILL.md에 diff/변경 출력 형식 없음",
         )
 
-        last_updated_pattern = re.compile(
-            header_schema["properties"]["last_updated"]["pattern"]
-        )
-        self.assertTrue(last_updated_pattern.fullmatch("YYYY-MM-DD"))
-        self.assertTrue(last_updated_pattern.fullmatch("2026-04-25"))
-        self.assertFalse(last_updated_pattern.fullmatch(r"\d{4}-\d{2}-\d{2}"))
+    def test_publish_gate_output_documented(self):
+        content = self._content()
+        self.assertIn("Publish gate", content)
+        self.assertIn("review-required", content)
+
+    def test_doc_type_detection_documented(self):
+        content = self._content()
+        for doc_type in ["상위설계서", "기능설계서", "정책서"]:
+            self.assertIn(doc_type, content, f"plan-draft SKILL.md에 문서 타입 '{doc_type}' 판별 없음")
+
+    def test_no_question_limit_implied(self):
+        content = self._content()
+        self.assertNotIn("최대 3번", content, "질문 제한 있음")
+        self.assertNotIn("최대 5번", content, "질문 제한 있음")
+
+    def test_retrieval_reference_documented(self):
+        content = self._content()
+        self.assertIn("references/confluence-retrieval.md", content)
+
+
+# ---------------------------------------------------------------------------
+# plan-review SKILL.md 핵심 내용 검증
+# ---------------------------------------------------------------------------
+
+class TestPlanReviewSkill(unittest.TestCase):
+
+    def _content(self):
+        return read_text(skill_path("plan-review", "SKILL.md"))
+
+    def test_three_perspectives_documented(self):
+        content = self._content()
+        for perspective in ["근거", "범위", "실행"]:
+            self.assertIn(perspective, content, f"plan-review SKILL.md에 관점 '{perspective}' 없음")
+
+    def test_optional_documented(self):
+        self.assertIn("선택", self._content(), "plan-review가 선택 스킬임이 명시되지 않음")
+
+    def test_pass_verdict_documented(self):
+        self.assertIn("pass", self._content().lower())
+
+    def test_conditional_pass_documented(self):
+        self.assertIn("conditional pass", self._content())
+
+    def test_review_gate_reference_documented(self):
+        self.assertIn("references/review-gate.md", self._content())
+
+
+# ---------------------------------------------------------------------------
+# references
+# ---------------------------------------------------------------------------
+
+class TestReferences(unittest.TestCase):
+
+    def test_plan_draft_retrieval_reference_exists_and_uses_index_rule(self):
+        p = skill_path("plan-draft", "references", "confluence-retrieval.md")
+        self.assertTrue(os.path.isfile(p), f"{p} 없음")
+        content = read_text(p)
+        for phrase in [
+            ".confluence-index/registry.json",
+            "source-index.jsonl",
+            "tree.md",
+            "smallest relevant",
+            "raw exported Markdown",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_publish_runbook_exists_and_uses_schema_aware_mcp_terms(self):
+        p = skill_path("plan-publish", "references", "publish-runbook.md")
+        self.assertTrue(os.path.isfile(p), f"{p} 없음")
+        content = read_text(p)
+        for phrase in [
+            "MCP tool discovery",
+            "cloudId",
+            "spaceId",
+            "body",
+            "contentFormat",
+            "parent lookup",
+            "normalize",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_review_gate_reference_exists(self):
+        p = skill_path("plan-review", "references", "review-gate.md")
+        self.assertTrue(os.path.isfile(p), f"{p} 없음")
+        content = read_text(p)
+        for phrase in ["[미정]", "[가정]", "충돌 경고", "pass", "conditional pass"]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
 
 
 if __name__ == "__main__":

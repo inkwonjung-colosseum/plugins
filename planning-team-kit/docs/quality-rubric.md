@@ -1,41 +1,47 @@
 # planning-team-kit Quality Rubric
 
-Use this rubric for draft-only quality review.
+`plan-review`는 초안을 Confluence에 반영하기 전에 근거, 범위, 실행 가능성을 확인한다.
 
 ## Verdicts
 
-- `pass`: no critical defects and the document is usable as a draft.
-- `conditional pass`: usable as a draft if named conditions are resolved.
-- `needs revision`: critical ambiguity, missing sections, unsupported claims, or execution risk remain.
+| Verdict | 의미 | publish 가능 여부 |
+|---|---|---|
+| `pass` | 치명적인 누락이나 충돌이 없다 | 가능 |
+| `conditional pass` | 남은 조건을 기획자가 인지하고 확인하면 반영 가능하다 | 조건 확인 후 가능 |
+| `수정 필요` | 구현 또는 운영 판단에 필요한 정보가 부족하다 | 불가 |
 
-## Scoring Axes
+## 근거
 
-| Axis | 0 | 1 | 2 |
-|---|---|---|---|
-| Problem clarity | Missing or contradictory | Present but vague | Clear one-sentence problem |
-| Audience clarity | Missing | Partially implied | Explicit reader or decision maker |
-| Requirement completeness | Missing or mixed | Partial separation | Required, optional, and out-of-scope separated |
-| Exception coverage | Missing | Some examples | Edge cases and policies covered |
-| Metric verifiability | Missing | Metric exists but weak | Measurement source and decision rule exist |
-| Evidence quality | Unsupported claims | Mixed sources and assumptions | Claims tied to sources or assumptions |
-| Structure | Unstructured | Mostly follows template | Follows expected section model |
-| Execution readiness | Requires guessing | Some gaps remain | Another team can act on it |
+확인 항목:
 
-## Critical Failure Conditions
+- 기존 Confluence 문서와 충돌하지 않는다.
+- 출처가 필요한 주장은 관련 문서나 회의록을 근거로 가진다.
+- `[가정]` 항목은 실제 결정이 필요한지 구분되어 있다.
+- archive 문서는 현재 정책처럼 사용하지 않는다.
 
-- No clear problem statement.
-- No target audience or decision maker.
-- Requirements conflict with goals.
-- Unsupported facts drive decisions.
-- Metrics cannot be measured.
-- Draft implies final approval.
+## 범위
 
-## Review Output
+확인 항목:
 
-Each review should include:
+- 문서 타입이 상위설계서, 기능설계서, 정책서 중 하나로 명확하다.
+- 적용 대상, 비대상, 예외가 분리되어 있다.
+- `[미정]` 항목은 결정 필요자나 후속 액션이 있다.
+- 관련 정책 또는 상위 문서와 연결된다.
 
-- Verdict
-- Critical findings
-- Evidence for each finding
-- Highest-impact question
-- Suggested fixes
+## 실행
+
+확인 항목:
+
+- 개발팀이 상태, 조건, 권한, 오류 처리 기준을 문서만 보고 이해할 수 있다.
+- 정상 케이스와 주요 예외 케이스가 모두 있다.
+- 수정 문서라면 `[기존]`과 `[변경]` 차이가 명확하다.
+- QA가 확인할 수 있는 체크포인트가 있다.
+
+## Publish Gate
+
+아래 항목 중 하나라도 남아 있으면 `plan-publish`는 review 결과 또는 명시적 override 확인을 요구한다.
+
+- `[미정]`
+- `[가정]`
+- 기존 Confluence 문서와의 충돌 경고
+- `Publish gate: review-required`

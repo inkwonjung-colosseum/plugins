@@ -1,8 +1,0 @@
-interface:
-  display_name: "기획 품질 검토"
-  short_description: "Review draft planning documents for clarity, completeness, evidence, and execution readiness."
-  brand_color: "#0F766E"
-  default_prompt: "Review this draft planning document and identify the most important quality gaps."
-
-policy:
-  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: Confluence 반영
+  short_description: 초안을 확인 후 Confluence에 직접 반영합니다
+  brand_color: "#0F766E"
+  default_prompt: Confluence에 반영해줘
+policy:
+  allow_implicit_invocation: true

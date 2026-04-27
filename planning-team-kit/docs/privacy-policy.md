@@ -1,28 +1,38 @@
 # planning-team-kit Privacy Policy
 
-`planning-team-kit` is a local-first, draft-only planning plugin.
+`planning-team-kit` reads local Confluence exports and can publish confirmed drafts back to Confluence through the host MCP tools.
 
-## What this plugin stores
+## Data Read
 
-- Draft planning artifacts created in the local workspace
-- Timestamped `planning-draft` drafts saved under `planning/drafts/topic-slug--YYYY-MM-DD-HHMMSS/`
-- Manual `confluence-update-plan` instructions saved inside reviewed draft directories
-- Plugin manifests, templates, schemas, and examples stored in the repository
-- User-provided planning inputs that are included in generated drafts
+The plugin instructions guide the host agent to read:
 
-## What this plugin does not do in v0.2.1
+- Local Confluence Markdown exports under the configured workspace.
+- `.confluence-index/` retrieval metadata.
+- `confluence/confluence-lock.json` page IDs, versions, titles, and export paths.
+- User-provided planning intent and answers in the current conversation.
 
-- It does not automatically reflect content in Jira, Confluence, Slack, Google Drive, Notion, or other third-party services.
-- It does not call Confluence write APIs or change Confluence pages.
-- It does not include built-in telemetry or analytics collection inside the plugin bundle.
-- It does not make final business decisions on behalf of users.
+## Data Written
 
-## User responsibility
+The plugin does not directly include network code. When `plan-publish` is used, the host agent may call available Confluence MCP write tools after explicit user confirmation.
 
-- Review generated drafts before sharing them.
-- Remove or redact sensitive information before moving artifacts into external systems.
-- Confirm whether the local workspace path is synced by the host operating system or cloud storage provider.
-- Confirm the privacy and retention rules of the host AI platform being used.
+Expected write operations:
+
+- Create a new Confluence page.
+- Update an existing Confluence page.
+
+The plugin instructions prohibit modifying local exported Markdown and `confluence/confluence-lock.json` after publish.
+
+## Confirmation Requirements
+
+Before Confluence write operations, `plan-publish` requires:
+
+- Stale export check.
+- Review gate check for `[미정]`, `[가정]`, and conflict warnings.
+- Final user confirmation with `yes`.
+
+## User Responsibility
+
+Users should review drafts before publishing, avoid including unnecessary sensitive data, and re-run Confluence export/index after publishing when local snapshots need to reflect the latest source of truth.
 
 ## Contact
 

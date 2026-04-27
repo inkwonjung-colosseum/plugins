@@ -1,26 +1,27 @@
 # planning-team-kit Terms of Service
 
-`planning-team-kit` is provided as a draft-generation and review aid for planning documents.
+`planning-team-kit` is a local workflow plugin for drafting, reviewing, and publishing planning documents based on Confluence source material.
 
-## Acceptable use
+## Intended Use
 
-- Use the plugin to create and review draft planning materials.
-- Expect `planning-draft` to save generated core standard draft suites as local workspace files.
-- Expect `confluence-update-plan` to create manual Confluence add/update instructions only.
-- Keep a human owner responsible for final approval, publication, and operational decisions.
-- Verify claims, metrics, and requirements before treating generated content as final.
+Use this plugin to:
+
+- Read local Confluence exports for product planning context.
+- Draft 상위설계서, 기능설계서, and 정책서 documents.
+- Review drafts before publishing.
+- Publish explicitly confirmed changes to Confluence through available MCP tools.
 
 ## Limitations
 
-- The plugin is provided on an as-is basis without any guarantee that generated drafts are complete, correct, or approved for execution.
-- v0.2.1 is draft-only and does not include automatic writes to external systems. Local draft saves and Confluence update plans are not publication or approval.
-- Generated content may include assumptions when source evidence is missing.
+- The plugin does not replace human product, legal, security, or operational approval.
+- Local exported Markdown may be stale. `plan-publish` includes a stale check, but users remain responsible for confirming source freshness.
+- Parent page lookup depends on `confluence/confluence-lock.json`. If the parent cannot be found exactly, the agent must ask for a page ID or URL.
+- The plugin should not be used to bypass Confluence permissions or team review policies.
 
-## Responsibility
+## Publishing Rules
 
-- Users are responsible for reviewing outputs, confirming compliance requirements, and deciding whether drafts are appropriate for downstream use.
-- Users must not represent generated drafts as approved policy, legal advice, or final commitments without human review.
+Confluence writes require explicit confirmation. If a draft includes `[미정]`, `[가정]`, or conflict warnings, publish requires a `plan-review` pass/conditional pass or an explicit user override.
 
-## Source
+## No Warranty
 
-Repository: https://github.com/inkwonjung-colosseum/plugins
+The plugin is provided as-is. Users are responsible for reviewing generated content and confirming that published changes are accurate and appropriate for their workspace.

@@ -1,7 +1,7 @@
 {
   "name": "planning-team-kit",
-  "version": "0.2.1",
-  "description": "Claude Code and Codex compatible planning kit for planner-friendly input organization, draft generation, review, and manual Confluence update plans.",
+  "version": "0.3.0",
+  "description": "로컬 Confluence 문서를 읽고 기획 초안을 만들어 Confluence에 직접 반영하는 기획팀 도구.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -13,9 +13,8 @@
   "keywords": [
     "planning",
     "product",
-    "prd",
+    "confluence",
     "documentation",
-    "quality",
     "claude-plugin"
   ],
   "skills": "./skills/"
