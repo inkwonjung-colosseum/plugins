@@ -1,0 +1,43 @@
+{
+  "name": "logistics-expert-kit",
+  "version": "0.1.0",
+  "description": "Codex plugin for general-purpose logistics domain advice: scope framing, operations diagnosis, KPI design, and risk review.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-expert-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "logistics",
+    "supply-chain",
+    "operations",
+    "warehouse",
+    "transportation",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "logistics-expert-kit",
+    "shortDescription": "General logistics scope, diagnosis, metrics, and risk advice",
+    "longDescription": "logistics-expert-kit provides general-purpose logistics domain guidance for framing logistics issues, diagnosing operations symptoms, designing practical KPI definitions, and reviewing process or policy risk. It separates confirmed evidence, general logistics principles, assumptions, and company-specific follow-up needs.",
+    "developerName": "developjik",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-expert-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/logistics-expert-kit/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/logistics-expert-kit/docs/terms-of-service.md",
+    "defaultPrompt": [
+      "Scope this logistics issue and tell me what data I need.",
+      "Diagnose why order fulfillment is delayed.",
+      "Design logistics KPIs for delivery reliability and inventory health.",
+      "Review operational risk in a warehouse process change."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

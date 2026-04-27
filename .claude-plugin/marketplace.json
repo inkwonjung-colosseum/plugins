@@ -31,6 +31,14 @@
       "version": "1.0.0",
       "license": "MIT",
       "tags": ["diagrams", "svg", "architecture", "flowchart", "visualization", "editorial"]
+    },
+    {
+      "name": "logistics-expert-kit",
+      "source": "./logistics-expert-kit",
+      "description": "General-purpose logistics domain assistant for scope framing, operations diagnosis, KPI design, and risk review.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "tags": ["logistics", "supply-chain", "operations", "warehouse", "transportation"]
     }
   ]
 }

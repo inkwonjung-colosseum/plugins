@@ -1,0 +1,22 @@
+{
+  "name": "logistics-expert-kit",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for general-purpose logistics domain advice: scope framing, operations diagnosis, KPI design, and risk review.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-expert-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "logistics",
+    "supply-chain",
+    "operations",
+    "warehouse",
+    "transportation",
+    "claude-plugin"
+  ],
+  "skills": "./skills/"
+}
