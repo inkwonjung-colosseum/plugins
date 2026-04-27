@@ -11,18 +11,18 @@
     {
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
-      "description": "Claude Code plugin for Confluence export and local export-index workflows: auth setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
-      "version": "0.1.4",
+      "description": "Claude Code plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
+      "version": "0.2.0",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },
     {
       "name": "planning-team-kit",
       "source": "./planning-team-kit",
-      "description": "Claude Code and Codex compatible planning kit for planner-friendly input organization, draft generation, review, and manual Confluence update plans.",
-      "version": "0.2.1",
+      "description": "Claude Code and Codex compatible planning kit that reads local Confluence exports, generates planning drafts, reviews them, and publishes confirmed updates to Confluence.",
+      "version": "0.3.0",
       "license": "MIT",
-      "tags": ["planning", "prd", "documentation", "quality", "product"]
+      "tags": ["planning", "product", "confluence", "documentation"]
     },
     {
       "name": "diagram-design",
