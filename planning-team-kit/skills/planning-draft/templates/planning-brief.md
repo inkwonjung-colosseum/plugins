@@ -76,7 +76,22 @@ List unsupported or unverified statements here.
 
 ## Evidence and Sources
 
-Link source notes, tickets, documents, research, or meeting records.
+Link source notes, tickets, documents, research, or meeting records. Preserve selected `planning-start` evidence with source confidence.
+
+| Source | Status | Type | Reason Used | Confidence |
+|---|---|---|---|---|
+
+## Confirmed Facts
+
+List source-backed facts that should drive the draft.
+
+## Source Conflicts
+
+List conflicting source statements or version/status ambiguity that reviewers must resolve.
+
+## Excluded Sources
+
+List nearby or candidate sources that were intentionally not used and why.
 
 ## Open Questions
 

@@ -1,0 +1,8 @@
+interface:
+  display_name: "기획 점검 질문"
+  short_description: "Check planning decisions with focused one-question-at-a-time questions."
+  brand_color: "#0F766E"
+  default_prompt: "Check this planning decision and ask the highest-impact question first."
+
+policy:
+  allow_implicit_invocation: true

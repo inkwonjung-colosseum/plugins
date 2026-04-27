@@ -49,4 +49,4 @@ Confirm final scope.
 
 ## Recommended Next Skill
 
-`/planning-team-kit:quality-review`
+`/planning-team-kit:planning-review`

@@ -1,0 +1,8 @@
+interface:
+  display_name: "기획 입력 정리"
+  short_description: "Organize planning input and select relevant indexed Confluence evidence before draft generation."
+  brand_color: "#0F766E"
+  default_prompt: "Turn this rough planning input into structured planning context and select relevant indexed Confluence evidence."
+
+policy:
+  allow_implicit_invocation: true

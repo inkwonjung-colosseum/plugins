@@ -1,7 +1,7 @@
 {
   "name": "planning-team-kit",
-  "version": "0.1.3",
-  "description": "Claude Code and Codex compatible planning document quality kit for structured brainstorming, artifact generation, review, and handoff drafts.",
+  "version": "0.2.1",
+  "description": "Claude Code and Codex compatible planning kit for planner-friendly input organization, draft generation, review, and manual Confluence update plans.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -21,8 +21,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "planning-team-kit",
-    "shortDescription": "Create consistent draft planning artifacts with lightweight quality gates",
-    "longDescription": "planning-team-kit helps planning teams define and align rough ideas, generate and locally save a core draft planning suite, review quality gaps, and prepare handoff summaries. v0.1 is draft-only and does not write to external systems.",
+    "shortDescription": "Create draft planning artifacts and manual Confluence update plans",
+    "longDescription": "planning-team-kit helps planning teams organize input, select relevant indexed Confluence evidence, generate and locally save a core draft planning suite, review quality gaps, and prepare manual Confluence add/update plans. v0.2.1 remains draft-only and does not change external systems.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -34,9 +34,9 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/planning-team-kit/docs/privacy-policy.md",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/planning-team-kit/docs/terms-of-service.md",
     "defaultPrompt": [
-      "이 아이디어를 먼저 정의/정렬한 뒤 필요한 기획 문서 묶음을 추천하고 초안을 만들어줘.",
+      "이 아이디어를 먼저 기획 입력으로 정리한 뒤 필요한 기획 문서 묶음을 추천하고 초안을 만들어줘.",
       "입력된 회의 메모를 목표, 문제, 대상, 결정사항, 미결정사항, 리스크 순으로 구조화해줘.",
-      "이 기획 문서를 품질 기준으로 검토하고 가장 중요한 보완 질문 하나부터 물어봐줘."
+      "이 기획 문서를 품질 기준으로 검토하고 Confluence에 사람이 반영할 계획을 정리해줘."
     ],
     "brandColor": "#0F766E"
   }

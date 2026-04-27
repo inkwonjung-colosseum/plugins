@@ -31,7 +31,7 @@ Core suite output behavior.
 
 ## User Flow
 
-User runs planning-drafts and reads the generated files.
+User runs planning-draft and reads the generated files.
 
 ## Screen or Surface Behavior
 

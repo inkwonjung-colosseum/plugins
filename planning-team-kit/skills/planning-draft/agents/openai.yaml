@@ -1,8 +1,8 @@
 interface:
-  display_name: "Planning Drafts"
+  display_name: "기획 초안 생성"
   short_description: "Generate a core draft planning suite with index, planning brief, requirements, and behavior spec."
   brand_color: "#0F766E"
-  default_prompt: "Generate the right draft planning artifact suite from this planning context."
+  default_prompt: "Generate the core draft planning artifact suite from this planning context."
 
 policy:
   allow_implicit_invocation: true

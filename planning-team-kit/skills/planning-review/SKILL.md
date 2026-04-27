@@ -1,10 +1,10 @@
 ---
-name: quality-review
+name: planning-review
 description: "Review draft planning documents against the shared quality rubric."
 argument-hint: "<planning document or document suite>"
 ---
 
-# Quality Review
+# Planning Review
 
 Use this skill to inspect a draft planning document suite before handoff.
 
@@ -13,13 +13,13 @@ Use this skill to inspect a draft planning document suite before handoff.
 Claude Code:
 
 ```text
-/planning-team-kit:quality-review <document>
+/planning-team-kit:planning-review <document>
 ```
 
 Codex:
 
 ```text
-$quality-review <document>
+$planning-review <document>
 ```
 
 ## Purpose
@@ -44,9 +44,9 @@ The standard suite files are:
 Rules:
 
 - Always state `Input Type`, `Documents Reviewed`, and `Documents Missing`.
-- Prefer full-suite review when the user provides a saved `planning-drafts` directory.
+- Prefer full-suite review when the user provides a saved `planning-draft` directory.
 - For `partial suite` or `single document`, disclose coverage limits and do not invent findings for documents that were not provided.
-- If the missing context prevents a useful review, return `needs revision` and recommend `planning-intake`.
+- If the missing context prevents a useful review, return `needs revision` and recommend `planning-start`.
 - If a provided path points to a directory, read all standard files present before judging individual documents.
 
 ## Rubric
@@ -134,10 +134,26 @@ Use these severity values:
 - Prefer the higher handoff risk when reviewer findings conflict.
 - Record reviewer disagreement or tradeoffs under `Conflict Resolution`.
 - Deduplicate repeated findings and keep only the highest-impact issues.
-- If core planning context is missing, recommend `planning-intake`.
+- If core planning context is missing, recommend `planning-start`.
 - If any critical failure is present, return `needs revision` regardless of score totals.
 - If the suite is usable with named conditions, use `conditional pass` and recommend the smallest fix.
-- If the suite is ready for downstream handoff as a draft, state that no next skill is required and the reviewed draft can be shared by the human owner.
+- If the suite is ready for manual Confluence update planning, recommend `confluence-update-plan`.
+
+## Local Review Persistence
+
+When the input is a saved draft directory, save the consolidated review result into that directory as:
+
+```text
+04-planning-review.md
+```
+
+Rules:
+
+- Do not overwrite unrelated files.
+- Include the verdict, gate results, reviewer summary, critical findings, unsupported claims, highest-impact question, and suggested fixes.
+- Use only these final verdict values: `pass`, `conditional pass`, `needs revision`.
+- If the verdict is `needs revision`, do not recommend `confluence-update-plan`; recommend `planning-start`, `planning-check`, or `planning-draft` based on the smallest needed fix.
+- If the input is not a local directory, return the review in the response and state that no review file was saved.
 
 ## Fallback Mode
 
@@ -166,6 +182,8 @@ When asking the highest-impact follow-up question, prefer an interactive choice 
 - Do not ask reviewers to design outside their assigned scope.
 - Do not require implementation design details such as API endpoint, DB schema, concrete query, or instrumentation event.
 - Do not turn Feature Spec review into backend architecture review.
+- Save `04-planning-review.md` when reviewing a local draft suite directory.
+- Do not recommend `confluence-update-plan` when the verdict is `needs revision`.
 
 ## Response Format
 
@@ -186,4 +204,4 @@ Return:
 - `Suggested Fixes`
 - `Recommended Next Skill`
 
-The recommended next skill is usually `/planning-team-kit:planning-intake` or `$planning-intake` when core context needs more clarification. When the reviewed draft is ready for human handoff, return `No next skill required`.
+The recommended next skill is usually `/planning-team-kit:planning-start` or `$planning-start` when core context needs more clarification. When the reviewed draft is ready for manual Confluence update planning, recommend `/planning-team-kit:confluence-update-plan` or `$confluence-update-plan`.

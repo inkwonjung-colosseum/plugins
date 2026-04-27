@@ -1,8 +1,0 @@
-interface:
-  display_name: "Planning Grill"
-  short_description: "Stress-test planning decisions with focused one-question-at-a-time interrogation."
-  brand_color: "#0F766E"
-  default_prompt: "Stress-test this planning decision and ask the highest-impact question first."
-
-policy:
-  allow_implicit_invocation: true
