@@ -12,6 +12,12 @@
 이 PRD 초안에서 개발자가 해석해야 하는 모호한 요구사항과 빠진 엣지 케이스를 찾아줘.
 ```
 
+## Grill Prompt
+
+```text
+이 planning context를 문서화하기 전에 가장 위험한 결정부터 하나씩 질문하면서 검증해줘.
+```
+
 ## Handoff Prompt
 
 ```text
@@ -47,4 +53,18 @@ Codex:
 
 ```text
 $quality-review <draft>
+```
+
+If the plan is still too soft before draft generation, run `planning-grill` and answer one decision question at a time.
+
+Claude Code:
+
+```text
+/planning-team-kit:planning-grill <planning-context>
+```
+
+Codex:
+
+```text
+$planning-grill <planning-context>
 ```

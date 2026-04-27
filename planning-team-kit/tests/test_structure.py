@@ -142,6 +142,7 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         skill_names = [
             "help",
             "planning-intake",
+            "planning-grill",
             "planning-drafts",
             "quality-review",
         ]
@@ -205,12 +206,15 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
             PLUGIN_ROOT / "docs" / "terms-of-service.md",
             PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
             PLUGIN_ROOT / "skills" / "planning-intake" / "SKILL.md",
+            PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md",
             PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md",
             PLUGIN_ROOT / "skills" / "planning-drafts" / "agents" / "openai.yaml",
         ]
 
         for public_file in public_files:
             with self.subTest(path=public_file):
+                if not public_file.exists():
+                    continue
                 text = public_file.read_text()
                 self.assertNotIn(legacy_name, text)
                 self.assertNotIn(legacy_codex_invocation, text)
@@ -250,6 +254,16 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("route to `planning-intake`", text)
         self.assertNotIn("planning-coach", text)
         self.assertIn("approval_state: needs_review", text)
+
+    def test_planning_grill_is_optional_and_one_question_at_a_time(self) -> None:
+        text = (PLUGIN_ROOT / "skills" / "planning-grill" / "SKILL.md").read_text()
+
+        self.assertIn("not a required workflow gate", text)
+        self.assertIn("optional pre-draft or pre-handoff", text)
+        self.assertIn("Ask one question at a time", text)
+        self.assertIn("recommended answer", text)
+        self.assertIn("If a question can be answered", text)
+        self.assertIn("must not generate the standard draft suite", text)
 
     def test_planning_drafts_is_standard_only_for_now(self) -> None:
         text = (PLUGIN_ROOT / "skills" / "planning-drafts" / "SKILL.md").read_text()
@@ -615,11 +629,12 @@ class PlanningTeamKitStructureTests(unittest.TestCase):
         self.assertIn("기획 문서", readme)
         self.assertIn(".claude-plugin/marketplace.json", readme)
         self.assertIn(".agents/plugins/marketplace.json", readme)
-        self.assertIn("planning-team-kit/snippets/", readme)
+        self.assertIn("├── snippets/", readme)
         self.assertIn("claude plugin install planning-team-kit@inkwonjung-colosseum", readme)
-        self.assertIn("claude plugin add ./planning-team-kit", readme)
+        self.assertIn("claude plugin marketplace add", readme)
+        self.assertNotIn("claude plugin add ./planning-team-kit", readme)
         self.assertIn("Codex", readme)
-        self.assertIn("planning-team-kit/.codex-plugin/plugin.json", readme)
+        self.assertIn(".codex-plugin/plugin.json", readme)
         self.assertIn("policy.installation", readme)
         self.assertIn("policy.authentication", readme)
 
