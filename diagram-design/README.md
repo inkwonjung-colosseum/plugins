@@ -109,10 +109,11 @@ claude plugin marketplace add inkwonjung-colosseum/plugins
 claude plugin install diagram-design@inkwonjung-colosseum
 ```
 
-로컬 개발 중에는 저장소 루트에서 직접 추가할 수 있습니다.
+로컬 개발 중에는 저장소 루트를 marketplace로 추가한 뒤 이 플러그인을 설치합니다.
 
 ```bash
-claude plugin add ./diagram-design
+claude plugin marketplace add /absolute/path/to/colo-plugins
+claude plugin install diagram-design@inkwonjung-colosseum
 ```
 
 ### Codex
