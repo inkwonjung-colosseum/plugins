@@ -11,9 +11,36 @@ PLUGIN_ROOT = WORKSPACE_ROOT / "confluence-export-kit"
 SUPPORTED_FEATURES_DOC = (
     PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md"
 )
+EXPECTED_PLUGIN_VERSION = "0.2.1"
 
 
 class CurrentDocumentationStateTests(unittest.TestCase):
+    def test_plugin_version_is_synchronized_across_release_surfaces(self) -> None:
+        claude_manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text())
+        codex_manifest = json.loads((PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text())
+        claude_marketplace = json.loads(
+            (WORKSPACE_ROOT / ".claude-plugin" / "marketplace.json").read_text()
+        )
+        root_readme = (WORKSPACE_ROOT / "README.md").read_text()
+        plugin_readme = (PLUGIN_ROOT / "README.md").read_text()
+        supported_features_doc = SUPPORTED_FEATURES_DOC.read_text()
+
+        self.assertEqual(claude_manifest["version"], EXPECTED_PLUGIN_VERSION)
+        self.assertEqual(codex_manifest["version"], EXPECTED_PLUGIN_VERSION)
+
+        marketplace_entry = next(
+            entry
+            for entry in claude_marketplace["plugins"]
+            if entry["name"] == "confluence-export-kit"
+        )
+        self.assertEqual(marketplace_entry["version"], EXPECTED_PLUGIN_VERSION)
+        self.assertIn(f"| `confluence-export-kit` | `{EXPECTED_PLUGIN_VERSION}` |", root_readme)
+        self.assertIn(f"(v{EXPECTED_PLUGIN_VERSION})", plugin_readme)
+        self.assertIn(
+            f"로컬 래퍼 플러그인 버전: `confluence-export-kit {EXPECTED_PLUGIN_VERSION}`",
+            supported_features_doc,
+        )
+
     def test_supported_features_plugin_version_matches_manifests(self) -> None:
         claude_manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text())
         codex_manifest = json.loads((PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text())

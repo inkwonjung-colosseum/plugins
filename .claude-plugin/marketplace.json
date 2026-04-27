@@ -12,7 +12,7 @@
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
       "description": "Claude Code plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },

@@ -35,7 +35,7 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `confluence-export-kit` | `0.2.0` | Confluence export 및 local export-index workflow. auth/export 기본값 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export` | [README](./confluence-export-kit/README.md) |
+| `confluence-export-kit` | `0.2.1` | Confluence export 및 local export-index workflow. auth/export 기본값 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export` | [README](./confluence-export-kit/README.md) |
 | `planning-team-kit` | `0.3.0` | 로컬 Confluence export를 읽고 질문 루프로 기획 초안을 만든 뒤, 확인된 내용만 MCP로 Confluence에 반영합니다. `[미정]`, `[가정]`, 충돌 경고가 있으면 review 확인 후 publish합니다. | `plan-draft`, `plan-review`, `plan-publish` | [README](./planning-team-kit/README.md) |
 | `diagram-design` | `1.0.0` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 
