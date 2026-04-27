@@ -31,7 +31,7 @@ $export-space <space-url> <space-url2> [output-path]
 1. Treat the arguments as one or more Confluence space URLs (e.g. `https://company.atlassian.net/wiki/spaces/SPACEKEY`).
 2. If the final argument is not URL-like, treat it as an optional export output path override.
 3. Before export, validate that Python and `cme` are usable; install `confluence-markdown-exporter` only when `cme` is missing.
-4. Extract the base site from each space URL (`scheme://netloc`) and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for every site.
+4. Resolve config through `cme config path`, read it through `cme config list -o json`, then extract the base site from each space URL (`scheme://netloc`) and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for every site. Do not hardcode `~/.cme/config.yaml`.
 5. If auth is missing or incomplete, stop and tell the user to run one of:
 
 ```text

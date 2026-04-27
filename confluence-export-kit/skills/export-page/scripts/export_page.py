@@ -19,7 +19,7 @@ from scripts.cme_runtime import (
     effective_output_path,
     ensure_cme_available,
     ensure_python_preflight,
-    load_json,
+    load_cme_config,
     print_export_flags,
     print_preflight,
     require_auth,
@@ -78,7 +78,7 @@ def main() -> int:
     python_path = ensure_python_preflight()
     cme_path, cme_status, installer_status = ensure_cme_available()
     config_path = resolve_config_path(args.config_path, cme_path)
-    config_data = load_json(config_path)
+    config_data = load_cme_config(cme_path, config_path)
 
     base_url = validate_same_site(args.page_urls)
     require_auth(config_data, base_url)

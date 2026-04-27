@@ -278,6 +278,24 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
+def load_cme_config(cme_path: str, config_path: Path | str | None = None) -> dict[str, Any]:
+    env = os.environ.copy()
+    if config_path:
+        env["CME_CONFIG_PATH"] = str(config_path)
+
+    result = run_command([cme_path, "config", "list", "-o", "json"], env=env)
+    raw = result.stdout.strip()
+    if not raw:
+        raise RuntimeError("`cme config list -o json` returned an empty config.")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("`cme config list -o json` returned invalid JSON.") from exc
+    if not isinstance(data, dict):
+        raise RuntimeError("`cme config list -o json` must return a JSON object.")
+    return data
+
+
 def ensure_dict(parent: dict[str, Any], key: str) -> dict[str, Any]:
     value = parent.get(key)
     if not isinstance(value, dict):

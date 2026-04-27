@@ -36,7 +36,7 @@ $export-page <page-url> [<page-url2> ...] --output-path <path>
 4. At least one page URL is required.
 5. All supplied URLs must belong to the same Confluence site (`scheme://netloc`). Mixed-site exports are not supported.
 6. Before export, validate that Python and `cme` are usable; install `confluence-markdown-exporter` only when `cme` is missing.
-7. Extract the base site from the first page URL and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for that site.
+7. Resolve config through `cme config path`, read it through `cme config list -o json`, then extract the base site from the first page URL and verify that a configured `auth.confluence` entry with both `username` and `api_token` exists for that site. Do not hardcode `~/.cme/config.yaml`.
 8. If auth is missing or incomplete, stop and tell the user to run one of:
 
 ```text

@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 from pathlib import Path
+import subprocess
 import unittest
 from unittest import mock
 
@@ -86,6 +87,32 @@ class CmeRuntimeTests(unittest.TestCase):
         self.assertEqual(installer_status, "not needed (cme already available)")
         validate_mock.assert_called_once_with("/usr/local/bin/cme")
         pipx_mock.assert_not_called()
+
+    def test_load_cme_config_reads_json_from_cme_command_with_resolved_config_path(self) -> None:
+        config_path = Path("/tmp/cme-app-data.json")
+        result = subprocess.CompletedProcess(
+            ["/usr/local/bin/cme", "config", "list", "-o", "json"],
+            0,
+            stdout='{"auth":{"confluence":{"https://alpha.atlassian.net":{"username":"user@example.com","api_token":"token"}}}}',
+            stderr="",
+        )
+
+        with mock.patch.object(self.module, "run_command", return_value=result) as run_command:
+            config = self.module.load_cme_config("/usr/local/bin/cme", config_path)
+
+        self.assertEqual(
+            config["auth"]["confluence"]["https://alpha.atlassian.net"]["username"],
+            "user@example.com",
+        )
+        run_command.assert_called_once()
+        self.assertEqual(
+            run_command.call_args.args[0],
+            ["/usr/local/bin/cme", "config", "list", "-o", "json"],
+        )
+        self.assertEqual(
+            run_command.call_args.kwargs["env"]["CME_CONFIG_PATH"],
+            str(config_path),
+        )
 
 
 if __name__ == "__main__":

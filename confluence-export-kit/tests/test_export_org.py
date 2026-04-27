@@ -96,13 +96,16 @@ class ExportOrgArgumentTests(unittest.TestCase):
             mock.patch.object(
                 self.module, "resolve_config_path", return_value=Path("/tmp/cme-config.json")
             ),
-            mock.patch.object(self.module, "load_json", return_value=config_data),
+            mock.patch.object(self.module, "load_cme_config", return_value=config_data) as load_cme_config,
             mock.patch.object(self.module, "run_cme_and_report") as run_cme,
             mock.patch("builtins.print"),
         ):
             exit_code = self.module.main()
 
         self.assertEqual(exit_code, 0)
+        load_cme_config.assert_called_once_with(
+            "/usr/local/bin/cme", Path("/tmp/cme-config.json")
+        )
         run_cme.assert_called_once()
         self.assertEqual(
             run_cme.call_args.args[1],
