@@ -30,21 +30,7 @@ class ExportPageArgumentTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_export_page_module()
 
-    def test_single_page_url_keeps_positional_output_path(self) -> None:
-        args = self.module.parse_args(
-            [
-                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "./docs/confluence",
-            ]
-        )
-
-        self.assertEqual(
-            args.page_urls,
-            ["https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page"],
-        )
-        self.assertEqual(args.output_path, "./docs/confluence")
-
-    def test_multiple_page_urls_are_not_treated_as_output_path(self) -> None:
+    def test_multiple_page_urls_are_kept_as_targets(self) -> None:
         args = self.module.parse_args(
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
@@ -59,13 +45,11 @@ class ExportPageArgumentTests(unittest.TestCase):
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/2/Other",
             ],
         )
-        self.assertIsNone(args.output_path)
 
-    def test_multiple_page_urls_keep_trailing_output_path(self) -> None:
+    def test_path_like_target_is_forwarded_to_cme_validation(self) -> None:
         args = self.module.parse_args(
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/2/Other",
                 "./docs/confluence",
             ]
         )
@@ -74,43 +58,30 @@ class ExportPageArgumentTests(unittest.TestCase):
             args.page_urls,
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/2/Other",
+                "./docs/confluence",
             ],
         )
-        self.assertEqual(args.output_path, "./docs/confluence")
 
-    def test_output_path_flag_still_works(self) -> None:
-        args = self.module.parse_args(
-            [
-                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "--output-path",
-                "./docs/confluence",
-            ]
-        )
-
-        self.assertEqual(
-            args.page_urls,
-            ["https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page"],
-        )
-        self.assertEqual(args.output_path, "./docs/confluence")
-
-    def test_rejects_positional_and_flag_output_paths_together(self) -> None:
+    def test_rejects_output_path_flag(self) -> None:
         with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
             self.module.parse_args(
                 [
                     "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                    "./positional",
                     "--output-path",
-                    "./flag",
+                    "./docs/confluence",
                 ]
             )
+
+    def test_non_url_target_is_forwarded_to_cme_validation(self) -> None:
+        args = self.module.parse_args(["not-a-url"])
+
+        self.assertEqual(args.page_urls, ["not-a-url"])
 
     def test_main_passes_all_page_urls_to_cme_pages(self) -> None:
         argv = [
             "export_page.py",
             "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
             "https://alpha.atlassian.net/wiki/spaces/ENG/pages/2/Other",
-            "./docs/confluence",
         ]
 
         with (
@@ -132,11 +103,63 @@ class ExportPageArgumentTests(unittest.TestCase):
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/2/Other",
             ],
         )
-        self.assertEqual(
-            run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"],
-            "./docs/confluence",
-        )
-        run_index.assert_called_once_with("./docs/confluence")
+        self.assertEqual(run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"], "./confluence")
+        run_index.assert_called_once_with("./confluence")
+
+    def test_rejects_max_workers_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--max-workers",
+                    "3",
+                ]
+            )
+
+    def test_rejects_skip_unchanged_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--skip-unchanged",
+                ]
+            )
+
+    def test_rejects_no_skip_unchanged_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--no-skip-unchanged",
+                ]
+            )
+
+    def test_rejects_cleanup_stale_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--cleanup-stale",
+                ]
+            )
+
+    def test_rejects_no_cleanup_stale_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--no-cleanup-stale",
+                ]
+            )
+
+    def test_rejects_jira_enrichment_flag(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                    "--jira-enrichment",
+                ]
+            )
 
 
 if __name__ == "__main__":

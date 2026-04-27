@@ -20,7 +20,6 @@ class RemovedSearchExportSkillTests(unittest.TestCase):
         docs = [
             PLUGIN_ROOT / "README.md",
             PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md",
-            PLUGIN_ROOT / "skills" / "help" / "SKILL.md",
             PLUGIN_ROOT / ".claude-plugin" / "plugin.json",
             PLUGIN_ROOT / ".codex-plugin" / "plugin.json",
             WORKSPACE_ROOT / ".claude-plugin" / "marketplace.json",

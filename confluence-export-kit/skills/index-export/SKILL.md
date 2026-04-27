@@ -1,7 +1,8 @@
 ---
 name: index-export
-description: "Index local Markdown files that were already exported from Confluence. Usage: /confluence-export-kit:index-export <export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]"
+description: "Background workflow for indexing local Markdown files that were already exported from Confluence; export skills run it automatically after successful cme export."
 argument-hint: "<export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]"
+user-invocable: false
 ---
 
 # Index Export
@@ -14,21 +15,11 @@ It does not fetch, create, or update remote Confluence or Jira content.
 
 Claude Code:
 
-```text
-/confluence-export-kit:index-export <export-path>
-/confluence-export-kit:index-export <export-path> --source-id <id>
-/confluence-export-kit:index-export <export-path> --no-agent-rules
-/confluence-export-kit:index-export <export-path> --agent-files AGENTS.md CLAUDE.md
-```
+This skill is hidden from the slash menu with `user-invocable: false`. Export skills run this helper automatically after successful `cme` export. Claude can still load the skill when local export indexing guidance is relevant.
 
 Codex:
 
-```text
-$index-export <export-path>
-$index-export <export-path> --source-id <id>
-$index-export <export-path> --no-agent-rules
-$index-export <export-path> --agent-files AGENTS.md CLAUDE.md
-```
+Codex has no confirmed exact equivalent to Claude's `user-invocable: false`. Keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false` so this skill is not auto-injected for ordinary user requests. Export scripts still invoke the helper script automatically after successful `cme` export.
 
 ## Rules
 
@@ -39,9 +30,16 @@ $index-export <export-path> --agent-files AGENTS.md CLAUDE.md
 5. Default `<source-id>` to the export folder basename in kebab-case.
 6. Support repeated indexing of multiple export folders by keeping each source under `.confluence-index/sources/<source-id>/`.
 7. If a `<source-id>` already points to a different export path, stop and tell the user to pass a different `--source-id`.
-8. Unless `--no-agent-rules` is passed, add or update managed Reading Rule blocks in `AGENTS.md` and `CLAUDE.md`.
-9. If `--agent-files <file> [<file> ...]` is passed, install Reading Rule blocks into those files instead of the default `AGENTS.md` and `CLAUDE.md`.
-10. Only replace content between `confluence-export-kit:reading-rule:start` and `confluence-export-kit:reading-rule:end`; preserve all other file content.
+8. Prefer scalar front matter metadata for `title`, `status`, and `source_type` / `type`; use headings and path-based fallback when metadata is absent.
+9. Append to `.confluence-index/**/log.md`; do not rewrite existing logs just to add a new entry.
+10. Unless `--no-agent-rules` is passed, add or update managed Reading Rule blocks in `AGENTS.md` and `CLAUDE.md`.
+11. If `--agent-files <file> [<file> ...]` is passed, install Reading Rule blocks into those files instead of the default `AGENTS.md` and `CLAUDE.md`.
+12. Only replace content between `confluence-export-kit:reading-rule:start` and `confluence-export-kit:reading-rule:end`; preserve all other file content.
+13. The Reading Rule must state that Confluence is the source of truth and local exported Markdown is a read-only snapshot.
+14. The Reading Rule must prohibit derived wiki, entity, concept, summary, and product-context pages unless a user explicitly asks for a draft-only artifact.
+15. The Reading Rule must treat planning outputs as draft-only until a human reflects them back into Confluence.
+16. For Claude Code, keep `user-invocable: false` so this remains background workflow guidance rather than a direct slash command.
+17. For Codex, keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false`; export skills should be the normal path that runs this helper.
 
 ## Execution
 

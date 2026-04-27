@@ -12,6 +12,7 @@ if str(PLUGIN_ROOT) not in sys.path:
     sys.path.insert(0, str(PLUGIN_ROOT))
 
 from scripts.cme_runtime import (
+    DEFAULT_OUTPUT_PATH,
     DEFAULT_SITE,
     canonicalize_base_url,
     chmod_config_private,
@@ -21,7 +22,12 @@ from scripts.cme_runtime import (
     platform_label,
     resolve_config_path,
     set_auth_credentials,
+    set_cleanup_stale,
     set_default_output_path,
+    set_enable_jira_enrichment,
+    set_include_document_title,
+    set_page_breadcrumbs,
+    set_skip_unchanged,
     write_json_atomic,
 )
 
@@ -37,25 +43,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=DEFAULT_SITE,
         help=f"Confluence base URL for auth updates (default: {DEFAULT_SITE})",
     )
-    parser.add_argument(
-        "--output-path",
-        help="Default export output directory to persist in cme config.",
-    )
-    parser.add_argument(
-        "--config-path",
-        help="Optional explicit path to the confluence-markdown-exporter config file",
-    )
-    parser.add_argument(
-        "--skip-jira",
-        action="store_true",
-        help="Do not mirror credentials into auth.jira for the same site.",
-    )
     args = parser.parse_args(argv)
 
     wants_auth = bool(args.api_key or args.email)
-    wants_output_path = bool(args.output_path)
-    if not wants_auth and not wants_output_path:
-        parser.error("Set at least one of --api-key/--email or --output-path.")
+    if not wants_auth:
+        parser.error("--api-key and --email are required.")
     if wants_auth and not (args.api_key and args.email):
         parser.error("--api-key and --email must be provided together.")
     return args
@@ -64,7 +56,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     exporter_status = ensure_exporter_installed_with_pip()
-    config_path = resolve_config_path(args.config_path, "cme")
+    config_path = resolve_config_path(None, "cme")
     data = load_json(config_path)
 
     auth_updated = False
@@ -79,16 +71,15 @@ def main() -> int:
             site,
             username,
             api_token,
-            mirror_jira=not args.skip_jira,
         )
         auth_updated = True
 
-    output_previous = None
-    output_updated = False
-    if args.output_path:
-        output_path = normalize_nonempty(args.output_path, "Output path")
-        output_previous = set_default_output_path(data, output_path)
-        output_updated = True
+    output_previous = set_default_output_path(data, DEFAULT_OUTPUT_PATH)
+    skip_unchanged_previous = set_skip_unchanged(data, True)
+    cleanup_stale_previous = set_cleanup_stale(data, True)
+    jira_enrichment_previous = set_enable_jira_enrichment(data, False)
+    include_title_previous = set_include_document_title(data, False)
+    breadcrumbs_previous = set_page_breadcrumbs(data, False)
 
     write_json_atomic(config_path, data)
     if auth_updated:
@@ -102,10 +93,19 @@ def main() -> int:
         print(f"Site: {site}")
         print("Username status: set from required email argument")
         print(f"Jira mirror updated: {'yes' if jira_updated else 'no'}")
-    print(f"Output path updated: {'yes' if output_updated else 'no'}")
-    if output_updated:
-        print(f"Previous output path: {output_previous}")
-        print(f"New output path: {args.output_path}")
+    print("Output path updated: yes")
+    print(f"Previous output path: {output_previous}")
+    print(f"New output path: {DEFAULT_OUTPUT_PATH}")
+    print(f"Previous skip unchanged: {skip_unchanged_previous}")
+    print("Skip unchanged: true")
+    print(f"Previous cleanup stale: {cleanup_stale_previous}")
+    print("Cleanup stale: true")
+    print(f"Previous Jira enrichment: {jira_enrichment_previous}")
+    print("Jira enrichment: false")
+    print(f"Previous include document title: {include_title_previous}")
+    print("Include document title: false")
+    print(f"Previous page breadcrumbs: {breadcrumbs_previous}")
+    print("Page breadcrumbs: false")
     return 0
 
 

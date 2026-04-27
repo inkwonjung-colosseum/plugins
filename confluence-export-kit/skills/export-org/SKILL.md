@@ -1,7 +1,7 @@
 ---
 name: export-org
-description: "Export all spaces/pages under one or more Confluence orgs. Usage: /confluence-export-kit:export-org <org-url> [<org-url> ...] [output-path]"
-argument-hint: "<org-url> [<org-url> ...] [output-path]"
+description: "Export all spaces/pages under one or more Confluence orgs. Usage: /confluence-export-kit:export-org <org-url> [<org-url> ...]"
+argument-hint: "<org-url> [<org-url> ...]"
 ---
 
 # Export Org
@@ -14,31 +14,27 @@ Claude Code:
 
 ```text
 /confluence-export-kit:export-org <org-url>
-/confluence-export-kit:export-org <org-url> <output-path>
-/confluence-export-kit:export-org <org-url> <org-url2> [output-path]
+/confluence-export-kit:export-org <org-url> <org-url2>
 ```
 
 Codex:
 
 ```text
 $export-org <org-url>
-$export-org <org-url> <output-path>
-$export-org <org-url> <org-url2> [output-path]
+$export-org <org-url> <org-url2>
 ```
 
 ## Rules
 
-1. Treat the arguments as one or more Confluence instance root URLs (e.g. `https://company.atlassian.net`).
-2. If the final argument is not URL-like, treat it as an optional export output path override.
+1. Treat positional arguments as Confluence instance root targets and forward them to `cme orgs` unchanged.
+2. Do not perform wrapper-side URL validation; malformed or unsupported targets must fail in `cme`.
 3. Assume `cme`, config, and auth are already available.
 4. Do not print the stored API token.
 5. Run `cme orgs <org-url> [<org-url2> ...]`.
-6. If an output path was supplied, apply it only for this export via environment override. Do not persistently rewrite the user's `cme` config.
-7. After `cme orgs` completes, index the effective output path with `index-export`.
-8. `--skip-unchanged` / `--no-skip-unchanged` — skips pages whose version matches the lockfile (incremental export). **Default: on.**
-9. `--cleanup-stale` / `--no-cleanup-stale` — removes local files for pages deleted or moved in Confluence. **Default: on.**
-10. `--jira-enrichment` fetches Jira issue summaries and includes them in the exported Markdown.
-11. `--max-workers N` overrides the upstream export worker count for this run.
+6. Force the fixed output path with `CME_EXPORT__OUTPUT_PATH=./confluence`; do not expose per-export output path overrides.
+7. After `cme orgs` completes, index the fixed output path with `index-export`.
+8. Export behavior defaults are configured by `set-config`: `export.skip_unchanged=true`, `export.cleanup_stale=true`, and `export.enable_jira_enrichment=false`.
+9. Do not expose per-export flags for skip unchanged, cleanup stale, or Jira enrichment.
 
 ## Execution
 
@@ -50,6 +46,6 @@ After the script finishes:
 
 - state that config/auth were assumed to be configured
 - report the org URL(s) being exported
-- report the effective export output path
+- report the fixed export output path
 - confirm that the org export command completed
 - confirm that the output path was indexed

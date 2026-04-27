@@ -1,8 +1,8 @@
 interface:
   display_name: "Index Confluence Export"
-  short_description: "Index local Markdown files already exported from Confluence and install Reading Rules."
+  short_description: "Background indexer for completed Confluence exports."
   brand_color: "#0052CC"
-  default_prompt: "Index this local Confluence export folder and install Reading Rules: <export-path>"
+  default_prompt: "Internal helper: index-export is invoked automatically by export skills after successful cme export."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

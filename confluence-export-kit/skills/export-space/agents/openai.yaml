@@ -2,7 +2,7 @@ interface:
   display_name: "Export Confluence Space"
   short_description: "Export one or more Confluence spaces (all pages, attachments, hierarchy) to local Markdown."
   brand_color: "#0052CC"
-  default_prompt: "Export the Confluence spaces at <space-url> [<space-url> ...] to ./docs/confluence."
+  default_prompt: "Export the Confluence spaces at <space-url> [<space-url> ...] to ./confluence."
 
 policy:
   allow_implicit_invocation: true

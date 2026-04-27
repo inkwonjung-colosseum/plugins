@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 from pathlib import Path
 import sys
 import unittest
@@ -29,15 +30,7 @@ class ExportOrgArgumentTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_export_org_module()
 
-    def test_single_org_url_keeps_optional_output_path(self) -> None:
-        args = self.module.parse_args(
-            ["https://alpha.atlassian.net", "./docs/confluence"]
-        )
-
-        self.assertEqual(args.org_urls, ["https://alpha.atlassian.net"])
-        self.assertEqual(args.output_path, "./docs/confluence")
-
-    def test_multiple_org_urls_are_not_treated_as_output_path(self) -> None:
+    def test_multiple_org_urls_are_kept_as_targets(self) -> None:
         args = self.module.parse_args(
             ["https://alpha.atlassian.net", "https://beta.atlassian.net"]
         )
@@ -46,29 +39,25 @@ class ExportOrgArgumentTests(unittest.TestCase):
             args.org_urls,
             ["https://alpha.atlassian.net", "https://beta.atlassian.net"],
         )
-        self.assertIsNone(args.output_path)
 
-    def test_multiple_org_urls_keep_trailing_output_path(self) -> None:
-        args = self.module.parse_args(
-            [
-                "https://alpha.atlassian.net",
-                "https://beta.atlassian.net",
-                "./docs/confluence",
-            ]
-        )
+    def test_path_like_target_is_forwarded_to_cme_validation(self) -> None:
+        args = self.module.parse_args(["https://alpha.atlassian.net", "./docs/confluence"])
 
         self.assertEqual(
             args.org_urls,
-            ["https://alpha.atlassian.net", "https://beta.atlassian.net"],
+            ["https://alpha.atlassian.net", "./docs/confluence"],
         )
-        self.assertEqual(args.output_path, "./docs/confluence")
+
+    def test_non_url_target_is_forwarded_to_cme_validation(self) -> None:
+        args = self.module.parse_args(["not-a-url"])
+
+        self.assertEqual(args.org_urls, ["not-a-url"])
 
     def test_main_passes_all_org_urls_to_cme_orgs(self) -> None:
         argv = [
             "export_org.py",
-            "not-a-url",
-            "still-not-a-url",
-            "./docs/confluence",
+            "https://alpha.atlassian.net",
+            "https://beta.atlassian.net",
         ]
 
         with (
@@ -86,15 +75,12 @@ class ExportOrgArgumentTests(unittest.TestCase):
             run_cme.call_args.args[1],
             [
                 "orgs",
-                "not-a-url",
-                "still-not-a-url",
+                "https://alpha.atlassian.net",
+                "https://beta.atlassian.net",
             ],
         )
-        self.assertEqual(
-            run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"],
-            "./docs/confluence",
-        )
-        run_index.assert_called_once_with("./docs/confluence")
+        self.assertEqual(run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"], "./confluence")
+        run_index.assert_called_once_with("./confluence")
 
 
 if __name__ == "__main__":

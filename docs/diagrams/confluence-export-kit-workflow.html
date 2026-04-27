@@ -65,11 +65,11 @@
 <body>
   <main class="frame">
     <p class="eyebrow">Flowchart · confluence-export-kit</p>
-    <h1>Confluence export-only workflow</h1>
+    <h1>Confluence export and indexing workflow</h1>
 
     <svg viewBox="0 0 1000 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
       <title id="title">confluence-export-kit 주요 workflow</title>
-      <desc id="desc">Confluence export 요청이 설정 준비, 범위 선택, cme 실행, 자동 local index를 거쳐 Markdown과 .confluence-index로 저장되는 흐름.</desc>
+      <desc id="desc">Confluence export 요청이 set-config fixed export defaults, export target 전달, cme 실행, 자동 index-export를 거쳐 Markdown과 .confluence-index로 저장되는 흐름.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
@@ -88,7 +88,7 @@
       <line x1="500" y1="168" x2="500" y2="192" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <line x1="600" y1="240" x2="728" y2="240" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <line x1="500" y1="288" x2="500" y2="328" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-      <path d="M 808 264 C 808 308, 620 308, 620 352" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <path d="M 808 280 C 808 312, 620 312, 620 352" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
       <line x1="500" y1="376" x2="500" y2="416" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
       <line x1="500" y1="464" x2="500" y2="504" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
 
@@ -100,31 +100,35 @@
       <text x="500" y="400" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">RUN</text>
 
       <rect x="400" y="40" width="200" height="48" rx="24" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
-      <text x="500" y="68" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Export 요청</text>
+      <text x="500" y="64" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Confluence export 요청</text>
+      <text x="500" y="78" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">7 skills · no help command</text>
 
       <rect x="388" y="120" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="500" y="140" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Config 준비</text>
-      <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">cme / config / auth assumed</text>
+      <text x="500" y="140" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Auth + defaults 준비</text>
+      <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">cme + config/auth assumed</text>
 
       <polygon points="500,192 600,240 500,288 400,240" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">설정 필요?</text>
-      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">first run or path change</text>
+      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">first run or credential change</text>
 
-      <rect x="728" y="216" width="160" height="48" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
-      <text x="808" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">set-config</text>
-      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">pip check + credentials</text>
+      <rect x="690" y="216" width="236" height="64" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="808" y="234" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">set-config</text>
+      <text x="808" y="248" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">api-key + email + optional url</text>
+      <text x="808" y="262" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">output_path=./confluence</text>
+      <text x="808" y="274" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">skip + cleanup on · jira off</text>
 
       <rect x="388" y="328" width="224" height="48" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
       <text x="500" y="348" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Export scope 선택</text>
-      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">org / space / descendants / page</text>
+      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">export-org / space / descendants / page</text>
 
       <rect x="388" y="416" width="224" height="48" rx="6" fill="#ffffff" stroke="#2e5aa8" stroke-width="1"/>
-      <text x="500" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">cme export 실행</text>
-      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">skip / cleanup / workers</text>
+      <text x="500" y="432" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">cme export 실행</text>
+      <text x="500" y="446" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">targets passed through; cme validates</text>
+      <text x="500" y="458" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">uses set-config defaults</text>
 
       <rect x="400" y="504" width="200" height="56" rx="28" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
-      <text x="500" y="528" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Markdown + index</text>
-      <text x="500" y="544" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">output + .confluence-index + rules</text>
+      <text x="500" y="528" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Markdown + .confluence-index</text>
+      <text x="500" y="544" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">index-export + AGENTS/CLAUDE rules</text>
 
       <line x1="40" y1="588" x2="960" y2="588" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
       <text x="40" y="608" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">LEGEND</text>

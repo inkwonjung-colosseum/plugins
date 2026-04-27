@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 from pathlib import Path
 import sys
 import unittest
@@ -31,21 +32,7 @@ class ExportPageWithDescendantArgumentTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_export_page_with_descendant_module()
 
-    def test_single_page_url_keeps_optional_output_path(self) -> None:
-        args = self.module.parse_args(
-            [
-                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "./docs/confluence",
-            ]
-        )
-
-        self.assertEqual(
-            args.page_urls,
-            ["https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page"],
-        )
-        self.assertEqual(args.output_path, "./docs/confluence")
-
-    def test_multiple_page_urls_are_not_treated_as_output_path(self) -> None:
+    def test_multiple_page_urls_are_kept_as_targets(self) -> None:
         args = self.module.parse_args(
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
@@ -60,13 +47,11 @@ class ExportPageWithDescendantArgumentTests(unittest.TestCase):
                 "https://beta.atlassian.net/wiki/spaces/OPS/pages/2/Other",
             ],
         )
-        self.assertIsNone(args.output_path)
 
-    def test_multiple_page_urls_keep_trailing_output_path(self) -> None:
+    def test_path_like_target_is_forwarded_to_cme_validation(self) -> None:
         args = self.module.parse_args(
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "https://beta.atlassian.net/wiki/spaces/OPS/pages/2/Other",
                 "./docs/confluence",
             ]
         )
@@ -75,17 +60,20 @@ class ExportPageWithDescendantArgumentTests(unittest.TestCase):
             args.page_urls,
             [
                 "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
-                "https://beta.atlassian.net/wiki/spaces/OPS/pages/2/Other",
+                "./docs/confluence",
             ],
         )
-        self.assertEqual(args.output_path, "./docs/confluence")
+
+    def test_non_url_target_is_forwarded_to_cme_validation(self) -> None:
+        args = self.module.parse_args(["not-a-url"])
+
+        self.assertEqual(args.page_urls, ["not-a-url"])
 
     def test_main_passes_all_page_urls_to_cme_pages_with_descendants(self) -> None:
         argv = [
             "export_page_with_descendant.py",
-            "not-a-url",
-            "still-not-a-url",
-            "./docs/confluence",
+            "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+            "https://beta.atlassian.net/wiki/spaces/OPS/pages/2/Other",
         ]
 
         with (
@@ -103,15 +91,12 @@ class ExportPageWithDescendantArgumentTests(unittest.TestCase):
             run_cme.call_args.args[1],
             [
                 "pages-with-descendants",
-                "not-a-url",
-                "still-not-a-url",
+                "https://alpha.atlassian.net/wiki/spaces/ENG/pages/1/Page",
+                "https://beta.atlassian.net/wiki/spaces/OPS/pages/2/Other",
             ],
         )
-        self.assertEqual(
-            run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"],
-            "./docs/confluence",
-        )
-        run_index.assert_called_once_with("./docs/confluence")
+        self.assertEqual(run_cme.call_args.args[2]["CME_EXPORT__OUTPUT_PATH"], "./confluence")
+        run_index.assert_called_once_with("./confluence")
 
 
 if __name__ == "__main__":

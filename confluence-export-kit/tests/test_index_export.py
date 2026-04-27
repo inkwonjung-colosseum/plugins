@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
 
 SCRIPT_PATH = (
@@ -53,6 +54,104 @@ class IndexExportTests(unittest.TestCase):
     def read_jsonl(self, path: Path) -> list[dict[str, object]]:
         return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
+    def test_append_log_appends_without_reading_existing_content(self) -> None:
+        log_path = self.tmp / "log.md"
+        log_path.write_text("first\n", encoding="utf-8")
+
+        with mock.patch.object(
+            Path,
+            "read_text",
+            side_effect=AssertionError("append_log must not read the existing log"),
+        ):
+            self.module.append_log(log_path, "second")
+
+        with log_path.open(encoding="utf-8") as file:
+            self.assertEqual(file.read(), "first\nsecond\n")
+
+    def test_extract_frontmatter_preserves_colons_inside_quoted_values(self) -> None:
+        frontmatter = self.module.extract_frontmatter(
+            '---\ntitle: "Config: v2"\nstatus: current\n---\n# Body\n'
+        )
+
+        self.assertEqual(frontmatter["title"], "Config: v2")
+        self.assertEqual(frontmatter["status"], "current")
+
+    def test_extract_frontmatter_returns_empty_for_unterminated_block(self) -> None:
+        self.assertEqual(
+            self.module.extract_frontmatter('---\ntitle: "Config: v2"\n# Body\n'),
+            {},
+        )
+
+    def test_classify_status_uses_frontmatter_and_path_fallbacks(self) -> None:
+        self.assertEqual(
+            self.module.classify_status(Path("Product/Page.md"), {"status": "current"}),
+            "current",
+        )
+        self.assertEqual(
+            self.module.classify_status(Path("Product/draft/Page.md"), {"status": "retired"}),
+            "draft",
+        )
+        self.assertEqual(
+            self.module.classify_status(Path("Product/archive/Page.md"), {}),
+            "archive",
+        )
+
+    def test_classify_source_type_uses_frontmatter_status_and_path_fallbacks(self) -> None:
+        self.assertEqual(
+            self.module.classify_source_type(
+                Path("Product/Page.md"),
+                {"source_type": "feature spec"},
+                "unknown",
+            ),
+            "feature-spec",
+        )
+        self.assertEqual(
+            self.module.classify_source_type(
+                Path("Product/Page.md"),
+                {"type": "meeting note"},
+                "unknown",
+            ),
+            "meeting-note",
+        )
+        self.assertEqual(
+            self.module.classify_source_type(Path("Product/Page.md"), {}, "archive"),
+            "archive",
+        )
+        self.assertEqual(
+            self.module.classify_source_type(Path("Product/policy/Page.md"), {}, "unknown"),
+            "policy",
+        )
+
+    def test_install_reading_rule_replaces_existing_managed_block(self) -> None:
+        agent_file = self.tmp / "AGENTS.md"
+        agent_file.write_text(
+            "Intro\n\n"
+            f"{self.module.READING_RULE_START}\n"
+            "old rule\n"
+            f"{self.module.READING_RULE_END}\n"
+            "After\n",
+            encoding="utf-8",
+        )
+
+        self.module.install_reading_rule(agent_file)
+
+        content = agent_file.read_text(encoding="utf-8")
+        self.assertTrue(content.startswith("Intro\n\n"))
+        self.assertTrue(content.endswith("After\n"))
+        self.assertIn("Treat Confluence as the source of truth.", content)
+        self.assertNotIn("old rule", content)
+
+    def test_install_reading_rule_appends_to_existing_file_without_managed_block(self) -> None:
+        agent_file = self.tmp / "AGENTS.md"
+        agent_file.write_text("Existing instructions", encoding="utf-8")
+
+        self.module.install_reading_rule(agent_file)
+
+        content = agent_file.read_text(encoding="utf-8")
+        self.assertTrue(content.startswith("Existing instructions\n\n"))
+        self.assertIn(self.module.READING_RULE_START, content)
+        self.assertIn("Treat Confluence as the source of truth.", content)
+
     def test_indexes_export_into_source_namespace_and_agent_rules(self) -> None:
         export_root = self.tmp / "Product Team Space"
         self.write_source(
@@ -92,6 +191,9 @@ class IndexExportTests(unittest.TestCase):
         agents = (self.tmp / "AGENTS.md").read_text()
         claude = (self.tmp / "CLAUDE.md").read_text()
         self.assertIn(".confluence-index/registry.json", agents)
+        self.assertIn("Treat Confluence as the source of truth.", agents)
+        self.assertIn("Do not create or maintain derived wiki", agents)
+        self.assertIn("Treat planning outputs as draft-only", agents)
         self.assertIn("confluence-export-kit:reading-rule:start", claude)
 
     def test_repeated_indexes_keep_sources_separate(self) -> None:

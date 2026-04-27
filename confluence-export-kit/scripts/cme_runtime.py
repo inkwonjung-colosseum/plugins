@@ -111,22 +111,12 @@ def canonicalize_base_url(url: str, *, error_label: str = "Confluence base URL")
 # Shared export infrastructure
 # ---------------------------------------------------------------------------
 
-DEFAULT_OUTPUT_PATH = "confluence"
+DEFAULT_OUTPUT_PATH = "./confluence"
 DEFAULT_LOCKFILE_NAME = "confluence-lock.json"
 DEFAULT_SITE: str = os.environ.get(
     "CONFLUENCE_EXPORT_KIT_BASE_URL",
     "https://colosseum.atlassian.net",
 ).rstrip("/")
-
-
-def effective_output_path(config_data: dict[str, Any], override: str | None) -> str:
-    if override:
-        return override
-    export = config_data.get("export", {})
-    if not isinstance(export, dict):
-        return DEFAULT_OUTPUT_PATH
-    current = export.get("output_path")
-    return current if isinstance(current, str) and current.strip() else DEFAULT_OUTPUT_PATH
 
 
 def write_json_atomic(path: Path, data: dict[str, Any]) -> None:
@@ -146,16 +136,11 @@ def set_auth_credentials(
     base_url: str,
     username: str,
     api_token: str,
-    *,
-    mirror_jira: bool = True,
 ) -> bool:
     confluence_entry = get_service_entry(data, "confluence", base_url)
     confluence_entry["username"] = username
     confluence_entry["api_token"] = api_token
     confluence_entry["pat"] = ""
-
-    if not mirror_jira:
-        return False
 
     jira_entry = get_service_entry(data, "jira", base_url)
     jira_entry["username"] = username
@@ -171,68 +156,56 @@ def set_default_output_path(data: dict[str, Any], output_path: str) -> Any:
     return previous
 
 
+def set_skip_unchanged(data: dict[str, Any], skip: bool) -> Any:
+    export_section = ensure_dict(data, "export")
+    previous = export_section.get("skip_unchanged", "(not set)")
+    export_section["skip_unchanged"] = skip
+    return previous
+
+
+def set_cleanup_stale(data: dict[str, Any], cleanup: bool) -> Any:
+    export_section = ensure_dict(data, "export")
+    previous = export_section.get("cleanup_stale", "(not set)")
+    export_section["cleanup_stale"] = cleanup
+    return previous
+
+
+def set_enable_jira_enrichment(data: dict[str, Any], enabled: bool) -> Any:
+    export_section = ensure_dict(data, "export")
+    previous = export_section.get("enable_jira_enrichment", "(not set)")
+    export_section["enable_jira_enrichment"] = enabled
+    return previous
+
+
+def set_include_document_title(data: dict[str, Any], include: bool) -> Any:
+    export_section = ensure_dict(data, "export")
+    previous = export_section.get("include_document_title", "(not set)")
+    export_section["include_document_title"] = include
+    return previous
+
+
+def set_page_breadcrumbs(data: dict[str, Any], include: bool) -> Any:
+    export_section = ensure_dict(data, "export")
+    previous = export_section.get("page_breadcrumbs", "(not set)")
+    export_section["page_breadcrumbs"] = include
+    return previous
+
+
 def chmod_config_private(path: Path) -> None:
     if not IS_WINDOWS:
         os.chmod(path, 0o600)
-
-
-def add_export_args(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--skip-unchanged",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Skip pages whose version matches the lockfile (incremental export). Default: on.",
-    )
-    parser.add_argument(
-        "--cleanup-stale",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Remove local files for pages deleted or moved in Confluence. Default: on.",
-    )
-    parser.add_argument(
-        "--jira-enrichment",
-        action="store_true",
-        help="Fetch Jira issue summaries and include them in exported Markdown.",
-    )
-    parser.add_argument(
-        "--max-workers",
-        type=int,
-        metavar="N",
-        help="Override the number of parallel export workers.",
-    )
-
-
-def _bool_env(value: bool) -> str:
-    return "true" if value else "false"
 
 
 def build_export_env(
     args: argparse.Namespace,
     *,
     config_path: Path | str | None = None,
-    output_path: str | None = None,
 ) -> dict[str, str]:
     env = os.environ.copy()
+    env["CME_EXPORT__OUTPUT_PATH"] = DEFAULT_OUTPUT_PATH
     if config_path:
         env["CME_CONFIG_PATH"] = str(config_path)
-
-    effective_output_path = output_path or getattr(args, "output_path", None)
-    if effective_output_path:
-        env["CME_EXPORT__OUTPUT_PATH"] = effective_output_path
-
-    env["CME_EXPORT__SKIP_UNCHANGED"] = _bool_env(args.skip_unchanged)
-    env["CME_EXPORT__CLEANUP_STALE"] = _bool_env(args.cleanup_stale)
-    env["CME_EXPORT__ENABLE_JIRA_ENRICHMENT"] = _bool_env(args.jira_enrichment)
-    if args.max_workers is not None:
-        env["CME_CONNECTION_CONFIG__MAX_WORKERS"] = str(args.max_workers)
     return env
-
-
-def print_export_flags(args: argparse.Namespace) -> None:
-    print(f"Skip unchanged: {'yes' if args.skip_unchanged else 'no'}")
-    print(f"Cleanup stale: {'yes' if args.cleanup_stale else 'no'}")
-    print(f"Jira enrichment: {'yes' if args.jira_enrichment else 'no'}")
-    print(f"Max workers: {args.max_workers if args.max_workers is not None else '(default)'}")
 
 
 def _read_lockfile_export_paths(

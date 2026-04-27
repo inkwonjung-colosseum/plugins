@@ -2,7 +2,7 @@ interface:
   display_name: "Export Confluence Org"
   short_description: "Export every accessible space and page in one or more Confluence instances to local Markdown."
   brand_color: "#0052CC"
-  default_prompt: "Export the Confluence orgs at https://<your-org>.atlassian.net [<org-url> ...] to ./docs/confluence."
+  default_prompt: "Export the Confluence orgs at https://<your-org>.atlassian.net [<org-url> ...] to ./confluence."
 
 policy:
   allow_implicit_invocation: true

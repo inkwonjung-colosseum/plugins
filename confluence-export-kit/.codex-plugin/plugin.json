@@ -1,7 +1,7 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.1.4",
-  "description": "Codex plugin for Confluence export and local export-index workflows: config setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
+  "version": "0.2.0",
+  "description": "Codex plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "confluence-export-kit",
     "shortDescription": "Export Confluence content and index local Markdown exports",
-    "longDescription": "confluence-export-kit provides Confluence export and local export-index workflows powered by confluence-markdown-exporter. Configure auth and output defaults, export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files, then automatically index the exported output for agent-friendly reading. You can also re-index an already-exported Markdown folder.",
+    "longDescription": "confluence-export-kit provides Confluence export and local export-index workflows powered by confluence-markdown-exporter. Configure auth and fixed export defaults, export single or multiple pages, full spaces, page descendants, or full organizations to local Markdown files, then automatically index the exported output for agent-friendly reading. You can also re-index an already-exported Markdown folder.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -33,9 +33,9 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
     "defaultPrompt": [
-      "Set my Confluence API key and default export output path so I can start exporting pages.",
+      "Set my Confluence API key and export defaults so I can start exporting pages.",
       "Export the Confluence space at <space-url> to a local Markdown folder.",
-      "Export one or more Confluence pages at <page-url> [<page-url> ...] to ./docs/.",
+      "Export one or more Confluence pages at <page-url> [<page-url> ...] to ./confluence.",
       "Index a local Confluence export folder and install Reading Rules: <export-path>"
     ],
     "brandColor": "#0052CC"

@@ -32,11 +32,49 @@ class SetConfigTests(unittest.TestCase):
     def setUp(self) -> None:
         self.module = load_set_config_module()
 
-    def test_parse_requires_at_least_one_setting(self) -> None:
+    def test_parse_requires_auth_settings(self) -> None:
         with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
             self.module.parse_args([])
 
-    def test_main_sets_auth_and_output_path_together(self) -> None:
+    def test_parse_rejects_output_path_option(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "--api-key",
+                    "secret-token",
+                    "--email",
+                    "user@example.com",
+                    "--output-path",
+                    "./docs/confluence",
+                ]
+            )
+
+    def test_parse_rejects_config_path_option(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "--api-key",
+                    "secret-token",
+                    "--email",
+                    "user@example.com",
+                    "--config-path",
+                    "/tmp/app_data.json",
+                ]
+            )
+
+    def test_parse_rejects_skip_jira_option(self) -> None:
+        with mock.patch("sys.stderr", new_callable=io.StringIO), self.assertRaises(SystemExit):
+            self.module.parse_args(
+                [
+                    "--api-key",
+                    "secret-token",
+                    "--email",
+                    "user@example.com",
+                    "--skip-jira",
+                ]
+            )
+
+    def test_main_sets_auth_and_export_defaults_together(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             config_path = Path(tmp_dir) / "app_data.json"
             argv = [
@@ -47,8 +85,6 @@ class SetConfigTests(unittest.TestCase):
                 "user@example.com",
                 "--url",
                 "https://alpha.atlassian.net/wiki/spaces/ENG",
-                "--output-path",
-                "./docs/confluence",
             ]
 
             with (
@@ -79,7 +115,12 @@ class SetConfigTests(unittest.TestCase):
                 config_data["auth"]["jira"]["https://alpha.atlassian.net"]["api_token"],
                 "secret-token",
             )
-            self.assertEqual(config_data["export"]["output_path"], "./docs/confluence")
+            self.assertEqual(config_data["export"]["output_path"], "./confluence")
+            self.assertIs(config_data["export"]["skip_unchanged"], True)
+            self.assertIs(config_data["export"]["cleanup_stale"], True)
+            self.assertIs(config_data["export"]["enable_jira_enrichment"], False)
+            self.assertIs(config_data["export"]["include_document_title"], False)
+            self.assertIs(config_data["export"]["page_breadcrumbs"], False)
             printed = "\n".join(str(call.args[0]) for call in print_mock.call_args_list)
             self.assertNotIn("secret-token", printed)
 
