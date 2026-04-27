@@ -9,7 +9,7 @@
 
 - 확인 일자: 2026-04-23
 - upstream 패키지 최신 확인 버전: `confluence-markdown-exporter 4.0.8`
-- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.3`
+- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.1.4`
 
 ## 한눈에 보기
 
