@@ -1,0 +1,7 @@
+interface:
+  display_name: plan-format
+  short_description: 기획 입력을 기능설계서와 정책서 초안으로 동시에 정리합니다
+  brand_color: "#0F766E"
+  default_prompt: 기획 내용을 기능설계서와 정책서로 정리해줘
+policy:
+  allow_implicit_invocation: true

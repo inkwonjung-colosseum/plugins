@@ -60,7 +60,7 @@ class TestSkillsExist(unittest.TestCase):
                 p = skill_path(skill, "SKILL.md")
                 self.assertTrue(os.path.isfile(p), f"{p} 없음")
 
-    SKILLS_WITH_AGENT_CONFIG = ["plan-review"]
+    SKILLS_WITH_AGENT_CONFIG = ["plan-format", "plan-review"]
 
     def test_skills_with_agent_config_have_openai_yaml(self):
         for skill in self.SKILLS_WITH_AGENT_CONFIG:
