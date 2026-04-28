@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.0 구조 테스트
+product-team-kit v0.4.1 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_0(self):
-        self.assertEqual(self._claude()["version"], "0.4.0")
-        self.assertEqual(self._codex()["version"], "0.4.0")
+    def test_version_is_0_4_1(self):
+        self.assertEqual(self._claude()["version"], "0.4.1")
+        self.assertEqual(self._codex()["version"], "0.4.1")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.0")
+        self.assertEqual(claude_entry["version"], "0.4.1")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
@@ -368,7 +368,7 @@ class TestTemplates(unittest.TestCase):
         self.assertIn("비차단 안내 메시지", content)
         self.assertIn("기획 의도와 초안 문구", content)
         self.assertIn("최종 UX copy·디자인 명세가 아니다", content)
-        self.assertIn("차단성 예외 메시지는 §9에 적는다", content)
+        self.assertIn("차단성 예외 메시지는 9. 예외 처리에 적는다", content)
         self.assertNotIn("검증 실패 차단 메시지는 §10", content)
 
     def test_templates_document_id_rules(self):
@@ -416,8 +416,8 @@ class TestTemplates(unittest.TestCase):
         for phrase in forbidden:
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, content)
-        self.assertIn("기능설계서 §9 예외 처리", content)
-        self.assertIn("기능설계서 §6.1.2는 정책서 §6 상태 전이를 사용자 동작 관점으로 참조한다", content)
+        self.assertIn("[기능설계서] 9. 예외 처리", content)
+        self.assertIn("기능설계서 6.1.2 상태 및 전이는 정책서 6. 상태 전이를 사용자 동작 관점으로 참조한다", content)
         self.assertIn("비즈니스 연동 정책만 작성", content)
         self.assertIn("API 계약·schema·technical design은 작성하지 않는다", content)
         self.assertIn("재시도 횟수·timeout·queue 같은 구현 방식은 작성하지 않는다", content)
@@ -581,6 +581,36 @@ class TestPlanFormatSkill(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
+    def test_original_document_feedback_is_reported(self):
+        content = self._content()
+        for phrase in [
+            "원본 문서 피드백",
+            "중복 내용",
+            "상충/모순",
+            "용어 불일치",
+            "범위 혼입",
+            "구조 문제",
+            "근거 부족",
+            "최종 화면 출력",
+            "입력 원문에서 관찰 가능한 문제만",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_template_meta_markers_are_removed_from_outputs(self):
+        content = self._content()
+        for phrase in [
+            "템플릿 메타 표식",
+            "[필수]",
+            "[선택]",
+            "[필수 — 발행 전]",
+            "결과물에서는 제거",
+            "최종 문서에서 제거",
+            "[미정]`, `[가정]`은 검토 표식",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
     def test_eight_step_formatter_flow_documented(self):
         content = self._content()
         for phrase in [
@@ -690,10 +720,11 @@ class TestPlanReviewSkill(unittest.TestCase):
     def test_review_gate_reference_documented(self):
         self.assertIn("references/review-gate.md", self._content())
 
-    def test_agent_description_matches_four_perspectives(self):
+    def test_agent_description_matches_three_perspectives(self):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))
-        self.assertIn("4개 관점", content)
-        self.assertIn("템플릿 준수", content)
+        self.assertIn("3개 관점", content)
+        self.assertIn("근거·범위·실행", content)
+        self.assertNotIn("템플릿 준수", content)
 
     def test_fresh_context_reviewer_is_required(self):
         content = self._content()
@@ -713,12 +744,22 @@ class TestPlanReviewSkill(unittest.TestCase):
             "근거 reviewer",
             "범위 reviewer",
             "실행 reviewer",
-            "템플릿 reviewer",
             "공통 입력 패키지",
             "최종 verdict",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+
+    def test_plan_review_does_not_include_template_reviewer(self):
+        content = self._content()
+        for phrase in [
+            "템플릿 reviewer",
+            "템플릿 준수",
+            "Template completeness reviewer",
+            "template completeness",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
 
     def test_agent_description_mentions_parallel_reviewers(self):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))

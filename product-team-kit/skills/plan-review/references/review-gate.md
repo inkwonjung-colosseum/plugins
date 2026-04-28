@@ -22,15 +22,11 @@ Checks source support, Confluence conflicts, unsupported assumptions, stale evid
 
 ### Scope reviewer
 
-Checks remaining `[미정]` items, missing decisions, missing sections, affected cases, and unsupported document types.
+Checks remaining `[미정]` items, missing decisions, affected cases, and unsupported document types.
 
 ### Implementation readiness reviewer
 
 Checks whether development or operations can act on the draft without conversation memory, including conditions, states, exceptions, permissions, APIs, data fields, and QA specificity when relevant.
-
-### Template completeness reviewer
-
-Checks required sections for the document type and whether source intent is preserved when the source input is named. If the source input is not available, source-intent claims remain unsupported.
 
 ## Required Reviewer Output
 
@@ -50,7 +46,7 @@ The final verdict uses the most conservative Role verdict. Conservative order: `
 
 - If any reviewer returns `수정 필요`, final verdict is `수정 필요`.
 - Otherwise, if any reviewer returns `conditional pass`, final verdict is `conditional pass`.
-- Final verdict is `pass` only when all four reviewers return `pass`.
+- Final verdict is `pass` only when all three reviewers return `pass`.
 
 If the main context and fresh-context reviewers disagree, use the more conservative verdict:
 
