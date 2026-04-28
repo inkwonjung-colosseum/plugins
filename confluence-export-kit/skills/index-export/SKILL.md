@@ -2,7 +2,6 @@
 name: index-export
 description: "Background workflow for indexing local Markdown files that were already exported from Confluence; export skills run it automatically after successful cme export."
 argument-hint: "<export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]"
-user-invocable: false
 ---
 
 # Index Export
@@ -15,11 +14,11 @@ It does not fetch, create, or update remote Confluence or Jira content.
 
 Claude Code:
 
-This skill is hidden from the slash menu with `user-invocable: false`. Export skills run this helper automatically after successful `cme` export. Claude can still load the skill when local export indexing guidance is relevant.
+This skill does not declare a visibility override in its front matter. Treat it as a background workflow: export skills run this helper automatically after successful `cme` export, and Claude can still load the skill when local export indexing guidance is relevant.
 
 Codex:
 
-Codex has no confirmed exact equivalent to Claude's `user-invocable: false`. Keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false` so this skill is not auto-injected for ordinary user requests. Export scripts still invoke the helper script automatically after successful `cme` export.
+Keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false` so this skill is not auto-injected for ordinary user requests. Export scripts still invoke the helper script automatically after successful `cme` export.
 
 ## Rules
 
@@ -38,7 +37,7 @@ Codex has no confirmed exact equivalent to Claude's `user-invocable: false`. Kee
 13. The Reading Rule must state that Confluence is the source of truth and local exported Markdown is a read-only snapshot.
 14. The Reading Rule must prohibit derived wiki, entity, concept, summary, and product-context pages unless a user explicitly asks for a draft-only artifact.
 15. The Reading Rule must treat planning outputs as draft-only until a human reflects them back into Confluence.
-16. For Claude Code, keep `user-invocable: false` so this remains background workflow guidance rather than a direct slash command.
+16. Do not add a Claude-specific front matter visibility override; keep the background-workflow intent in the description and invocation guidance.
 17. For Codex, keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false`; export skills should be the normal path that runs this helper.
 
 ## Execution

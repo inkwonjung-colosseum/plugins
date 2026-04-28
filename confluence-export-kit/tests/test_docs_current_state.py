@@ -11,7 +11,7 @@ PLUGIN_ROOT = WORKSPACE_ROOT / "confluence-export-kit"
 SUPPORTED_FEATURES_DOC = (
     PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md"
 )
-EXPECTED_PLUGIN_VERSION = "0.3.0"
+EXPECTED_PLUGIN_VERSION = "0.3.1"
 
 
 class CurrentDocumentationStateTests(unittest.TestCase):
@@ -95,11 +95,13 @@ class CurrentDocumentationStateTests(unittest.TestCase):
 
         self.assertIn("--agent-files <file> ...", skill_doc)
         self.assertIn("--agent-files <file> ...", supported_features_doc)
-        self.assertIn("user-invocable: false", skill_doc)
         self.assertIn("allow_implicit_invocation: false", agent_doc)
-        self.assertIn("user-invocable: false", readme)
-        self.assertIn("user-invocable: false", supported_features_doc)
-        self.assertIn("Codex에는 Claude의 `user-invocable: false`", supported_features_doc)
+        self.assertNotIn("user-invocable", skill_doc)
+        self.assertNotIn("user-invocable", readme)
+        self.assertNotIn("user-invocable", supported_features_doc)
+        self.assertIn("visibility override", skill_doc)
+        self.assertIn("visibility override", readme)
+        self.assertIn("visibility override", supported_features_doc)
         self.assertIn("allow_implicit_invocation=false", supported_features_doc)
         self.assertNotIn("$index-export", readme)
 

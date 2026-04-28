@@ -1,6 +1,6 @@
 # confluence-export-kit
 
-confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.3.0). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
+confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.3.1). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
 
 두 에이전트의 플러그인 매니페스트(`.claude-plugin/`, `.codex-plugin/`)가 하나의 `skills/` 디렉터리와 `scripts/` 런타임을 공유합니다. 스킬 호출 문법은 에이전트별로 다릅니다 — Claude Code는 `/confluence-export-kit:<skill>` 콜론 네임스페이스, Codex는 공식 플러그인 스펙에 따라 `$<skill>` 형태를 사용합니다.
 
@@ -33,6 +33,7 @@ confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Conf
 - `skills/index-export/SKILL.md` — 이미 export된 로컬 Markdown 색인 및 Reading Rule 설치
 - `skills/show-config/SKILL.md` — 현재 cme 설정 출력
 - `scripts/cme_runtime.py` — export/config helper 공통 처리
+- `docs/` — privacy policy와 terms of service
 
 ## Export 워크플로우
 
@@ -144,8 +145,8 @@ $export-page-with-descendant https://colosseum.atlassian.net/wiki/spaces/KEY/pag
   - `cme` export가 성공하면 `./confluence` 를 `index-export` 로 자동 색인합니다. 이때 `index-export` 기본 동작에 따라 `AGENTS.md` / `CLAUDE.md` Reading Rule도 설치 또는 갱신됩니다.
 - `index-export`
   - Confluence/Jira remote write를 하지 않고, 이미 export된 로컬 Markdown만 읽습니다.
-  - Claude Code에서는 `user-invocable: false` 로 slash menu에 직접 노출하지 않습니다. Export 명령 성공 후 자동 실행되는 background workflow로 취급합니다.
-  - Codex에는 Claude의 `user-invocable: false` 와 같은 직접 호출 숨김 필드가 현재 확인되지 않았습니다. 대신 `agents/openai.yaml` 의 `allow_implicit_invocation=false` 로 일반 요청에서 자동 주입되지 않게 하고, export 명령의 후처리 경로에서 실행되도록 둡니다.
+  - front matter에 별도 visibility override를 두지 않습니다. Export 명령 성공 후 자동 실행되는 background workflow로 취급합니다.
+  - Codex에서는 `agents/openai.yaml` 의 `allow_implicit_invocation=false` 로 일반 요청에서 자동 주입되지 않게 하고, export 명령의 후처리 경로에서 실행되도록 둡니다.
   - Confluence를 SSOT로 취급하고, 로컬 Markdown은 read-only snapshot으로 취급합니다.
   - 기본 출력은 현재 작업 폴더의 `.confluence-index/` 입니다.
   - 여러 export 폴더를 반복 색인할 수 있도록 `.confluence-index/sources/<source-id>/` namespace를 사용합니다.

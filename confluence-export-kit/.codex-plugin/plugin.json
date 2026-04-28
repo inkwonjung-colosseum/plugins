@@ -1,6 +1,6 @@
 {
   "name": "confluence-export-kit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Codex plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
   "author": {
     "name": "developjik",
@@ -30,8 +30,8 @@
       "Write"
     ],
     "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/confluence-export-kit",
-    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
-    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/confluence-export-kit/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/confluence-export-kit/docs/terms-of-service.md",
     "defaultPrompt": [
       "Set my Confluence API key and export defaults so I can start exporting pages.",
       "Export the Confluence space at <space-url> to a local Markdown folder.",
