@@ -1,6 +1,6 @@
 {
   "name": "diagram-design",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Codex plugin for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
   "author": {
     "name": "developjik",
@@ -31,8 +31,8 @@
       "Interactive"
     ],
     "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/diagram-design",
-    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins",
-    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/diagram-design/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/diagram-design/docs/terms-of-service.md",
     "defaultPrompt": [
       "Create an architecture diagram for this system.",
       "Turn this workflow into a flowchart.",

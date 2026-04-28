@@ -1,6 +1,6 @@
 {
   "name": "diagram-design",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Claude Code and Codex compatible diagram design kit for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
   "author": {
     "name": "developjik",

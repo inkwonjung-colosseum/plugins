@@ -99,6 +99,7 @@ $diagram-design
 - `skills/diagram-design/references/primitive-*.md` — annotation, sketchy 변형 규칙
 - `skills/diagram-design/assets/template*.html` — light, dark, full editorial 템플릿
 - `skills/diagram-design/assets/example-*.html` — 타입별 예시 HTML
+- `docs/` — privacy policy와 terms of service
 
 ## 설치
 
