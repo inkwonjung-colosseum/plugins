@@ -4,5 +4,7 @@ __pycache__/
 confluence/
 .confluence-index/
 
+AGENTS.md
+CLAUDE.md
 @AGENTS.md
 @CLAUDE.md
