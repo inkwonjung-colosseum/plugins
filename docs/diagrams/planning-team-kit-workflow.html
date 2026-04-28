@@ -61,11 +61,11 @@
 <body>
   <main class="frame">
     <p class="eyebrow">Flowchart · planning-team-kit</p>
-    <h1>Local Confluence draft to confirmed publish workflow</h1>
+    <h1>Planning input to review-ready drafts workflow</h1>
 
     <svg viewBox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
       <title id="title">planning-team-kit 주요 workflow</title>
-      <desc id="desc">기획 의도나 회의 메모가 plan-draft 질문 루프, 필요 시 plan-review, plan-publish review gate와 확인을 거쳐 Confluence MCP 반영과 export 재실행 안내로 이어지는 흐름.</desc>
+      <desc id="desc">기획 의도나 회의 메모가 plan-format formatter를 거쳐 기능설계서와 정책서 초안으로 저장되고, 미정·가정·확인 필요 질문이 있으면 plan-review의 병렬 fresh-context reviewer 검증으로 이어지는 흐름.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
@@ -80,7 +80,6 @@
       <line x1="500" y1="88" x2="500" y2="120" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <line x1="500" y1="168" x2="500" y2="192" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <line x1="600" y1="240" x2="728" y2="240" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-      <path d="M 808 264 C 808 304, 620 304, 620 352" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
       <line x1="500" y1="288" x2="500" y2="328" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
       <line x1="500" y1="376" x2="500" y2="416" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
       <line x1="500" y1="464" x2="500" y2="504" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
@@ -98,28 +97,28 @@
       <text x="500" y="68" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">기획 의도 / 회의 메모</text>
 
       <rect x="388" y="120" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="500" y="140" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-draft</text>
-      <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">local export + questions</text>
+      <text x="500" y="140" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-format</text>
+      <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">template formatter</text>
 
       <polygon points="500,192 600,240 500,288 400,240" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Draft specific enough?</text>
-      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">evidence / scope / assumptions</text>
+      <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Draftability gate</text>
+      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">passed / blocked</text>
 
       <rect x="728" y="216" width="160" height="48" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
-      <text x="808" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">질문 보완</text>
-      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">one question loop</text>
+      <text x="808" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">저장 보류</text>
+      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">feedback only</text>
 
       <rect x="388" y="328" width="224" height="48" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-      <text x="500" y="348" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">초안 생성</text>
-      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">design / feature / policy doc</text>
+      <text x="500" y="348" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">초안 2개 저장</text>
+      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">feature spec + policy doc</text>
 
       <rect x="388" y="416" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="500" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-review (선택)</text>
-      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">evidence · scope · execution</text>
+      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">4 parallel fresh-context reviewers</text>
 
       <rect x="388" y="504" width="224" height="48" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-      <text x="500" y="524" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-publish</text>
-      <text x="500" y="540" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">review gate + yes confirm</text>
+      <text x="500" y="524" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">외부 발행 절차</text>
+      <text x="500" y="540" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">outside this plugin</text>
 
       <line x1="40" y1="580" x2="960" y2="580" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
       <text x="40" y="600" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">LEGEND</text>
@@ -130,9 +129,9 @@
       <polygon points="432,598 444,592 456,598 444,604" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="468" y="602" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Readiness gate</text>
       <line x1="636" y1="600" x2="668" y2="600" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-      <text x="680" y="602" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Publish path</text>
+      <text x="680" y="602" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">External handoff</text>
       <line x1="812" y1="600" x2="844" y2="600" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-      <text x="856" y="602" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Clarify</text>
+      <text x="856" y="602" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Blocked path</text>
     </svg>
   </main>
 </body>

@@ -1,15 +1,10 @@
 types:
-  상위설계서:
-    description: 기능/제품의 WHY와 WHAT. 개발 시작 전 방향 정렬.
-    template: skills/plan-draft/templates/상위설계서.md
-    confluence_path_hint: 상위 설계서/
-
   기능설계서:
-    description: 화면/기능의 HOW. 개발팀 구현 명세.
-    template: skills/plan-draft/templates/기능설계서.md
+    description: 화면/기능의 HOW. 기획자가 정하는 기능 동작 명세.
+    template: skills/plan-format/templates/기능설계서.md
     confluence_path_hint: 정책서 & 상세설계서/
 
   정책서:
     description: 비즈니스 규칙과 예외 처리 정의.
-    template: skills/plan-draft/templates/정책서.md
+    template: skills/plan-format/templates/정책서.md
     confluence_path_hint: 정책서 & 상세설계서/

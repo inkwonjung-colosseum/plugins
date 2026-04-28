@@ -1,6 +1,6 @@
 interface:
   display_name: 기획 검토
-  short_description: 초안을 3개 관점(근거·범위·실행)으로 검토합니다
+  short_description: 초안을 병렬 fresh-context reviewer 4개로 4개 관점(근거·범위·실행·템플릿 준수)에서 검토합니다
   brand_color: "#0F766E"
   default_prompt: 초안 검토해줘
 policy:

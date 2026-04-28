@@ -1,26 +1,24 @@
 # planning-team-kit Terms of Service
 
-`planning-team-kit` is a local workflow plugin for drafting, reviewing, and publishing planning documents based on Confluence source material.
+`planning-team-kit` is a local workflow plugin for formatting planning input into 기능설계서 and 정책서 drafts and reviewing those drafts before external publishing.
 
 ## Intended Use
 
 Use this plugin to:
 
-- Read local Confluence exports for product planning context.
-- Draft 상위설계서, 기능설계서, and 정책서 documents.
-- Review drafts before publishing.
-- Publish explicitly confirmed changes to Confluence through available MCP tools.
+- Draft 기능설계서 and 정책서 documents from user-provided planning input.
+- Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
+- Review drafts before publishing through a separate external process.
 
 ## Limitations
 
 - The plugin does not replace human product, legal, security, or operational approval.
-- Local exported Markdown may be stale. `plan-publish` includes a stale check, but users remain responsible for confirming source freshness.
-- Parent page lookup depends on `confluence/confluence-lock.json`. If the parent cannot be found exactly, the agent must ask for a page ID or URL.
+- Local exported Markdown may be stale. Users remain responsible for confirming source freshness.
 - The plugin should not be used to bypass Confluence permissions or team review policies.
 
 ## Publishing Rules
 
-Confluence writes require explicit confirmation. If a draft includes `[미정]`, `[가정]`, or conflict warnings, publish requires a `plan-review` pass/conditional pass or an explicit user override.
+This plugin does not publish directly to Confluence. If a draft includes `[미정]`, `[가정]`, confirmation questions, or conflict warnings, users should run `plan-review` and resolve or explicitly accept those items before using the draft in a publishing process.
 
 ## No Warranty
 
