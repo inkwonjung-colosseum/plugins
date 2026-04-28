@@ -3,3 +3,6 @@ __pycache__/
 .DS_Store
 confluence/
 .confluence-index/
+
+@AGENTS.md
+@CLAUDE.md

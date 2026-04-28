@@ -1,0 +1,43 @@
+{
+  "name": "ai-utility-kit",
+  "version": "0.1.0",
+  "description": "Codex plugin for general-purpose AI work utilities: idea grilling, context mapping, meeting briefs, and term clarification.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/ai-utility-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "productivity",
+    "thinking",
+    "meeting-notes",
+    "glossary",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ai-utility-kit",
+    "shortDescription": "AI 작업을 정리하고 검토하는 범용 유틸리티",
+    "longDescription": "ai-utility-kit provides general-purpose AI work utilities for stress-testing plans, mapping unfamiliar context, summarizing meetings, and clarifying terminology. It is Korean-first, conversational, and does not write files or call external services in v0.1.",
+    "developerName": "developjik",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Interactive"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/ai-utility-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/ai-utility-kit/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/ai-utility-kit/docs/terms-of-service.md",
+    "defaultPrompt": [
+      "이 기획안을 ai-grill로 검토해줘.",
+      "이 프로젝트를 context-map으로 먼저 파악해줘.",
+      "이 회의록을 meeting-brief로 정리해줘.",
+      "이 문서의 용어를 term-clarifier로 정리해줘."
+    ],
+    "brandColor": "#7C3AED"
+  }
+}

@@ -12,15 +12,15 @@
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
       "description": "Claude Code plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },
     {
       "name": "planning-team-kit",
       "source": "./planning-team-kit",
-      "description": "Claude Code and Codex compatible planning kit that reads local Confluence exports, generates planning drafts, reviews them, and publishes confirmed updates to Confluence.",
-      "version": "0.3.0",
+      "description": "Claude Code and Codex compatible planning kit that formats user-provided planning input into 기능설계서 and 정책서 drafts, then reviews them before external publishing.",
+      "version": "0.3.1",
       "license": "MIT",
       "tags": ["planning", "product", "confluence", "documentation"]
     },
@@ -28,7 +28,7 @@
       "name": "diagram-design",
       "source": "./diagram-design",
       "description": "Editorial-quality technical and product diagrams rendered as standalone HTML with inline SVG and skinnable brand-aware styling.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "license": "MIT",
       "tags": ["diagrams", "svg", "architecture", "flowchart", "visualization", "editorial"]
     },
@@ -39,6 +39,14 @@
       "version": "0.1.0",
       "license": "MIT",
       "tags": ["logistics", "supply-chain", "operations", "warehouse", "transportation"]
+    },
+    {
+      "name": "ai-utility-kit",
+      "source": "./ai-utility-kit",
+      "description": "Korean-first general AI utility kit for idea grilling, context mapping, meeting briefs, and term clarification.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "tags": ["ai", "productivity", "thinking", "meeting-notes", "glossary"]
     }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "name": "ai-utility-kit",
+  "version": "0.1.0",
+  "description": "Claude Code plugin for general-purpose AI work utilities: idea grilling, context mapping, meeting briefs, and term clarification.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/ai-utility-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "productivity",
+    "thinking",
+    "meeting-notes",
+    "glossary",
+    "claude-plugin"
+  ],
+  "skills": "./skills/"
+}
