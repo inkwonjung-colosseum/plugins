@@ -1,7 +1,7 @@
 {
   "name": "diagram-design",
   "version": "1.0.1",
-  "description": "Codex plugin for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
+  "description": "브랜드 스타일을 반영한 기술·제품 다이어그램을 독립 HTML/SVG로 만드는 Codex 플러그인입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -21,8 +21,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "diagram-design",
-    "shortDescription": "Create brand-aware technical diagrams as standalone HTML/SVG",
-    "longDescription": "diagram-design helps create architecture, flowchart, sequence, state machine, ER/data model, timeline, swimlane, quadrant, nested, tree, layer stack, venn, and pyramid diagrams with an editorial design system and project style guide.",
+    "shortDescription": "브랜드 스타일 기반 기술 다이어그램 HTML/SVG 생성",
+    "longDescription": "diagram-design는 아키텍처, 플로우차트, 시퀀스, 상태 머신, ER/데이터 모델, 타임라인, 스윔레인, 사분면, 트리, 레이어 스택, 벤, 피라미드 다이어그램을 프로젝트 스타일 가이드와 편집형 디자인 시스템에 맞춰 독립 HTML/SVG로 생성합니다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -34,9 +34,9 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/diagram-design/docs/privacy-policy.md",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/diagram-design/docs/terms-of-service.md",
     "defaultPrompt": [
-      "Create an architecture diagram for this system.",
-      "Turn this workflow into a flowchart.",
-      "Make a sequence diagram for this API flow."
+      "이 시스템의 아키텍처 다이어그램을 만들어줘.",
+      "이 workflow를 플로우차트로 바꿔줘.",
+      "이 API 흐름을 시퀀스 다이어그램으로 만들어줘."
     ],
     "brandColor": "#B5523A"
   }

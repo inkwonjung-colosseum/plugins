@@ -1,7 +1,7 @@
 {
   "name": "logistics-expert-kit",
   "version": "0.1.0",
-  "description": "Codex plugin for general-purpose logistics domain advice: scope framing, operations diagnosis, KPI design, and risk review.",
+  "description": "물류 이슈 범위 정의, 운영 진단, KPI 설계, 리스크 검토를 돕는 Codex 플러그인입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -21,8 +21,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "logistics-expert-kit",
-    "shortDescription": "General logistics scope, diagnosis, metrics, and risk advice",
-    "longDescription": "logistics-expert-kit provides general-purpose logistics domain guidance for framing logistics issues, diagnosing operations symptoms, designing practical KPI definitions, and reviewing process or policy risk. It separates confirmed evidence, general logistics principles, assumptions, and company-specific follow-up needs.",
+    "shortDescription": "물류 범위 정의, 진단, 지표, 리스크 검토",
+    "longDescription": "logistics-expert-kit은 물류 이슈 범위 정의, 운영 증상 진단, 실무형 KPI 정의, 프로세스·정책 리스크 검토를 돕는 범용 물류 도메인 도구입니다. 확인된 근거, 일반 물류 원칙, 가정, 회사별 확인 필요 사항을 분리해 답합니다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -33,10 +33,10 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/logistics-expert-kit/docs/privacy-policy.md",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/logistics-expert-kit/docs/terms-of-service.md",
     "defaultPrompt": [
-      "Scope this logistics issue and tell me what data I need.",
-      "Diagnose why order fulfillment is delayed.",
-      "Design logistics KPIs for delivery reliability and inventory health.",
-      "Review operational risk in a warehouse process change."
+      "이 물류 이슈의 범위를 잡고 필요한 데이터를 알려줘.",
+      "주문 fulfillment가 지연되는 원인을 진단해줘.",
+      "배송 신뢰도와 재고 건전성 KPI를 설계해줘.",
+      "창고 프로세스 변경의 운영 리스크를 검토해줘."
     ],
     "brandColor": "#2563EB"
   }

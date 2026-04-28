@@ -1,7 +1,7 @@
 {
   "name": "confluence-export-kit",
   "version": "0.3.1",
-  "description": "Claude Code plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
+  "description": "Confluence 문서를 Markdown으로 내보내고 로컬 export-index를 만드는 Claude Code 플러그인입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",

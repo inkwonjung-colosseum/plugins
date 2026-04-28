@@ -1,7 +1,7 @@
 {
   "name": "ai-utility-kit",
   "version": "0.1.0",
-  "description": "Codex plugin for general-purpose AI work utilities: idea grilling, context mapping, meeting briefs, and term clarification.",
+  "description": "기획안 검토, 맥락 파악, 회의 요약, 용어 정리를 돕는 한국어 우선 Codex 플러그인입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "ai-utility-kit",
     "shortDescription": "AI 작업을 정리하고 검토하는 범용 유틸리티",
-    "longDescription": "ai-utility-kit provides general-purpose AI work utilities for stress-testing plans, mapping unfamiliar context, summarizing meetings, and clarifying terminology. It is Korean-first, conversational, and does not write files or call external services in v0.1.",
+    "longDescription": "ai-utility-kit은 기획안을 비판적으로 검토하고, 낯선 맥락을 구조화하고, 회의 내용을 요약하고, 문서 용어를 정리하는 범용 AI 작업 유틸리티입니다. 기본 출력은 한국어이며, v0.1에서는 대화 안에서만 답하고 파일 생성이나 외부 서비스 호출은 하지 않습니다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

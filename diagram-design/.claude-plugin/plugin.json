@@ -1,7 +1,7 @@
 {
   "name": "diagram-design",
   "version": "1.0.1",
-  "description": "Claude Code and Codex compatible diagram design kit for creating brand-aware technical and product diagrams as standalone HTML with inline SVG.",
+  "description": "브랜드 스타일을 반영한 기술·제품 다이어그램을 독립 HTML/SVG로 만드는 Claude Code/Codex 호환 도구입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",

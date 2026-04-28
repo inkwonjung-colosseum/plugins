@@ -1,7 +1,7 @@
 {
   "name": "ai-utility-kit",
   "version": "0.1.0",
-  "description": "Claude Code plugin for general-purpose AI work utilities: idea grilling, context mapping, meeting briefs, and term clarification.",
+  "description": "기획안 검토, 맥락 파악, 회의 요약, 용어 정리를 돕는 한국어 우선 Claude Code 플러그인입니다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",

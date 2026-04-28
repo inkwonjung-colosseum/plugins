@@ -1,7 +1,7 @@
 {
   "name": "inkwonjung-colosseum",
   "interface": {
-    "displayName": "inkwonjung-colosseum plugins"
+    "displayName": "COLO 플러그인"
   },
   "plugins": [
     {

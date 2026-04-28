@@ -5,13 +5,13 @@
     "url": "https://github.com/inkwonjung-colosseum"
   },
   "metadata": {
-    "description": "Claude Code plugins by inkwonjung-colosseum: productivity, documentation, and developer tools."
+    "description": "inkwonjung-colosseum의 Claude Code/Codex 플러그인 모음: 생산성, 문서화, 개발 도구."
   },
   "plugins": [
     {
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
-      "description": "Claude Code plugin for Confluence export and local export-index workflows: auth/default setup, page, space, org, page-with-descendants export, automatic post-export indexing, and local Markdown indexing.",
+      "description": "Confluence 문서를 Markdown으로 내보내고 로컬 export-index를 만드는 도구입니다. 인증/기본값 설정, 페이지·스페이스·조직·하위 페이지 export, 자동 인덱싱을 지원합니다.",
       "version": "0.3.1",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
@@ -19,7 +19,7 @@
     {
       "name": "product-team-kit",
       "source": "./product-team-kit",
-      "description": "Claude Code and Codex compatible planning kit that formats user-provided planning input into 기능설계서 and 정책서 drafts, then reviews them before external publishing.",
+      "description": "사용자가 제공한 기획 입력을 기능설계서와 정책서 초안으로 정리하고, 외부 반영 전 검토까지 돕는 제품팀 도구입니다.",
       "version": "0.4.0",
       "license": "MIT",
       "tags": ["planning", "product", "confluence", "documentation"]
@@ -27,7 +27,7 @@
     {
       "name": "diagram-design",
       "source": "./diagram-design",
-      "description": "Editorial-quality technical and product diagrams rendered as standalone HTML with inline SVG and skinnable brand-aware styling.",
+      "description": "기술·제품 다이어그램을 브랜드 스타일을 반영한 독립 HTML/SVG 산출물로 만드는 도구입니다.",
       "version": "1.0.1",
       "license": "MIT",
       "tags": ["diagrams", "svg", "architecture", "flowchart", "visualization", "editorial"]
@@ -35,7 +35,7 @@
     {
       "name": "logistics-expert-kit",
       "source": "./logistics-expert-kit",
-      "description": "General-purpose logistics domain assistant for scope framing, operations diagnosis, KPI design, and risk review.",
+      "description": "물류 이슈 범위 정의, 운영 진단, KPI 설계, 리스크 검토를 돕는 범용 물류 도메인 도구입니다.",
       "version": "0.1.0",
       "license": "MIT",
       "tags": ["logistics", "supply-chain", "operations", "warehouse", "transportation"]
@@ -43,7 +43,7 @@
     {
       "name": "ai-utility-kit",
       "source": "./ai-utility-kit",
-      "description": "Korean-first general AI utility kit for idea grilling, context mapping, meeting briefs, and term clarification.",
+      "description": "기획안 검토, 맥락 파악, 회의 요약, 용어 정리를 돕는 한국어 우선 AI 작업 유틸리티입니다.",
       "version": "0.1.0",
       "license": "MIT",
       "tags": ["ai", "productivity", "thinking", "meeting-notes", "glossary"]
