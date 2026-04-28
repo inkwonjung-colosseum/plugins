@@ -1,6 +1,6 @@
-# planning-team-kit Terms of Service
+# product-team-kit Terms of Service
 
-`planning-team-kit` is a local workflow plugin for formatting planning input into 기능설계서 and 정책서 drafts and reviewing those drafts before external publishing.
+`product-team-kit` is a local workflow plugin for formatting planning input into 기능설계서 and 정책서 drafts and reviewing those drafts before external publishing.
 
 ## Intended Use
 

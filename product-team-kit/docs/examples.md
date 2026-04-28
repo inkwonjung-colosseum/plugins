@@ -1,4 +1,4 @@
-# planning-team-kit Examples
+# product-team-kit Examples
 
 ## 기능설계서/정책서 동시 생성
 

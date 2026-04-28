@@ -1,4 +1,4 @@
-# planning-team-kit Style Guide
+# product-team-kit Style Guide
 
 ## 문서 원칙
 

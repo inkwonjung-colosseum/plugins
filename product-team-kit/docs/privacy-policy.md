@@ -1,6 +1,6 @@
-# planning-team-kit Privacy Policy
+# product-team-kit Privacy Policy
 
-`planning-team-kit` formats user-provided planning input into local 기능설계서 and 정책서 drafts for review.
+`product-team-kit` formats user-provided planning input into local 기능설계서 and 정책서 drafts for review.
 
 ## Data Read
 

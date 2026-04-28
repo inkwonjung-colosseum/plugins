@@ -1,13 +1,13 @@
 {
-  "name": "planning-team-kit",
-  "version": "0.3.1",
-  "description": "기획 입력을 기능설계서와 정책서 초안으로 formatting하는 기획팀 도구.",
+  "name": "product-team-kit",
+  "version": "0.4.0",
+  "description": "기획 입력을 기능설계서와 정책서 초안으로 formatting하는 제품팀 도구.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
     "url": "https://github.com/developjik"
   },
-  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-team-kit",
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/product-team-kit",
   "repository": "https://github.com/inkwonjung-colosseum/plugins",
   "license": "MIT",
   "keywords": [

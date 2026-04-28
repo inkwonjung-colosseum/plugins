@@ -17,10 +17,10 @@
       "category": "Productivity"
     },
     {
-      "name": "planning-team-kit",
+      "name": "product-team-kit",
       "source": {
         "source": "local",
-        "path": "./planning-team-kit"
+        "path": "./product-team-kit"
       },
       "policy": {
         "installation": "AVAILABLE",

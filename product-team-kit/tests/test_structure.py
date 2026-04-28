@@ -1,5 +1,5 @@
 """
-planning-team-kit v0.3.1 구조 테스트
+product-team-kit v0.4.0 구조 테스트
 """
 
 import json
@@ -14,6 +14,7 @@ DOCS = os.path.join(BASE, "docs")
 CLAUDE_PLUGIN = os.path.join(BASE, ".claude-plugin", "plugin.json")
 CODEX_PLUGIN = os.path.join(BASE, ".codex-plugin", "plugin.json")
 CLAUDE_MARKETPLACE = os.path.join(WORKSPACE_ROOT, ".claude-plugin", "marketplace.json")
+CODEX_MARKETPLACE = os.path.join(WORKSPACE_ROOT, ".agents", "plugins", "marketplace.json")
 PUBLIC_DOCS = [
     os.path.join(BASE, "README.md"),
     os.path.join(WORKSPACE_ROOT, "README.md"),
@@ -117,8 +118,8 @@ class TestOldSkillsRemoved(unittest.TestCase):
 
     def test_plain_plan_command_not_in_public_docs(self):
         forbidden_commands = [
-            "/planning-team-kit:plan ",
-            "/planning-team-kit:plan\n",
+            "/product-team-kit:plan ",
+            "/product-team-kit:plan\n",
             "$plan ",
             "$plan\n",
         ]
@@ -133,11 +134,11 @@ class TestOldSkillsRemoved(unittest.TestCase):
         package_readme = read_text(os.path.join(BASE, "README.md"))
         for content in [workspace_readme, package_readme]:
             with self.subTest():
-                self.assertIn("/planning-team-kit:plan-format", content)
+                self.assertIn("/product-team-kit:plan-format", content)
                 self.assertIn("$plan-format", content)
-                self.assertNotIn("/planning-team-kit:plan-draft", content)
+                self.assertNotIn("/product-team-kit:plan-draft", content)
                 self.assertNotIn("$plan-draft", content)
-                self.assertNotIn("/planning-team-kit:plan-publish", content)
+                self.assertNotIn("/product-team-kit:plan-publish", content)
                 self.assertNotIn("$plan-publish", content)
 
     def test_public_docs_do_not_hardcode_workspace_confluence_values(self):
@@ -175,9 +176,13 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_3_1(self):
-        self.assertEqual(self._claude()["version"], "0.3.1")
-        self.assertEqual(self._codex()["version"], "0.3.1")
+    def test_version_is_0_4_0(self):
+        self.assertEqual(self._claude()["version"], "0.4.0")
+        self.assertEqual(self._codex()["version"], "0.4.0")
+
+    def test_name_is_product_team_kit(self):
+        self.assertEqual(self._claude()["name"], "product-team-kit")
+        self.assertEqual(self._codex()["name"], "product-team-kit")
 
     def test_name_synced(self):
         self.assertEqual(self._claude()["name"], self._codex()["name"])
@@ -202,6 +207,16 @@ class TestManifests(unittest.TestCase):
     def test_claude_marketplace_does_not_claim_confluence_publish(self):
         content = read_text(CLAUDE_MARKETPLACE)
         self.assertNotIn("publishes confirmed updates to Confluence", content)
+
+    def test_marketplaces_point_to_product_team_kit(self):
+        claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
+        claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
+        self.assertEqual(claude_entry["source"], "./product-team-kit")
+        self.assertEqual(claude_entry["version"], "0.4.0")
+
+        codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
+        codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
+        self.assertEqual(codex_entry["source"]["path"], "./product-team-kit")
 
 
 # ---------------------------------------------------------------------------
@@ -636,7 +651,7 @@ class TestPlanFormatSkill(unittest.TestCase):
         self.assertIn("$plan-format <기획 입력 또는 파일경로>", content)
         self.assertIn("입력 내용에서 기능명을 추출", content)
         self.assertNotIn("$plan-format <기능명>", content)
-        self.assertNotIn("/planning-team-kit:plan-format <기능명>", content)
+        self.assertNotIn("/product-team-kit:plan-format <기능명>", content)
 
     def test_public_examples_do_not_pass_feature_name_separately(self):
         readme = read_text(os.path.join(BASE, "README.md"))

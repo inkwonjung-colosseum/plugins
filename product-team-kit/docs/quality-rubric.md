@@ -1,4 +1,4 @@
-# planning-team-kit Quality Rubric
+# product-team-kit Quality Rubric
 
 `plan-review`는 `plan-format`이 저장한 기능설계서 또는 정책서 파일을 발행 전에 근거, 범위, 실행 가능성, 템플릿 준수 관점에서 확인한다. 각 관점은 병렬 fresh-context reviewer가 담당하며, 현재 대화 컨텍스트가 아니라 검토 대상 파일과 필요한 근거 문서를 직접 읽어 판단한다.
 

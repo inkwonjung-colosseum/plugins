@@ -17,10 +17,10 @@
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },
     {
-      "name": "planning-team-kit",
-      "source": "./planning-team-kit",
+      "name": "product-team-kit",
+      "source": "./product-team-kit",
       "description": "Claude Code and Codex compatible planning kit that formats user-provided planning input into 기능설계서 and 정책서 drafts, then reviews them before external publishing.",
-      "version": "0.3.1",
+      "version": "0.4.0",
       "license": "MIT",
       "tags": ["planning", "product", "confluence", "documentation"]
     },

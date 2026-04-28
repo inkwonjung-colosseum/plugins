@@ -6,16 +6,16 @@ argument-hint: "<파일경로>"
 
 # plan-review
 
-`/planning-team-kit:plan-format`으로 저장한 초안 파일을 4개 관점으로 검토하는 선택 스킬.
+`/product-team-kit:plan-format`으로 저장한 초안 파일을 4개 관점으로 검토하는 선택 스킬.
 
 검토 신뢰성을 위해 `plan-review`는 항상 **parallel fresh-context reviewers**를 사용한다. 새 검증 에이전트 4개가 지정 파일과 근거 문서를 직접 읽어 각 관점별 verdict를 내리고, 현재 대화 컨텍스트는 결과 취합과 명백한 누락 확인에만 사용한다.
 
 ## 호출
 
-- Claude Code: `/planning-team-kit:plan-review <파일경로>`
+- Claude Code: `/product-team-kit:plan-review <파일경로>`
 - Codex: `$plan-review <파일경로>`
 
-예시: `/planning-team-kit:plan-review planning/결제기능/결제기능_기능설계서.md`
+예시: `/product-team-kit:plan-review planning/결제기능/결제기능_기능설계서.md`
 
 ## 언제 사용하나
 
@@ -126,7 +126,7 @@ argument-hint: "<파일경로>"
 [관점]: [이유]
 → [수정 포인트]
 
-수정 후 다시 /planning-team-kit:plan-review 를 실행하세요.
+수정 후 다시 /product-team-kit:plan-review 를 실행하세요.
 ```
 
 ## 규칙

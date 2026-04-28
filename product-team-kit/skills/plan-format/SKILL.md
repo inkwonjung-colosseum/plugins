@@ -16,7 +16,7 @@ argument-hint: "<기획 입력 또는 파일경로>"
 
 ## 호출
 
-- Claude Code: `/planning-team-kit:plan-format <기획 입력 또는 파일경로>`
+- Claude Code: `/product-team-kit:plan-format <기획 입력 또는 파일경로>`
 - Codex: `$plan-format <기획 입력 또는 파일경로>`
 
 결과물 입력 방식:
@@ -192,7 +192,7 @@ Draftability gate가 `passed`이면 저장 완료 형식으로 출력한다.
 [정책서] [가정] 항목 (N개):
 - [섹션명]: [가정 내용]
 
-다음 단계: /planning-team-kit:plan-review planning/[추출기능명]/[추출기능명]_기능설계서.md
+다음 단계: /product-team-kit:plan-review planning/[추출기능명]/[추출기능명]_기능설계서.md
 ```
 
 ## plan-review 권장 신호

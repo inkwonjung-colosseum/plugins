@@ -1,13 +1,13 @@
 {
-  "name": "planning-team-kit",
-  "version": "0.3.1",
-  "description": "기획 입력을 기능설계서와 정책서 초안으로 formatting하는 기획팀 도구.",
+  "name": "product-team-kit",
+  "version": "0.4.0",
+  "description": "기획 입력을 기능설계서와 정책서 초안으로 formatting하는 제품팀 도구.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
     "url": "https://github.com/developjik"
   },
-  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-team-kit",
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/product-team-kit",
   "repository": "https://github.com/inkwonjung-colosseum/plugins",
   "license": "MIT",
   "keywords": [
@@ -19,7 +19,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "planning-team-kit",
+    "displayName": "product-team-kit",
     "shortDescription": "기능설계서·정책서 초안 formatting 도구",
     "longDescription": "사용자가 제공한 기획 입력을 기능설계서와 정책서 초안으로 동시에 정리합니다. 부족한 내용은 [미정], [가정], 확인 필요 질문으로 남기고, 발행 전 검토는 plan-review로 수행합니다.",
     "developerName": "developjik",
@@ -29,9 +29,9 @@
       "Write",
       "Interactive"
     ],
-    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-team-kit",
-    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/planning-team-kit/docs/privacy-policy.md",
-    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/planning-team-kit/docs/terms-of-service.md",
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/product-team-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/product-team-kit/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/product-team-kit/docs/terms-of-service.md",
     "defaultPrompt": [
       "주문 취소 정책 정리해줘",
       "입고 기능 설계서 만들어줘",
