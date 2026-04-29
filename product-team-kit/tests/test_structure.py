@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.3 구조 테스트
+product-team-kit v0.4.4 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_3(self):
-        self.assertEqual(self._claude()["version"], "0.4.3")
-        self.assertEqual(self._codex()["version"], "0.4.3")
+    def test_version_is_0_4_4(self):
+        self.assertEqual(self._claude()["version"], "0.4.4")
+        self.assertEqual(self._codex()["version"], "0.4.4")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.3")
+        self.assertEqual(claude_entry["version"], "0.4.4")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
@@ -323,6 +323,8 @@ class TestTemplates(unittest.TestCase):
         policy = read_text(skill_path("plan-format", "templates", "정책서.md"))
         self.assertNotIn("Flow Chart:", feature)
         self.assertNotIn("다이어그램:", policy)
+        self.assertNotIn("```mermaid", feature)
+        self.assertNotIn("```mermaid", policy)
 
     def test_audit_retention_is_not_forced_into_every_feature_doc(self):
         content = self._feature_content()
@@ -624,6 +626,22 @@ class TestPlanFormatSkill(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
+    def test_conditional_mermaid_visualization_contract_documented(self):
+        content = self._content()
+        for phrase in [
+            "조건부 보조 시각화",
+            "Mermaid",
+            "템플릿에는 Mermaid 섹션을 상시 추가하지 않는다",
+            "새 사실을 만들지 않는다",
+            "표나 본문과 1:1로 대응",
+            "기능설계서 `3. 진입점과 사용자 흐름`",
+            "정책서 `6. 상태 및 처리 기준`",
+            "문서당 최대 1개",
+            "Mermaid와 표/본문 불일치 여부",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
     def test_original_document_feedback_is_reported(self):
         content = self._content()
         for phrase in [
@@ -714,6 +732,18 @@ class TestPlanFormatSkill(unittest.TestCase):
             "초안 생성 가능성 검증",
             "Confluence 근거 검증은 plan-review",
             "확인 필요 질문",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_style_guide_documents_conditional_mermaid_boundary(self):
+        content = read_text(os.path.join(DOCS, "style-guide.md"))
+        for phrase in [
+            "Mermaid",
+            "조건부 보조 시각화",
+            "템플릿 기본 섹션으로 강제하지 않는다",
+            "새 사실을 만들지 않는다",
+            "표나 본문과 불일치하면 제거하거나 수정한다",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
