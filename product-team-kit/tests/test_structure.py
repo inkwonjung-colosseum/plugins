@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.6 구조 테스트
+product-team-kit v0.4.7 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_6(self):
-        self.assertEqual(self._claude()["version"], "0.4.6")
-        self.assertEqual(self._codex()["version"], "0.4.6")
+    def test_version_is_0_4_7(self):
+        self.assertEqual(self._claude()["version"], "0.4.7")
+        self.assertEqual(self._codex()["version"], "0.4.7")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.6")
+        self.assertEqual(claude_entry["version"], "0.4.7")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")

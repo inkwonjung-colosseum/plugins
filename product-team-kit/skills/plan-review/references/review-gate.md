@@ -22,12 +22,17 @@
 1. `.confluence-index/registry.json`에서 관련 export source를 고른다.
 2. `.confluence-index/sources/<source-id>/source-index.jsonl`에서 후보 문서와 metadata를 확인한다.
 3. `.confluence-index/sources/<source-id>/tree.md`로 문서 위치와 계층을 파악한다.
-4. 확인할 주장과 충돌 가능성이 있는 관련 문서를 충분히 확장해 raw exported Markdown 파일을 선택한다.
+4. 검토 대상 파일명, 문서 제목, 본문 메타의 `버전`, 또는 후보 문서명에 `v0.8`, `v0.9`, `v1.0` 같은 버전 표기가 있는지 확인한다.
+   - 버전 표기는 `v` 뒤의 숫자 세그먼트로 해석한다. 예: `v0.91`은 `0.91`, `v1.0`은 `1.0`이다.
+   - version-aware 필터가 켜진 경우 버전이 명시된 후보 문서는 `v0.8` 이상만 현재 발행 검증 근거로 선택한다.
+   - `v0.8` 미만의 버전 문서는 archive 여부와 무관하게 현재 발행 검증 근거로 사용하지 않고 `읽지 않은 관련 후보`에 제외 사유를 기록한다.
+   - 버전이 없는 직접 관련 문서는 읽을 수 있지만, 버전 확인 불가를 `검증 한계`에 기록한다. 이 경우 그 근거만으로는 `pass`를 반환하지 않는다.
+5. 확인할 주장과 충돌 가능성이 있는 관련 문서를 충분히 확장해 raw exported Markdown 파일을 선택한다.
    - 직접 관련 문서: 초안에 명시된 문서, 같은 기능/정책명, 같은 버전 또는 동일 업무 흐름 문서.
    - 상위/하위 문서: `tree.md` 기준 부모 문서가 범위/정책 맥락을 제공하거나 자식 문서가 상세 규칙을 보유하는 경우.
    - 참조 문서: 원문 안에 링크된 공통 가이드, 권한표, 발번표, 연관 정책서/기능설계서, 외부 Sheet.
    - sibling 문서: 같은 문서군의 Location, Center, 권한, 공통 정책처럼 같은 범위에서 충돌 가능성이 있는 문서.
-5. 판단 전에 선택한 raw exported Markdown 본문을 직접 읽는다.
+6. 판단 전에 선택한 raw exported Markdown 본문을 직접 읽는다.
 
 전체 export 공간을 한 번에 읽지 않는다. 관련 후보를 넓히되 확인할 주장과 충돌 가능성이 있는 문서로 제한한다. 로컬 exported Markdown은 Confluence의 읽기 전용 snapshot으로 취급한다. index 또는 page metadata가 없으면 `metadata unavailable`로 기록하고 status나 freshness를 추론하지 않는다. archive 문서는 읽을 수 있지만 현재 정책 근거가 아니라 과거 맥락으로만 사용한다.
 
@@ -56,6 +61,7 @@
 - 읽지 않은 관련 후보: 후보로 식별했지만 읽지 않은 문서와 제외 이유.
 - 검증 한계: 접근 불가, metadata unavailable, stale 확인 불가, raw exported Markdown 미확인 등 판단 한계.
 - source metadata, document status, freshness를 로컬 export에서 확인할 수 없으면 `metadata unavailable` 사용.
+- version-aware 필터 적용 여부와 제외한 `v0.8` 미만 후보를 읽지 않은 관련 후보에 기록.
 - 담당 관점의 구조화된 발견 사항.
   - 필드: `관점`, `제목`, `위치`, `심각도`, `발견 유형`, `신뢰도 앵커`, `근거 인용`, `영향`, `최소 수정 포인트 또는 확인 조건`, `출력 버킷`.
   - 발견 유형: `오류`, `누락`.
@@ -69,6 +75,8 @@
 - metadata unavailable이면 pass 금지.
 - stale 값을 확인할 수 없으면 pass 금지.
 - raw exported Markdown을 읽지 못했으면 pass 금지.
+- version-aware 필터가 필요한데 버전 확인을 수행하지 않았으면 pass 금지.
+- version-aware 필터 적용 시 `v0.8` 미만 문서를 현재 발행 검증 근거로 사용했으면 pass 금지.
 - 구조화 출력이 실패한 검토자가 있으면 pass 금지.
 - 위 경우는 누락된 근거가 외부 발행에 중요하지 않고 남은 확인 조건이 명확할 때만 `conditional pass`가 될 수 있다.
 
