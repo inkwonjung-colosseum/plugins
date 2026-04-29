@@ -1,6 +1,6 @@
 interface:
   display_name: plan-review
-  short_description: 초안을 병렬 fresh-context reviewer 3개 관점(근거 / 결정·범위 / 실행·검증 가능성)으로 검토합니다
+  short_description: 초안을 병렬 독립 검토 3개 관점(근거 / 결정·범위 / 실행·검증 가능성)으로 검토합니다
   brand_color: "#0F766E"
   default_prompt: 초안 검토해줘
 policy:

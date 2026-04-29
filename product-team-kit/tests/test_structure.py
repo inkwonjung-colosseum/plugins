@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.2 구조 테스트
+product-team-kit v0.4.3 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_2(self):
-        self.assertEqual(self._claude()["version"], "0.4.2")
-        self.assertEqual(self._codex()["version"], "0.4.2")
+    def test_version_is_0_4_3(self):
+        self.assertEqual(self._claude()["version"], "0.4.3")
+        self.assertEqual(self._codex()["version"], "0.4.3")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,11 +212,37 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.2")
+        self.assertEqual(claude_entry["version"], "0.4.3")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
         self.assertEqual(codex_entry["source"]["path"], "./product-team-kit")
+
+
+# ---------------------------------------------------------------------------
+# packaging
+# ---------------------------------------------------------------------------
+
+class TestPackageHygiene(unittest.TestCase):
+
+    FORBIDDEN_PACKAGE_SUFFIXES = (".DS_Store", ".pyc", ".pyo", ".tmp", ".swp")
+    FORBIDDEN_PACKAGE_PARTS = {"__pycache__"}
+
+    def test_package_tree_has_no_local_artifacts(self):
+        for root, dirs, files in os.walk(BASE):
+            rel_root = os.path.relpath(root, BASE)
+            if rel_root == os.path.join("tests", "__pycache__"):
+                continue
+            for part in rel_root.split(os.sep):
+                with self.subTest(path=rel_root, part=part):
+                    self.assertNotIn(part, self.FORBIDDEN_PACKAGE_PARTS)
+            for filename in files:
+                rel_path = os.path.relpath(os.path.join(root, filename), BASE)
+                with self.subTest(path=rel_path):
+                    self.assertFalse(
+                        filename.endswith(self.FORBIDDEN_PACKAGE_SUFFIXES),
+                        f"패키지에 로컬 산출물 포함: {rel_path}",
+                    )
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +258,7 @@ class TestTemplates(unittest.TestCase):
 
     def _feature_acceptance_section(self):
         content = self._feature_content()
-        return content.split("## 11. 인수 조건 / 확인 기준 [필수]", 1)[1].split("## 12.", 1)[0]
+        return content.split("## 9. 확인 기준", 1)[1].split("## 10.", 1)[0]
 
     def test_templates_exist(self):
         for tmpl in self.REQUIRED_TEMPLATES:
@@ -249,82 +275,76 @@ class TestTemplates(unittest.TestCase):
 
     def test_기능설계서_has_required_sections(self):
         content = read_text(skill_path("plan-format", "templates", "기능설계서.md"))
-        for section in ["기능 설명", "전체 흐름", "권한 정책", "기능 상세 설계", "예외 처리", "인수 조건"]:
+        for section in [
+            "개요",
+            "범위",
+            "진입점과 사용자 흐름",
+            "화면과 입력 항목",
+            "기능 동작",
+            "권한과 데이터 접근",
+            "예외와 메시지",
+            "영향 범위와 충돌 방지",
+            "확인 기준",
+            "확인 필요 사항",
+        ]:
             self.assertIn(section, content, f"기능설계서 템플릿에 '{section}' 없음")
 
     def test_기능설계서_has_formatter_contract_sections(self):
         content = self._feature_content()
         for phrase in [
-            "입력 반영 요약",
-            "초안 생성 가능성",
-            "섹션 적용 체크리스트",
             "확인 기준",
-            "관련 정책 ID",
-            "값/코드 출처",
-            "상태별 수정 가능",
-            "권한별 수정 가능",
-            "기준 ID",
+            "수정 가능 조건",
             "조건",
-            "사용자 행동",
+            "사용자 행동 / 트리거",
             "기대 결과",
+            "실패 / 부분 성공 기준",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
-    def test_기능설계서_qa_section_numbering_is_consistent(self):
+    def test_기능설계서_uses_single_confirmation_section(self):
         content = self._feature_content()
-        for section in ["### 11.1", "### 11.2", "### 11.3", "### 11.4", "### 11.5"]:
-            with self.subTest(section=section):
-                self.assertIn(section, content)
-        for old_section in ["### 12.1", "### 12.2", "### 12.3", "### 12.4", "### 12.5"]:
+        self.assertIn("## 9. 확인 기준", content)
+        for old_section in ["### 11.1", "### 11.2", "### 11.3", "### 11.4", "### 11.5"]:
             with self.subTest(old_section=old_section):
                 self.assertNotIn(old_section, content)
 
     def test_기능설계서_acceptance_section_is_planner_owned(self):
         acceptance_section = self._feature_acceptance_section()
-        for phrase in ["조건", "사용자 행동", "기대 결과", "검토 상태"]:
+        for phrase in ["조건", "사용자 행동", "기대 결과"]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, acceptance_section)
         for phrase in ["테스트 데이터", "절차", "우선순위", "Case ID", "TC-", "케이스", "검수"]:
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, acceptance_section)
 
-    def test_optional_visual_artifacts_are_not_required(self):
+    def test_optional_visual_artifacts_are_not_baked_into_templates(self):
         feature = self._feature_content()
         policy = read_text(skill_path("plan-format", "templates", "정책서.md"))
-        self.assertIn("Flow Chart: <!-- 있으면 링크 또는 이미지. 없으면 위 흐름 표만으로 충분 -->", feature)
-        self.assertIn("다이어그램: <!-- 있으면 링크 또는 이미지. 없으면 위 상태 전이 표만으로 충분 -->", policy)
+        self.assertNotIn("Flow Chart:", feature)
+        self.assertNotIn("다이어그램:", policy)
 
-    def test_audit_retention_can_reference_common_policy(self):
+    def test_audit_retention_is_not_forced_into_every_feature_doc(self):
         content = self._feature_content()
-        self.assertIn("보존 기간은 공통 보존 정책 참조 가능", content)
-        self.assertIn("기능별 예외가 있으면 별도 명시", content)
-        self.assertIn("공통 보존 정책 참조 / [미정]", content)
+        self.assertNotIn("감사 로그", content)
+        self.assertNotIn("보존 기간", content)
 
-    def test_기능설계서_has_section_applicability_checklist(self):
+    def test_기능설계서_does_not_include_generation_meta_sections(self):
         content = read_text(skill_path("plan-format", "templates", "기능설계서.md"))
         for phrase in [
-            "0.1 섹션 적용 체크리스트",
-            "적용 여부",
-            "남길 섹션",
-            "권한 분리",
-            "상태 전이",
-            "시간/SLA",
-            "엑셀 입력",
-            "외부 채널",
-            "예 / 아니오 / [미정]",
+            "입력 반영 요약",
+            "초안 생성 가능성",
+            "섹션 적용 체크리스트",
+            "Draftability gate",
+            "원본 입력",
+            "원문",
         ]:
             with self.subTest(phrase=phrase):
-                self.assertIn(phrase, content)
+                self.assertNotIn(phrase, content)
 
-    def test_기능설계서_core_tables_have_review_status(self):
+    def test_기능설계서_does_not_include_review_status_columns(self):
         content = read_text(skill_path("plan-format", "templates", "기능설계서.md"))
-        required_review_status_count = 15
-        self.assertGreaterEqual(
-            content.count("검토 상태"),
-            required_review_status_count,
-            "기능설계서 주요 표는 [미정]/[가정]을 명시할 검토 상태 컬럼을 가져야 함",
-        )
+        self.assertNotIn("검토 상태", content)
 
     def test_기능설계서_excludes_developer_owned_contract_details(self):
         content = self._feature_content()
@@ -349,29 +369,27 @@ class TestTemplates(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, content)
 
-    def test_기능설계서_exception_rows_have_ids_and_unknown_policy_links(self):
+    def test_기능설계서_exception_section_is_concise(self):
         content = self._feature_content()
         for phrase in [
-            "| EX-001      | 필수값 누락",
-            "| EX-002      | 중복 데이터",
-            "| EX-003      | 권한 부족",
-            "| EX-004      | 상태 조건 불충족",
-            "차단 메시지 노출",
-            "| [미정]",
+            "예외와 메시지",
+            "처리 등급",
+            "사용자 메시지 / 결과",
+            "운영 조치",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+        for phrase in ["예외 ID", "관련 정책 ID", "EX-001"]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
 
     def test_기능설계서_message_sections_have_clear_ownership(self):
         content = self._feature_content()
-        self.assertIn("차단성 예외의 사용자 노출 결과", content)
-        self.assertIn("비차단 안내 메시지", content)
-        self.assertIn("기획 의도와 초안 문구", content)
-        self.assertIn("최종 UX copy·디자인 명세가 아니다", content)
-        self.assertIn("차단성 예외 메시지는 9. 예외 처리에 적는다", content)
+        self.assertIn("사용자 메시지 / 결과", content)
+        self.assertIn("운영 조치", content)
         self.assertNotIn("검증 실패 차단 메시지는 §10", content)
 
-    def test_templates_document_id_rules(self):
+    def test_templates_do_not_document_trace_id_rules(self):
         for template in ["기능설계서.md", "정책서.md"]:
             content = read_text(skill_path("plan-format", "templates", template))
             for phrase in [
@@ -381,24 +399,32 @@ class TestTemplates(unittest.TestCase):
                 "ST-###",
                 "EX-###",
                 "AC-###",
-                "[미정]",
                 "초안에서는 연결 ID를 `[미정]`으로 둘 수 있으나",
                 "발행 전 plan-review에서 trace 연결 누락을 확인한다",
             ]:
                 with self.subTest(template=template, phrase=phrase):
-                    self.assertIn(phrase, content)
+                    self.assertNotIn(phrase, content)
 
-    def test_templates_document_detail_unknowns_after_draftability_gate(self):
+    def test_templates_do_not_force_unknown_markers(self):
         for template in ["기능설계서.md", "정책서.md"]:
             content = read_text(skill_path("plan-format", "templates", template))
             with self.subTest(template=template):
-                self.assertIn("Draftability gate 통과 후에도", content)
-                self.assertIn("세부 미정", content)
-                self.assertIn("[미정]", content)
+                self.assertNotIn("[미정]", content)
 
     def test_정책서_has_required_sections(self):
         content = read_text(skill_path("plan-format", "templates", "정책서.md"))
-        for section in ["문서 목적", "적용 범위", "정책 원칙", "세부 규칙", "예외 시나리오", "상태 전이", "미확정 항목"]:
+        for section in [
+            "정책 목적",
+            "적용 범위",
+            "용어 정의",
+            "정책 원칙",
+            "세부 규칙",
+            "상태 및 처리 기준",
+            "역할과 권한",
+            "예외 및 승인 기준",
+            "외부 / 타시스템 연동 정책",
+            "확인 필요 사항",
+        ]:
             self.assertIn(section, content, f"정책서 템플릿에 '{section}' 없음")
 
     def test_정책서_does_not_reference_developer_owned_feature_details(self):
@@ -416,29 +442,17 @@ class TestTemplates(unittest.TestCase):
         for phrase in forbidden:
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, content)
-        self.assertIn("[기능설계서] 9. 예외 처리", content)
-        self.assertIn("기능설계서 6.1.2 상태 및 전이는 정책서 6. 상태 전이를 사용자 동작 관점으로 참조한다", content)
-        self.assertIn("비즈니스 연동 정책만 작성", content)
-        self.assertIn("API 계약·schema·technical design은 작성하지 않는다", content)
-        self.assertIn("재시도 횟수·timeout·queue 같은 구현 방식은 작성하지 않는다", content)
-        self.assertIn("업무상 실패 대응", content)
-        self.assertIn("본 정책과 연결된 기능설계서", content)
+        self.assertIn("실패 시 업무 대응", content)
+        self.assertIn("정책이 보장해야 하는 결과", content)
 
-    def test_정책서_has_trace_and_evidence_fields(self):
+    def test_정책서_does_not_include_evidence_or_trace_fields(self):
         content = read_text(skill_path("plan-format", "templates", "정책서.md"))
-        for phrase in [
-            "R-001",
-            "ST-001",
-            "EX-001",
-            "근거",
-            "검토 상태",
-            "관련 문서 및 근거",
-            "결정 필요 이유",
-            "영향 범위",
-            "확인 질문",
-        ]:
+        for phrase in ["관련 문서", "결정 필요 이유", "영향"]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+        for phrase in ["근거", "R-001", "ST-001", "EX-001", "검토 상태", "규칙 ID", "관련 규칙 ID"]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
 
 
 # ---------------------------------------------------------------------------
@@ -509,7 +523,7 @@ class TestDocs(unittest.TestCase):
         for doc in ["examples.md", "quality-rubric.md", "style-guide.md"]:
             with self.subTest(doc=doc):
                 content = read_text(os.path.join(DOCS, doc))
-                self.assertIn("Draftability gate", content)
+                self.assertIn("초안 생성 가능성", content)
                 self.assertIn("저장 보류", content)
         style = read_text(os.path.join(DOCS, "style-guide.md"))
         self.assertIn("생성 전", style)
@@ -518,13 +532,42 @@ class TestDocs(unittest.TestCase):
             read_text(os.path.join(DOCS, doc))
             for doc in ["examples.md", "quality-rubric.md", "style-guide.md"]
         )
+        self.assertNotIn("Draftability gate", combined)
+        self.assertNotIn("planning brief", combined)
+        self.assertNotIn("fresh-context", combined)
+        self.assertNotIn("verdict", combined)
         self.assertNotIn("Completeness gate", combined)
+
+    def test_policy_docs_reflect_draft_folder_path(self):
+        privacy = read_text(os.path.join(DOCS, "privacy-policy.md"))
+        self.assertIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", privacy)
+        self.assertNotIn("planning/[기능명]/", privacy)
+
+    def test_root_readme_reflects_pair_review_contract(self):
+        root_readme = read_text(os.path.join(WORKSPACE_ROOT, "README.md"))
+        self.assertIn("기능설계서와 정책서를 함께 검토", root_readme)
+        self.assertIn("초안 폴더", root_readme)
+        for phrase in ["fresh-context", "verdict", "Draftability gate"]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, root_readme)
+
+    def test_diagrams_do_not_use_old_internal_terms(self):
+        diagram_dir = os.path.join(WORKSPACE_ROOT, "docs", "diagrams")
+        for name in [
+            "product-team-kit-workflow.html",
+            "planning-confluence-document-workflow.html",
+            "planning-confluence-document-workflow-overview.html",
+            "planning-confluence-document-workflow-v2.html",
+        ]:
+            content = read_text(os.path.join(diagram_dir, name))
+            for phrase in ["Draftability gate", "fresh-context", "parallel reviewers", "verdict", "plan-review (선택)"]:
+                with self.subTest(name=name, phrase=phrase):
+                    self.assertNotIn(phrase, content)
 
     def test_docs_use_planner_acceptance_wording(self):
         for doc in ["examples.md", "quality-rubric.md", "style-guide.md"]:
             with self.subTest(doc=doc):
                 content = read_text(os.path.join(DOCS, doc))
-                self.assertIn("인수 조건", content)
                 self.assertIn("확인 기준", content)
                 self.assertNotIn("QA 시드", content)
                 self.assertNotIn("QA 매트릭스", content)
@@ -551,7 +594,7 @@ class TestPlanFormatSkill(unittest.TestCase):
 
     def test_plan_format_does_not_make_publish_gate_judgment(self):
         content = self._content()
-        self.assertIn("Draftability gate", content)
+        self.assertIn("초안 생성 가능성 검증", content)
         self.assertIn("생성 전 판단", content)
         self.assertIn("plan-review 권장 신호", content)
         self.assertIn("초안 생성 가능성", content)
@@ -564,7 +607,7 @@ class TestPlanFormatSkill(unittest.TestCase):
         content = self._content()
         for doc_type in ["기능설계서", "정책서"]:
             self.assertIn(doc_type, content, f"plan-format SKILL.md에 문서 타입 '{doc_type}' 생성 없음")
-        self.assertIn("Draftability gate 통과 시 두 문서를 모두 생성", content)
+        self.assertIn("초안 생성 가능성 검증 통과 시 두 문서를 모두 생성", content)
         self.assertIn("상위설계서는 지원하지 않는다", content)
 
     def test_parallel_body_generation_contract_documented(self):
@@ -572,7 +615,7 @@ class TestPlanFormatSkill(unittest.TestCase):
         for phrase in [
             "공통 분석은 순차 실행",
             "문서 본문 작성만 병렬 실행",
-            "공통 planning brief",
+            "공통 정리 기준",
             "기능설계서 작성 worker",
             "정책서 작성 worker",
             "최종 조정은 단일 실행",
@@ -604,9 +647,9 @@ class TestPlanFormatSkill(unittest.TestCase):
             "[필수]",
             "[선택]",
             "[필수 — 발행 전]",
-            "결과물에서는 제거",
+            "결과물에서 제거",
             "최종 문서에서 제거",
-            "[미정]`, `[가정]`은 검토 표식",
+            "[미정]`, `[가정]`은 판단 보류 표식",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
@@ -629,10 +672,10 @@ class TestPlanFormatSkill(unittest.TestCase):
     def test_draftability_gate_contract_documented(self):
         content = self._content()
         for phrase in [
-            "Draftability gate",
+            "초안 생성 가능성 검증",
             "저장 보류",
-            "blocked",
-            "passed",
+            "초안 생성 가능: 아니오",
+            "초안 생성 가능: 예",
             "입력 보완 질문",
             "기능 목적/기능명",
             "적용 대상 또는 업무 범위",
@@ -693,6 +736,26 @@ class TestPlanFormatSkill(unittest.TestCase):
                 self.assertNotIn("plan-format 입고등록 /path", content)
                 self.assertNotIn("plan-format 반품접수 \"", content)
 
+    def test_plan_format_review_next_step_targets_draft_folder(self):
+        content = self._content()
+        self.assertIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
+        self.assertIn("다음 단계: /product-team-kit:plan-review planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
+        self.assertIn("기능설계서와 정책서를 함께 검토", content)
+        self.assertNotIn("다음 단계: /product-team-kit:plan-review planning/[추출기능명]/[추출기능명]_기능설계서.md", content)
+
+    def test_plan_format_slug_contract_documented(self):
+        content = self._content()
+        for phrase in [
+            "안전기능명",
+            "경로 구분자",
+            "`..`",
+            "줄바꿈",
+            "50자",
+            "중복 저장을 피하기 위해 timestamp",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
 
 # ---------------------------------------------------------------------------
 # plan-review SKILL.md 핵심 내용 검증
@@ -708,10 +771,13 @@ class TestPlanReviewSkill(unittest.TestCase):
         for perspective in ["근거", "결정·범위", "실행·검증 가능성"]:
             self.assertIn(perspective, content, f"plan-review SKILL.md에 관점 '{perspective}' 없음")
 
-    def test_optional_documented(self):
-        self.assertIn("선택", self._content(), "plan-review가 선택 스킬임이 명시되지 않음")
+    def test_external_publish_review_required(self):
+        content = self._content()
+        self.assertIn("외부 발행 전에는 필수", content)
+        self.assertNotIn("선택 스킬", content)
+        self.assertNotIn("건너뛸 수 있다", content)
 
-    def test_pass_verdict_documented(self):
+    def test_pass_result_documented(self):
         self.assertIn("pass", self._content().lower())
 
     def test_conditional_pass_documented(self):
@@ -728,17 +794,17 @@ class TestPlanReviewSkill(unittest.TestCase):
 
     def test_review_gate_uses_canonical_role_names(self):
         content = read_text(skill_path("plan-review", "references", "review-gate.md"))
-        for role in ["근거 reviewer", "결정·범위 reviewer", "실행·검증 가능성 reviewer"]:
+        for role in ["근거 검토자", "결정·범위 검토자", "실행·검증 가능성 검토자"]:
             with self.subTest(role=role):
                 self.assertIn(role, content)
 
-    def test_fresh_context_reviewer_is_required(self):
+    def test_independent_review_is_required(self):
         content = self._content()
         for phrase in [
-            "fresh-context reviewer",
+            "독립 검토자",
             "새 검증 에이전트",
             "현재 대화 컨텍스트를 근거로 사용하지 않는다",
-            "더 보수적인 verdict",
+            "더 보수적인 검토 결과",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
@@ -746,15 +812,34 @@ class TestPlanReviewSkill(unittest.TestCase):
     def test_parallel_reviewers_are_documented(self):
         content = self._content()
         for phrase in [
-            "parallel fresh-context reviewers",
-            "근거 reviewer",
-            "결정·범위 reviewer",
-            "실행·검증 가능성 reviewer",
+            "독립 검토 3개 관점",
+            "근거 검토자",
+            "결정·범위 검토자",
+            "실행·검증 가능성 검토자",
             "공통 입력 패키지",
-            "최종 verdict",
+            "최종 검토 결과",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+
+    def test_plan_review_skill_uses_korean_business_terms_for_user_surface(self):
+        content = self._content()
+        for phrase in ["fresh-context", "verdict", "reviewer"]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
+
+    def test_plan_review_accepts_draft_folder_or_pair(self):
+        content = self._content()
+        self.assertIn("argument-hint: \"<초안 폴더 또는 기능설계서/정책서 파일경로>\"", content)
+        self.assertIn("초안 폴더를 받으면 기능설계서와 정책서를 함께 검토한다", content)
+        self.assertIn("역할명·범위·정책 기준이 두 문서에서 충돌하지 않는지", content)
+
+    def test_pass_output_does_not_allow_unknown_evidence_metadata(self):
+        content = self._content()
+        pass_section = content.split("### pass", 1)[1].split("### 조건부 pass", 1)[0]
+        self.assertNotIn("metadata unavailable", pass_section)
+        self.assertIn("status: current", pass_section)
+        self.assertIn("stale: no", pass_section)
 
     def test_plan_review_does_not_include_template_reviewer(self):
         content = "\n".join(
@@ -796,7 +881,7 @@ class TestPlanReviewSkill(unittest.TestCase):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))
         for phrase in [
             "병렬",
-            "fresh-context reviewer",
+            "독립 검토",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
@@ -824,8 +909,8 @@ class TestReferences(unittest.TestCase):
             "충돌 경고",
             "pass",
             "conditional pass",
-            "fresh-context reviewer",
-            "more conservative verdict",
+            "독립 검토자",
+            "더 보수적인 검토 결과",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
@@ -845,16 +930,32 @@ class TestReferences(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
+    def test_plan_review_gate_disallows_pass_with_unknown_evidence(self):
+        content = read_text(skill_path("plan-review", "references", "review-gate.md"))
+        for phrase in [
+            "metadata unavailable이면 pass 금지",
+            "stale 값을 확인할 수 없으면 pass 금지",
+            "raw exported Markdown을 읽지 못했으면 pass 금지",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
     def test_plan_review_gate_parallel_aggregation_exists(self):
         content = read_text(skill_path("plan-review", "references", "review-gate.md"))
         for phrase in [
-            "parallel fresh-context reviewer",
-            "Role verdict",
-            "final verdict",
+            "독립 검토자",
+            "관점별 검토 결과",
+            "최종 검토 결과",
             "수정 필요 > conditional pass > pass",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
+
+    def test_plan_review_gate_uses_korean_business_terms(self):
+        content = read_text(skill_path("plan-review", "references", "review-gate.md"))
+        for phrase in ["fresh-context", "verdict", "reviewer"]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
 
 
 if __name__ == "__main__":
