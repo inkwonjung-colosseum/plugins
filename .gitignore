@@ -1,12 +1,13 @@
 __pycache__/
 *.py[cod]
 .DS_Store
+
 confluence/
 .confluence-index/
 planning/
 
 
-AGENTS.md
-CLAUDE.md
+.claude/
+.codex/
 @AGENTS.md
 @CLAUDE.md
