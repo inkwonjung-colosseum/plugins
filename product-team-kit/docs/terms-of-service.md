@@ -18,7 +18,7 @@ Use this plugin to:
 
 ## Publishing Rules
 
-This plugin does not publish directly to Confluence. If a draft includes `[미정]`, `[가정]`, confirmation questions, conflict warnings, decision-scope gaps, or execution-readiness gaps, users should run `plan-review` and resolve or explicitly accept those items before using the draft in a publishing process.
+This plugin does not publish directly to Confluence. If a draft includes `[가정]`, confirmation questions, conflict warnings, decision-scope gaps, or execution-readiness gaps, users should run `plan-review` and resolve or explicitly accept those items before using the draft in a publishing process.
 
 ## No Warranty
 

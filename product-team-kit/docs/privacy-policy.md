@@ -23,7 +23,7 @@ The plugin instructions prohibit modifying local exported Markdown.
 
 Before using generated drafts as publish-ready material, users should check:
 
-- Review gate status for `[미정]`, `[가정]`, confirmation questions, and decision-scope or execution-readiness gaps.
+- Review gate status for `[가정]`, confirmation questions, and decision-scope or execution-readiness gaps.
 - Source freshness of the local Confluence export.
 - Team approval requirements outside this plugin.
 

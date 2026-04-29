@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.4 구조 테스트
+product-team-kit v0.4.5 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_4(self):
-        self.assertEqual(self._claude()["version"], "0.4.4")
-        self.assertEqual(self._codex()["version"], "0.4.4")
+    def test_version_is_0_4_5(self):
+        self.assertEqual(self._claude()["version"], "0.4.5")
+        self.assertEqual(self._codex()["version"], "0.4.5")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.4")
+        self.assertEqual(claude_entry["version"], "0.4.5")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
@@ -575,6 +575,16 @@ class TestDocs(unittest.TestCase):
                 self.assertNotIn("QA 매트릭스", content)
                 self.assertNotIn("검수 기준", content)
 
+    def test_style_guide_keeps_department_owned_outputs_as_references(self):
+        content = read_text(os.path.join(DOCS, "style-guide.md"))
+        for phrase in [
+            "Confluence 발행 문서는 정책/기능 판단 계약을 소유한다",
+            "부서별 상세 산출물은 본문에 완성본처럼 생성하지 않는다",
+            "관련 문서 또는 확인 필요 사항으로만 남긴다",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
 
 # ---------------------------------------------------------------------------
 # plan-format SKILL.md 핵심 내용 검증
@@ -724,6 +734,20 @@ class TestPlanFormatSkill(unittest.TestCase):
         self.assertIn("기능 동작 명세", content)
         self.assertIn("개발자 소유 API 계약·내부 구현 결정은 기능설계서에 생성하지 않는다", content)
         self.assertNotIn("구현 명세", content)
+
+    def test_plan_format_excludes_department_owned_detailed_deliverables(self):
+        content = self._content()
+        for phrase in [
+            "Confluence 업로드용 기능설계서와 정책서 본문만 생성한다",
+            "부서 소유 상세 산출물은 본문에 완성본처럼 생성하지 않는다",
+            "관련 문서 또는 확인 필요 사항으로 남긴다",
+            "디자인 상세",
+            "QA 상세 테스트 케이스",
+            "API 명세",
+            "운영 런북",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
 
     def test_formatter_scope_documented(self):
         content = self._content()
@@ -907,6 +931,83 @@ class TestPlanReviewSkill(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
+    def test_plan_review_flags_department_owned_deliverables_mixed_into_body(self):
+        content = "\n".join(
+            [
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+                read_text(os.path.join(DOCS, "quality-rubric.md")),
+            ]
+        )
+        for phrase in [
+            "부서 소유 상세 산출물",
+            "본문에 완성본처럼 섞였는지",
+            "관련 문서 또는 확인 필요 사항으로 분리",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_confluence_evidence_expansion_is_owned_by_evidence_reviewer(self):
+        content = "\n".join(
+            [
+                self._content(),
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+            ]
+        )
+        for phrase in [
+            "근거 검토자가 관련 Confluence 근거 확장 탐색을 주도한다",
+            "근거 패키지",
+            "결정·범위 검토자와 실행·검증 가능성 검토자는 근거 패키지를 사용한다",
+            "추가 근거 후보를 발견하면 읽지 않은 관련 후보 또는 검증 한계로 남긴다",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_review_requires_structured_findings(self):
+        content = "\n".join(
+            [
+                self._content(),
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+                read_text(os.path.join(DOCS, "quality-rubric.md")),
+            ]
+        )
+        for phrase in [
+            "구조화된 발견 사항",
+            "관점",
+            "제목",
+            "위치",
+            "발견 유형",
+            "신뢰도 앵커",
+            "근거 인용",
+            "영향",
+            "최소 수정 포인트 또는 확인 조건",
+            "출력 버킷",
+            "오류",
+            "누락",
+            "신뢰도 앵커: 50 / 75 / 100",
+            "출력 버킷: 수정 포인트 / 확인 조건 / 참고 관찰",
+            "참고 관찰은 최종 검토 결과를 낮추지 않는다",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_review_does_not_adopt_ce_auto_workflow_terms(self):
+        content = "\n".join(
+            [
+                self._content(),
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+                read_text(os.path.join(DOCS, "quality-rubric.md")),
+            ]
+        )
+        for phrase in [
+            "safe_auto",
+            "gated_auto",
+            "Open Questions",
+            "Auto-resolve",
+            "headless mode",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, content)
+
     def test_agent_description_mentions_parallel_reviewers(self):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))
         for phrase in [
@@ -951,6 +1052,14 @@ class TestReferences(unittest.TestCase):
             ".confluence-index/registry.json",
             "source-index.jsonl",
             "tree.md",
+            "충돌 가능성이 있는 관련 문서를 충분히 확장",
+            "직접 관련 문서",
+            "상위/하위 문서",
+            "참조 문서",
+            "sibling 문서",
+            "전체 export 공간을 한 번에 읽지 않는다",
+            "읽지 않은 관련 후보",
+            "검증 한계",
             "raw exported Markdown path",
             "source-id",
             "current/draft/archive",
@@ -977,6 +1086,23 @@ class TestReferences(unittest.TestCase):
             "관점별 검토 결과",
             "최종 검토 결과",
             "수정 필요 > conditional pass > pass",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_review_gate_structured_synthesis_contract(self):
+        content = read_text(skill_path("plan-review", "references", "review-gate.md"))
+        for phrase in [
+            "필수 필드가 빠진 발견 사항은 최종 판단에 사용하지 않고 검증 한계에 기록한다",
+            "위치 + 제목 + 근거 인용",
+            "중복 발견을 병합",
+            "더 높은 심각도",
+            "더 높은 신뢰도",
+            "더 보수적인 출력 버킷",
+            "수정 포인트가 하나라도 있으면 최종 결과는 수정 필요",
+            "수정 포인트가 없고 확인 조건만 있으면 conditional pass",
+            "참고 관찰만 있으면 최종 검토 결과를 낮추지 않는다",
+            "구조화 출력이 실패한 검토자가 있으면 pass 금지",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
