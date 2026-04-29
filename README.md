@@ -38,7 +38,7 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `confluence-export-kit` | `0.3.1` | Confluence export 및 local export-index workflow. auth/export 기본값 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export` | [README](./confluence-export-kit/README.md) |
-| `product-team-kit` | `0.4.5` | 기획 입력을 기능설계서와 정책서 초안으로 정리하고, 초안 폴더 단위로 기능설계서와 정책서를 함께 검토해 발행 전 근거·결정 범위·실행 가능성을 확인합니다. | `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
+| `product-team-kit` | `0.4.6` | 기획 입력을 기능설계서와 정책서 초안으로 정리하고, 초안 폴더 단위로 기능설계서와 정책서를 함께 검토해 발행 전 근거·결정 범위·실행 가능성을 확인합니다. | `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
 | `diagram-design` | `1.0.1` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.0` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.0` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |

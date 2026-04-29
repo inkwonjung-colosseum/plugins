@@ -15,7 +15,7 @@ The plugin does not directly include network code or Confluence write instructio
 
 Expected write operations:
 
-- Create or update local draft files under `planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/`.
+- Create or update local draft files under `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`.
 
 The plugin instructions prohibit modifying local exported Markdown.
 

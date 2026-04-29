@@ -15,7 +15,7 @@ argument-hint: "<초안 폴더 또는 기능설계서/정책서 파일경로>"
 - Claude Code: `/product-team-kit:plan-review <초안 폴더 또는 기능설계서/정책서 파일경로>`
 - Codex: `$plan-review <초안 폴더 또는 기능설계서/정책서 파일경로>`
 
-예시: `/product-team-kit:plan-review planning/drafts/결제기능--YYYY-MM-DD-HHMMSS/`
+예시: `/product-team-kit:plan-review planning/결제기능--YYYY-MM-DD-HHMMSS/`
 
 초안 폴더를 받으면 기능설계서와 정책서를 함께 검토한다. 단일 파일을 받으면 지정 파일을 검토하되, 같은 폴더에 짝이 되는 기능설계서 또는 정책서가 있으면 함께 읽어 역할명·범위·정책 기준이 두 문서에서 충돌하지 않는지 확인한다.
 

@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.5 구조 테스트
+product-team-kit v0.4.6 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_5(self):
-        self.assertEqual(self._claude()["version"], "0.4.5")
-        self.assertEqual(self._codex()["version"], "0.4.5")
+    def test_version_is_0_4_6(self):
+        self.assertEqual(self._claude()["version"], "0.4.6")
+        self.assertEqual(self._codex()["version"], "0.4.6")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.5")
+        self.assertEqual(claude_entry["version"], "0.4.6")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
@@ -542,7 +542,8 @@ class TestDocs(unittest.TestCase):
 
     def test_policy_docs_reflect_draft_folder_path(self):
         privacy = read_text(os.path.join(DOCS, "privacy-policy.md"))
-        self.assertIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", privacy)
+        self.assertIn("planning/[안전기능명]--YYYY-MM-DD-HHMMSS/", privacy)
+        self.assertNotIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", privacy)
         self.assertNotIn("planning/[기능명]/", privacy)
 
     def test_root_readme_reflects_pair_review_contract(self):
@@ -636,17 +637,17 @@ class TestPlanFormatSkill(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
-    def test_conditional_mermaid_visualization_contract_documented(self):
+    def test_proactive_mermaid_visualization_contract_documented(self):
         content = self._content()
         for phrase in [
-            "조건부 보조 시각화",
+            "적극적 보조 시각화",
             "Mermaid",
-            "템플릿에는 Mermaid 섹션을 상시 추가하지 않는다",
+            "표시 가능한 흐름, 상태 전이, 승인/차단/예외 분기, 관계 구조가 있으면 Mermaid를 기본적으로 추가",
             "새 사실을 만들지 않는다",
             "표나 본문과 1:1로 대응",
             "기능설계서 `3. 진입점과 사용자 흐름`",
             "정책서 `6. 상태 및 처리 기준`",
-            "문서당 최대 1개",
+            "문서당 Mermaid 개수는 1개로 제한하지 않는다",
             "Mermaid와 표/본문 불일치 여부",
         ]:
             with self.subTest(phrase=phrase):
@@ -760,12 +761,11 @@ class TestPlanFormatSkill(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)
 
-    def test_style_guide_documents_conditional_mermaid_boundary(self):
+    def test_style_guide_documents_proactive_mermaid_boundary(self):
         content = read_text(os.path.join(DOCS, "style-guide.md"))
         for phrase in [
             "Mermaid",
-            "조건부 보조 시각화",
-            "템플릿 기본 섹션으로 강제하지 않는다",
+            "표시 가능한 흐름, 상태, 분기, 관계 구조가 있으면 기본적으로 추가",
             "새 사실을 만들지 않는다",
             "표나 본문과 불일치하면 제거하거나 수정한다",
         ]:
@@ -792,9 +792,10 @@ class TestPlanFormatSkill(unittest.TestCase):
 
     def test_plan_format_review_next_step_targets_draft_folder(self):
         content = self._content()
-        self.assertIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
-        self.assertIn("다음 단계: /product-team-kit:plan-review planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
+        self.assertIn("planning/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
+        self.assertIn("다음 단계: /product-team-kit:plan-review planning/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
         self.assertIn("기능설계서와 정책서를 함께 검토", content)
+        self.assertNotIn("planning/drafts/[안전기능명]--YYYY-MM-DD-HHMMSS/", content)
         self.assertNotIn("다음 단계: /product-team-kit:plan-review planning/[추출기능명]/[추출기능명]_기능설계서.md", content)
 
     def test_plan_format_slug_contract_documented(self):
