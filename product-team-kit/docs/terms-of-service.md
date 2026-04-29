@@ -8,7 +8,7 @@ Use this plugin to:
 
 - Draft 기능설계서 and 정책서 documents from user-provided planning input.
 - Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
-- Review drafts before publishing through a separate external process.
+- Review draft evidence, decision scope, and execution readiness before publishing through a separate external process.
 
 ## Limitations
 
@@ -18,7 +18,7 @@ Use this plugin to:
 
 ## Publishing Rules
 
-This plugin does not publish directly to Confluence. If a draft includes `[미정]`, `[가정]`, confirmation questions, or conflict warnings, users should run `plan-review` and resolve or explicitly accept those items before using the draft in a publishing process.
+This plugin does not publish directly to Confluence. If a draft includes `[미정]`, `[가정]`, confirmation questions, conflict warnings, decision-scope gaps, or execution-readiness gaps, users should run `plan-review` and resolve or explicitly accept those items before using the draft in a publishing process.
 
 ## No Warranty
 

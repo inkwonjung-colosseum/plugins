@@ -1,5 +1,5 @@
 """
-product-team-kit v0.4.1 구조 테스트
+product-team-kit v0.4.2 구조 테스트
 """
 
 import json
@@ -176,9 +176,9 @@ class TestManifests(unittest.TestCase):
     def _codex(self):
         return load_json(CODEX_PLUGIN)
 
-    def test_version_is_0_4_1(self):
-        self.assertEqual(self._claude()["version"], "0.4.1")
-        self.assertEqual(self._codex()["version"], "0.4.1")
+    def test_version_is_0_4_2(self):
+        self.assertEqual(self._claude()["version"], "0.4.2")
+        self.assertEqual(self._codex()["version"], "0.4.2")
 
     def test_name_is_product_team_kit(self):
         self.assertEqual(self._claude()["name"], "product-team-kit")
@@ -212,7 +212,7 @@ class TestManifests(unittest.TestCase):
         claude_plugins = load_json(CLAUDE_MARKETPLACE)["plugins"]
         claude_entry = next(p for p in claude_plugins if p["name"] == "product-team-kit")
         self.assertEqual(claude_entry["source"], "./product-team-kit")
-        self.assertEqual(claude_entry["version"], "0.4.1")
+        self.assertEqual(claude_entry["version"], "0.4.2")
 
         codex_plugins = load_json(CODEX_MARKETPLACE)["plugins"]
         codex_entry = next(p for p in codex_plugins if p["name"] == "product-team-kit")
@@ -669,7 +669,7 @@ class TestPlanFormatSkill(unittest.TestCase):
         for phrase in [
             "formatting 중심",
             "초안 생성 가능성 검증",
-            "Confluence 검증은 plan-review",
+            "Confluence 근거 검증은 plan-review",
             "확인 필요 질문",
         ]:
             with self.subTest(phrase=phrase):
@@ -705,7 +705,7 @@ class TestPlanReviewSkill(unittest.TestCase):
 
     def test_three_perspectives_documented(self):
         content = self._content()
-        for perspective in ["근거", "범위", "실행"]:
+        for perspective in ["근거", "결정·범위", "실행·검증 가능성"]:
             self.assertIn(perspective, content, f"plan-review SKILL.md에 관점 '{perspective}' 없음")
 
     def test_optional_documented(self):
@@ -723,8 +723,14 @@ class TestPlanReviewSkill(unittest.TestCase):
     def test_agent_description_matches_three_perspectives(self):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))
         self.assertIn("3개 관점", content)
-        self.assertIn("근거·범위·실행", content)
+        self.assertIn("근거 / 결정·범위 / 실행·검증 가능성", content)
         self.assertNotIn("템플릿 준수", content)
+
+    def test_review_gate_uses_canonical_role_names(self):
+        content = read_text(skill_path("plan-review", "references", "review-gate.md"))
+        for role in ["근거 reviewer", "결정·범위 reviewer", "실행·검증 가능성 reviewer"]:
+            with self.subTest(role=role):
+                self.assertIn(role, content)
 
     def test_fresh_context_reviewer_is_required(self):
         content = self._content()
@@ -742,8 +748,8 @@ class TestPlanReviewSkill(unittest.TestCase):
         for phrase in [
             "parallel fresh-context reviewers",
             "근거 reviewer",
-            "범위 reviewer",
-            "실행 reviewer",
+            "결정·범위 reviewer",
+            "실행·검증 가능성 reviewer",
             "공통 입력 패키지",
             "최종 verdict",
         ]:
@@ -751,15 +757,40 @@ class TestPlanReviewSkill(unittest.TestCase):
                 self.assertIn(phrase, content)
 
     def test_plan_review_does_not_include_template_reviewer(self):
-        content = self._content()
+        content = "\n".join(
+            [
+                self._content(),
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+                read_text(os.path.join(DOCS, "quality-rubric.md")),
+                read_text(os.path.join(BASE, "README.md")),
+                read_text(os.path.join(DOCS, "examples.md")),
+                read_text(skill_path("plan-review", "agents", "openai.yaml")),
+            ]
+        )
         for phrase in [
             "템플릿 reviewer",
             "템플릿 준수",
             "Template completeness reviewer",
             "template completeness",
+            "required sections",
+            "conditional required sections",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, content)
+
+    def test_plan_review_contract_excludes_api_spec_review(self):
+        content = "\n".join(
+            [
+                self._content(),
+                read_text(skill_path("plan-review", "references", "review-gate.md")),
+                read_text(os.path.join(DOCS, "quality-rubric.md")),
+            ]
+        )
+        self.assertNotIn("API 누락", content)
+        self.assertNotIn("APIs, data fields", content)
+        for phrase in ["업무 연동 경계", "업무 데이터", "외부 채널", "실패 대응", "운영 영향"]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
 
     def test_agent_description_mentions_parallel_reviewers(self):
         content = read_text(skill_path("plan-review", "agents", "openai.yaml"))
@@ -795,6 +826,21 @@ class TestReferences(unittest.TestCase):
             "conditional pass",
             "fresh-context reviewer",
             "more conservative verdict",
+        ]:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, content)
+
+    def test_plan_review_gate_confluence_evidence_contract(self):
+        content = read_text(skill_path("plan-review", "references", "review-gate.md"))
+        for phrase in [
+            ".confluence-index/registry.json",
+            "source-index.jsonl",
+            "tree.md",
+            "raw exported Markdown path",
+            "source-id",
+            "current/draft/archive",
+            "stale",
+            "metadata unavailable",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, content)

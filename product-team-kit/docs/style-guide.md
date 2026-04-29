@@ -8,7 +8,7 @@
 - `plan-format`은 생성 전 `Draftability gate`로 초안 생성 가능성을 점검하고, 통과한 입력만 템플릿에 맞게 formatting한다.
 - `plan-format`은 입력 해석과 공통 planning brief 확정은 순차로 처리하고, 기능설계서/정책서 본문 작성만 병렬화한다.
 - `plan-format`은 Confluence 검색이나 index 조회를 수행하지 않는다.
-- Confluence 검증과 발행 전 판단은 `plan-review`에서 수행한다.
+- Confluence 근거 검증과 발행 전 결정·실행 가능성 판단은 `plan-review`에서 수행한다.
 - 기획자가 결정해야 하는 기능 동작, 조건, 예외를 표로 정리한다.
 
 ## 표현
@@ -28,7 +28,7 @@
 
 ## 초안 출력 문구
 
-초안 출력에는 생성 전 판단인 `Draftability gate`만 포함한다. 발행 전 판단은 `plan-review`에서 수행한다.
+초안 출력에는 생성 전 판단인 `Draftability gate`만 포함한다. 발행 전 근거·결정·실행 가능성 판단은 `plan-review`에서 수행한다.
 
 입력이 부족하면 파일을 만들지 않고 저장 보류를 출력한다.
 

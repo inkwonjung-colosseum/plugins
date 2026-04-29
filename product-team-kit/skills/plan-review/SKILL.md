@@ -1,12 +1,12 @@
 ---
 name: plan-review
-description: "Review a 기능설계서 or 정책서 file from plan-format for evidence, scope, and implementation readiness before external publishing."
+description: "Review a 기능설계서 or 정책서 file from plan-format for evidence, decision scope, and execution readiness before external publishing."
 argument-hint: "<파일경로>"
 ---
 
 # plan-review
 
-`/product-team-kit:plan-format`으로 저장한 초안 파일을 3개 관점으로 검토하는 선택 스킬.
+`/product-team-kit:plan-format`으로 저장한 초안 파일을 3개 관점으로 검토하는 선택 스킬. `plan-review`는 템플릿 구조 검증 도구가 아니라 발행 전 근거·결정·실행 가능성 검토 도구다.
 
 검토 신뢰성을 위해 `plan-review`는 항상 **parallel fresh-context reviewers**를 사용한다. 새 검증 에이전트 3개가 지정 파일과 근거 문서를 직접 읽어 각 관점별 verdict를 내리고, 현재 대화 컨텍스트는 결과 취합과 명백한 누락 확인에만 사용한다.
 
@@ -31,13 +31,15 @@ argument-hint: "<파일경로>"
 - 기존 Confluence 문서 내용과 충돌하는 부분이 있는가?
 - `[가정]` 태그가 붙은 항목 중 실제로 확인이 필요한 것은 무엇인가?
 
-### ② 범위
+### ② 결정·범위
 - 이 문서에서 결정해야 할 사항이 모두 담겼는가?
-- `[미정]` 항목이 남아 있는가?
+- `[미정]` 항목마다 결정 주체나 후속 액션이 있는가?
+- 관련 정책서/기능설계서 trace 연결이 필요한데 빠진 곳은 없는가?
 
-### ③ 실행
-- 개발팀이 이 문서만 보고 구현을 시작할 수 있는가?
+### ③ 실행·검증 가능성
+- 개발·운영·QA가 이 문서만 보고 같은 판단을 할 수 있는가?
 - 모호한 조건, 정의되지 않은 상태, 누락된 예외 케이스가 있는가?
+- 업무 연동 경계, 업무 데이터, 외부 채널, 실패 대응, 운영 영향이 필요한 수준으로 드러나는가?
 
 ## parallel fresh-context reviewers 절차
 
@@ -49,9 +51,9 @@ argument-hint: "<파일경로>"
    - 담당 reviewer 역할과 관점 범위
 3. 새 검증 에이전트 3개를 생성해 각각 `fresh-context reviewer`로 지정한다.
 4. reviewer 3개를 병렬로 실행한다.
-   - 근거 reviewer: 기존 Confluence 원문과의 충돌, unsupported assumption, `[가정]`의 publish 영향 확인
-   - 범위 reviewer: `[미정]`, 결정 누락, 지원 문서 타입 확인
-   - 실행 reviewer: 개발·운영 착수 가능성, 모호한 조건, 상태·예외·권한·API 누락 확인
+   - 근거 reviewer: 기존 Confluence 원문과의 충돌, unsupported assumption, `[가정]`, stale/archive 근거의 publish 영향 확인
+   - 결정·범위 reviewer: `[미정]`, 결정 누락, 결정 주체/후속 액션, 적용/비적용/예외 범위, 관련 정책서/기능설계서 trace 연결 확인
+   - 실행·검증 가능성 reviewer: 개발·운영·QA 착수 가능성, 모호한 조건, 상태·예외·권한, 업무 연동 경계, 업무 데이터, 외부 채널, 실패 대응, 운영 영향 확인
 5. 각 reviewer는 검토 대상 파일을 직접 읽고, 초안에 명시된 관련 문서와 필요한 최소 Confluence 원문만 추가로 읽는다.
 6. 각 reviewer는 현재 대화 컨텍스트를 근거로 사용하지 않는다. 대화에서 알게 된 배경, 의도, 작성 당시 판단은 파일 또는 근거 문서에 없으면 `[미정]` 또는 unsupported assumption으로 본다.
 7. 각 reviewer는 `pass`, `conditional pass`, `수정 필요` 중 하나를 role verdict로 낸다.
@@ -72,11 +74,11 @@ argument-hint: "<파일경로>"
 검증 방식: parallel fresh-context reviewers
 검토 대상: [파일경로]
 읽은 근거 문서:
-- [문서명 또는 파일경로]
+- source-id: [source-id 또는 metadata unavailable] / raw exported Markdown path: [파일경로] / status: [current/draft/archive 또는 metadata unavailable] / stale: [yes/no/metadata unavailable]
 관점별 verdict:
 - 근거 reviewer: pass
-- 범위 reviewer: pass
-- 실행 reviewer: pass
+- 결정·범위 reviewer: pass
+- 실행·검증 가능성 reviewer: pass
 
 팀의 외부 발행 절차에 따라 Confluence 반영 여부를 결정하세요.
 ```
@@ -88,11 +90,11 @@ argument-hint: "<파일경로>"
 검증 방식: parallel fresh-context reviewers
 검토 대상: [파일경로]
 읽은 근거 문서:
-- [문서명 또는 파일경로]
+- source-id: [source-id 또는 metadata unavailable] / raw exported Markdown path: [파일경로] / status: [current/draft/archive 또는 metadata unavailable] / stale: [yes/no/metadata unavailable]
 관점별 verdict:
 - 근거 reviewer: [pass / conditional pass]
-- 범위 reviewer: [pass / conditional pass]
-- 실행 reviewer: [pass / conditional pass]
+- 결정·범위 reviewer: [pass / conditional pass]
+- 실행·검증 가능성 reviewer: [pass / conditional pass]
 
 [조건]: [발행 전에 기획자가 명시적으로 확인해야 할 내용]
 
@@ -106,11 +108,11 @@ argument-hint: "<파일경로>"
 검증 방식: parallel fresh-context reviewers
 검토 대상: [파일경로]
 읽은 근거 문서:
-- [문서명 또는 파일경로]
+- source-id: [source-id 또는 metadata unavailable] / raw exported Markdown path: [파일경로] / status: [current/draft/archive 또는 metadata unavailable] / stale: [yes/no/metadata unavailable]
 관점별 verdict:
 - 근거 reviewer: [pass / conditional pass / 수정 필요]
-- 범위 reviewer: [pass / conditional pass / 수정 필요]
-- 실행 reviewer: [pass / conditional pass / 수정 필요]
+- 결정·범위 reviewer: [pass / conditional pass / 수정 필요]
+- 실행·검증 가능성 reviewer: [pass / conditional pass / 수정 필요]
 
 [관점]: [이유]
 → [수정 포인트]
@@ -124,7 +126,7 @@ argument-hint: "<파일경로>"
 ## 규칙
 
 - 검토는 지정한 파일을 parallel fresh-context reviewers가 직접 읽어서 수행한다
-- 3개 reviewer는 근거 reviewer, 범위 reviewer, 실행 reviewer로 나눈다
+- 3개 reviewer는 근거 reviewer, 결정·범위 reviewer, 실행·검증 가능성 reviewer로 나눈다
 - 로컬 Confluence 파일을 추가로 읽어 근거를 확인할 수 있다
 - 수정이 필요한 경우 직접 수정하지 않는다. 수정 포인트만 제시한다
 - 현재 대화 컨텍스트를 근거로 사용하지 않는다

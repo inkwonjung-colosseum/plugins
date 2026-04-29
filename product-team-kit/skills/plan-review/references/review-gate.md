@@ -14,26 +14,39 @@ Use this reference to decide whether a `plan-format` output is ready for externa
 
 The current conversation is not evidence. If a fact is only known from conversation context and is absent from the draft or selected source files, treat it as missing evidence.
 
+## Confluence Evidence Selection
+
+When a reviewer needs local Confluence evidence, use the repo reading rule:
+
+1. Start from `.confluence-index/registry.json` to choose the relevant export source.
+2. Read `.confluence-index/sources/<source-id>/source-index.jsonl` to locate candidate pages and metadata.
+3. Use `.confluence-index/sources/<source-id>/tree.md` to understand the source hierarchy.
+4. Select the smallest relevant raw exported Markdown file for the concrete claim being checked.
+5. Read the raw exported Markdown before making claims.
+
+Do not load a whole exported space. Treat local exported Markdown as a read-only snapshot of Confluence. If the index or page metadata is missing, report `metadata unavailable` and do not infer status or freshness.
+
 ## Reviewer Roles
 
-### Evidence reviewer
+### 근거 reviewer (Evidence reviewer)
 
 Checks source support, Confluence conflicts, unsupported assumptions, stale evidence, and `[가정]` items that affect publish readiness.
 
-### Scope reviewer
+### 결정·범위 reviewer (Decision-scope reviewer)
 
-Checks remaining `[미정]` items, missing decisions, affected cases, and unsupported document types.
+Checks remaining `[미정]` items, missing decisions, decision owner or follow-up action, affected and excluded cases, unsupported document types, and related 정책서/기능설계서 trace links.
 
-### Implementation readiness reviewer
+### 실행·검증 가능성 reviewer (Execution-readiness reviewer)
 
-Checks whether development or operations can act on the draft without conversation memory, including conditions, states, exceptions, permissions, APIs, data fields, and QA specificity when relevant.
+Checks whether development, operations, and QA can act on the draft without conversation memory, including conditions, states, exceptions, permissions, business integration boundaries, business data, external channels, failure handling, operational impact, and acceptance criteria / confirmation criteria when relevant.
 
 ## Required Reviewer Output
 
 - Review method: `parallel fresh-context reviewer`.
 - Reviewer role.
 - Target file path.
-- Evidence files read.
+- Evidence files read, including `source-id`, `raw exported Markdown path`, `current/draft/archive` status, and `stale` assessment for each local Confluence source.
+- Use `metadata unavailable` when source metadata, document status, or freshness cannot be verified from the local export.
 - Findings for the assigned role.
 - Role verdict: `pass`, `conditional pass`, or `수정 필요`.
 - Minimum required changes or confirmation condition, when applicable.

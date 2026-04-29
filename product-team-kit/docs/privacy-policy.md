@@ -11,7 +11,7 @@ The plugin instructions guide the host agent to read:
 
 ## Data Written
 
-The plugin does not directly include network code or Confluence write instructions in the current `plan-format` workflow. `plan-format` does not validate Confluence conflicts; `plan-review` performs that review step.
+The plugin does not directly include network code or Confluence write instructions in the current `plan-format` workflow. `plan-format` does not validate Confluence conflicts; `plan-review` reviews evidence, decision scope, and execution readiness before external publishing.
 
 Expected write operations:
 
@@ -23,7 +23,7 @@ The plugin instructions prohibit modifying local exported Markdown.
 
 Before using generated drafts as publish-ready material, users should check:
 
-- Review gate status for `[미정]`, `[가정]`, and confirmation questions.
+- Review gate status for `[미정]`, `[가정]`, confirmation questions, and decision-scope or execution-readiness gaps.
 - Source freshness of the local Confluence export.
 - Team approval requirements outside this plugin.
 
