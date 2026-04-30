@@ -55,6 +55,10 @@ $plan-review planning/주문취소--YYYY-MM-DD-HHMMSS/
 
 결과는 `pass`, `conditional pass`, `수정 필요` 중 하나다.
 
+- `pass`: 팀의 Confluence 반영 또는 외부 공유 절차로 넘길 수 있다.
+- `conditional pass`: 확인 조건을 기획자가 명시적으로 수용한 뒤 반영 절차로 넘긴다.
+- `수정 필요`: 초안을 수정하고 같은 폴더로 `plan-review`를 다시 실행한다.
+
 ## 파일 입력
 
 ```text

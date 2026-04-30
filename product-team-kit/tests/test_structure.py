@@ -556,12 +556,7 @@ class TestDocs(unittest.TestCase):
 
     def test_diagrams_do_not_use_old_internal_terms(self):
         diagram_dir = os.path.join(WORKSPACE_ROOT, "docs", "diagrams")
-        for name in [
-            "product-team-kit-workflow.html",
-            "planning-confluence-document-workflow.html",
-            "planning-confluence-document-workflow-overview.html",
-            "planning-confluence-document-workflow-v2.html",
-        ]:
+        for name in sorted(name for name in os.listdir(diagram_dir) if name.endswith(".html")):
             content = read_text(os.path.join(diagram_dir, name))
             for phrase in ["Draftability gate", "fresh-context", "parallel reviewers", "verdict", "plan-review (선택)"]:
                 with self.subTest(name=name, phrase=phrase):

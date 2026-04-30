@@ -50,7 +50,8 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 | 다이어그램 | 설명 |
 |---|---|
 | [`confluence-export-kit-workflow.html`](./docs/diagrams/confluence-export-kit-workflow.html) | `set-config`의 고정 export 기본값, export scope 선택, `cme` 실행, 자동 `index-export` 흐름 |
-| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format` 단일 패스 초안 생성과 `plan-review`의 초안 폴더 단위 근거 / 결정·범위 / 실행·검증 가능성 검토 흐름 |
+| [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence 원본, 로컬 읽기 전용 스냅샷, 기획 초안, `plan-review`, 사람의 반영 절차를 분리한 문서 운영 흐름 |
+| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`의 생성 가능성 판단, 저장 보류, 기능설계서·정책서 초안 저장, `plan-review` 재검토 루프와 팀 handoff 흐름 |
 | [`diagram-design-workflow.html`](./docs/diagrams/diagram-design-workflow.html) | `diagram-design`의 타입 선택, style guide gate, taste gate 기반 HTML/SVG 생성 흐름 |
 
 ## 사용 문법
