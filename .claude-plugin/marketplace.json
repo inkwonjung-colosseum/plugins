@@ -12,7 +12,7 @@
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
       "description": "Confluence 문서를 Markdown으로 내보내고 로컬 export-index를 만드는 도구입니다. 인증/기본값 설정, 페이지·스페이스·조직·하위 페이지 export, 자동 인덱싱을 지원합니다.",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },

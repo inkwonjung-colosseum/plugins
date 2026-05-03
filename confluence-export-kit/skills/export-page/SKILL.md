@@ -1,6 +1,6 @@
 ---
 name: export-page
-description: "Export one or more Confluence pages by URL. Usage: /confluence-export-kit:export-page <page-url> [<page-url> ...]"
+description: "하나 이상의 Confluence 페이지를 URL로 내보냅니다. 사용법: /confluence-export-kit:export-page <page-url> [<page-url> ...]"
 argument-hint: "<page-url> [<page-url> ...]"
 ---
 

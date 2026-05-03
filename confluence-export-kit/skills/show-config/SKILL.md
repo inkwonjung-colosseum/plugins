@@ -1,6 +1,6 @@
 ---
 name: show-config
-description: Show the current confluence-markdown-exporter configuration by running cme config list. Add --json to output JSON format.
+description: "cme config list로 현재 confluence-markdown-exporter 설정을 표시합니다. JSON 형식으로 출력하려면 --json을 추가하세요."
 ---
 
 # Show Config

@@ -11,7 +11,7 @@ PLUGIN_ROOT = WORKSPACE_ROOT / "confluence-export-kit"
 SUPPORTED_FEATURES_DOC = (
     PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md"
 )
-EXPECTED_PLUGIN_VERSION = "0.3.1"
+EXPECTED_PLUGIN_VERSION = "0.3.2"
 
 
 class CurrentDocumentationStateTests(unittest.TestCase):
@@ -197,8 +197,8 @@ class CurrentDocumentationStateTests(unittest.TestCase):
         ).read_text()
         codex_manifest = (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text()
 
-        self.assertIn("one or more Confluence spaces", export_space)
-        self.assertIn("one or more Confluence instances", export_org)
+        self.assertIn("하나 이상의 Confluence 스페이스", export_space)
+        self.assertIn("하나 이상의 Confluence 인스턴스", export_org)
         self.assertIn("<page-url> [<page-url> ...]", export_page_with_descendant)
         self.assertNotIn("<page-url-1> <page-url-2>", export_page)
         self.assertNotIn("<page-url> and <page-url>", codex_manifest)

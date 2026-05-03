@@ -1,8 +1,8 @@
 interface:
   display_name: "Index Confluence Export"
-  short_description: "Background indexer for completed Confluence exports."
+  short_description: "완료된 Confluence export를 인덱싱하는 백그라운드 도우미입니다."
   brand_color: "#0052CC"
-  default_prompt: "Internal helper: index-export is invoked automatically by export skills after successful cme export."
+  default_prompt: "내부 도우미: index-export는 cme export 성공 후 export skill에서 자동으로 실행됩니다."
 
 policy:
   allow_implicit_invocation: false

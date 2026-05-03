@@ -1,6 +1,6 @@
 ---
 name: set-config
-description: "Set confluence-export-kit auth and export defaults. Usage: /confluence-export-kit:set-config --api-key <api-key> --email <email> [--url <base-url>]"
+description: "confluence-export-kit 인증과 export 기본값을 설정합니다. 사용법: /confluence-export-kit:set-config --api-key <api-key> --email <email> [--url <base-url>]"
 argument-hint: "--api-key <api-key> --email <email> [--url <base-url>]"
 ---
 

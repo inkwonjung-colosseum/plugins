@@ -1,8 +1,8 @@
 interface:
   display_name: "Set Confluence Export Config"
-  short_description: "Configure Confluence auth and fixed export defaults for confluence-export-kit."
+  short_description: "confluence-export-kit의 Confluence 인증과 고정 export 기본값을 설정합니다."
   brand_color: "#0052CC"
-  default_prompt: "Set my Confluence API key and export defaults for confluence-export-kit."
+  default_prompt: "confluence-export-kit에서 사용할 Confluence API 키와 export 기본값을 설정하세요."
 
 policy:
   allow_implicit_invocation: true

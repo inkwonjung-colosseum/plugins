@@ -1,6 +1,6 @@
 ---
 name: export-space
-description: "Export all pages in one or more Confluence spaces. Usage: /confluence-export-kit:export-space <space-url> [<space-url> ...]"
+description: "하나 이상의 Confluence 스페이스의 모든 페이지를 내보냅니다. 사용법: /confluence-export-kit:export-space <space-url> [<space-url> ...]"
 argument-hint: "<space-url> [<space-url> ...]"
 ---
 

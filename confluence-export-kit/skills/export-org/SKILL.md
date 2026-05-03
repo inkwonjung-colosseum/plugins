@@ -1,6 +1,6 @@
 ---
 name: export-org
-description: "Export all spaces/pages under one or more Confluence orgs. Usage: /confluence-export-kit:export-org <org-url> [<org-url> ...]"
+description: "하나 이상의 Confluence 조직 아래 모든 스페이스와 페이지를 내보냅니다. 사용법: /confluence-export-kit:export-org <org-url> [<org-url> ...]"
 argument-hint: "<org-url> [<org-url> ...]"
 ---
 

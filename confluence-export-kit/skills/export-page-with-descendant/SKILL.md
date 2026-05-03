@@ -1,6 +1,6 @@
 ---
 name: export-page-with-descendant
-description: "Export one or more Confluence pages with descendants. Usage: /confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...]"
+description: "하나 이상의 Confluence 페이지와 그 하위 페이지를 함께 내보냅니다. 사용법: /confluence-export-kit:export-page-with-descendant <page-url> [<page-url> ...]"
 argument-hint: "<page-url> [<page-url> ...]"
 ---
 

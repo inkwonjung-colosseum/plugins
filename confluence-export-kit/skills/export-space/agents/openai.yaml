@@ -1,8 +1,8 @@
 interface:
   display_name: "Export Confluence Space"
-  short_description: "Export one or more Confluence spaces (all pages, attachments, hierarchy) to local Markdown."
+  short_description: "하나 이상의 Confluence 스페이스를 모든 페이지, 첨부파일, 계층 정보와 함께 로컬 Markdown으로 내보냅니다."
   brand_color: "#0052CC"
-  default_prompt: "Export the Confluence spaces at <space-url> [<space-url> ...] to ./confluence."
+  default_prompt: "다음 Confluence 스페이스를 ./confluence로 내보내세요: <space-url> [<space-url> ...]"
 
 policy:
   allow_implicit_invocation: true

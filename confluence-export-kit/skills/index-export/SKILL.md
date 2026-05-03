@@ -1,6 +1,6 @@
 ---
 name: index-export
-description: "Background workflow for indexing local Markdown files that were already exported from Confluence; export skills run it automatically after successful cme export."
+description: "이미 Confluence에서 내보낸 로컬 Markdown 파일을 인덱싱하는 백그라운드 워크플로입니다. export skill이 cme export 성공 후 자동으로 실행합니다."
 argument-hint: "<export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]"
 ---
 
