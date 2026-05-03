@@ -1,0 +1,178 @@
+{
+  "workflow": {
+    "nodes": {
+      "input": {
+        "title": "기획 입력",
+        "lines": ["아이디어, 노트, 파일, AI 대화 결과물"]
+      },
+      "draft": {
+        "title": "plan-draft",
+        "lines": ["핵심 모호함 질문", "최대 3라운드"]
+      },
+      "draft_artifact": {
+        "title": "_기획초안.md",
+        "lines": ["planning/[name]--timestamp/", "재실행 맥락 optional"]
+      },
+      "format": {
+        "title": "plan-format",
+        "lines": ["기능설계서/정책서 formatter", "인터뷰하지 않음"]
+      },
+      "format_gate": {
+        "title": "초안 생성 가능?",
+        "lines": ["목적, 대상, 행동, 정책 충족 여부"]
+      },
+      "format_hold": {
+        "title": "저장 보류",
+        "lines": ["재실행 상태: format-insufficient-hold", "$plan-draft 보완 안내"]
+      },
+      "terminal_hold": {
+        "title": "사용자 결정 필요",
+        "lines": ["재실행 상태: format-after-draft-insufficient", "자동 plan-draft 재안내 금지"]
+      },
+      "draft_pair": {
+        "title": "기능설계서 + 정책서 초안",
+        "lines": ["atomic write 후 같은 폴더 저장", "기존 산출물 덮어쓰기 금지"]
+      },
+      "review": {
+        "title": "plan-review",
+        "lines": ["Project Docs SSOT 근거 패키지", "3 관점 보수 합성"]
+      },
+      "evidence": {
+        "title": "근거 경계",
+        "lines": ["planning/은 SSOT 근거 제외", "linked local resource만 확인"]
+      },
+      "review_gate": {
+        "title": "검토 결과",
+        "lines": ["수정 필요 > conditional pass > pass"]
+      },
+      "repair": {
+        "title": "review_repair",
+        "lines": ["P0/P1 수정 작업 블록", "초안 수정 후 같은 경로 재검토"]
+      },
+      "publish": {
+        "title": "publish_readiness",
+        "lines": ["pass 또는 conditional pass에서만 출력", "readiness checklist only"]
+      },
+      "handoff": {
+        "title": "팀의 반영 절차",
+        "lines": ["사람이 외부 반영", "plan-review는 publish하지 않음"]
+      }
+    },
+    "invariants": [
+      "plan-format은 인터뷰하지 않는다.",
+      "Project Docs SSOT 근거 검증은 plan-review 책임이다.",
+      "planning/ 산출물은 review target이지 SSOT 근거가 아니다.",
+      "plan-review는 외부 시스템에 직접 publish하지 않는다."
+    ]
+  },
+  "views": {
+    "overview": {
+      "output": "product-team-kit-workflow.html",
+      "document_title": "product-team-kit workflow",
+      "eyebrow": "Flowchart · product-team-kit",
+      "heading": "Planning input to team handoff workflow",
+      "summary": "product-team-kit은 기획 입력을 초안으로 정리한 뒤 Project Docs SSOT 근거 기반 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
+      "svg": {
+        "width": 1180,
+        "height": 1085,
+        "min_width": 1060,
+        "title": "product-team-kit 기획 입력 검토 흐름",
+        "desc": "plan-draft는 기획초안을 만들고, plan-format은 초안 생성 가능성을 판단한다. 일반 입력 부족은 plan-draft 보완으로 연결하지만 draft artifact도 부족하면 사용자 결정 필요 terminal hold로 종료한다. plan-review는 review_repair 또는 publish_readiness를 출력하며 외부 publish는 하지 않는다."
+      },
+      "nodes": [
+        {"ref": "input", "kind": "pill", "class": "node", "x": 450, "y": 42, "w": 280, "h": 62},
+        {"ref": "draft", "kind": "box", "class": "node-soft", "x": 804, "y": 42, "w": 246, "h": 72},
+        {"ref": "draft_artifact", "kind": "box", "class": "node-store", "x": 804, "y": 150, "w": 246, "h": 72},
+        {"ref": "format", "kind": "box", "class": "node-accent", "x": 450, "y": 160, "w": 280, "h": 74},
+        {"ref": "format_gate", "kind": "decision", "class": "node", "x": 435, "y": 276, "w": 310, "h": 128},
+        {"ref": "format_hold", "kind": "box", "class": "node-soft", "x": 814, "y": 282, "w": 280, "h": 78},
+        {"ref": "terminal_hold", "kind": "box", "class": "node-warn", "x": 814, "y": 394, "w": 280, "h": 86},
+        {"ref": "draft_pair", "kind": "box", "class": "node-accent", "x": 378, "y": 462, "w": 424, "h": 78},
+        {"ref": "review", "kind": "box", "class": "node", "x": 450, "y": 596, "w": 280, "h": 74},
+        {"ref": "review_gate", "kind": "decision", "class": "node", "x": 430, "y": 714, "w": 320, "h": 122},
+        {"ref": "repair", "kind": "box", "class": "node-soft", "x": 814, "y": 720, "w": 280, "h": 82},
+        {"ref": "publish", "kind": "box", "class": "node-accent", "x": 420, "y": 872, "w": 340, "h": 72},
+        {"ref": "handoff", "kind": "pill", "class": "node-accent", "x": 430, "y": 966, "w": 320, "h": 62}
+      ],
+      "edges": [
+        {"d": "M 730 73 L 804 73", "label": "질문 필요", "label_x": 767, "label_y": 61, "label_w": 66},
+        {"d": "M 927 114 L 927 150"},
+        {"d": "M 804 186 C 742 186, 742 198, 730 198", "accent": true, "label": "_기획초안.md", "label_x": 762, "label_y": 174, "label_w": 92},
+        {"d": "M 590 104 L 590 160", "accent": true, "label": "일반 입력", "label_x": 590, "label_y": 132, "label_w": 66},
+        {"d": "M 590 234 L 590 276", "accent": true},
+        {"d": "M 745 340 L 814 321", "label": "일반 부족", "label_x": 782, "label_y": 317, "label_w": 70},
+        {"d": "M 745 372 L 814 437", "label": "draft도 부족", "label_x": 781, "label_y": 395, "label_w": 82},
+        {"d": "M 435 340 L 320 340 C 300 340, 300 78, 804 78", "dash": true, "label": "$plan-draft", "label_x": 330, "label_y": 328, "label_w": 72},
+        {"d": "M 590 404 L 590 462", "accent": true, "label": "YES", "label_x": 590, "label_y": 434, "label_w": 38},
+        {"d": "M 590 540 L 590 596", "accent": true},
+        {"d": "M 590 670 L 590 714"},
+        {"d": "M 750 775 L 814 761", "label": "수정 필요", "label_x": 788, "label_y": 749, "label_w": 70},
+        {"d": "M 814 790 C 720 842, 504 724, 500 670", "dash": true, "label": "재검토", "label_x": 706, "label_y": 824, "label_w": 54},
+        {"d": "M 590 836 L 590 872", "accent": true, "label": "pass / conditional pass", "label_x": 590, "label_y": 856, "label_w": 146},
+        {"d": "M 590 944 L 590 966", "accent": true}
+      ],
+      "notes": [
+        {"x": 72, "y": 1058, "lines": ["경계: planning/은 SSOT 근거가 아니며, publish_readiness는 외부 게시가 아니라 사람이 확인할 checklist다."]}
+      ]
+    },
+    "analysis": {
+      "output": "product-team-kit-workflow-analysis.html",
+      "document_title": "product-team-kit workflow analysis",
+      "eyebrow": "Workflow analysis · product-team-kit",
+      "heading": "기획 입력에서 팀 반영 전 검토까지",
+      "summary": "상세 view는 같은 workflow source에서 생성된다. 입력 보완, terminal hold, review_repair, publish_readiness, SSOT 근거 경계를 한 화면에서 확인한다.",
+      "svg": {
+        "width": 1260,
+        "height": 1060,
+        "min_width": 1160,
+        "title": "product-team-kit workflow analysis",
+        "desc": "기획 입력은 plan-draft 또는 plan-format으로 들어간다. plan-format은 일반 부족과 draft artifact 부족을 다르게 처리하고, plan-review는 수정 작업 블록 또는 발행 준비 증적을 출력한다. 팀 반영은 플러그인 밖의 사람 절차다."
+      },
+      "lanes": [
+        {"x": 44, "y": 58, "w": 1172, "h": 180, "label": "1. input shaping"},
+        {"x": 44, "y": 270, "w": 1172, "h": 310, "label": "2. format gate"},
+        {"x": 44, "y": 612, "w": 1172, "h": 238, "label": "3. review gate"},
+        {"x": 44, "y": 882, "w": 1172, "h": 138, "label": "4. publish readiness"}
+      ],
+      "nodes": [
+        {"ref": "input", "kind": "pill", "class": "node", "x": 88, "y": 116, "w": 230, "h": 62},
+        {"ref": "draft", "kind": "box", "class": "node-soft", "x": 424, "y": 104, "w": 238, "h": 82},
+        {"ref": "draft_artifact", "kind": "box", "class": "node-store", "x": 760, "y": 104, "w": 260, "h": 82},
+        {"ref": "format", "kind": "box", "class": "node-accent", "x": 88, "y": 330, "w": 250, "h": 82},
+        {"ref": "format_gate", "kind": "decision", "class": "node", "x": 436, "y": 310, "w": 286, "h": 132},
+        {"ref": "format_hold", "kind": "box", "class": "node-soft", "x": 820, "y": 300, "w": 310, "h": 86},
+        {"ref": "terminal_hold", "kind": "box", "class": "node-warn", "x": 820, "y": 432, "w": 310, "h": 96},
+        {"ref": "draft_pair", "kind": "box", "class": "node-accent", "x": 314, "y": 492, "w": 360, "h": 78},
+        {"ref": "evidence", "kind": "box", "class": "node-soft", "x": 754, "y": 648, "w": 330, "h": 86},
+        {"ref": "review", "kind": "box", "class": "node", "x": 180, "y": 654, "w": 280, "h": 82},
+        {"ref": "review_gate", "kind": "decision", "class": "node", "x": 176, "y": 772, "w": 288, "h": 118},
+        {"ref": "repair", "kind": "box", "class": "node-soft", "x": 570, "y": 766, "w": 300, "h": 90},
+        {"ref": "publish", "kind": "box", "class": "node-accent", "x": 430, "y": 912, "w": 360, "h": 78},
+        {"ref": "handoff", "kind": "pill", "class": "node-accent", "x": 850, "y": 920, "w": 292, "h": 64}
+      ],
+      "edges": [
+        {"d": "M 318 147 L 424 145", "label": "질문 필요", "label_x": 372, "label_y": 133, "label_w": 66},
+        {"d": "M 662 145 L 760 145"},
+        {"d": "M 213 178 L 213 330", "accent": true, "label": "충분하면 직접 format", "label_x": 213, "label_y": 256, "label_w": 116},
+        {"d": "M 890 186 C 890 246, 338 254, 288 330", "accent": true, "label": "draft artifact input", "label_x": 604, "label_y": 240, "label_w": 122},
+        {"d": "M 338 371 L 436 376", "accent": true},
+        {"d": "M 722 376 L 820 343", "label": "normal-input 부족", "label_x": 770, "label_y": 344, "label_w": 112},
+        {"d": "M 722 396 L 820 480", "label": "draft artifact 부족", "label_x": 770, "label_y": 440, "label_w": 120},
+        {"d": "M 820 343 C 710 250, 504 244, 504 186", "dash": true, "label": "1회 보완", "label_x": 690, "label_y": 270, "label_w": 62},
+        {"d": "M 579 442 L 496 492", "accent": true, "label": "생성 가능", "label_x": 536, "label_y": 468, "label_w": 68},
+        {"d": "M 494 570 C 494 622, 370 614, 330 654", "accent": true},
+        {"d": "M 674 530 C 760 580, 820 604, 900 648"},
+        {"d": "M 460 695 L 754 691"},
+        {"d": "M 320 736 L 320 772"},
+        {"d": "M 464 831 L 570 811", "label": "수정 필요", "label_x": 520, "label_y": 806, "label_w": 70},
+        {"d": "M 570 846 C 430 900, 220 780, 246 736", "dash": true, "label": "같은 경로 재검토", "label_x": 432, "label_y": 892, "label_w": 112},
+        {"d": "M 320 890 C 350 924, 384 946, 430 951", "accent": true, "label": "pass / conditional", "label_x": 350, "label_y": 916, "label_w": 116},
+        {"d": "M 790 951 L 850 952", "accent": true}
+      ],
+      "notes": [
+        {"x": 70, "y": 1000, "lines": ["보수성: draft artifact 입력도 부족하면 format-after-draft-insufficient로 종료하고 자동 plan-draft 재라우팅을 하지 않는다."]},
+        {"x": 70, "y": 1020, "lines": ["발행 경계: publish_readiness는 readiness only이며 Confluence, Project Docs SSOT, linked local resource를 자동 수정하지 않는다."]}
+      ]
+    }
+  }
+}

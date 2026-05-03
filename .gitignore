@@ -6,6 +6,8 @@ confluence/
 .confluence-index/
 planning/
 
+.obsidian/
+.claudian/
 
 .claude/
 .codex/

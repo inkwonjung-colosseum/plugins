@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<!-- Generated from product-team-kit-workflow.source.json by render_product_team_kit_workflow.py. Do not edit directly. -->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>product-team-kit workflow analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --paper: #f5f5f5;
+      --ink: #2d3142;
+      --muted: #4f5d75;
+      --soft: #7a8399;
+      --rule: rgba(45,49,66,0.13);
+      --accent: #eb6c36;
+      --warn: #b84a2b;
+      --accent-tint: rgba(235,108,54,0.08);
+      --warn-tint: rgba(184,74,43,0.08);
+      --sans: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      padding: 44px 28px;
+    }
+
+    main {
+      width: min(100%, 1260px);
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(30px, 3vw, 38px);
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin-bottom: 10px;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin-bottom: 24px;
+      max-width: 960px;
+    }
+
+    svg {
+      display: block;
+      min-width: 1160px;
+      width: 100%;
+      height: auto;
+    }
+
+    .lane { fill: rgba(45,49,66,0.025); stroke: rgba(45,49,66,0.10); stroke-width: 1; }
+    .lane-label { fill: var(--soft); font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: uppercase; }
+    .node { fill: #ffffff; stroke: var(--ink); stroke-width: 1; }
+    .node-soft { fill: rgba(45,49,66,0.02); stroke: rgba(45,49,66,0.25); stroke-width: 1; stroke-dasharray: 4 3; }
+    .node-accent { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 1.2; }
+    .node-store { fill: rgba(45,49,66,0.05); stroke: var(--muted); stroke-width: 1; }
+    .node-warn { fill: var(--warn-tint); stroke: var(--warn); stroke-width: 1.15; stroke-dasharray: 5 3; }
+    .title { fill: var(--ink); font-family: var(--sans); font-size: 13px; font-weight: 600; }
+    .sub { fill: var(--muted); font-family: var(--mono); font-size: 8.5px; }
+    .note { fill: var(--muted); font-family: var(--sans); font-size: 11px; }
+    .line { fill: none; stroke: var(--muted); stroke-width: 1.25; marker-end: url(#arrow); }
+    .line-accent { fill: none; stroke: var(--accent); stroke-width: 1.35; marker-end: url(#arrow-accent); }
+    .line-dash { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; marker-end: url(#arrow); }
+    .edge-label-bg { fill: var(--paper); }
+    .edge-label { fill: var(--muted); font-family: var(--mono); font-size: 8px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">Workflow analysis · product-team-kit</p>
+    <h1>기획 입력에서 팀 반영 전 검토까지</h1>
+    <p class="summary">상세 view는 같은 workflow source에서 생성된다. 입력 보완, terminal hold, review_repair, publish_readiness, SSOT 근거 경계를 한 화면에서 확인한다.</p>
+
+<svg viewBox="0 0 1260 1060" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">product-team-kit workflow analysis</title>
+  <desc id="desc">기획 입력은 plan-draft 또는 plan-format으로 들어간다. plan-format은 일반 부족과 draft artifact 부족을 다르게 처리하고, plan-review는 수정 작업 블록 또는 발행 준비 증적을 출력한다. 팀 반영은 플러그인 밖의 사람 절차다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#4f5d75"/>
+    </marker>
+    <marker id="arrow-accent" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#eb6c36"/>
+    </marker>
+  </defs>
+  <rect width="1260" height="1060" fill="#f5f5f5"/>
+  <rect class="lane" x="44" y="58" width="1172" height="180" rx="10"/>
+  <text class="lane-label" x="66" y="86">1. input shaping</text>
+  <rect class="lane" x="44" y="270" width="1172" height="310" rx="10"/>
+  <text class="lane-label" x="66" y="298">2. format gate</text>
+  <rect class="lane" x="44" y="612" width="1172" height="238" rx="10"/>
+  <text class="lane-label" x="66" y="640">3. review gate</text>
+  <rect class="lane" x="44" y="882" width="1172" height="138" rx="10"/>
+  <text class="lane-label" x="66" y="910">4. publish readiness</text>
+  <path class="line" d="M 318 147 L 424 145"/>
+  <rect class="edge-label-bg" x="339" y="121" width="66" height="18" rx="3"/>
+<text class="edge-label" x="372" y="133" text-anchor="middle">질문 필요</text>
+  <path class="line" d="M 662 145 L 760 145"/>
+  <path class="line-accent" d="M 213 178 L 213 330"/>
+  <rect class="edge-label-bg" x="155" y="244" width="116" height="18" rx="3"/>
+<text class="edge-label" x="213" y="256" text-anchor="middle">충분하면 직접 format</text>
+  <path class="line-accent" d="M 890 186 C 890 246, 338 254, 288 330"/>
+  <rect class="edge-label-bg" x="543" y="228" width="122" height="18" rx="3"/>
+<text class="edge-label" x="604" y="240" text-anchor="middle">draft artifact input</text>
+  <path class="line-accent" d="M 338 371 L 436 376"/>
+  <path class="line" d="M 722 376 L 820 343"/>
+  <rect class="edge-label-bg" x="714" y="332" width="112" height="18" rx="3"/>
+<text class="edge-label" x="770" y="344" text-anchor="middle">normal-input 부족</text>
+  <path class="line" d="M 722 396 L 820 480"/>
+  <rect class="edge-label-bg" x="710" y="428" width="120" height="18" rx="3"/>
+<text class="edge-label" x="770" y="440" text-anchor="middle">draft artifact 부족</text>
+  <path class="line-dash" d="M 820 343 C 710 250, 504 244, 504 186"/>
+  <rect class="edge-label-bg" x="659" y="258" width="62" height="18" rx="3"/>
+<text class="edge-label" x="690" y="270" text-anchor="middle">1회 보완</text>
+  <path class="line-accent" d="M 579 442 L 496 492"/>
+  <rect class="edge-label-bg" x="502" y="456" width="68" height="18" rx="3"/>
+<text class="edge-label" x="536" y="468" text-anchor="middle">생성 가능</text>
+  <path class="line-accent" d="M 494 570 C 494 622, 370 614, 330 654"/>
+  <path class="line" d="M 674 530 C 760 580, 820 604, 900 648"/>
+  <path class="line" d="M 460 695 L 754 691"/>
+  <path class="line" d="M 320 736 L 320 772"/>
+  <path class="line" d="M 464 831 L 570 811"/>
+  <rect class="edge-label-bg" x="485" y="794" width="70" height="18" rx="3"/>
+<text class="edge-label" x="520" y="806" text-anchor="middle">수정 필요</text>
+  <path class="line-dash" d="M 570 846 C 430 900, 220 780, 246 736"/>
+  <rect class="edge-label-bg" x="376" y="880" width="112" height="18" rx="3"/>
+<text class="edge-label" x="432" y="892" text-anchor="middle">같은 경로 재검토</text>
+  <path class="line-accent" d="M 320 890 C 350 924, 384 946, 430 951"/>
+  <rect class="edge-label-bg" x="292" y="904" width="116" height="18" rx="3"/>
+<text class="edge-label" x="350" y="916" text-anchor="middle">pass / conditional</text>
+  <path class="line-accent" d="M 790 951 L 850 952"/>
+  <rect class="node" x="88" y="116" width="230" height="62" rx="31"/>
+  <text class="title" x="203" y="144" text-anchor="middle">기획 입력</text>
+  <text class="sub" x="203" y="161" text-anchor="middle">아이디어, 노트, 파일, AI 대화 결과물</text>
+  <rect class="node-soft" x="424" y="104" width="238" height="82" rx="8"/>
+  <text class="title" x="543" y="134" text-anchor="middle">plan-draft</text>
+  <text class="sub" x="543" y="151" text-anchor="middle">핵심 모호함 질문</text>
+  <text class="sub" x="543" y="168" text-anchor="middle">최대 3라운드</text>
+  <rect class="node-store" x="760" y="104" width="260" height="82" rx="8"/>
+  <text class="title" x="890" y="134" text-anchor="middle">_기획초안.md</text>
+  <text class="sub" x="890" y="151" text-anchor="middle">planning/[name]--timestamp/</text>
+  <text class="sub" x="890" y="168" text-anchor="middle">재실행 맥락 optional</text>
+  <rect class="node-accent" x="88" y="330" width="250" height="82" rx="8"/>
+  <text class="title" x="213" y="360" text-anchor="middle">plan-format</text>
+  <text class="sub" x="213" y="377" text-anchor="middle">기능설계서/정책서 formatter</text>
+  <text class="sub" x="213" y="394" text-anchor="middle">인터뷰하지 않음</text>
+  <polygon class="node" points="579,310 722,376 579,442 436,376"/>
+  <text class="title" x="579" y="373" text-anchor="middle">초안 생성 가능?</text>
+  <text class="sub" x="579" y="390" text-anchor="middle">목적, 대상, 행동, 정책 충족 여부</text>
+  <rect class="node-soft" x="820" y="300" width="310" height="86" rx="8"/>
+  <text class="title" x="975" y="332" text-anchor="middle">저장 보류</text>
+  <text class="sub" x="975" y="349" text-anchor="middle">재실행 상태: format-insufficient-hold</text>
+  <text class="sub" x="975" y="366" text-anchor="middle">$plan-draft 보완 안내</text>
+  <rect class="node-warn" x="820" y="432" width="310" height="96" rx="8"/>
+  <text class="title" x="975" y="469" text-anchor="middle">사용자 결정 필요</text>
+  <text class="sub" x="975" y="486" text-anchor="middle">재실행 상태: format-after-draft-insufficient</text>
+  <text class="sub" x="975" y="503" text-anchor="middle">자동 plan-draft 재안내 금지</text>
+  <rect class="node-accent" x="314" y="492" width="360" height="78" rx="8"/>
+  <text class="title" x="494" y="520" text-anchor="middle">기능설계서 + 정책서 초안</text>
+  <text class="sub" x="494" y="537" text-anchor="middle">atomic write 후 같은 폴더 저장</text>
+  <text class="sub" x="494" y="554" text-anchor="middle">기존 산출물 덮어쓰기 금지</text>
+  <rect class="node-soft" x="754" y="648" width="330" height="86" rx="8"/>
+  <text class="title" x="919" y="680" text-anchor="middle">근거 경계</text>
+  <text class="sub" x="919" y="697" text-anchor="middle">planning/은 SSOT 근거 제외</text>
+  <text class="sub" x="919" y="714" text-anchor="middle">linked local resource만 확인</text>
+  <rect class="node" x="180" y="654" width="280" height="82" rx="8"/>
+  <text class="title" x="320" y="684" text-anchor="middle">plan-review</text>
+  <text class="sub" x="320" y="701" text-anchor="middle">Project Docs SSOT 근거 패키지</text>
+  <text class="sub" x="320" y="718" text-anchor="middle">3 관점 보수 합성</text>
+  <polygon class="node" points="320,772 464,831 320,890 176,831"/>
+  <text class="title" x="320" y="828" text-anchor="middle">검토 결과</text>
+  <text class="sub" x="320" y="845" text-anchor="middle">수정 필요 &gt; conditional pass &gt; pass</text>
+  <rect class="node-soft" x="570" y="766" width="300" height="90" rx="8"/>
+  <text class="title" x="720" y="800" text-anchor="middle">review_repair</text>
+  <text class="sub" x="720" y="817" text-anchor="middle">P0/P1 수정 작업 블록</text>
+  <text class="sub" x="720" y="834" text-anchor="middle">초안 수정 후 같은 경로 재검토</text>
+  <rect class="node-accent" x="430" y="912" width="360" height="78" rx="8"/>
+  <text class="title" x="610" y="940" text-anchor="middle">publish_readiness</text>
+  <text class="sub" x="610" y="957" text-anchor="middle">pass 또는 conditional pass에서만 출력</text>
+  <text class="sub" x="610" y="974" text-anchor="middle">readiness checklist only</text>
+  <rect class="node-accent" x="850" y="920" width="292" height="64" rx="32"/>
+  <text class="title" x="996" y="941" text-anchor="middle">팀의 반영 절차</text>
+  <text class="sub" x="996" y="958" text-anchor="middle">사람이 외부 반영</text>
+  <text class="sub" x="996" y="975" text-anchor="middle">plan-review는 publish하지 않음</text>
+  <text class="note" x="70" y="1000">보수성: draft artifact 입력도 부족하면 format-after-draft-insufficient로 종료하고 자동 plan-draft 재라우팅을 하지 않는다.</text>
+  <text class="note" x="70" y="1020">발행 경계: publish_readiness는 readiness only이며 Confluence, Project Docs SSOT, linked local resource를 자동 수정하지 않는다.</text>
+</svg>
+  </main>
+</body>
+</html>

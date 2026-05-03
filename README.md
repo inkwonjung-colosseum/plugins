@@ -1,6 +1,6 @@
 # COLO plugins
 
-Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs, tests를 관리합니다. 현재 이 저장소는 Claude Code와 Codex용 manifest만 제공하며, Cowork용 plugin manifest나 marketplace catalog는 포함하지 않습니다.
+Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs와 필요한 경우 tests를 관리합니다. 현재 이 저장소는 Claude Code와 Codex용 manifest만 제공하며, Cowork용 plugin manifest나 marketplace catalog는 포함하지 않습니다.
 
 ## 빠른 시작
 
@@ -27,7 +27,7 @@ Codex는 repository marketplace를 추가한 뒤 Codex 앱에서 `/plugins`를 �
 codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 ```
 
-스킬은 `$plan-format`, `$plan-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
+스킬은 `$plan-draft`, `$plan-format`, `$plan-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
@@ -38,20 +38,21 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `confluence-export-kit` | `0.3.1` | Confluence export 및 local export-index workflow. auth/export 기본값 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export` | [README](./confluence-export-kit/README.md) |
-| `product-team-kit` | `0.4.7` | 기획 입력을 기능설계서와 정책서 초안으로 정리하고, 초안 폴더 단위로 기능설계서와 정책서를 함께 검토해 발행 전 근거·결정 범위·실행 가능성을 확인합니다. | `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
+| `product-team-kit` | `0.4.8` | 핵심 모호함을 질문으로 해소하거나 명시해 기획초안을 만들고, 기획 입력을 기능설계서와 정책서 초안으로 정리하며, Project Docs SSOT 근거 패키지 기반 `plan-review`로 발행 전 근거·결정 범위·실행 가능성을 확인합니다. | `plan-draft`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
 | `diagram-design` | `1.0.1` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.0` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.0` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
 
 ## 프로젝트 다이어그램
 
-프로젝트 workflow 다이어그램은 `docs/diagrams/` 아래의 standalone HTML/SVG 파일로 관리합니다.
+프로젝트 workflow 다이어그램은 `docs/diagrams/` 아래의 standalone HTML/SVG 파일로 관리합니다. `product-team-kit` 다이어그램 2개는 `docs/diagrams/product-team-kit-workflow.source.json`에서 생성하므로 HTML을 직접 수정하지 않고 `python3 docs/diagrams/render_product_team_kit_workflow.py --write`로 갱신합니다.
 
 | 다이어그램 | 설명 |
 |---|---|
 | [`confluence-export-kit-workflow.html`](./docs/diagrams/confluence-export-kit-workflow.html) | `set-config`의 고정 export 기본값, export scope 선택, `cme` 실행, 자동 `index-export` 흐름 |
-| [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence 원본, 로컬 읽기 전용 스냅샷, 기획 초안, `plan-review`, 사람의 반영 절차를 분리한 문서 운영 흐름 |
-| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`의 생성 가능성 판단, 저장 보류, 기능설계서·정책서 초안 저장, `plan-review` 재검토 루프와 팀 handoff 흐름 |
+| [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence export를 Project Docs Markdown 후보로 가져오는 보조 문서 운영 흐름 |
+| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-draft`, `plan-format`, terminal hold, `review_repair`, `publish_readiness`, 팀 handoff를 요약한 generated overview |
+| [`product-team-kit-workflow-analysis.html`](./docs/diagrams/product-team-kit-workflow-analysis.html) | 같은 source에서 생성한 상세 분석 view. 입력 보완, SSOT 근거 경계, 보수적 종료 조건, 발행 준비 경계를 함께 표시 |
 | [`diagram-design-workflow.html`](./docs/diagrams/diagram-design-workflow.html) | `diagram-design`의 타입 선택, style guide gate, taste gate 기반 HTML/SVG 생성 흐름 |
 
 ## 사용 문법
@@ -60,6 +61,7 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 
 ```text
 /confluence-export-kit:set-config --api-key <api-key> --email <email>
+/product-team-kit:plan-draft
 /product-team-kit:plan-format
 /product-team-kit:plan-review
 /diagram-design:diagram-design
@@ -77,6 +79,7 @@ Codex는 설치된 플러그인의 skill invocation을 사용합니다.
 
 ```text
 $set-config --api-key <api-key> --email <email>
+$plan-draft
 $plan-format
 $plan-review
 $diagram-design
@@ -112,6 +115,7 @@ colo-plugins/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
 │   ├── skills/
+│   ├── references/
 │   ├── schemas/
 │   ├── docs/
 │   └── tests/
