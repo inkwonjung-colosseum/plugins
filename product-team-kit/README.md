@@ -56,6 +56,8 @@ $plan-review planning/반품접수--YYYY-MM-DD-HHMMSS/
 
 `plan-format`에는 기능명을 입력하지 않는다. 스킬이 입력 본문 또는 파일명에서 기능명을 추출한다.
 
+전체 스킬 설명과 각 스킬별 워크플로 다이어그램은 [`docs/skills-workflow.md`](docs/skills-workflow.md)를 참고한다.
+
 ## Implicit Invocation 라우팅
 
 자연어 요청으로 스킬을 암묵 호출할 때는 아래 우선순위를 따른다.
@@ -131,5 +133,5 @@ $plan-review
 - `skills/plan-review/references/` — review gate, evidence package, output template, publish readiness, rerun contract, portable reviewer prompt 기준
 - `references/` — 입력 dispatch, 저장 atomicity, 출력 형식, marker, 재실행 제어 공통 계약
 - `schemas/doc-types.yaml` — 기획초안·기능설계서·정책서 타입 정의
-- `docs/` — 예시, 품질 기준, 안전/정책 문서
+- `docs/` — 스킬 워크플로 설명, 예시, 품질 기준, 안전/정책 문서
 - `tests/` — 로컬 초안 경계와 `plan-draft` fallback 계약 테스트

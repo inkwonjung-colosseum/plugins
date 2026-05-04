@@ -9,7 +9,7 @@
 
 - 확인 일자: 2026-04-27
 - upstream 패키지 최신 확인 버전: `confluence-markdown-exporter 4.1.1`
-- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.3.2`
+- 로컬 래퍼 플러그인 버전: `confluence-export-kit 0.3.3`
 
 ## 한눈에 보기
 
@@ -340,7 +340,7 @@ Export 명령은 skip unchanged, cleanup stale, Jira enrichment에 대한 per-ru
 - background helper 옵션은 `<export-path> [--source-id <id>] [--index-root <path>] [--no-agent-rules] [--agent-files <file> ...]` 형식을 유지
 - Claude Code용 `index-export` skill front matter에는 별도 visibility override를 두지 않고, 문서/설명상 export 후 자동 실행되는 background workflow로 취급
 - Codex에서는 `agents/openai.yaml` 의 `allow_implicit_invocation=false` 로 일반 요청에서 자동 주입되지 않게 하고 export 후처리 경로에서 실행되도록 유지
-- Reading Rule은 Confluence를 SSOT로 두고 로컬 Markdown을 read-only snapshot으로 취급하며, LLM 파생 wiki/product-context 유지보수와 draft의 SSOT 취급을 금지
+- Reading Rule은 Confluence를 SSOT로 두고 로컬 Markdown을 read-only snapshot으로 취급하며, 파생 wiki/product-context를 SSOT처럼 유지하지 못하게 하고 명시 요청된 산출물만 별도 draft-only artifact로 허용
 
 ### 3.3 래퍼가 의도적으로 제외한 범위
 

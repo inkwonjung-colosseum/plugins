@@ -35,7 +35,7 @@ Keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false` so th
 11. If `--agent-files <file> [<file> ...]` is passed, install Reading Rule blocks into those files instead of the default `AGENTS.md` and `CLAUDE.md`.
 12. Only replace content between `confluence-export-kit:reading-rule:start` and `confluence-export-kit:reading-rule:end`; preserve all other file content.
 13. The Reading Rule must state that Confluence is the source of truth and local exported Markdown is a read-only snapshot.
-14. The Reading Rule must prohibit derived wiki, entity, concept, summary, and product-context pages unless a user explicitly asks for a draft-only artifact.
+14. The Reading Rule must prohibit derived wiki, entity, concept, summary, and product-context pages as source-of-truth material unless a user explicitly asks for a draft-only, non-authoritative artifact outside the exported source tree and `.confluence-index/`.
 15. The Reading Rule must treat planning outputs as draft-only until a human reflects them back into Confluence.
 16. Do not add a Claude-specific front matter visibility override; keep the background-workflow intent in the description and invocation guidance.
 17. For Codex, keep `agents/openai.yaml` set to `policy.allow_implicit_invocation: false`; export skills should be the normal path that runs this helper.

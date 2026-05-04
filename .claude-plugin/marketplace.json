@@ -12,7 +12,7 @@
       "name": "confluence-export-kit",
       "source": "./confluence-export-kit",
       "description": "Confluence 문서를 Markdown으로 내보내고 로컬 export-index를 만드는 도구입니다. 인증/기본값 설정, 페이지·스페이스·조직·하위 페이지 export, 자동 인덱싱을 지원합니다.",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "license": "MIT",
       "tags": ["confluence", "export", "atlassian", "markdown", "cme"]
     },
@@ -20,7 +20,7 @@
       "name": "product-team-kit",
       "source": "./product-team-kit",
       "description": "사용자와 대화하며 기획초안을 만들고, 기능설계서와 정책서 초안을 정리하며, Project Docs SSOT 근거 패키지 기반 외부 반영 전 검토까지 돕는 제품팀 도구입니다.",
-      "version": "0.4.8",
+      "version": "0.4.9",
       "license": "MIT",
       "tags": ["planning", "product", "project-docs", "documentation"]
     },

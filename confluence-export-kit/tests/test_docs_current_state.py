@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -11,7 +12,19 @@ PLUGIN_ROOT = WORKSPACE_ROOT / "confluence-export-kit"
 SUPPORTED_FEATURES_DOC = (
     PLUGIN_ROOT / "docs" / "confluence-markdown-exporter-supported-features.md"
 )
-EXPECTED_PLUGIN_VERSION = "0.3.2"
+INDEX_EXPORT_SCRIPT = (
+    PLUGIN_ROOT / "skills" / "index-export" / "scripts" / "index_export.py"
+)
+EXPECTED_PLUGIN_VERSION = "0.3.3"
+
+
+def load_index_export_module():
+    spec = importlib.util.spec_from_file_location("index_export", INDEX_EXPORT_SCRIPT)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load {INDEX_EXPORT_SCRIPT}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class CurrentDocumentationStateTests(unittest.TestCase):
@@ -104,6 +117,21 @@ class CurrentDocumentationStateTests(unittest.TestCase):
         self.assertIn("visibility override", supported_features_doc)
         self.assertIn("allow_implicit_invocation=false", supported_features_doc)
         self.assertNotIn("$index-export", readme)
+
+    def test_root_agent_files_are_ignored_and_match_generated_block_when_present(self) -> None:
+        module = load_index_export_module()
+        expected_block = module.reading_rule_block()
+        gitignore = (WORKSPACE_ROOT / ".gitignore").read_text()
+
+        self.assertIn("AGENTS.md", gitignore)
+        self.assertIn("CLAUDE.md", gitignore)
+        self.assertNotIn("@AGENTS.md", gitignore)
+        self.assertNotIn("@CLAUDE.md", gitignore)
+
+        for guidance_file in ("AGENTS.md", "CLAUDE.md"):
+            path = WORKSPACE_ROOT / guidance_file
+            if path.exists():
+                self.assertEqual(path.read_text(), expected_block)
 
     def test_index_export_documents_metadata_and_append_log_behavior(self) -> None:
         skill_doc = (PLUGIN_ROOT / "skills" / "index-export" / "SKILL.md").read_text()

@@ -14,6 +14,13 @@ SCRIPT_PATH = (
     / "scripts"
     / "index_export.py"
 )
+INDEX_NOT_EVIDENCE_PHRASE = (
+    "`.confluence-index/` entries are retrieval metadata, not evidence"
+)
+DRAFT_ONLY_EXCEPTION_PHRASE = (
+    "draft-only, non-authoritative artifact outside the exported source tree "
+    "and `.confluence-index/`"
+)
 
 
 def load_index_export_module():
@@ -141,6 +148,13 @@ class IndexExportTests(unittest.TestCase):
         self.assertIn("Treat Confluence as the source of truth.", content)
         self.assertNotIn("old rule", content)
 
+    def test_reading_rule_block_allows_explicit_draft_only_artifacts(self) -> None:
+        block = self.module.reading_rule_block()
+
+        self.assertIn(INDEX_NOT_EVIDENCE_PHRASE, block)
+        self.assertIn(DRAFT_ONLY_EXCEPTION_PHRASE, block)
+        self.assertIn("as source-of-truth material", block)
+
     def test_install_reading_rule_appends_to_existing_file_without_managed_block(self) -> None:
         agent_file = self.tmp / "AGENTS.md"
         agent_file.write_text("Existing instructions", encoding="utf-8")
@@ -192,9 +206,12 @@ class IndexExportTests(unittest.TestCase):
         claude = (self.tmp / "CLAUDE.md").read_text()
         self.assertIn(".confluence-index/registry.json", agents)
         self.assertIn("Treat Confluence as the source of truth.", agents)
-        self.assertIn("Do not create or maintain derived wiki", agents)
+        self.assertIn(INDEX_NOT_EVIDENCE_PHRASE, agents)
+        self.assertIn(DRAFT_ONLY_EXCEPTION_PHRASE, agents)
         self.assertIn("Treat planning outputs as draft-only", agents)
         self.assertIn("confluence-export-kit:reading-rule:start", claude)
+        self.assertIn(INDEX_NOT_EVIDENCE_PHRASE, claude)
+        self.assertIn(DRAFT_ONLY_EXCEPTION_PHRASE, claude)
 
     def test_repeated_indexes_keep_sources_separate(self) -> None:
         product_root = self.tmp / "Product Team Space"

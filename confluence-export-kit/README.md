@@ -1,6 +1,6 @@
 # confluence-export-kit
 
-confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.3.2). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
+confluence-export-kit은 `Claude Code`와 `Codex` 양쪽에서 동작하는 Confluence export 및 local export-index 플러그인입니다 (v0.3.3). `confluence-markdown-exporter` 기반으로 auth 설정, 다양한 export 범위, export된 로컬 Markdown 색인을 다룹니다.
 
 두 에이전트의 플러그인 매니페스트(`.claude-plugin/`, `.codex-plugin/`)가 하나의 `skills/` 디렉터리와 `scripts/` 런타임을 공유합니다. 스킬 호출 문법은 에이전트별로 다릅니다 — Claude Code는 `/confluence-export-kit:<skill>` 콜론 네임스페이스, Codex는 공식 플러그인 스펙에 따라 `$<skill>` 형태를 사용합니다.
 
@@ -154,4 +154,4 @@ $export-page-with-descendant https://colosseum.atlassian.net/wiki/spaces/KEY/pag
   - `.confluence-index/**/log.md` 는 기존 로그를 재작성하지 않고 append-only로 누적합니다.
   - 기본적으로 `AGENTS.md` 와 `CLAUDE.md` 에 Reading Rule 관리 블록을 설치합니다. `--no-agent-rules` 로 생략할 수 있습니다.
   - `--agent-files <file> [<file> ...]` 로 Reading Rule을 설치할 guidance 파일을 직접 지정할 수 있습니다.
-  - Reading Rule은 LLM이 파생 wiki/entity/concept/summary/product-context 페이지를 유지보수하지 않고, planning 산출물은 사람이 Confluence에 반영하기 전까지 draft-only로 취급하도록 명시합니다.
+  - Reading Rule은 파생 wiki/entity/concept/summary/product-context 페이지를 SSOT처럼 유지하지 않도록 막고, 사용자가 명시 요청한 산출물만 export source tree와 `.confluence-index/` 밖의 draft-only artifact로 허용하도록 명시합니다.

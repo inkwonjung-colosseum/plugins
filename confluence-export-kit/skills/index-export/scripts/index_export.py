@@ -283,10 +283,15 @@ def reading_rule_block() -> str:
             "4. Then read `.confluence-index/sources/<source-id>/source-index.jsonl`.",
             "5. Use `.confluence-index/sources/<source-id>/tree.md` to understand that source hierarchy.",
             "6. Select the smallest relevant source files.",
-            "7. Read raw exported Markdown before making claims.",
+            "7. Read raw exported Markdown before making claims; "
+            "`.confluence-index/` entries are retrieval metadata, not evidence.",
             "8. Do not load a whole exported space into context.",
             "9. Treat archive/draft/current documents differently when metadata is available.",
-            "10. Do not create or maintain derived wiki, entity, concept, summary, or product-context pages.",
+            "10. Do not create or maintain derived wiki, entity, concept, summary, or "
+            "product-context pages as source-of-truth material. If the user explicitly requests "
+            "one, create it only as a draft-only, non-authoritative artifact outside the "
+            "exported source tree and `.confluence-index/`, with references back to the raw "
+            "exported Confluence sources.",
             "11. Treat `.confluence-index/` as retrieval metadata only, not as a source of truth.",
             "12. Treat planning outputs as draft-only until a human reflects them back into Confluence.",
             READING_RULE_END,
