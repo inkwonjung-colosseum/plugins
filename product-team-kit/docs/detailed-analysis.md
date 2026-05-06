@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.1`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.2`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -24,7 +24,7 @@ plan-review
 ```text
 .claude-plugin/plugin.json    # Claude 매니페스트
 .codex-plugin/plugin.json     # Codex 매니페스트
-agents/                       # plan-format 내부 worker 정의
+agents/                       # plan-format / plan-review 내부 worker 정의
 docs/                         # workflow, PRD, 기능 정의, 약관/정책
 references/config-contract.md # 세 skill 공유 로컬 설정 계약
 skills/set-config/
@@ -127,6 +127,8 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 | C. 용어 일관성 | 역할명, 상태명, 권한명, 화면명, 도메인 stem 통일성 |
 | D. 4역할 넘김 가능성 | 디자인, 개발, QA, 운영이 대화 기억 없이 다음 업무를 시작할 수 있는지 |
 
+점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고, A/B/C/D worker는 각 축 발견 사항만 작성한다. main은 발견 사항 dedup, 보수 합성, 결과 판정, 사람용 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+
 출력은 YAML manifest가 아니라 사람용 markdown 리포트 하나다. 상단에 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서와의 충돌을 두고, 하단에 coverage, 읽은 근거, 읽지 않은 관련 후보, 제외 후보, 검증 한계, 상세 발견 항목을 둔다.
 
 결과별 출력:
@@ -170,4 +172,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.6.1은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.6.2는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

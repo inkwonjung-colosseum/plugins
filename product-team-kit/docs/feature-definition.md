@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.1
+- 대상 버전: product-team-kit 0.6.2
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -122,6 +122,8 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 근거 기록은 사람용 리포트 하단의 `읽은 근거`, `읽지 않은 관련 후보`, `제외 후보`, `검증 한계`로 남긴다. 핵심 근거를 확보하지 못하면 최종 결과는 보수적으로 낮춘다.
 
 ### 4.3 review gate
+
+점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고, A/B/C/D worker는 각 축 발견 사항만 작성하며, main이 dedup, 보수 합성, 결과 판정, 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 | 판정 | 의미 |
 |---|---|

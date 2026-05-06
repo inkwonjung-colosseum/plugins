@@ -167,7 +167,7 @@ flowchart TD
     D -- 예 --> F[검토 대상 본문 직접 읽기]
     F --> G[키워드 추출]
     G --> H[SSOT corpus와 linked local resource 직접 읽기]
-    H --> I[4축 점검]
+    H --> I[4축 worker 점검]
     I --> J[발견 사항 dedup과 보수 합성]
     J --> K{최종 결과}
     K -- 통과 --> L[기획팀용 리포트와 발행 준비 체크리스트 출력]

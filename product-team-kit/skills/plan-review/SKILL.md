@@ -45,9 +45,9 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 3. 입력이 폴더면 같은 폴더의 기능설계서와 정책서를 함께 검토 대상으로 잡는다. 입력이 단일 파일이면 같은 폴더에서 `plan-format` 산출 파일명인 `[안전기능명]_기능설계서.md` / `[안전기능명]_정책서.md`의 같은 stem을 우선해 짝문서를 찾는다.
 4. 짝문서가 없으면 단일 검토를 진행하고 `검증 한계`에 `짝문서 없음`을 기록한다. 검토 대상이 명시적으로 다른 문서의 정책/기능 판단에 의존하면 분류를 `필수 수정` 또는 `발행 전 확인`으로 올린다.
 
-## 4축 검토
+## 4축 개요
 
-각 축은 검토 대상 본문과 SSOT corpus를 직접 읽고 점검한다. 상세 기준은 `references/review-rules.md`의 `4축 점검 기준` 섹션을 따른다.
+각 축은 검토 대상 본문과 SSOT corpus를 직접 읽고 점검한다. 상세 기준은 `references/review-rules.md`의 `## 4축 점검 기준` 섹션을 단일 진실 소스로 따른다.
 
 - **A. SSOT 충돌**: 초안 확정 문장 vs Product Docs SSOT current evidence.
 - **B. 명확성**: `[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]` markers 처리, 모호 문장, 결정 가능 수준.
@@ -56,14 +56,48 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 
 발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록한다.
 
-## 실행 순서
+## 실행 단계
 
-1. 사전 점검 완료. 입력 확정, config 확정, 문서 타입 검증.
-2. 검토 대상에서 키워드(기능명, 정책명, 도메인, 역할명, 상태명, 권한명, 화면명, 핵심 조건·예외)를 추출한다.
-3. SSOT corpus를 키워드로 좁혀 직접 읽는다. 외부 URL, 코드, 설정 파일은 읽지 않는다. 핵심 근거가 외부 URL뿐이면 `검증 한계`에 남긴다.
-4. 4축(A·B·C·D)을 점검하고 발견 사항을 분류와 함께 만든다.
-5. `references/review-rules.md`의 합성 규칙으로 dedup하고 보수 합성으로 결과를 결정한다.
-6. `references/output-format.md`의 결과별 템플릿으로 사람용 리포트를 출력한다. 설정 경고가 있으면 `[설정 경고]` 블록을 한 번 추가한다.
+`dispatch → 4 worker 병렬 → merge` 3단계로 동작한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
+
+### dispatch (단일 패스)
+
+본문 검토는 하지 않는다. 분류·고정 항목만 결정한다.
+
+- config 확정 (`outputRoot`, `ssot.include`, `ssot.exclude`) — `../../references/config-contract.md` 따름. 치명 설정 오류는 즉시 종료하고 `set-config` 안내.
+- 입력 타입 검증 — 기능설계서/정책서가 아니면 `references/output-format.md`의 `올바른 검토 대상이 아님` 템플릿으로 종료.
+- 검토 대상 본문 read + 짝문서 탐색·read (`## 사전 점검` 4단계 그대로).
+- 키워드 추출 (기능명, 정책명, 도메인, 역할명, 상태명, 권한명, 화면명, 핵심 조건·예외).
+- SSOT corpus 후보 listing — `references/review-rules.md`의 `## SSOT corpus 선택 규칙` 따름.
+- A축용 SSOT corpus 본문 read — 키워드 매칭된 후보들.
+- SSOT corpus 0건 분기 — `references/review-rules.md`의 (a) 추출 성공 + 매칭 0건 / (b) 추출 실패 처리. 추출 실패는 worker spawn 없이 즉시 `수정 필요` 결과로 종료한다.
+- 4 worker 분배 데이터 준비 — `references/review-rules.md`의 `## 4축 점검 기준` 4 섹션을 각 worker prompt에 inline.
+
+### 4 worker 병렬 작성
+
+main이 단일 어시스턴트 메시지에 Agent tool 호출 4 block 동시 발행한다. 4 호출이 모두 회신될 때까지 merge로 가지 않는다.
+
+호출 환경에서 Agent 병렬 호출이 불가능하면 (Codex, MCP 단일 패스 환경) 단일 패스 fallback으로 main이 4축을 순차 점검한다. 결과 형식은 동일해야 한다.
+
+| worker | 받는 데이터 |
+|---|---|
+| `plan-review-ssot-worker` (A축) | dispatch 결과 + SSOT corpus 본문 + review-rules.md A축 inline |
+| `plan-review-clarity-worker` (B축) | dispatch 결과 (본문만) + review-rules.md B축 inline |
+| `plan-review-terminology-worker` (C축) | dispatch 결과 (본문만) + review-rules.md C축 inline |
+| `plan-review-readiness-worker` (D축) | dispatch 결과 (본문만) + review-rules.md D축 inline |
+
+각 worker는 `references/review-rules.md`의 `## 발견 사항 필드` 8 필드 표 형식으로 발견 사항만 return한다. 발견 0건 시 응답 끝에 `<!-- worker-flag: no-findings -->` 한 줄 명시. D worker는 readiness 4행 표 (design/development/qa/operations × ready/conditional/blocked/n/a + 사유 + 위치)를 추가 return한다.
+
+worker는 합성·결과 4종 판정·리포트 작성을 하지 않는다. 본문 수정·파일 write도 하지 않는다. 모두 main의 merge가 일괄 처리한다.
+
+### merge (단일 패스)
+
+- 4 worker 발견 사항 합치기 + `references/review-rules.md`의 `## 합성 규칙` 적용 (위치+제목+근거 정규화 dedup, NFC, 보수 분류).
+- 결과 4종 판정 — `references/review-rules.md`의 `## 결과 4종 기준` + `## 보수 합성 우선순위` 적용.
+- D readiness 표 검증 — `blocked` 1개라도 → `수정 필요`. 4행 미만이면 1회 retry, 2회 누락 시 해당 역할 `n/a` + 사유 `worker 응답 누락`으로 보수 합성.
+- 모든 worker `<!-- worker-flag: no-findings -->` + readiness 모두 `ready`/`n/a` → `통과`.
+- worker 발견 사항 형식이 8 필드와 어긋나면 1회 retry, 2회 어긋나면 `검증 한계`에 기록 후 보수 합성.
+- `references/output-format.md` 템플릿으로 사람용 리포트 출력. 설정 경고는 dispatch 모은 목록 사용.
 
 현재 대화 컨텍스트는 근거가 아니다. 대화에서 알게 된 배경, 의도, 작성 당시 판단은 검토 대상 파일 또는 SSOT 근거에 없으면 근거 부족으로 본다.
 
