@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-07
-- 대상 버전: product-team-kit 0.6.6
+- 대상 버전: product-team-kit 0.6.7
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
