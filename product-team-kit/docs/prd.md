@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.3
+- 대상 버전: product-team-kit 0.6.4
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -85,11 +85,11 @@ flowchart TD
 | PRD-03 | 입력이 부족하거나 config가 없으면 파일을 만들지 않는다. | config 부재·검증 실패 시 strict-exit으로 set-config 안내, 정보 부족 시 기능 목적/적용 범위/사용자 행동/주요 조건 중 부족한 항목을 출력한다. |
 | PRD-04 | 충분한 입력은 기능설계서와 정책서 두 문서로 분리한다. | 화면/흐름/사용자 결과는 기능설계서, 규칙/조건/예외/제한은 정책서에 배치된다. |
 | PRD-05 | 저장된 초안은 공식 팀 문서가 아님을 표시한다. | 산출물과 출력에 로컬 초안, 팀 문서 미반영, 공식 팀 문서 아님이 드러난다. |
-| PRD-06 | 발행 전 검토는 Product Docs SSOT를 근거로 4축을 점검한다. | `<outputRoot>/` 산출물, 코드, 설정, 외부 URL은 SSOT 근거에서 제외되고, SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성이 함께 판정된다. |
+| PRD-06 | 발행 전 검토는 Product Docs SSOT를 근거로 4축을 점검한다. | `<outputRoot>/` 산출물, 코드, 설정, 외부 URL은 SSOT 근거에서 제외되고, SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성이 함께 판정된다. 초안 자체가 과도하게 미완성인 경우 SSOT 탐색 전 `수정 필요 (조기 판정)`으로 종료한다. |
 | PRD-07 | 검토 결과는 기획팀이 바로 행동할 수 있어야 한다. | 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서 충돌이 상단에 표시된다. |
 | PRD-08 | 검토는 보수적으로 취합한다. | 필수 수정 또는 `착수 전 보강 필요` 역할이 있으면 최종 결과는 `수정 필요`다. |
 | PRD-09 | Claude Code와 Codex에서 같은 제품 계약을 유지한다. | 양쪽 manifest가 같은 이름, 버전, 스킬 경로를 가리킨다. |
-| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 키워드 매칭된 SSOT corpus만 읽는다. |
+| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 조기 판정과 상단 인덱스 스캔을 거쳐 축소된 SSOT corpus만 읽는다. |
 
 ## 8. 성공 기준
 

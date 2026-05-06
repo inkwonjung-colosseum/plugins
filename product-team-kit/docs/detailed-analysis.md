@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.3`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.4`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -117,12 +117,13 @@ dispatch → worker A·B 병렬 작성 → merge 3단계로 작성한다. dispat
 
 `plan-review`는 초안 폴더 또는 기능설계서/정책서 파일을 검토한다. 먼저 config를 확인하고, 치명 오류면 `output-format.md`만 읽어 종료한다. 폴더 입력이면 기능설계서와 정책서를 함께 읽고, 단일 파일 입력이면 같은 폴더에서 짝문서를 찾는다. 지원하지 않는 문서 타입이면 `review-rules.md`와 SSOT corpus를 읽지 않고 `올바른 검토 대상이 아님`으로 종료한다. 짝문서가 없으면 단일 검토를 진행하되 `검증 한계`에 남긴다.
 
-Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상에서 키워드를 먼저 추출하고, 키워드 매칭 후보가 1건 이상일 때만 해당 corpus 본문과 필요한 linked local resource를 읽는다. 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C/D축은 검토 대상 본문만으로 점검한다.
+Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상 본문만으로 핵심 섹션 `[미정]`, 빈 필수 섹션, `[충돌 후보]`가 과도하면 `수정 필요 (조기 판정)`으로 종료한다. 조기 판정이 아니면 검토 대상에서 키워드를 추출하고, 후보 파일 상위 20줄 인덱스로 archive/deprecated/낮은 버전/키워드 미매칭 문서를 제외한 뒤 핵심 후보만 전문으로 읽는다. 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C/D축은 검토 대상 본문만으로 점검한다.
 
 4축 점검:
 
 | 축 | 확인 내용 |
 |---|---|
+| 조기 판정 | SSOT 탐색 전 핵심 판단 누락이 과도한지 |
 | A. SSOT 충돌 | 초안 확정 문장과 current evidence 충돌 여부 |
 | B. 명확성 | marker, 모호 조건, 상태·권한·예외 판단 가능성 |
 | C. 용어 일관성 | 역할명, 상태명, 권한명, 화면명, 도메인 stem 통일성 |
@@ -174,4 +175,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.6.3은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. lazy read, 산출물 신뢰성, 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.6.4는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. lazy read, 조기 수정 판정, 산출물 신뢰성, 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

@@ -92,9 +92,15 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 - 입력 타입 검증 — 기능설계서/정책서가 아니면 `output-format.md`를 read해 `올바른 검토 대상이 아님` 템플릿으로 종료.
 - 검토 대상 본문 read + 짝문서 탐색·read (`## 사전 점검` 4단계 그대로).
 - 키워드 추출 (기능명, 정책명, 도메인, 역할명, 상태명, 권한명, 화면명, 핵심 조건·예외).
+- **조기 판정** — 검토 대상 본문만으로 아래 기준 확인:
+  - 핵심 섹션(상태·권한·예외·처리기준) `[미정]` 3개 이상
+  - 필수 섹션(1~5) 중 2개 이상 실질 내용 없음
+  - `[충돌 후보]` 3개 이상
+  기준 충족 시 `output-format.md`를 read해 `수정 필요 (조기 판정)` 템플릿으로 종료. SSOT corpus 탐색·4 worker·merge를 수행하지 않는다.
 - `review-rules.md` read — 이 시점에서 한 번만. `## SSOT corpus 선택 규칙`과 `## 4축 점검 기준` 4 섹션을 worker prompt에 inline.
 - SSOT corpus 후보 listing — `review-rules.md`의 `## SSOT corpus 선택 규칙` 따름.
-- **키워드 매칭 후보 ≥1개** → SSOT corpus 본문 read. **0건** → A worker에 "SSOT 근거 없음" 전달, corpus 본문 read skip.
+- **SSOT 후보 인덱스 스캔** — 후보 파일 상위 20줄을 Bash 1회 호출로 일괄 읽기. archive/deprecated/낮은 버전/키워드 미매칭 문서를 과거 맥락으로 분류하고 전문 읽기에서 제외. 상세 규칙은 `review-rules.md` 규칙 4.5.
+- **키워드 매칭 핵심 후보 ≥1개** → 축소된 후보만 전문 read. **0건** → A worker에 "SSOT 근거 없음" 전달, corpus 본문 read skip.
 - SSOT corpus 0건 분기 — `review-rules.md`의 (a) 추출 성공 + 매칭 0건 / (b) 추출 실패 처리. 추출 실패는 worker spawn 없이 즉시 `수정 필요` 결과로 종료한다. 이 시점에 `output-format.md`를 read해 적용.
 - 4 worker 분배 데이터 준비 — `review-rules.md`의 `## 4축 점검 기준` 4 섹션을 각 worker prompt에 inline.
 
