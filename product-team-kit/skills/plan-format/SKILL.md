@@ -6,7 +6,7 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 # plan-format
 
-기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. 3-step 단일 패스로 동작한다.
+기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. config strict-exit, Gate First, dispatch/worker 작성/merge 후 저장의 3-step 흐름으로 동작한다.
 
 1. `.product-team-kit/config.json` 존재·유효성 확인 (없으면 종료)
 2. 입력 기반 변환 가능 여부 Gate (불가 시 종료)
@@ -59,9 +59,61 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ## 3. 변환 및 저장
 
-단일 LLM 패스로 기능설계서를 먼저 작성하고 이어서 정책서를 작성한다. 분리 컨텍스트 worker 호출은 사용하지 않는다.
+`dispatch → worker A·B 병렬 작성 → merge` 3단계로 동작한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
+
+작성 시작 전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다. 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
+
+### 3.1 공통 dispatch (단일 패스)
+
+분류·고정 항목만 결정하고 본문 작성은 하지 않는다.
+
+- 추출 기능명, 안전기능명
+- 도메인, 접속 환경, 적용 사용자, 역할명, 용어 사전
+- 입력 단편별 귀속 라벨: `feature`, `policy`, `both`, `excluded`
+- 입력 제외 항목, 원본 문서 피드백 후보, 설정 경고 후보
+
+기능명·역할명·용어 일관성은 이 단계에서만 결정한다. 두 worker는 dispatch 결과를 그대로 사용하고 재추출하지 않는다.
+
+### 3.2 두 worker 병렬 작성
+
+기능설계서 worker (`plan-format-feature-worker`)와 정책서 worker (`plan-format-policy-worker`)를 병렬 호출한다. main이 단일 어시스턴트 메시지에 두 Agent tool 호출 block을 동시 발행한다. 두 호출이 모두 회신될 때까지 step 3.3으로 가지 않는다.
+
+호출 환경에서 Agent 병렬 호출이 불가능하면 (Codex, MCP 단일 패스 환경) 단일 패스 fallback으로 main 자신이 두 문서를 순차 작성한다. 결과 형식은 동일해야 한다.
+
+각 Agent 호출 prompt 내용:
+
+- dispatch 결과 (안전기능명, 도메인, 접속 환경, 적용 사용자, 역할명, 용어 사전, 라벨 매핑, 입력 제외 항목, 설정 경고)
+- 자기 라벨 단편만 (worker A: `feature` + `both`, worker B: `policy` + `both`)
+- 자기 템플릿 원문 (worker A: `templates/기능설계서.md`, worker B: `templates/정책서.md`)
+- marker 4종 규칙 요약과 빈 골격 신호 (`<!-- worker-flag: empty-skeleton -->`) 작성 조건
+
+worker 출력 규칙:
+
+- worker A (기능설계서): `feature` + `both` 중 사용자 결과·가능 행위 부분만. `templates/기능설계서.md` 9 섹션 채움.
+- worker B (정책서): `policy` + `both` 중 판단 기준 부분만. `templates/정책서.md` 9 섹션 채움.
+- 각 worker는 자기 문서의 marker (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`)만 기록.
+- 서로의 본문 참조 금지. 일관성은 dispatch 결과로만 보장.
+- 자기 라벨 단편이 비어 빈 골격을 반환할 때는 응답 끝에 `<!-- worker-flag: empty-skeleton -->` 한 줄 명시.
+
+worker는 채워진 markdown 본문 텍스트만 return한다. **worker는 파일을 쓰지 않는다.** 저장은 main이 step 3.3 merge 후 `references/storage-contract.md` 절차 (staging folder → 두 파일 write → verify → rename → verify)로 일괄 처리한다.
+
+### 3.3 merge (단일 패스)
+
+두 worker 결과를 합쳐 최종 산출을 만든다.
+
+- worker 결과 양쪽 응답을 검사한다.
+  - 한쪽 또는 양쪽이 `<!-- worker-flag: empty-skeleton -->`를 포함하거나, metadata 외 9 섹션 본문 셀이 모두 비어 있고 marker만 남으면 step 2 보류로 되돌린다. 저장 절차 (staging folder 생성 포함) 진입 금지. `references/output-contract.md`의 "저장 보류" 템플릿으로 출력하고 부족 항목에 worker 출력 분석 결과 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족")를 추가한다.
+  - 양쪽 모두 본문 내용이 있으면 정상 merge로 진행한다.
+- 정상 merge 처리:
+  - 같은 항목이 양쪽에 중복 등장하면 아래 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복 표/행 제거.
+  - marker 합산은 두 문서 marker를 모아 화면 출력 `[미확정·가정 항목]` / `확인 필요 질문`에 1회만 반영.
+  - 원본 문서 피드백, 입력 제외 항목, 설정 경고는 dispatch 목록을 화면 출력에 사용.
+- worker가 템플릿 섹션 헤더를 의역하거나 컬럼을 줄였으면 1회 retry, 2회 어긋나면 step 2 보류 fallback.
+- 정상 merge 통과 후에만 storage-contract 절차로 저장한다.
 
 ### 분류 기준
+
+섹션 매핑·번호는 `templates/*.md` 파일 기준이다. 본 표는 입력 항목을 어느 템플릿으로 보낼지 결정하는 용도이며 새 섹션을 만들지 않는다.
 
 | 입력 성격 | 귀속 문서 |
 |:--|:--|
@@ -92,10 +144,10 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ### 작성 규칙
 
-- 빈 표 행, 예시 placeholder, 값 없는 metadata, 빈 섹션을 결과물에 남기지 않는다.
-- 내용이 있는 섹션만 생성한다. 필요한데 확정 불가한 항목은 marker로 표시.
+- 섹션 헤더(`## 1. 개요` 등) 자체는 템플릿과 동일하게 유지한다. 임의 삭제·번호 재배열·제목 변형 금지.
+- 빈 표 행, 예시 placeholder, 값 없는 metadata 줄은 제거한다. 본문이 비는 섹션은 헤더만 두고 marker(`[미정]`/`[확인 필요]`)로 사유를 표시한다.
+- 단, 다음 섹션은 입력 근거가 있을 때만 헤더째 생성한다: `외부/타시스템 연동`, `운영 조치`, `관련 문서`, `접속 환경`.
 - 기능설계서 `관련 정책서`와 정책서 `관련 기능설계서`는 같은 output folder 상대 링크 기본.
-- `외부/타시스템 연동`, `운영 조치`, `관련 문서`, `접속 환경`은 입력 근거 있을 때만 생성.
 - 정책서 세부 규칙은 허용/금지/조건/예외 판단 기준만. 화면 동작·입력 방식·사용자 노출 결과는 기능설계서.
 - 역할명·기능명·범위·용어는 두 문서에 동일하게 쓴다.
 - 작성 가이드, HTML 주석, `[기능명]`, `[정책명]`, 값 없는 `- 항목:`, 빈 표 행, handoff artifact heading, 생성 과정 설명 (`원본`, `원문`, `입력 반영 요약`, `섹션 적용 체크리스트`)은 결과물에서 제거.

@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.0`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.1`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -24,6 +24,7 @@ plan-review
 ```text
 .claude-plugin/plugin.json    # Claude 매니페스트
 .codex-plugin/plugin.json     # Codex 매니페스트
+agents/                       # plan-format 내부 worker 정의
 docs/                         # workflow, PRD, 기능 정의, 약관/정책
 references/config-contract.md # 세 skill 공유 로컬 설정 계약
 skills/set-config/
@@ -100,7 +101,7 @@ Gate First 4 조건:
 
 ### Step 3 변환·저장
 
-단일 LLM 패스로 기능설계서 → 정책서 순차 작성한다. 분리 컨텍스트 worker나 handoff artifact는 사용하지 않는다.
+dispatch → worker A·B 병렬 작성 → merge 3단계로 작성한다. dispatch는 기능명, 안전기능명, 역할명, 용어, 입력 단편 라벨을 고정한다. 기능설계서 worker는 `feature`와 `both`의 사용자 결과·가능 행위만 작성하고, 정책서 worker는 `policy`와 `both`의 판단 기준만 작성한다. main은 두 결과를 merge하며 중복, marker 합산, 빈 골격 신호를 확인한 뒤 저장한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 저장 계약:
 
@@ -169,4 +170,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.6.0은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.6.1은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

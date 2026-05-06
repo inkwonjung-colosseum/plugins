@@ -5,6 +5,14 @@
         "title": "기획 입력",
         "lines": ["아이디어, 노트, 파일, 디렉터리"]
       },
+      "config_gate": {
+        "title": "config 유효?",
+        "lines": [".product-team-kit/config.json", "없음·파싱·version·outputRoot 검증"]
+      },
+      "config_exit": {
+        "title": "strict-exit",
+        "lines": ["set-config 안내", "저장·검토 시작 안 함"]
+      },
       "format": {
         "title": "plan-format",
         "lines": ["기능설계서/정책서 formatter", "질문 루프 없음"]
@@ -23,7 +31,7 @@
       },
       "review": {
         "title": "plan-review",
-        "lines": ["Product Docs SSOT 직접 읽기", "4축 보수 합성"]
+        "lines": ["검토 대상·짝문서 확정", "Product Docs SSOT 직접 읽기", "4축 보수 합성"]
       },
       "evidence": {
         "title": "근거 경계",
@@ -31,7 +39,7 @@
       },
       "review_gate": {
         "title": "검토 결과",
-        "lines": ["수정 필요 > 조건부 통과 > 통과"]
+        "lines": ["수정 필요 > 조건부 통과 > 통과", "대상 아님: 검토 미수행"]
       },
       "repair": {
         "title": "재검토 안내",
@@ -47,6 +55,7 @@
       }
     },
     "invariants": [
+      "plan-format과 plan-review는 config 치명 오류에서 strict-exit한다.",
       "plan-format은 인터뷰하지 않는다.",
       "Product Docs SSOT 근거 검증은 plan-review 책임이다.",
       "<outputRoot>/ 산출물은 review target이지 SSOT 근거가 아니다.",
@@ -59,13 +68,13 @@
       "document_title": "product-team-kit workflow",
       "eyebrow": "Flowchart · product-team-kit",
       "heading": "Planning input to team handoff workflow",
-      "summary": "product-team-kit은 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
+      "summary": "product-team-kit은 config를 먼저 확인하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
       "svg": {
         "width": 1180,
         "height": 1040,
         "min_width": 1060,
         "title": "product-team-kit 기획 입력 검토 흐름",
-        "desc": "plan-format은 초안 생성 가능성을 판단한다. 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력하고, 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 재검토 안내 또는 발행 준비 체크리스트를 출력하며 외부 publish는 하지 않는다."
+        "desc": "plan-format과 plan-review는 config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 초안 생성 가능성을 판단하고, 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력한다. 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 재검토 안내 또는 발행 준비 체크리스트를 출력하며 외부 publish는 하지 않는다."
       },
       "nodes": [
         {"ref": "input", "kind": "pill", "class": "node", "x": 450, "y": 42, "w": 280, "h": 62},
@@ -100,50 +109,57 @@
       "document_title": "product-team-kit workflow analysis",
       "eyebrow": "Workflow analysis · product-team-kit",
       "heading": "기획 입력에서 팀 반영 전 검토까지",
-      "summary": "상세 view는 같은 workflow source에서 생성된다. 입력 보완, 저장 보류, 재검토 안내, 발행 준비 체크리스트, SSOT 근거 경계를 한 화면에서 확인한다.",
+      "summary": "상세 view는 같은 workflow source에서 생성된다. config strict-exit, 입력 보완, 저장 보류, 재검토 안내, 발행 준비 체크리스트, SSOT 근거 경계를 한 화면에서 확인한다.",
       "svg": {
-        "width": 1260,
-        "height": 980,
-        "min_width": 1160,
+        "width": 640,
+        "height": 1540,
+        "min_width": 560,
         "title": "product-team-kit workflow analysis",
-        "desc": "기획 입력은 plan-format으로 들어간다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 필수 수정 항목 또는 발행 준비 체크리스트를 출력한다. 팀 반영은 플러그인 밖의 사람 절차다."
+        "desc": "기획 입력은 config 확인 후 plan-format으로 들어간다. plan-format과 plan-review는 config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 필수 수정 항목 또는 발행 준비 체크리스트를 출력한다. 팀 반영은 플러그인 밖의 사람 절차다."
       },
       "lanes": [
-        {"x": 44, "y": 58, "w": 1172, "h": 172, "label": "1. input formatting"},
-        {"x": 44, "y": 262, "w": 1172, "h": 260, "label": "2. format gate"},
-        {"x": 44, "y": 554, "w": 1172, "h": 238, "label": "3. review gate"},
-        {"x": 44, "y": 824, "w": 1172, "h": 118, "label": "4. publish readiness"}
+        {"x": 40, "y": 58, "w": 560, "h": 260, "label": "1. input formatting"},
+        {"x": 40, "y": 350, "w": 560, "h": 360, "label": "2. format gate"},
+        {"x": 40, "y": 750, "w": 560, "h": 520, "label": "3. review gate"},
+        {"x": 40, "y": 1300, "w": 560, "h": 200, "label": "4. publish readiness"}
       ],
       "nodes": [
-        {"ref": "input", "kind": "pill", "class": "node", "x": 88, "y": 116, "w": 250, "h": 62},
-        {"ref": "format", "kind": "box", "class": "node-accent", "x": 444, "y": 106, "w": 250, "h": 82},
-        {"ref": "format_gate", "kind": "decision", "class": "node", "x": 436, "y": 302, "w": 286, "h": 132},
-        {"ref": "format_hold", "kind": "box", "class": "node-soft", "x": 820, "y": 322, "w": 310, "h": 86},
-        {"ref": "draft_pair", "kind": "box", "class": "node-accent", "x": 314, "y": 434, "w": 360, "h": 78},
-        {"ref": "evidence", "kind": "box", "class": "node-soft", "x": 754, "y": 590, "w": 330, "h": 86},
-        {"ref": "review", "kind": "box", "class": "node", "x": 180, "y": 596, "w": 280, "h": 82},
-        {"ref": "review_gate", "kind": "decision", "class": "node", "x": 176, "y": 714, "w": 288, "h": 118},
-        {"ref": "repair", "kind": "box", "class": "node-soft", "x": 570, "y": 708, "w": 300, "h": 90},
-        {"ref": "publish", "kind": "box", "class": "node-accent", "x": 430, "y": 854, "w": 360, "h": 78},
-        {"ref": "handoff", "kind": "pill", "class": "node-accent", "x": 850, "y": 862, "w": 292, "h": 64}
+        {"ref": "input", "kind": "pill", "class": "node", "x": 70, "y": 112, "w": 220, "h": 62},
+        {"ref": "config_gate", "kind": "decision", "class": "node", "x": 350, "y": 86, "w": 210, "h": 112},
+        {"ref": "config_exit", "kind": "box", "class": "node-warn", "x": 350, "y": 220, "w": 210, "h": 76},
+        {"ref": "format", "kind": "box", "class": "node-accent", "x": 90, "y": 236, "w": 220, "h": 82},
+        {"ref": "format_gate", "kind": "decision", "class": "node", "x": 80, "y": 380, "w": 240, "h": 128},
+        {"ref": "format_hold", "kind": "box", "class": "node-soft", "x": 360, "y": 540, "w": 200, "h": 86},
+        {"ref": "draft_pair", "kind": "box", "class": "node-accent", "x": 90, "y": 620, "w": 320, "h": 78},
+        {"ref": "config_gate", "kind": "decision", "class": "node", "x": 70, "y": 790, "w": 220, "h": 116},
+        {"ref": "config_exit", "kind": "box", "class": "node-warn", "x": 70, "y": 930, "w": 220, "h": 70},
+        {"ref": "review", "kind": "box", "class": "node", "x": 350, "y": 790, "w": 220, "h": 82},
+        {"ref": "evidence", "kind": "box", "class": "node-soft", "x": 350, "y": 900, "w": 220, "h": 86},
+        {"ref": "review_gate", "kind": "decision", "class": "node", "x": 340, "y": 1032, "w": 240, "h": 118},
+        {"ref": "repair", "kind": "box", "class": "node-soft", "x": 70, "y": 1054, "w": 220, "h": 90},
+        {"ref": "publish", "kind": "box", "class": "node-accent", "x": 160, "y": 1330, "w": 320, "h": 78},
+        {"ref": "handoff", "kind": "pill", "class": "node-accent", "x": 180, "y": 1432, "w": 280, "h": 64}
       ],
       "edges": [
-        {"d": "M 338 147 L 444 147", "accent": true, "label": "입력 전달", "label_x": 392, "label_y": 133, "label_w": 66},
-        {"d": "M 569 188 L 569 302", "accent": true},
-        {"d": "M 722 368 L 820 365", "label": "부족", "label_x": 770, "label_y": 354, "label_w": 42},
-        {"d": "M 579 434 L 496 434", "accent": true, "label": "생성 가능", "label_x": 536, "label_y": 418, "label_w": 68},
-        {"d": "M 494 512 C 494 564, 370 556, 330 596", "accent": true},
-        {"d": "M 674 472 C 760 522, 820 546, 900 590"},
-        {"d": "M 460 637 L 754 633"},
-        {"d": "M 320 678 L 320 714"},
-        {"d": "M 464 773 L 570 753", "label": "수정 필요", "label_x": 520, "label_y": 748, "label_w": 70},
-        {"d": "M 570 788 C 430 842, 220 722, 246 678", "dash": true, "label": "같은 경로 재검토", "label_x": 432, "label_y": 834, "label_w": 112},
-        {"d": "M 320 832 C 350 866, 384 888, 430 893", "accent": true, "label": "통과 / 조건부", "label_x": 350, "label_y": 858, "label_w": 88},
-        {"d": "M 790 893 L 850 894", "accent": true}
+        {"d": "M 290 143 L 350 142", "accent": true, "label": "입력 전달", "label_x": 318, "label_y": 128, "label_w": 66},
+        {"d": "M 455 198 C 420 230, 250 220, 200 236", "accent": true, "label": "유효", "label_x": 320, "label_y": 218, "label_w": 38},
+        {"d": "M 502 184 L 455 220", "label": "없음/오류", "label_x": 510, "label_y": 204, "label_w": 66},
+        {"d": "M 200 318 L 200 380", "accent": true},
+        {"d": "M 320 444 C 380 454, 450 502, 460 540", "label": "부족", "label_x": 394, "label_y": 492, "label_w": 42},
+        {"d": "M 200 508 L 250 620", "accent": true, "label": "생성 가능", "label_x": 234, "label_y": 568, "label_w": 68},
+        {"d": "M 250 698 C 250 740, 180 750, 180 790", "accent": true},
+        {"d": "M 180 906 L 180 930", "label": "없음/오류", "label_x": 206, "label_y": 920, "label_w": 66},
+        {"d": "M 290 848 L 350 831", "accent": true, "label": "유효", "label_x": 322, "label_y": 826, "label_w": 38},
+        {"d": "M 460 872 L 460 900"},
+        {"d": "M 460 986 L 460 1032"},
+        {"d": "M 340 1091 L 290 1096", "label": "수정 필요", "label_x": 318, "label_y": 1076, "label_w": 70},
+        {"d": "M 180 1144 C 220 1198, 396 1118, 420 986", "dash": true, "label": "같은 경로 재검토", "label_x": 308, "label_y": 1192, "label_w": 112},
+        {"d": "M 460 1150 C 460 1220, 320 1260, 320 1330", "accent": true, "label": "통과 / 조건부", "label_x": 388, "label_y": 1262, "label_w": 88},
+        {"d": "M 320 1408 L 320 1432", "accent": true}
       ],
       "notes": [
-        {"x": 70, "y": 920, "lines": ["보수성: 입력이 부족하면 저장하지 않고 부족 항목만 출력한다."]},
-        {"x": 70, "y": 940, "lines": ["발행 경계: 발행 준비 체크리스트는 안내용이며 Product Docs SSOT, linked local resource를 자동 수정하지 않는다."]}
+        {"x": 70, "y": 1518, "lines": ["보수성: config 치명 오류와 입력 부족은 저장/검토 전 단계에서 멈춘다."]},
+        {"x": 70, "y": 1538, "lines": ["발행 경계: 발행 준비 체크리스트는 안내용이며 Product Docs SSOT, linked local resource를 자동 수정하지 않는다."]}
       ]
     }
   }

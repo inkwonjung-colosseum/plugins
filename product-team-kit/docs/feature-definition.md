@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.0
+- 대상 버전: product-team-kit 0.6.1
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -69,7 +69,7 @@ Gate First 조건은 모두 식별되어야 한다.
 
 ### 3.3 Step 3 — 문서 분리
 
-단일 LLM 패스로 기능설계서를 먼저 작성하고 이어서 정책서를 작성한다. 분리 컨텍스트 worker나 handoff artifact는 사용하지 않는다.
+dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤 기능설계서 worker와 정책서 worker가 각 문서 본문을 작성한다. main은 두 결과를 merge하고, 중복·marker·빈 골격 신호를 확인한 뒤 저장한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 | 입력 성격 | 귀속 문서 |
 |---|---|

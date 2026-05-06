@@ -108,7 +108,7 @@ flowchart TD
     B2 --> C
     C --> D{Gate First 4 조건 충족?}
     D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 충족 --> H[Step 3: 단일 LLM 패스로 기능설계서·정책서 작성]
+    D -- 충족 --> H[Step 3: dispatch 후 worker A·B 작성과 merge]
     H --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
     N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
