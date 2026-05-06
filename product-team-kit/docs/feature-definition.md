@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.4
+- 대상 버전: product-team-kit 0.6.5
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -71,7 +71,7 @@ Gate First 조건은 모두 식별되어야 한다.
 
 ### 3.3 Step 3 — 문서 분리
 
-dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤, worker 호출 직전에 기능설계서/정책서 templates를 읽는다. 기능설계서 worker와 정책서 worker가 각 문서 본문을 작성하고, main은 두 결과를 merge해 중복·marker·빈 골격 신호를 확인한다. storage contract는 merge 통과 후 저장 절차에 들어가기 직전에만 읽는다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤, 본문 작성 직전에 기능설계서/정책서 templates를 읽는다. main은 두 문서 본문을 같은 턴에서 단일 패스로 작성하고, 헤더 일치, 빈 골격, 중복 항목, 라벨 cross-bleed, marker 합산을 자체 검증한다. storage contract는 자체 검증 통과 후 저장 절차에 들어가기 직전에만 읽는다.
 
 | 입력 성격 | 귀속 문서 |
 |---|---|
@@ -125,7 +125,7 @@ SSOT 탐색 전에 검토 대상 본문만으로 핵심 섹션 `[미정]` 3개 �
 
 ### 4.3 review gate
 
-점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 rules/corpus만 읽는다. A/B/C/D worker는 inline으로 전달된 검토 대상과 근거 패키지에서 각 축 발견 사항만 작성하며, main이 dedup, 보수 합성, 결과 판정, 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+점검 실행은 dispatch → main A축 점검 + 3 worker(B/C/D) 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 rules/corpus만 읽는다. SSOT corpus는 main이 보유하므로 A축 SSOT 충돌은 main이 직접 점검하고, B/C/D worker는 inline으로 전달된 검토 대상에서 각 축 발견 사항만 작성한다. main이 모든 발견 사항을 dedup하고 보수 합성, 결과 판정, 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 | 판정 | 의미 |
 |---|---|

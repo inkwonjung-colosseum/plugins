@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.4
+- 대상 버전: product-team-kit 0.6.5
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -105,7 +105,7 @@ flowchart TD
 ## 9. 비기능 요구사항
 
 - 로컬 우선: 입력, 초안, 검토는 현재 프로젝트의 로컬 파일을 기준으로 한다.
-- 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, worker에는 main이 확정한 본문과 근거 패키지만 전달한다.
+- 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, plan-review worker에는 main이 확정한 검토 대상 본문과 해당 축 기준만 전달한다. SSOT corpus는 main A축 점검에서만 사용한다.
 - 안전한 쓰기: 두 문서를 같은 staging folder에 먼저 작성하고 검증 후 target folder로 rename한다. 기존 target은 덮어쓰지 않으며 충돌 시 collision suffix `--01`~`--99`로 새 폴더를 확보한다.
 - 근거 제한: 외부 URL이나 코드 파일을 Product Docs SSOT 근거로 사용하지 않는다.
 - 문서 가독성: 기획팀이 먼저 읽을 수 있는 한국어 리포트를 우선한다.

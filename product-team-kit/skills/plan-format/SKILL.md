@@ -6,7 +6,7 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 # plan-format
 
-기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. config strict-exit, Gate First, dispatch/worker 작성/merge 후 저장의 3-step 흐름으로 동작한다.
+기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. config strict-exit, Gate First, dispatch + 단일 패스 작성·자체 검증 후 저장의 3-step 흐름으로 동작한다.
 
 1. `.product-team-kit/config.json` 존재·유효성 확인 (없으면 종료)
 2. 입력 기반 변환 가능 여부 Gate (불가 시 종료)
@@ -22,15 +22,15 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 | --- | --- | --- |
 | `<project-root>/.product-team-kit/config.json` | step 1 시작 | strict-exit 판정 |
 | 입력 본문 / 파일 / 디렉터리 | step 2 dispatch 직전 | gate 판정과 dispatch 입력 |
-| `templates/기능설계서.md`, `templates/정책서.md` | step 3.2 worker 호출 직전 (병렬) | worker prompt 구성·merge 시 헤더 검증 |
-| `references/storage-contract.md` | step 3.3 merge 통과 후 저장 절차 진입 직전 | staging→write→verify→rename 절차 |
+| `templates/기능설계서.md`, `templates/정책서.md` | step 3.2 본문 작성 직전 (병렬 read) | 본문 작성 시 헤더·컬럼 1:1 일치 검증 |
+| `references/storage-contract.md` | step 3.2 자체 검증 통과 후 저장 절차 진입 직전 | staging→write→verify→rename 절차 |
 | `references/output-contract.md` | 종료 출력 직전 (분기 확정 후 1회) | "설정 없음" / "저장 보류" / "저장 완료" 템플릿 |
 
 분기별 실제 읽기 순서:
 
 - **config fail**: `config.json` → `output-contract.md` → 종료
 - **gate 보류**: `config.json` → 입력 → `output-contract.md` → 종료
-- **정상 저장**: `config.json` → 입력 → `templates/*` (병렬) → worker 병렬 → merge → `storage-contract.md` → 저장 → `output-contract.md` → 종료
+- **정상 저장**: `config.json` → 입력 → `templates/*` (병렬) → 본문 작성·자체 검증 → `storage-contract.md` → 저장 → `output-contract.md` → 종료
 
 ## 호출
 
@@ -81,11 +81,11 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ## 3. 변환 및 저장
 
-**이 step에서 읽는 파일**: step 3.2 직전 `templates/*.md` 2개 (병렬), step 3.3 merge 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
+**이 step에서 읽는 파일**: step 3.2 본문 작성 직전 `templates/*.md` 2개 (병렬), 자체 검증 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
 
-`dispatch → worker A·B 병렬 작성 → merge` 3단계로 동작한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
+`dispatch → 단일 패스 본문 작성 → 자체 검증` 2단계로 동작한다. main이 두 문서를 같은 턴에 작성하고 자체 검증을 통과하면 저장 절차로 진입한다.
 
-step 3.2 worker 호출 직전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다 (두 파일 병렬). 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
+step 3.2 본문 작성 직전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다 (두 파일 병렬). 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
 
 ### 3.1 공통 dispatch (단일 패스)
 
@@ -98,48 +98,38 @@ step 3.2 worker 호출 직전 `templates/기능설계서.md`와 `templates/정�
 - 입력 단편별 귀속 라벨: `feature`, `policy`, `both`, `excluded`
 - 입력 제외 항목, 원본 문서 피드백 후보, 설정 경고 후보
 
-기능명·역할명·용어 일관성은 이 단계에서만 결정한다. 두 worker는 dispatch 결과를 그대로 사용하고 재추출하지 않는다.
+기능명·역할명·용어 일관성은 이 단계에서만 결정한다. 본문 작성 단계는 dispatch 결과를 그대로 사용하고 재추출하지 않는다.
 
-### 3.2 두 worker 병렬 작성
+### 3.2 두 문서 작성 (단일 패스)
 
-**읽는 파일**: 호출 직전 `templates/기능설계서.md`, `templates/정책서.md` 2개를 병렬 read. 각 worker prompt에 자기 템플릿 원문을 그대로 포함시킨다.
+**읽는 파일**: 본문 작성 직전 `templates/기능설계서.md`, `templates/정책서.md` 2개를 병렬 read. 두 템플릿 원문을 같은 턴 내에서 참조하며 본문을 채운다.
 
-기능설계서 worker (`plan-format-feature-worker`)와 정책서 worker (`plan-format-policy-worker`)를 병렬 호출한다. main이 단일 어시스턴트 메시지에 두 Agent tool 호출 block을 동시 발행한다. 두 호출이 모두 회신될 때까지 step 3.3으로 가지 않는다.
+main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴에 직접 작성한다. 별도 subagent 호출 없이 자기 컨텍스트에서 단일 패스로 처리한다. 두 문서의 작성 순서는 자유다.
 
-호출 환경에서 Agent 병렬 호출이 불가능하면 (Codex, MCP 단일 패스 환경) 단일 패스 fallback으로 main 자신이 두 문서를 순차 작성한다. 결과 형식은 동일해야 한다.
-
-각 Agent 호출 prompt 내용:
+작성 입력:
 
 - dispatch 결과 (안전기능명, 도메인, 접속 환경, 적용 사용자, 역할명, 용어 사전, 라벨 매핑, 입력 제외 항목, 설정 경고)
-- 자기 라벨 단편만 (worker A: `feature` + `both`, worker B: `policy` + `both`)
-- 자기 템플릿 원문 (worker A: `templates/기능설계서.md`, worker B: `templates/정책서.md`)
-- marker 4종 규칙 요약과 빈 골격 신호 (`<!-- worker-flag: empty-skeleton -->`) 작성 조건
+- `feature` + `both` 라벨 단편 → 기능설계서 (사용자 결과·가능 행위 부분만)
+- `policy` + `both` 라벨 단편 → 정책서 (판단 기준 부분만 — 허용·금지·조건·예외·제한·승인 기준)
+- `templates/기능설계서.md` 원문 (9 섹션 헤더, 표 컬럼, metadata) — 기능설계서 골격
+- `templates/정책서.md` 원문 (9 섹션 헤더, 표 컬럼, metadata) — 정책서 골격
 
-worker 출력 규칙:
+작성 규칙:
 
-- worker A (기능설계서): `feature` + `both` 중 사용자 결과·가능 행위 부분만. `templates/기능설계서.md` 9 섹션 채움.
-- worker B (정책서): `policy` + `both` 중 판단 기준 부분만. `templates/정책서.md` 9 섹션 채움.
-- 각 worker는 자기 문서의 marker (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`)만 기록.
-- 서로의 본문 참조 금지. 일관성은 dispatch 결과로만 보장.
-- 자기 라벨 단편이 비어 빈 골격을 반환할 때는 응답 끝에 `<!-- worker-flag: empty-skeleton -->` 한 줄 명시.
+- 기능설계서 9 섹션, 정책서 9 섹션을 각각 템플릿과 1:1로 채운다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 표 컬럼 줄이기 금지.
+- **라벨 cross-bleed 금지**: 정책서 본문에 화면 동작·입력 방식·사용자 노출 결과 작성 금지. 기능설계서 본문에 허용/금지/조건/예외 판단 기준 작성 금지. 양쪽에 걸리는 항목은 분류 기준 표에 따라 한쪽에만 남긴다.
+- 안전기능명·역할명·용어는 dispatch 결과 그대로 사용. 재추출·재명명 금지.
+- marker 4종 (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`)은 결정이 쓰이는 본문 문장 또는 표 셀에 inline 표시. 각 문서에 marker가 1건 이상이면 문서 끝에 `## 미확정·가정·확인 필요` 섹션 append + 항목 색인.
+- 두 문서 marker는 화면 출력의 `[미확정·가정 항목]` / `확인 필요 질문`에 1회만 합산해 반영.
+- 원본 문서 피드백, 입력 제외 항목, 설정 경고는 본문에 섞지 않고 화면 출력 dispatch 목록을 그대로 사용한다.
 
-worker는 채워진 markdown 본문 텍스트만 return한다. **worker는 파일을 쓰지 않는다.** 저장은 main이 step 3.3 merge 후 `references/storage-contract.md` 절차 (staging folder → 두 파일 write → verify → rename → verify)로 일괄 처리한다.
+작성 후 자체 검증:
 
-### 3.3 merge (단일 패스)
-
-**읽는 파일**: 없음 (templates는 3.2에서 읽음, worker 출력 검증에 재사용). 정상 merge 통과 후 저장 절차 진입 직전에만 `references/storage-contract.md`를 읽는다. 보류 분기는 `references/output-contract.md`만 읽는다.
-
-두 worker 결과를 합쳐 최종 산출을 만든다.
-
-- worker 결과 양쪽 응답을 검사한다.
-  - 한쪽 또는 양쪽이 `<!-- worker-flag: empty-skeleton -->`를 포함하거나, metadata 외 9 섹션 본문 셀이 모두 비어 있고 marker만 남으면 step 2 보류로 되돌린다. 저장 절차 (staging folder 생성 포함) 진입 금지. `references/output-contract.md`의 "저장 보류" 템플릿으로 출력하고 부족 항목에 worker 출력 분석 결과 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족")를 추가한다.
-  - 양쪽 모두 본문 내용이 있으면 정상 merge로 진행한다.
-- 정상 merge 처리:
-  - 같은 항목이 양쪽에 중복 등장하면 아래 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복 표/행 제거.
-  - marker 합산은 두 문서 marker를 모아 화면 출력 `[미확정·가정 항목]` / `확인 필요 질문`에 1회만 반영.
-  - 원본 문서 피드백, 입력 제외 항목, 설정 경고는 dispatch 목록을 화면 출력에 사용.
-- worker가 템플릿 섹션 헤더를 의역하거나 컬럼을 줄였으면 1회 retry, 2회 어긋나면 step 2 보류 fallback.
-- 정상 merge 통과 후에만 storage-contract 절차로 저장한다.
+- **빈 골격 검사**: 라벨 단편이 비어 본문이 헤더 + marker만 남는 빈 골격이면 step 2 보류로 되돌린다. 저장 절차 (staging folder 생성 포함) 진입 금지. `references/output-contract.md`의 "저장 보류" 템플릿으로 출력하고 부족 항목에 빈 골격 분석 결과 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족")를 추가한다.
+- **헤더 일치 검사**: 섹션 헤더 (번호·제목), 표 컬럼 헤더, metadata 필드가 템플릿과 1:1로 일치하는지 확인한다. 어긋나면 1회 재작성 retry, 2회 어긋나면 step 2 보류 fallback.
+- **중복 검사**: 같은 항목이 양쪽 문서에 중복 등장하면 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복 표/행 제거.
+- **라벨 범위 검사**: cross-bleed 위반 (정책서에 화면 동작, 기능설계서에 판단 기준)이 발견되면 위반 셀을 분류 기준 표대로 옮기거나 제거.
+- 자체 검증 통과 후에만 `references/storage-contract.md`를 읽고 저장 절차 (staging folder → 두 파일 write → verify → rename → verify)를 진행한다. 저장은 main이 일괄 처리한다.
 
 ### 분류 기준
 
@@ -189,7 +179,7 @@ worker는 채워진 markdown 본문 텍스트만 return한다. **worker는 파�
 
 ### 저장과 출력
 
-저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 이 파일은 step 3.3 merge 통과 후 저장 절차 직전에만 읽는다.
+저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 이 파일은 step 3.2 자체 검증 통과 후 저장 절차 직전에만 읽는다.
 
 사용자 출력은 `references/output-contract.md`의 "저장 완료" / "저장 보류" / "설정 없음" 템플릿을 따른다. 이 파일은 종료 분기가 확정된 직후 1회만 읽는다 (분기마다 동일).
 

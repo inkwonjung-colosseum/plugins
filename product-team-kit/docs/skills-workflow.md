@@ -115,7 +115,7 @@ flowchart TD
     B2 --> C
     C --> D{Gate First 4 조건 충족?}
     D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 충족 --> H[Step 3: templates lazy read 후 worker A·B 작성과 merge]
+    D -- 충족 --> H[Step 3: templates lazy read 후 단일 패스 작성과 자체 검증]
     H --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
     N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
@@ -176,7 +176,7 @@ flowchart TD
     G --> H{SSOT 후보 매칭?}
     H -- 1건 이상 --> I[필요 corpus와 linked local resource 읽기]
     H -- 0건 --> I0[A축 검증 대상 없음 처리]
-    I --> J[4축 worker 점검]
+    I --> J[main A축 점검 + B/C/D worker 점검]
     I0 --> J
     J --> K[발견 사항 dedup과 보수 합성]
     K --> L{최종 결과}

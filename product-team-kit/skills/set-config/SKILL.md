@@ -1,6 +1,6 @@
 ---
 name: set-config
-description: ".product-team-kit/config.json을 대화형으로 갱신한다. 각 키마다 현재 값(또는 default)을 제시하고 그대로 유지하거나 직접 입력받는다."
+description: "product-team-kit 플러그인 전용 로컬 설정 `.product-team-kit/config.json`(outputRoot, ssot.include, ssot.exclude)을 대화형으로 생성·갱신한다. 'product-team-kit 설정 변경', 'plan-format/plan-review 출력 폴더 변경', 'SSOT corpus 범위 조정', 'config.json 만들기/수정' 같은 요청에서 호출. 각 키마다 현재 값(또는 default)을 제시하고 유지/직접입력을 선택받는다. 글로벌 Claude Code 설정(settings.json)은 update-config 사용."
 argument-hint: "(인자 없음. 대화형 입력으로 키 값을 받는다)"
 ---
 
