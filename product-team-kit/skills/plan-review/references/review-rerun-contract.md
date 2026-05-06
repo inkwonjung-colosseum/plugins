@@ -1,31 +1,31 @@
 # Review Rerun Contract
 
-`plan-review`가 `수정 필요`를 반환할 때 후속 수정 작업과 재검토를 구조화하기 위한 계약이다. 이 계약은 출력 계약이며, `plan-review`가 파일을 직접 수정한다는 의미가 아니다.
+`plan-review`가 `수정 필요`를 반환할 때 후속 수정 작업과 재검토를 구조화하기 위한 계약이다. 이 계약은 출력 계약이며, `plan-review`가 파일을 직접 수정한다는 의미가 아니다. 사용자-facing 출력에서는 이 블록을 `재검토용 상세 정보`로 표시한다.
 
 ## 적용 범위
 
 - 적용: 최종 결과가 `수정 필요`인 경우.
-- 비적용: `pass`, `conditional pass`, 입력 오류 템플릿.
+- 비적용: `pass`, `conditional pass`, `올바른 검토 대상이 아님`.
 - 수정 대상으로 제안할 수 있는 범위: `planning/` 하위의 검토 대상 기능설계서/정책서 초안.
-- 수정 대상으로 제안하지 않는 범위: Project Docs SSOT Markdown, 팀 문서 export snapshot, linked local resource, 코드, 테스트, 설정 파일.
-- Project Docs SSOT Markdown은 수정 대상으로 제안하지 않는다.
+- 수정 대상으로 제안하지 않는 범위: Product Docs SSOT Markdown, 팀 문서 export snapshot, linked local resource, 코드, 테스트, 설정 파일.
+- Product Docs SSOT Markdown은 수정 대상으로 제안하지 않는다.
 
 ## 수정 근거
 
-- 수정 작업 블록은 최종 합성 후 출력에 남은 P0/P1 `수정 포인트`만 포함한다.
-- P2 `확인 조건`과 P3 `참고 관찰`은 `findings`에 넣지 않는다.
+- 재검토용 상세 정보는 최종 합성 후 출력에 남은 P0/P1 `필수 수정`만 포함한다.
+- P2 `발행 전 확인`과 P3 `참고`는 `findings`에 넣지 않는다.
 - 현재 대화 컨텍스트, 작성 당시 기억, 외부 URL, 코드, 테스트, 설정 파일을 수정 근거로 사용하지 않는다.
-- 검토 대상 파일 또는 Project Docs SSOT 근거에 없는 내용은 새 사실로 추가하지 않고 `[확인 필요]`로 남기도록 요구한다.
+- 검토 대상 파일 또는 Product Docs SSOT 근거에 없는 내용은 새 사실로 추가하지 않고 `[확인 필요]`로 남기도록 요구한다.
 
 ## Finding ID
 
-- 최종 합성 후 출력에 남은 P0/P1 수정 포인트 순서대로 `FIX-001`, `FIX-002`, `FIX-003` 형식으로 부여한다.
+- 최종 합성 후 출력에 남은 P0/P1 필수 수정 항목 순서대로 `FIX-001`, `FIX-002`, `FIX-003` 형식으로 부여한다.
 - 같은 발견 사항이 dedup 규칙으로 병합되면 병합 후 하나의 id만 부여한다.
 - id는 해당 `plan-review` 출력 안에서만 안정적이면 된다.
 
 ## 출력 블록
 
-`output-templates.md`의 `수정 필요` 템플릿에서 `참고 관찰` 표 다음, `관점별 검토 결과` 앞에 아래 YAML fenced block을 포함한다.
+`output-templates.md`의 `수정 필요` 템플릿에서 하단 `상세 검토 기록`의 `재검토용 상세 정보`에 아래 YAML fenced block을 포함한다.
 
 ```yaml
 review_repair:
@@ -35,7 +35,7 @@ review_repair:
   editable_scope:
     - "planning/ 하위 검토 대상 초안"
   forbidden_scope:
-    - "Project Docs SSOT Markdown"
+    - "Product Docs SSOT Markdown"
     - "팀 문서 export snapshot"
     - "linked local resource"
     - "코드, 테스트, 설정 파일"
