@@ -1,16 +1,29 @@
 # Config Contract
 
-`product-team-kit`의 `set-config`, `plan-format`, `plan-review`가 공통으로 따르는 로컬 설정 계약이다. Python, Node.js, 별도 CLI helper 설치를 전제하지 않는다. 설정 파일은 일반 JSON이며 표준 JSON 파싱으로 읽는다.
+`product-team-kit`의 `set-config`, `plan-format`, `plan-review`가 공통으로 따르는 로컬 설정 계약이다. Python, Node.js, 별도 CLI helper 설치를 전제하지 않는다. 설정 파일은 일반 JSON이며 표준 JSON 파싱으로 읽는다. `set-config`는 이 설정을 저장한 뒤 같은 프로젝트 루트의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 안내 블록도 항상 생성·갱신한다.
 
 ## 위치
 
 - 파일 경로: `<project-root>/.product-team-kit/config.json`
+- agent 안내 파일 경로: `<project-root>/CLAUDE.md`, `<project-root>/AGENTS.md`
 - `<project-root>` 결정 규칙은 `skills/plan-format/references/storage-contract.md`의 "저장 기준 루트"와 같다.
   1. 파일/디렉터리 입력이면 해당 경로의 git root 또는 상위 프로젝트 루트
   2. 프로젝트 루트를 식별할 수 없으면 입력 파일 또는 입력 디렉터리의 parent directory
   3. 존재하지 않는 path-like 입력 또는 직접 텍스트 입력이면 현재 작업 디렉터리
 - walk-up 검색은 하지 않는다. 위에서 결정된 단일 root만 확인한다.
-- `plan-format`과 `plan-review`는 파일이 없으면 즉시 실패한다. `set-config`만 이 파일을 새로 만들 수 있다.
+- `plan-format`과 `plan-review`는 config 파일이 없으면 즉시 실패한다. `set-config`만 이 파일을 새로 만들 수 있으며, config 저장 성공 후 `CLAUDE.md`와 `AGENTS.md` 안내 블록을 선택 없이 항상 upsert한다.
+
+## Agent 안내 파일
+
+`CLAUDE.md`와 `AGENTS.md`는 config schema가 아니며 `plan-format`/`plan-review`의 runtime source of truth도 아니다. 두 파일은 일반 agent가 프로젝트를 열었을 때 Product Docs SSOT 위치를 먼저 읽도록 돕는 로컬 안내 파일이다.
+
+`set-config`는 config 저장 성공 후 두 파일을 모두 처리한다. 사용자에게 생성 여부를 묻지 않는다.
+
+- 파일이 없으면 product-team-kit 관리 블록만 포함해 새로 만든다.
+- 기존 `<!-- product-team-kit:start -->` / `<!-- product-team-kit:end -->` 블록이 있으면 그 블록만 교체한다.
+- 관리 블록이 없으면 파일 끝에 append한다.
+- start marker 또는 end marker가 하나만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
+- 관리 블록은 `.product-team-kit/config.json`의 `ssot.include`, `ssot.exclude`, `<outputRoot>/**` 제외, Product Docs SSOT 경계를 우선 확인하라고 안내한다.
 
 ## Schema
 
@@ -109,5 +122,6 @@ CLI 인자 > `.product-team-kit/config.json` > 본 contract와 각 skill contrac
 | `outputRoot` | `skills/plan-format/references/storage-contract.md` 저장 경로, `skills/plan-format/SKILL.md` `## 입력 처리`의 디렉터리 제외 경로, `skills/plan-review`의 SSOT exclude 자동 추가 (`<outputRoot>/**`) |
 | `ssot.include` | `skills/plan-review/SKILL.md` "Product Docs SSOT" 정의, `skills/plan-review/references/review-rules.md`의 SSOT corpus 선택 규칙 |
 | `ssot.exclude` | `skills/plan-review/references/review-rules.md`의 SSOT corpus 선택 규칙(default 제외에 누적) |
+| `CLAUDE.md`, `AGENTS.md` 안내 블록 | schema key는 아니지만 `set-config` 저장 성공 후 항상 생성·갱신된다. 일반 agent가 Product Docs SSOT 범위를 `.product-team-kit/config.json` 기준으로 우선 조회하도록 안내한다. |
 
 config 적용으로 SSOT 범위가 좁혀진 것은 의도된 좁힘이므로 plan-review의 `검증 한계`에 새 항목으로 남기지 않는다. 좁힘 결과는 plan-review의 `읽은 근거`/`제외 후보` 출력에 그대로 반영한다.

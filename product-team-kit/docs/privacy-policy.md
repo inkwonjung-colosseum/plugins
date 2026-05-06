@@ -10,6 +10,7 @@ The plugin instructions guide the host agent to read:
 - Optional local files or directories explicitly provided as the planning input.
 - Project Markdown documents and local resources linked from those Markdown documents when `plan-review` builds its evidence record.
 - Existing `.product-team-kit/config.json` when `set-config`, `plan-format`, or `plan-review` needs local settings.
+- Existing project-root `CLAUDE.md` and `AGENTS.md` when `set-config` preserves user content while updating the product-team-kit managed block.
 
 ## Data Written
 
@@ -18,7 +19,7 @@ The plugin does not directly include network publishing instructions in the curr
 Expected write operations:
 
 - Create 기능설계서 and 정책서 drafts under `<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/`; the default `<outputRoot>` is `planning`.
-- Create or update `.product-team-kit/config.json` when the user invokes `set-config`.
+- Create or update local product-team-kit settings when the user invokes `set-config`: `.product-team-kit/config.json`, then the product-team-kit managed block in project-root `CLAUDE.md` and `AGENTS.md`.
 
 The plugin instructions prohibit modifying Product Docs SSOT evidence sources during review. External URLs are not automatically read as evidence. `plan-review` returns one planner-facing markdown report with a verdict, role readiness, evidence details, and either a publish-preparation checklist or a re-review checklist. These outputs do not write to Confluence, Product Docs SSOT, linked local resources, or external systems. Config failure, unsupported input, and SSOT no-match branches do not read unused templates, review rules, or corpus bodies.
 

@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로
 
-`product-team-kit`은 로컬 설정을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
+`product-team-kit`은 로컬 설정과 프로젝트 agent 안내 파일을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
 
 이 문서는 README의 빠른 시작보다 한 단계 자세히, 어떤 스킬을 언제 선택하고 어떤 산출물로 이어지는지 설명한다.
 
@@ -8,7 +8,7 @@
 
 | 스킬 | 역할 | 주요 입력 | 주요 산출물 | 다음 단계 |
 |---|---|---|---|---|
-| `set-config` | `.product-team-kit/config.json`을 대화형으로 만든다 | 현재 프로젝트 cwd, 기존 config | `version`, `outputRoot`, `ssot.include`, `ssot.exclude` | `plan-format` 또는 `plan-review` |
+| `set-config` | `.product-team-kit/config.json`과 agent 안내 블록을 대화형으로 만든다 | 현재 프로젝트 cwd, 기존 config, 기존 `CLAUDE.md`/`AGENTS.md` | `.product-team-kit/config.json`, `CLAUDE.md`, `AGENTS.md` product-team-kit 관리 블록 | `plan-format` 또는 `plan-review` |
 | `plan-format` | 충분한 기획 입력을 기능설계서와 정책서 로컬 초안으로 나눈다 | 기획 노트, 회의록, AI 대화 결과물, 문서 스크랩, 파일 경로, 디렉터리 경로 | `[안전기능명]_기능설계서.md`, `[안전기능명]_정책서.md` | `plan-review` |
 | `plan-review` | 기능설계서/정책서 초안을 발행 전 gate로 검토한다 | 초안 폴더 또는 기능설계서/정책서 파일 | `통과`, `조건부 통과`, `수정 필요` 판단과 기획팀용 리포트 | 사람의 반영 또는 초안 수정 |
 
@@ -18,6 +18,32 @@
 |---|---|---|---|
 | `plan-format` | `.product-team-kit/config.json` | 입력, templates, storage/output contract | config 실패 시 입력/templates/storage contract, 저장 보류 시 templates/storage contract |
 | `plan-review` | `.product-team-kit/config.json`, 검토 대상 타입 | 검토 대상 본문, `review-rules.md`, 키워드 매칭 SSOT corpus, `output-format.md` | config 실패·문서 타입 실패 시 review rules/SSOT corpus, SSOT 매칭 0건 시 corpus 본문 |
+
+### plan-review 종료 분기별 lazy read 경계
+
+| 분기 | review-rules.md | SSOT corpus 본문 | worker 실행 |
+|---|:---:|:---:|:---:|
+| config 치명 오류 | X | X | X |
+| 지원하지 않는 문서 타입 | X | X | X |
+| 조기 판정 (수정 필요) | X | X | X |
+| SSOT 키워드 추출 실패 | O | X | X |
+| SSOT 매칭 0건 | O | X | O (B/C/D 본문만) |
+| 정상 | O | O (축소 후보만) | O |
+
+## SSOT 근거 경계
+
+Product Docs SSOT는 현재 프로젝트의 Markdown과 그 Markdown이 상대경로로 명시 참조한 로컬 resource다.
+
+| 항목 | 포함 여부 | 비고 |
+|---|:---:|---|
+| 현재 프로젝트 `*.md` / `*.markdown` (정책·PRD·기능설계·운영/QA) | O | `ssot.include` glob으로 좁힘 |
+| 위 Markdown이 상대경로로 참조한 로컬 resource | O | 명시 참조만 |
+| `<outputRoot>/` 산출물 | X (검토 대상은 가능, 근거 X) | 항상 SSOT exclude |
+| `.git/`, `node_modules/`, `vendor/`, `build/`, `dist/`, `.cache/`, `generated/` | X | default 제외 |
+| 코드 파일, 설정 파일 | X | |
+| 외부 URL | X | |
+| Markdown에서 미참조 독립 resource | X | |
+| 외부 시스템(Confluence 등) export Markdown | △ | 일반 Product Docs 후보로만 취급, 특별 처리 없음 |
 
 ## 호출 방식
 
@@ -49,13 +75,13 @@ flowchart TD
 
 ### 설명
 
-`set-config`는 사용처 프로젝트의 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신한다. 이 설정은 `plan-format`의 저장 root와 `plan-review`의 SSOT corpus 범위를 결정한다.
+`set-config`는 사용처 프로젝트의 `.product-team-kit/config.json`과 프로젝트 agent 안내 블록을 함께 대화형으로 만들거나 갱신한다. config 저장이 성공하면 같은 프로젝트 루트의 `CLAUDE.md`와 `AGENTS.md`에 product-team-kit 관리 블록을 항상 생성·갱신한다. 이 설정은 `plan-format`의 저장 root와 `plan-review`의 SSOT corpus 범위를 결정하고, agent 안내 블록은 일반 agent가 해당 SSOT 범위를 먼저 읽도록 안내한다.
 
 ### 선택 기준
 
 `set-config`를 선택한다:
 
-- `.product-team-kit/config.json`을 처음 만들어야 한다.
+- `.product-team-kit/config.json`과 프로젝트 agent 안내 파일을 처음 만들어야 한다.
 - 초안 저장 root인 `outputRoot`를 바꿔야 한다.
 - `plan-review`가 읽을 Product Docs SSOT allow-list 또는 exclude glob을 조정해야 한다.
 
@@ -76,6 +102,8 @@ flowchart TD
     E --> F[ssot.exclude 확인]
     F --> G{저장할까?}
     G -- 저장 --> H[.product-team-kit/config.json atomic write]
+    H --> J[CLAUDE.md와 AGENTS.md 관리 블록 upsert]
+    J --> K[설정 저장 완료 출력]
     G -- 취소 --> I[기존 파일 유지]
 ```
 
@@ -88,6 +116,8 @@ flowchart TD
 입력이 부족하면 질문하지 않고 저장 보류를 반환한다. 보류 출력에는 부족 항목만 포함하고 보강용 입력 템플릿은 만들지 않는다.
 
 Product Docs SSOT 근거 검증은 하지 않는다. 검증은 `plan-review` 책임이다.
+
+`plan-format`은 파일 크기와 무관하게 main이 기능설계서와 정책서 본문을 같은 턴에 직접 작성한다. 기능설계서/정책서 worker로 분리하지 않으며, 큰 입력의 비용은 섹션 6~9 압축, 표 의미 보존 검증, 중복/cross-bleed 국소 repair로 제어한다.
 
 ### 선택 기준
 
@@ -115,23 +145,33 @@ flowchart TD
     B2 --> C
     C --> D{Gate First 4 조건 충족?}
     D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 충족 --> H[Step 3: templates lazy read 후 단일 패스 작성과 자체 검증]
+    D -- 충족 --> H[Step 3: templates lazy read 후 main 직접 작성과 main 검증]
     H --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
     N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
     O --> Q[다음 단계 안내: plan-review]
 ```
 
-### 생성 가능 조건
+### Gate First 4 조건
 
-각 항목을 1개 이상 충족해야 한다:
+Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 통과 전에는 저장 폴더·임시 파일을 만들지 않는다.
 
-- 기능 목적 또는 기능명: 기능명, 문제, 목적 중 한 문장 요약 가능
-- 적용 대상 또는 업무 범위: 사용자, 역할, 조직, 업무 대상, 포함 범위 중 확인 가능
-- 핵심 사용자 행동과 기대 결과: 행동 1개와 결과 1개
-- 주요 조건/정책/제약: 허용, 금지, 조건, 예외, 제한, 판단 기준 중 확인 가능
+| # | 조건 | 충족 기준 |
+|---|---|---|
+| 1 | 기능 목적 또는 기능명 | 기능명, 문제, 목적 중 한 문장 요약 가능 |
+| 2 | 적용 대상 또는 업무 범위 | 사용자, 역할, 조직, 업무 대상, 포함 범위 중 확인 가능 |
+| 3 | 핵심 사용자 행동 + 기대 결과 | 사용자 행동 1개 + 사용자에게 보이는 결과 1개 이상 |
+| 4 | 주요 조건/정책/제약 | 허용/금지/조건/예외/제한/판단 기준 중 업무 판단 기준 1개 이상 |
 
-기능설계서와 정책서 중 한쪽에 실질 내용이 거의 없으면 저장 보류한다. 이때 templates, storage contract, 저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 입력 dispatch 계약에 따라 기본 제외 경로만 적용해 통합하며, 입력 크기 상한은 두지 않는다. 읽을 수 없는 파일은 저장 보류 사유가 아니라 출력의 `[입력 제외 항목]`에 남긴다. Python, Node.js, 별도 CLI helper 설치는 전제하지 않는다.
+추가 최소 내용 검사:
+
+- 기능설계서 최소: 사용자 행동 + 사용자에게 보이는 결과 1개 이상
+- 정책서 최소: 업무 판단 기준 1개 이상
+- 한쪽이 빈 골격에 가까우면 보류
+
+부서 경계 (제외 대상): 디자인 상세(컬러·폰트·Figma), 최종 UX copy, QA 케이스, API 명세, DB schema, 운영 런북, 개발 작업 분해. 위 상세가 입력의 주된 내용이고 제품·업무 판단 정보가 부족하면 보류한다.
+
+조건 미충족 시 templates·storage contract·저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 dispatch 계약에 따라 기본 제외 경로만 적용해 통합한다. 입력 크기 상한 없음. 읽을 수 없는 파일은 보류 사유가 아니라 `[입력 제외 항목]`에 남긴다. Python·Node·CLI helper 설치 전제 없음.
 
 ### 산출물
 
@@ -142,6 +182,17 @@ flowchart TD
 <outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
 ```
 
+### 출력 4종
+
+`references/output-contract.md` 템플릿 4종을 종료 분기 확정 후 1회 read 적용.
+
+| 분기 | 템플릿 | 후속 |
+|---|---|---|
+| 저장 완료 | "저장 완료" | `plan-review` 다음 단계 안내 |
+| 입력 부족 (Gate First 미통과) | "저장 보류" — 부족 항목만 | 보강 후 재실행 (보강용 입력 템플릿·질문 섹션 안 만듦) |
+| config 없음/실패 | "설정 없음" | `set-config` 안내 |
+| 저장 단계 실패 | "저장 실패" | staging/target 경로 안내 |
+
 ## Skill 2. plan-review
 
 ### 설명
@@ -149,6 +200,27 @@ flowchart TD
 `plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성, 디자인·개발·QA·운영 착수 가능성을 4축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
 
 검토 대상은 `<outputRoot>/` 아래 초안일 수 있지만, `<outputRoot>/` 파일은 SSOT 근거로 사용하지 않는다.
+
+### 4축 정의
+
+| 축 | 점검 대상 | 담당 | 비고 |
+|---|---|---|---|
+| A. SSOT 충돌 | 초안 확정 문장 vs Product Docs SSOT current evidence | main 직접 | corpus 0건 시 `검증 대상 없음` |
+| B. 명확성 | `[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]` marker 처리, 모호 문장, 결정 가능 수준 | `plan-review-clarity-worker` | 본문만 |
+| C. 용어 일관성 | 역할명·상태명·권한명·화면명·도메인 stem 통일성 | `plan-review-terminology-worker` | 본문만 |
+| D. 4역할 넘김 가능성 | design·development·qa·operations 각각이 대화 기억 없이 다음 업무 시작 가능 여부 | `plan-review-readiness-worker` | 본문만, readiness 4행 표 추가 반환 |
+
+발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록. 합성 우선순위: `수정 필요 > 조건부 통과 > 통과`. D readiness `blocked` 1개라도 있으면 `수정 필요`.
+
+### 조기 수정 판정 기준
+
+검토 대상 본문만으로 아래 1개 이상 충족 시 SSOT corpus 탐색·worker 실행 없이 `수정 필요 (조기 판정)`으로 종료.
+
+| 기준 | 임계값 |
+|---|---|
+| 핵심 섹션(상태·권한·예외·처리기준)의 `[미정]` | 3개 이상 |
+| 필수 섹션(1~5) 중 실질 내용 없는 섹션 | 2개 이상 |
+| `[충돌 후보]` 누계 | 3개 이상 |
 
 ### 선택 기준
 
@@ -221,11 +293,16 @@ flowchart TD
 - Product Docs SSOT는 현재 프로젝트의 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
 - 코드, 설정, 빌드 산출물, dependency/vendor, 외부 URL, `<outputRoot>/` 산출물은 SSOT 근거에서 제외한다.
 
+## 다음 문서
+
+구현 디테일(분기별 read 순서, dispatch 분류, marker, plan-format main 검증, plan-review main + worker 분담, 인덱스 스캔, merge 합성, 병렬 시퀀스 다이어그램, fallback)은 [`./skills-workflow-detail.md`](./skills-workflow-detail.md)를 참고한다.
+
 ## Reference Map
 
 | 주제 | 기준 파일 |
 |---|---|
 | 스킬 개요 | [`../README.md`](../README.md) |
+| 워크플로 상세 | [`./skills-workflow-detail.md`](./skills-workflow-detail.md) |
 | 공유 설정 계약 | [`../references/config-contract.md`](../references/config-contract.md) |
 | `set-config` 계약 | [`../skills/set-config/SKILL.md`](../skills/set-config/SKILL.md) |
 | `plan-format` 계약 (3-step + 입력 dispatch + 분류 + marker) | [`../skills/plan-format/SKILL.md`](../skills/plan-format/SKILL.md) |

@@ -17,5 +17,5 @@ policy:
     sequencing:
       - "Step 1 strict-exit: .product-team-kit/config.json 없음/파싱 실패/version 미일치/outputRoot 거부 시 즉시 종료. 세부는 SKILL.md '## 1. 설정 확인' 참조."
       - "Step 2 Gate First: 변환 가능 판정 전 파일 생성 금지. 세부는 SKILL.md '## 2. Gate First 변환 가능 판정' 참조."
-      - "Step 3 변환·저장: dispatch → 단일 패스 본문 작성 → 자체 검증 후 저장. dispatch는 분류·고정 항목만 결정, main이 두 문서 본문을 같은 턴에 작성, 작성 후 헤더 일치·빈 골격·중복 항목·라벨 cross-bleed·marker 합산을 검증. 분류·marker는 SKILL.md, 저장 경로는 references/storage-contract.md, 출력은 references/output-contract.md를 단일 소스로 따른다."
+      - "Step 3 변환·저장: dispatch → main 직접 작성 → main 검증 후 저장. 파일 크기와 무관하게 main이 두 문서 본문을 같은 턴에 작성하고, 기능설계서/정책서 worker로 분리하지 않는다. 9개 섹션 헤더와 metadata는 유지하되, 섹션 6~9는 근거가 없으면 한 줄로 압축하고 표는 의미 보존 기준으로만 검증한다. main은 구조 일치(섹션·metadata)·표 의미 보존·빈 골격·중복 항목·라벨 cross-bleed·marker 합산을 검증한다. 중복과 cross-bleed는 전체 재작성 없이 위반 문장·행·셀만 국소 repair한다. 분류·marker는 SKILL.md, 저장 경로는 references/storage-contract.md, 출력은 references/output-contract.md를 단일 소스로 따른다."
       - "Python·Node.js·CLI helper 설치를 전제하지 않는다."

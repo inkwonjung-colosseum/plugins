@@ -6,7 +6,7 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 # plan-format
 
-기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. config strict-exit, Gate First, dispatch + 단일 패스 작성·자체 검증 후 저장의 3-step 흐름으로 동작한다.
+기획 입력을 **정책서 + 기능설계서** 두 로컬 초안으로 변환하는 formatter 스킬이다. config strict-exit, Gate First, dispatch + main 직접 작성·main 검증 후 저장의 3-step 흐름으로 동작한다.
 
 1. `.product-team-kit/config.json` 존재·유효성 확인 (없으면 종료)
 2. 입력 기반 변환 가능 여부 Gate (불가 시 종료)
@@ -22,15 +22,15 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 | --- | --- | --- |
 | `<project-root>/.product-team-kit/config.json` | step 1 시작 | strict-exit 판정 |
 | 입력 본문 / 파일 / 디렉터리 | step 2 dispatch 직전 | gate 판정과 dispatch 입력 |
-| `templates/기능설계서.md`, `templates/정책서.md` | step 3.2 본문 작성 직전 (병렬 read) | 본문 작성 시 헤더·컬럼 1:1 일치 검증 |
-| `references/storage-contract.md` | step 3.2 자체 검증 통과 후 저장 절차 진입 직전 | staging→write→verify→rename 절차 |
+| `templates/기능설계서.md`, `templates/정책서.md` | step 3.2 본문 작성 직전 (병렬 read) | 본문 작성 시 섹션·metadata 고정, 표 의미 보존 기준 확인 |
+| `references/storage-contract.md` | step 3.2 main 검증 통과 후 저장 절차 진입 직전 | staging→write→verify→rename 절차 |
 | `references/output-contract.md` | 종료 출력 직전 (분기 확정 후 1회) | "설정 없음" / "저장 보류" / "저장 완료" 템플릿 |
 
 분기별 실제 읽기 순서:
 
 - **config fail**: `config.json` → `output-contract.md` → 종료
 - **gate 보류**: `config.json` → 입력 → `output-contract.md` → 종료
-- **정상 저장**: `config.json` → 입력 → `templates/*` (병렬) → 본문 작성·자체 검증 → `storage-contract.md` → 저장 → `output-contract.md` → 종료
+- **정상 저장**: `config.json` → 입력 → `templates/*` (병렬) → main 직접 작성·main 검증 → `storage-contract.md` → 저장 → `output-contract.md` → 종료
 
 ## 호출
 
@@ -81,13 +81,13 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ## 3. 변환 및 저장
 
-**이 step에서 읽는 파일**: step 3.2 본문 작성 직전 `templates/*.md` 2개 (병렬), 자체 검증 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
+**이 step에서 읽는 파일**: step 3.2 본문 작성 직전 `templates/*.md` 2개 (병렬), main 검증 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
 
-`dispatch → 단일 패스 본문 작성 → 자체 검증` 2단계로 동작한다. main이 두 문서를 같은 턴에 작성하고 자체 검증을 통과하면 저장 절차로 진입한다.
+`dispatch → main 직접 작성 → main 검증` 흐름으로 동작한다. 파일 크기와 무관하게 main이 두 문서를 같은 턴에 직접 작성하고 검증한다. 별도 subagent/worker로 기능설계서·정책서 본문을 분리하지 않는다. main이 dispatch, canonical 값, marker 합산, cross-bleed repair, 저장을 모두 소유한다.
 
-step 3.2 본문 작성 직전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다 (두 파일 병렬). 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
+step 3.2 본문 작성 직전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다 (두 파일 병렬). 두 산출물의 섹션 헤더(번호·제목)와 metadata 필드는 템플릿과 1:1로 일치시킨다. 표는 템플릿의 필수 의미와 업무 계약을 유지하되, 컬럼명·컬럼 순서·컬럼 수의 exact match만을 저장 차단 조건으로 삼지 않는다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
 
-### 3.1 공통 dispatch (단일 패스)
+### 3.1 공통 dispatch
 
 **읽는 파일**: 없음 (step 2에서 읽은 입력만 사용). templates는 step 3.2 직전에 읽는다.
 
@@ -96,40 +96,44 @@ step 3.2 본문 작성 직전 `templates/기능설계서.md`와 `templates/정�
 - 추출 기능명, 안전기능명
 - 도메인, 접속 환경, 적용 사용자, 역할명, 용어 사전
 - 입력 단편별 귀속 라벨: `feature`, `policy`, `both`, `excluded`
+- `both` 단편의 분리 기준: 기능설계서에는 사용자 결과·가능 행위, 정책서에는 판단 기준
 - 입력 제외 항목, 원본 문서 피드백 후보, 설정 경고 후보
 
 기능명·역할명·용어 일관성은 이 단계에서만 결정한다. 본문 작성 단계는 dispatch 결과를 그대로 사용하고 재추출하지 않는다.
 
-### 3.2 두 문서 작성 (단일 패스)
+### 3.2 두 문서 작성 (main 직접 작성)
 
 **읽는 파일**: 본문 작성 직전 `templates/기능설계서.md`, `templates/정책서.md` 2개를 병렬 read. 두 템플릿 원문을 같은 턴 내에서 참조하며 본문을 채운다.
 
-main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴에 직접 작성한다. 별도 subagent 호출 없이 자기 컨텍스트에서 단일 패스로 처리한다. 두 문서의 작성 순서는 자유다.
+main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴에 직접 작성한다. 파일이 크거나 입력 단편이 많아도 기능설계서/정책서 worker로 분리하지 않는다. 큰 입력의 비용은 섹션 6~9 압축, semantic table validation, 중복/cross-bleed 국소 repair로 제어한다.
 
 작성 입력:
 
 - dispatch 결과 (안전기능명, 도메인, 접속 환경, 적용 사용자, 역할명, 용어 사전, 라벨 매핑, 입력 제외 항목, 설정 경고)
 - `feature` + `both` 라벨 단편 → 기능설계서 (사용자 결과·가능 행위 부분만)
 - `policy` + `both` 라벨 단편 → 정책서 (판단 기준 부분만 — 허용·금지·조건·예외·제한·승인 기준)
-- `templates/기능설계서.md` 원문 (9 섹션 헤더, 표 컬럼, metadata) — 기능설계서 골격
-- `templates/정책서.md` 원문 (9 섹션 헤더, 표 컬럼, metadata) — 정책서 골격
+- `templates/기능설계서.md` 원문 (9 섹션 헤더, metadata, 표 의미) — 기능설계서 골격
+- `templates/정책서.md` 원문 (9 섹션 헤더, metadata, 표 의미) — 정책서 골격
 
 작성 규칙:
 
-- 기능설계서 9 섹션, 정책서 9 섹션을 각각 템플릿과 1:1로 채운다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 표 컬럼 줄이기 금지.
+- 기능설계서 9 섹션, 정책서 9 섹션의 번호·제목과 metadata 필드는 각각 템플릿과 1:1로 유지한다. 섹션 추가·삭제·병합·재번역·순서 변경 금지.
+- 9개 섹션 헤더는 항상 출력한다. 섹션 1~5는 Gate First 통과 후 실질 내용을 포함해야 하며, 헤더 + marker만 남는 수준이면 빈 골격으로 보류한다.
+- 섹션 6~9는 입력 근거가 없거나 해당 없음이 명확하면 긴 표를 만들지 않고 한 줄로 압축할 수 있다. 허용 문구: `해당 없음: 입력 근거 없음`, `[확인 필요]: 판단 기준 미제공`, `[미정]: 역할/상태/예외 기준 미정`. 이 경우에도 섹션 헤더는 삭제하지 않는다.
+- 표는 semantic validation을 적용한다. 템플릿 표가 요구하는 필수 개념(범위, 사용자 흐름, 입력 항목, 권한, 상태, 세부 규칙, 예외, 확인 기준 등)을 빠뜨리지 않는다. 다만 입력 근거가 없는 컬럼을 채우기 위해 빈 칸이나 placeholder를 반복하지 말고, 의미가 보존되면 컬럼을 합치거나 설명문으로 대체할 수 있다.
 - **라벨 cross-bleed 금지**: 정책서 본문에 화면 동작·입력 방식·사용자 노출 결과 작성 금지. 기능설계서 본문에 허용/금지/조건/예외 판단 기준 작성 금지. 양쪽에 걸리는 항목은 분류 기준 표에 따라 한쪽에만 남긴다.
 - 안전기능명·역할명·용어는 dispatch 결과 그대로 사용. 재추출·재명명 금지.
 - marker 4종 (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`)은 결정이 쓰이는 본문 문장 또는 표 셀에 inline 표시. 각 문서에 marker가 1건 이상이면 문서 끝에 `## 미확정·가정·확인 필요` 섹션 append + 항목 색인.
 - 두 문서 marker는 화면 출력의 `[미확정·가정 항목]` / `확인 필요 질문`에 1회만 합산해 반영.
 - 원본 문서 피드백, 입력 제외 항목, 설정 경고는 본문에 섞지 않고 화면 출력 dispatch 목록을 그대로 사용한다.
 
-작성 후 자체 검증:
+작성 후 main 자체 검증:
 
-- **빈 골격 검사**: 라벨 단편이 비어 본문이 헤더 + marker만 남는 빈 골격이면 step 2 보류로 되돌린다. 저장 절차 (staging folder 생성 포함) 진입 금지. `references/output-contract.md`의 "저장 보류" 템플릿으로 출력하고 부족 항목에 빈 골격 분석 결과 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족")를 추가한다.
-- **헤더 일치 검사**: 섹션 헤더 (번호·제목), 표 컬럼 헤더, metadata 필드가 템플릿과 1:1로 일치하는지 확인한다. 어긋나면 1회 재작성 retry, 2회 어긋나면 step 2 보류 fallback.
-- **중복 검사**: 같은 항목이 양쪽 문서에 중복 등장하면 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복 표/행 제거.
-- **라벨 범위 검사**: cross-bleed 위반 (정책서에 화면 동작, 기능설계서에 판단 기준)이 발견되면 위반 셀을 분류 기준 표대로 옮기거나 제거.
-- 자체 검증 통과 후에만 `references/storage-contract.md`를 읽고 저장 절차 (staging folder → 두 파일 write → verify → rename → verify)를 진행한다. 저장은 main이 일괄 처리한다.
+- **빈 골격 검사**: 각 문서 섹션 1~5에 입력 근거 기반의 non-marker 문장 또는 표 행이 있는지 확인한다. 본문이 헤더 + marker만 남는 빈 골격이면 step 2 보류로 되돌린다. 저장 절차 (staging folder 생성 포함) 진입 금지. `references/output-contract.md`의 "저장 보류" 템플릿으로 출력하고 부족 항목에 빈 골격 분석 결과 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족")를 추가한다.
+- **구조 일치 검사**: 9개 섹션 헤더 (번호·제목)와 metadata 필드가 템플릿과 1:1로 일치하는지 기계적으로 확인한다. 표는 컬럼명·컬럼 순서·컬럼 수 exact match가 아니라 명백한 placeholder 반복, 필수 의미 손실, 업무 계약 누락만 확인한다. 섹션·metadata가 어긋나면 1회 구조 수정 retry, 2회 어긋나면 step 2 보류 fallback. 표의 의미 보강은 전체 재작성 대신 marker 또는 확인 필요 질문으로 남긴다.
+- **중복 검사**: 같은 항목이 양쪽 문서에 중복 등장하면 전체 문서를 재작성하지 않고 위반 문장·행·셀만 국소 repair한다. 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복 표/행은 삭제하거나 이동한다. 의미 손실 없이 국소 repair가 불가능하면 저장 보류 또는 원본 문서 피드백 후보로 남긴다.
+- **라벨 범위 검사**: cross-bleed 위반 (정책서에 화면 동작, 기능설계서에 판단 기준)이 발견되면 전체 문서를 재작성하지 않고 위반 문장·행·셀만 분류 기준 표대로 이동·삭제·재서술한다. 의미 손실 없이 국소 repair가 불가능하면 저장 보류 또는 확인 필요 질문으로 남긴다.
+- main 검증 통과 후에만 `references/storage-contract.md`를 읽고 저장 절차 (staging folder → 두 파일 write → verify → rename → verify)를 진행한다. 저장은 main이 일괄 처리한다.
 
 ### 분류 기준
 
@@ -166,11 +170,11 @@ main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴�
 
 - 섹션 헤더(`## 1. 개요` 등) 자체는 템플릿과 동일하게 유지한다. 임의 삭제·번호 재배열·제목 변형 금지.
 - 빈 표 행, 예시 placeholder, 값 없는 metadata 줄은 제거한다. 본문이 비는 섹션은 헤더만 두고 marker(`[미정]`/`[확인 필요]`)로 사유를 표시한다.
-- 단, 다음 섹션은 입력 근거가 있을 때만 헤더째 생성한다: `외부/타시스템 연동`, `운영 조치`, `관련 문서`, `접속 환경`.
+- 입력 근거가 없는 선택 정보는 헤더를 삭제하지 않고 압축한다. 표를 채울 근거가 없으면 표를 만들지 않고 `해당 없음`, `[확인 필요]`, `[미정]` 한 줄로 사유를 남긴다.
 - 기능설계서 `관련 정책서`와 정책서 `관련 기능설계서`는 같은 output folder 상대 링크 기본.
 - 정책서 세부 규칙은 허용/금지/조건/예외 판단 기준만. 화면 동작·입력 방식·사용자 노출 결과는 기능설계서.
 - 역할명·기능명·범위·용어는 두 문서에 동일하게 쓴다.
-- 작성 가이드, HTML 주석, `[기능명]`, `[정책명]`, 값 없는 `- 항목:`, 빈 표 행, handoff artifact heading, 생성 과정 설명 (`원본`, `원문`, `입력 반영 요약`, `섹션 적용 체크리스트`)은 결과물에서 제거.
+- 작성 가이드, HTML 주석, `[기능명]`, `[정책명]`, 값 없는 `- 항목:`, 빈 표 행, 생성 과정 설명 (`원본`, `원문`, `입력 반영 요약`, `섹션 적용 체크리스트`)은 결과물에서 제거.
 - Mermaid는 표·본문에 이미 있는 내용만 시각화한다. 기능설계서 `3. 진입점과 사용자 흐름`에 사용자 행동이 있으면 `flowchart`. 정책서 `6. 상태 및 처리 기준`에 상태가 있으면 `stateDiagram`, 판단 분기가 있으면 `flowchart`. 미확정 노드는 `[미정]`로 남기고 임의 확정하지 않음.
 
 ### 원본 문서 피드백
@@ -179,7 +183,7 @@ main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴�
 
 ### 저장과 출력
 
-저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 이 파일은 step 3.2 자체 검증 통과 후 저장 절차 직전에만 읽는다.
+저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 이 파일은 step 3.2 main 검증 통과 후 저장 절차 직전에만 읽는다.
 
 사용자 출력은 `references/output-contract.md`의 "저장 완료" / "저장 보류" / "설정 없음" 템플릿을 따른다. 이 파일은 종료 분기가 확정된 직후 1회만 읽는다 (분기마다 동일).
 

@@ -7,7 +7,7 @@
 Use this plugin to:
 
 - Draft 기능설계서 and 정책서 documents from user-provided planning input.
-- Create or update `.product-team-kit/config.json` with `set-config`.
+- Create or update local product-team-kit settings with `set-config`: `.product-team-kit/config.json`, then the product-team-kit managed block in project-root `CLAUDE.md` and `AGENTS.md`.
 - Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
 - Return a save-hold with missing fields when the planning input is not enough to create both draft documents.
 - Review SSOT conflict, clarity, terminology consistency, and role-based readiness with `plan-review` before publishing through a separate external process. `plan-review` narrows Product Docs candidates with review-target keywords and reads only directly needed Markdown and linked local resources.

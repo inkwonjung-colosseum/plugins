@@ -1,6 +1,6 @@
 interface:
   display_name: set-config
-  short_description: .product-team-kit/config.json을 대화형으로 갱신합니다 (각 키마다 default 유지/직접 입력)
+  short_description: .product-team-kit/config.json과 CLAUDE.md/AGENTS.md product-team-kit 안내 블록을 갱신합니다
   brand_color: "#0F766E"
   default_prompt: 설정을 바꿔줘
 policy:
@@ -9,6 +9,7 @@ policy:
     use_when:
       - .product-team-kit/config.json을 처음 만들거나 기존 값을 갱신하려는 경우
       - outputRoot 또는 SSOT corpus 범위(ssot.include, ssot.exclude)를 바꾸려는 경우
+      - 프로젝트 agent 안내 파일에 Product Docs SSOT 우선 조회 규칙을 반영하려는 경우
       - 설정 파일을 직접 편집하지 않고 대화형으로 정하고 싶은 경우
     avoid_when:
       - 기획 입력을 기능설계서/정책서로 변환하려는 경우에는 plan-format을 사용
@@ -24,6 +25,9 @@ policy:
       - 검증 거부값은 저장하지 않는다. runtime의 치명 설정 오류 또는 비치명 fallback 처리와 다르다.
       - 모든 키 입력 후 변경 요약을 보여주고 저장/취소 확인을 받는다.
       - 저장은 .product-team-kit/config.json으로 atomic write한다.
+      - config 저장 성공 후 CLAUDE.md와 AGENTS.md를 선택 없이 항상 생성·갱신한다.
+      - CLAUDE.md/AGENTS.md는 product-team-kit:start/end 관리 블록만 replace 또는 append하고 기존 사용자 내용은 보존한다.
+      - CLAUDE.md/AGENTS.md에 start 또는 end marker가 하나만 있으면 해당 파일은 변경하지 않고 agent-guide-write 실패로 보고한다.
       - 기존 config의 다른 키는 보존한다 (merge).
       - version은 항상 1로 고정 저장한다. 사용자에게 묻지 않는다.
       - Python, Node.js, 별도 CLI helper 설치를 전제하지 않는다.

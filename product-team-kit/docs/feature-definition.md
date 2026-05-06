@@ -1,8 +1,8 @@
 # product-team-kit 기능 정의서
 
 - 문서 상태: 초안
-- 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.5
+- 기준일: 2026-05-07
+- 대상 버전: product-team-kit 0.6.6
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -10,7 +10,7 @@
 
 | 영역 | 기능 | 목적 |
 |---|---|---|
-| 설정 | set-config | `.product-team-kit/config.json`을 대화형으로 생성/갱신한다. |
+| 설정 | set-config | `.product-team-kit/config.json`을 대화형으로 생성/갱신하고 `CLAUDE.md`/`AGENTS.md` 안내 블록을 항상 생성/갱신한다. |
 | 초안 생성 | Step 1 strict-exit | `.product-team-kit/config.json` 미존재·검증 실패 시 즉시 종료, set-config 안내. |
 | 공통 | Lazy read | config, 입력, templates, references, SSOT corpus를 필요한 단계에서만 읽는다. |
 | 입력 처리 | 입력 dispatch | 직접 텍스트, 파일, 디렉터리, 혼합 입력을 기획 입력으로 읽는다. |
@@ -25,7 +25,7 @@
 
 ## 2. set-config
 
-`set-config`는 사용처 프로젝트 루트의 `.product-team-kit/config.json`만 생성하거나 갱신한다. cwd의 git root가 있으면 git root를 기준으로 하고, 없으면 cwd를 기준으로 한다.
+`set-config`는 사용처 프로젝트 루트의 `.product-team-kit/config.json`을 생성하거나 갱신한다. cwd의 git root가 있으면 git root를 기준으로 하고, 없으면 cwd를 기준으로 한다. config 저장이 성공하면 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 사용자 선택 없이 항상 생성·갱신한다.
 
 수집하는 키:
 
@@ -36,7 +36,7 @@
 | `ssot.include` | 빈 값이면 key 제거 | plan-review SSOT allow-list glob. 제거 시 기본 `Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md` 사용 |
 | `ssot.exclude` | 빈 값이면 key 제거 | plan-review SSOT 추가 제외 glob |
 
-검증 거부값은 저장하지 않고 같은 키에서 재입력받는다. 저장은 `.product-team-kit/config.json.tmp` 작성 후 rename하는 atomic write로 수행한다.
+검증 거부값은 저장하지 않고 같은 키에서 재입력받는다. config 저장은 `.product-team-kit/config.json.tmp` 작성 후 rename하는 atomic write로 수행한다. `CLAUDE.md`/`AGENTS.md`는 기존 사용자 내용을 보존하고 `<!-- product-team-kit:start -->` / `<!-- product-team-kit:end -->` 관리 블록만 replace 또는 append한다. marker가 한쪽만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
 
 ## 3. plan-format
 
@@ -174,6 +174,7 @@ flowchart TD
     B -- 예 --> G[plan-review]
     B -- 아니오 --> Z{설정 변경인가?}
     Z -- 예 --> Z1[set-config]
+    Z1 --> Z2[config 저장 + CLAUDE.md/AGENTS.md 안내 블록 upsert]
     Z -- 아니오 --> C[plan-format]
     C --> S1{Step 1: config 존재·유효?}
     S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]

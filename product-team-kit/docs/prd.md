@@ -1,8 +1,8 @@
 # product-team-kit PRD
 
 - 문서 상태: 초안
-- 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.5
+- 기준일: 2026-05-07
+- 대상 버전: product-team-kit 0.6.6
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -19,7 +19,7 @@
 ## 3. 목표
 
 - 기획 입력을 기능설계서와 정책서 두 초안으로 안정적으로 분리한다.
-- 사용처 프로젝트별 `.product-team-kit/config.json`으로 초안 저장 위치와 SSOT 검색 범위를 조정한다.
+- 사용처 프로젝트별 `.product-team-kit/config.json`으로 초안 저장 위치와 SSOT 검색 범위를 조정하고, `CLAUDE.md`/`AGENTS.md` 안내 블록으로 agent가 해당 범위를 먼저 확인하게 한다.
 - config, 입력, templates, references, SSOT corpus를 필요한 단계에서만 읽어 불필요한 선행 context 사용을 줄인다.
 - 입력이 부족한 경우 문서를 만들지 않고 부족 항목만 알려준다.
 - 생성된 초안이 공식 팀 문서가 아니라 로컬 검토 대상임을 명확히 한다.
@@ -40,7 +40,7 @@
 ### 제공 범위
 
 - 직접 텍스트, 파일, 디렉터리 기반 기획 입력 처리
-- `set-config`를 통한 `.product-team-kit/config.json` 생성/갱신
+- `set-config`를 통한 `.product-team-kit/config.json` 생성/갱신과 `CLAUDE.md`/`AGENTS.md` 안내 블록 자동 생성/갱신
 - Lazy read 기반 실행: 종료 분기에서 쓰지 않는 templates, references, SSOT corpus를 읽지 않음
 - Gate First 기반 초안 생성 가능성 판정
 - 기능설계서와 정책서 동시 생성
@@ -81,7 +81,7 @@ flowchart TD
 | ID | 요구사항 | 수용 기준 |
 |---|---|---|
 | PRD-01 | 사용자는 기획 입력을 직접 텍스트, 파일, 디렉터리로 제공할 수 있다. | 입력 처리 결과에 출처와 제외 항목이 표시된다. |
-| PRD-02 | 사용자는 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신할 수 있다. | `set-config`가 `outputRoot`, `ssot.include`, `ssot.exclude`를 수집하고 `version: 1`로 저장한다. |
+| PRD-02 | 사용자는 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신할 수 있고, 같은 root의 agent 안내 파일도 자동으로 정렬된다. | `set-config`가 `outputRoot`, `ssot.include`, `ssot.exclude`를 수집하고 `version: 1`로 저장한 뒤 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 선택 없이 항상 생성·갱신한다. |
 | PRD-03 | 입력이 부족하거나 config가 없으면 파일을 만들지 않는다. | config 부재·검증 실패 시 strict-exit으로 set-config 안내, 정보 부족 시 기능 목적/적용 범위/사용자 행동/주요 조건 중 부족한 항목을 출력한다. |
 | PRD-04 | 충분한 입력은 기능설계서와 정책서 두 문서로 분리한다. | 화면/흐름/사용자 결과는 기능설계서, 규칙/조건/예외/제한은 정책서에 배치된다. |
 | PRD-05 | 저장된 초안은 공식 팀 문서가 아님을 표시한다. | 산출물과 출력에 로컬 초안, 팀 문서 미반영, 공식 팀 문서 아님이 드러난다. |

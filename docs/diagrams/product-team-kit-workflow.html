@@ -93,11 +93,11 @@
   <main>
     <p class="eyebrow">Flowchart · product-team-kit</p>
     <h1>Planning input to team handoff workflow</h1>
-    <p class="summary">product-team-kit은 필요한 파일을 단계별로 lazy read한다. config를 먼저 확인하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.</p>
+    <p class="summary">product-team-kit은 필요한 파일을 단계별로 lazy read한다. set-config로 config와 agent 안내 블록을 먼저 정렬하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.</p>
 
 <svg viewBox="0 0 1180 1040" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">product-team-kit 기획 입력 검토 흐름</title>
-  <desc id="desc">plan-format과 plan-review는 필요한 파일을 해당 sub-step에서만 읽고, config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 초안 생성 가능성을 판단하고, 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력한다. 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 재검토 안내 또는 발행 준비 체크리스트를 출력하며 외부 publish는 하지 않는다.</desc>
+  <desc id="desc">set-config는 config 저장 후 CLAUDE.md와 AGENTS.md 안내 블록을 항상 upsert한다. plan-format과 plan-review는 필요한 파일을 해당 sub-step에서만 읽고, config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 초안 생성 가능성을 판단하고, 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력한다. 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 재검토 안내 또는 발행 준비 체크리스트를 출력하며 외부 publish는 하지 않는다.</desc>
   <defs>
     <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
       <polygon points="0 0, 9 3.5, 0 7" fill="#4f5d75"/>
