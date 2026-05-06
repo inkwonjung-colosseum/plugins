@@ -14,28 +14,42 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 산출물은 `<outputRoot>/` 아래 로컬 초안이며 **공식 팀 문서가 아니다**. Product Docs SSOT 검증과 착수 가능성 판단은 `plan-review` 책임이다.
 
-### 화면 출력 원칙
+### 진행 표시 원칙
 
-실행 중 사용자에게 보이는 **유일한 텍스트 블록은 종료 분기에서 1회 출력하는 `references/output-contract.md` 템플릿**이다. 그 외 모든 mid-execution narration 금지.
+실행 중 사용자에게 보이는 narration은 **구조화된 step 헤더 한 줄로만** 표시한다. 각 step 진입 시점에 정확히 한 줄을 출력한다. 마지막 step에서 `references/output-contract.md` 템플릿 1회 출력한다.
 
-금지 항목 (전부 출력 금지):
-- step 진입/완료 보고: `step 1: ...`, `step 2: gate 통과`, `step 3.1: dispatch 완료`, `step 3.2: 작성 직전`
+형식: `Step N/M: <step 이름>` (M은 분기별 총 step 수, 사전 결정)
+
+분기별 step 시퀀스:
+
+- **config 치명** (M=2): `Step 1/2: 설정 확인` → `Step 2/2: 종료 출력`
+- **gate 보류** (M=3): `Step 1/3: 설정 확인` → `Step 2/3: gate 판정` → `Step 3/3: 종료 출력`
+- **저장 완료/실패** (M=6): `Step 1/6: 설정 확인` → `Step 2/6: gate 판정` → `Step 3/6: dispatch` → `Step 4/6: 두 문서 작성·검증` → `Step 5/6: 저장 절차` → `Step 6/6: 종료 출력`
+
+step 헤더 외 금지 항목 (전부 출력 금지):
+
 - file IO 안내: `templates read`, `templates 병렬 read`, `storage-contract read`, `output-contract read`, `timestamp 확인`
-- dispatch 중간 산출: `dispatch 결과: ...`, `안전기능명: ...`, `라벨 매핑: ...`, `용어 사전: ...`
-- 자체 검증 상세: `빈 골격 검사 통과`, `구조 일치 ✓`, `중복 없음`, `cross-bleed 없음`
-- 저장 진행: `staging folder 생성`, `verify OK`, `rename 완료`, `저장 절차 시작`
-- 본문 echo: `[기능설계서 초안]`, `[정책서 초안]`, markdown 섹션, 표, mermaid, metadata 줄
-- 추론·계획 narration: `이제 ~ 한다`, `~ 직전`, `~ 시작`, `~ 통과 후 ~ 진행`
+- dispatch 중간 산출 echo: `dispatch 결과: ...`, `안전기능명: ...`, `라벨 매핑: ...`, `용어 사전: ...`
+- 자체 검증 상세 echo: `빈 골격 검사 통과`, `구조 일치 ✓`, `중복 없음`, `cross-bleed 없음`
+- 저장 sub-action 보고: `staging folder 생성`, `verify OK`, `rename 완료`
+- 본문 echo: `[기능설계서 초안]`, `[정책서 초안]`, markdown 섹션, 표, mermaid, metadata 줄 (Write 툴 호출 결과는 Claude Code UI가 자동 표시 — 별도 echo 금지)
+- 추론·계획 narration: `이제 ~ 한다`, `~ 직전`, `~ 시작`, `~ 통과 후 ~ 진행`, `~ 완료 (디테일)`
 
-내부 추론은 모두 thinking으로 처리한다. Read/Write 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 progress 안내 텍스트 삽입 금지.
+내부 추론은 thinking으로 처리한다. Read/Write/Bash 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 진행 안내 텍스트 삽입 금지.
 
-사용자가 보는 turn 마지막 결과는 분기별 1개:
-- step 1 strict-exit → `output-contract.md` "설정 없음" 템플릿
-- step 2 gate 미통과 → "저장 보류" 템플릿
-- step 3 저장 완료 → "저장 완료" 템플릿
-- step 3 저장 실패 → "저장 실패" 템플릿
+분기 결정 시점:
 
-**예외**: 사용자 권한 승인 필요 (Bash, Write 툴 호출 시 Claude Code 권한 prompt)는 자동 표시되며 SKILL이 제어 불가. 모델이 추가 narration 붙이지 않으면 권한 prompt만 보인다.
+- 분기 확정 전(Step 1 진입 시점)에는 일단 정상 분기(M=6) 헤더로 시작한다.
+- 분기 변경 시점(예: Step 1 후 config 치명 발견, Step 2 후 gate 보류)에 다음 step 헤더부터 새 M 값으로 출력한다. 이전 헤더는 정정하지 않는다.
+
+사용자가 보는 turn 마지막 결과는 Step N/N (마지막 step) 직후 `references/output-contract.md` 템플릿 1회 출력이다. 분기별 템플릿:
+
+- config 치명 → "설정 없음" 템플릿
+- gate 보류 → "저장 보류" 템플릿
+- 저장 완료 → "저장 완료" 템플릿
+- 저장 실패 → "저장 실패" 템플릿
+
+**예외**: 사용자 권한 승인 필요 (Bash, Write 툴 호출 시 Claude Code 권한 prompt)는 자동 표시되며 SKILL이 제어 불가. 모델이 추가 narration 붙이지 않으면 step 헤더 + 권한 prompt만 보인다.
 
 ### Lazy read 원칙
 
@@ -64,6 +78,8 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ## 1. 설정 확인 (strict-exit)
 
+**진행 표시 매핑**: `Step 1/M: 설정 확인` 헤더 1회 출력 후 진행. 정상 분기 M=6, gate 보류 M=3, config 치명 M=2 (`### 진행 표시 원칙`).
+
 **이 step에서 읽는 파일**: `<project-root>/.product-team-kit/config.json` 하나만. templates·references·입력 파일은 읽지 않는다.
 
 `<project-root>/.product-team-kit/config.json`을 읽는다. `<project-root>`는 입력 기준 git root 또는 현재 작업 디렉터리다 (`../../references/config-contract.md` 동일 규칙).
@@ -80,6 +96,8 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]` 블록으로 처리한다. 이 경우는 종료하지 않고 step 2로 진행한다.
 
 ## 2. Gate First 변환 가능 판정
+
+**진행 표시 매핑**: `Step 2/M: gate 판정` 헤더 1회 출력 후 진행. 미통과 시 다음 헤더는 `Step 3/3: 종료 출력`로 분기 단축 (`### 진행 표시 원칙`).
 
 **이 step에서 읽는 파일**: 입력 (텍스트·파일·디렉터리). templates·references는 아직 읽지 않는다.
 
@@ -103,6 +121,8 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 `[미정]`/`[가정]`/`[확인 필요]`는 gate 통과 후 세부 보강용으로만 쓴다. gate 통과 전 부족분을 채우는 용도로 쓰지 않는다.
 
 ## 3. 변환 및 저장
+
+**진행 표시 매핑**: 3.1 dispatch = `Step 3/6: dispatch`. 3.2 본문 작성·검증 = `Step 4/6: 두 문서 작성·검증`. 저장 절차 (staging → write → verify → rename) = `Step 5/6: 저장 절차`. 종료 출력 = `Step 6/6: 종료 출력`. 각 step 진입 시점에 헤더 1회 출력. sub-action narration 금지 (`### 진행 표시 원칙`).
 
 **이 step에서 읽는 파일**: step 3.2 본문 작성 직전 `templates/*.md` 2개 (병렬), main 검증 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
 

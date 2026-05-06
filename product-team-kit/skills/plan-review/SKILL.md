@@ -34,6 +34,38 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 - **SSOT 매칭 0건**: `config.json` → 본문/짝문서 → `review-rules.md` → corpus 후보 listing 후 0건 확인 → main A축 "검증 대상 없음" 처리 + 3 worker 병렬(B/C/D) 본문 점검 → merge → `output-format.md`
 - **정상**: `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing → corpus 본문 read → main A축 점검 + 3 worker 병렬(B/C/D) → merge → `output-format.md`
 
+## 진행 표시 원칙
+
+실행 중 사용자에게 보이는 narration은 **구조화된 step 헤더 한 줄로만** 표시한다. 각 step 진입 시점에 정확히 한 줄을 출력한다.
+
+형식: `Step N/M: <step 이름>` (M은 분기별 총 step 수, 사전 결정)
+
+분기별 step 시퀀스:
+
+- **config 치명** (M=2): `Step 1/2: 설정 확인` → `Step 2/2: 종료 출력`
+- **입력 타입 fail** (M=3): `Step 1/3: 설정 확인` → `Step 2/3: 입력 타입 검증` → `Step 3/3: 종료 출력`
+- **SSOT 키워드 추출 실패** (M=4): `Step 1/4: 설정 확인` → `Step 2/4: 검토 대상 read` → `Step 3/4: 키워드 추출` → `Step 4/4: 종료 출력`
+- **조기 판정** (M=4): `Step 1/4: 설정 확인` → `Step 2/4: 검토 대상 read` → `Step 3/4: 조기 판정` → `Step 4/4: 종료 출력`
+- **SSOT 매칭 0건** (M=6): `Step 1/6: 설정 확인` → `Step 2/6: 검토 대상 read` → `Step 3/6: SSOT corpus 탐색` → `Step 4/6: 4축 점검 (A 검증 대상 없음 + B/C/D 병렬)` → `Step 5/6: merge` → `Step 6/6: 리포트 출력`
+- **정상** (M=6): `Step 1/6: 설정 확인` → `Step 2/6: 검토 대상 read` → `Step 3/6: SSOT corpus 탐색` → `Step 4/6: 4축 점검 (A + B/C/D 병렬)` → `Step 5/6: merge` → `Step 6/6: 리포트 출력`
+
+step 헤더 외 금지 항목 (전부 출력 금지):
+
+- file IO 안내: `config.json 먼저 확인`, `검토 대상 파일 2개 동시 read`, `output-format.md 읽는다`
+- sub-action 보고: `config 정상`, `직접 관련 SSOT 후보 발견`, `상위 20줄 인덱스 스캔`, `파일이 비어있는지 직접 확인`, `두 파일 모두 빈 파일`
+- 추론·계획 narration: `조기 판정 기준 미달`, `4축 점검 완료`, `최종 리포트 출력`, `이제 ~ 한다`
+- 본문 echo: 검토 대상 본문, SSOT corpus 본문, 표 미리보기, marker 인용
+
+내부 추론은 thinking으로 처리한다. Read/Bash/Agent 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 진행 안내 텍스트 삽입 금지.
+
+분기 결정 시점:
+
+- 분기 확정 전(Step 1 진입 시점)에는 일단 정상 분기(M=6) 헤더로 시작한다.
+- 분기 변경 시점(예: Step 1 후 config 치명 발견)에 다음 step 헤더부터 새 M 값으로 출력한다. 이전 헤더는 정정하지 않는다.
+- 사전 점검(`## 사전 점검` 1~4)은 Step 1과 Step 2에 분산된다. config 검증 = Step 1, 입력 타입·짝문서 탐색 = Step 2.
+
+사용자가 보는 turn 마지막 결과는 Step N/N (마지막 step) 직후 `references/output-format.md` 템플릿 1회 출력이다.
+
 ## 호출
 
 - Claude Code: `/product-team-kit:plan-review <초안 폴더 또는 기능설계서/정책서 파일경로>`
@@ -60,6 +92,8 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 
 ## 사전 점검
 
+**진행 표시 매핑**: 1번 = `Step 1/M: 설정 확인`, 2~4번 = `Step 2/M: 검토 대상 read`. step 헤더는 각 step 진입 시점에만 1회 출력하고 sub-action narration은 추가하지 않는다 (`## 진행 표시 원칙`).
+
 **이 단계에서 읽는 파일**: `config.json` (1번), 검토 대상 본문 + 짝문서 (2~4번 통과 후). `review-rules.md`·SSOT corpus·`output-format.md`는 아직 읽지 않는다.
 
 1. `.product-team-kit/config.json` 존재 여부를 확인하고 `outputRoot`, `ssot.include`, `ssot.exclude`를 확정한다. 파일 없음, JSON 파싱 실패, `version` 미일치, `outputRoot` 검증 거부는 치명 설정 오류로 즉시 종료하고 `set-config` 사용을 안내한다. 종료 출력은 `output-format.md`를 이 시점에 read해 적용한다. 비치명 검증 거부만 default fallback과 `[설정 경고]`로 처리한다.
@@ -81,6 +115,8 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 ## 실행 단계
 
 `dispatch → main A축 점검 + 3 worker(B/C/D) 병렬 → merge` 3단계로 동작한다. SSOT corpus는 main이 보유·사용하므로 A축은 main이 직접 점검하고, 본문만 보는 B/C/D만 worker로 분리한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
+
+**진행 표시 매핑**: dispatch의 SSOT corpus 탐색·매칭 = `Step 3/M: SSOT corpus 탐색`. main A축 점검 + 3 worker 병렬 = `Step 4/M: 4축 점검`. merge = `Step 5/M: merge`. 종료 출력 = `Step 6/M: 리포트 출력`. 조기 판정 종료 분기는 `Step 3/4: 조기 판정` → `Step 4/4: 종료 출력`로 단축한다 (`## 진행 표시 원칙`).
 
 ### dispatch (단일 패스)
 
