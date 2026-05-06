@@ -59,7 +59,6 @@ $term-clarifier "계정", "사용자", "멤버" 차이 정리해줘
 - `.codex-plugin/plugin.json` — Codex 플러그인 매니페스트
 - `skills/` — 4개 대화형 AI 유틸리티 스킬
 - `docs/` — privacy policy와 terms of service
-- `tests/` — 구조 회귀 테스트
 
 ## 참고
 
@@ -85,6 +84,5 @@ marketplace 추가 후 Codex 앱의 `/plugins`에서 `ai-utility-kit`을 설치/
 ## 검증
 
 ```bash
-python3 -m unittest ai-utility-kit/tests/test_structure.py
 claude plugin validate ./ai-utility-kit
 ```

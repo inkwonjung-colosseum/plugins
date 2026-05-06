@@ -40,4 +40,4 @@ Filter shapes, NOT text. Displacement-mapped text becomes illegible. Structure y
 ## When not to use
 - Technical documentation (precision matters).
 - Diagrams with dense labels or tight alignments (filter reads as noise).
-- Dark variants — wobble reads as artifact on dark backgrounds. Test first.
+- Dark variants — wobble reads as artifact on dark backgrounds. Check first.

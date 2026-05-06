@@ -93,11 +93,11 @@
   <main>
     <p class="eyebrow">Workflow analysis · product-team-kit</p>
     <h1>기획 입력에서 팀 반영 전 검토까지</h1>
-    <p class="summary">상세 view는 같은 workflow source에서 생성된다. 입력 보완, 저장 보류, review_repair, publish_readiness, SSOT 근거 경계를 한 화면에서 확인한다.</p>
+    <p class="summary">상세 view는 같은 workflow source에서 생성된다. 입력 보완, 저장 보류, 재검토 안내, 발행 준비 체크리스트, SSOT 근거 경계를 한 화면에서 확인한다.</p>
 
 <svg viewBox="0 0 1260 980" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">product-team-kit workflow analysis</title>
-  <desc id="desc">기획 입력은 plan-format으로 들어간다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 수정 작업 블록 또는 발행 준비 증적을 출력한다. 팀 반영은 플러그인 밖의 사람 절차다.</desc>
+  <desc id="desc">기획 입력은 plan-format으로 들어간다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 필수 수정 항목 또는 발행 준비 체크리스트를 출력한다. 팀 반영은 플러그인 밖의 사람 절차다.</desc>
   <defs>
     <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
       <polygon points="0 0, 9 3.5, 0 7" fill="#4f5d75"/>
@@ -136,8 +136,8 @@
   <rect class="edge-label-bg" x="376" y="822" width="112" height="18" rx="3"/>
 <text class="edge-label" x="432" y="834" text-anchor="middle">같은 경로 재검토</text>
   <path class="line-accent" d="M 320 832 C 350 866, 384 888, 430 893"/>
-  <rect class="edge-label-bg" x="292" y="846" width="116" height="18" rx="3"/>
-<text class="edge-label" x="350" y="858" text-anchor="middle">pass / conditional</text>
+  <rect class="edge-label-bg" x="306" y="846" width="88" height="18" rx="3"/>
+<text class="edge-label" x="350" y="858" text-anchor="middle">통과 / 조건부</text>
   <path class="line-accent" d="M 790 893 L 850 894"/>
   <rect class="node" x="88" y="116" width="250" height="62" rx="31"/>
   <text class="title" x="213" y="144" text-anchor="middle">기획 입력</text>
@@ -159,29 +159,29 @@
   <text class="sub" x="494" y="496" text-anchor="middle">기존 산출물 덮어쓰기 금지</text>
   <rect class="node-soft" x="754" y="590" width="330" height="86" rx="8"/>
   <text class="title" x="919" y="622" text-anchor="middle">근거 경계</text>
-  <text class="sub" x="919" y="639" text-anchor="middle">planning/은 SSOT 근거 제외</text>
+  <text class="sub" x="919" y="639" text-anchor="middle">&lt;outputRoot&gt;/은 SSOT 근거 제외</text>
   <text class="sub" x="919" y="656" text-anchor="middle">linked local resource만 확인</text>
   <rect class="node" x="180" y="596" width="280" height="82" rx="8"/>
   <text class="title" x="320" y="626" text-anchor="middle">plan-review</text>
-  <text class="sub" x="320" y="643" text-anchor="middle">Product Docs SSOT 근거 패키지</text>
-  <text class="sub" x="320" y="660" text-anchor="middle">2 관점 보수 합성</text>
+  <text class="sub" x="320" y="643" text-anchor="middle">Product Docs SSOT 직접 읽기</text>
+  <text class="sub" x="320" y="660" text-anchor="middle">4축 보수 합성</text>
   <polygon class="node" points="320,714 464,773 320,832 176,773"/>
   <text class="title" x="320" y="770" text-anchor="middle">검토 결과</text>
-  <text class="sub" x="320" y="787" text-anchor="middle">수정 필요 &gt; conditional pass &gt; pass</text>
+  <text class="sub" x="320" y="787" text-anchor="middle">수정 필요 &gt; 조건부 통과 &gt; 통과</text>
   <rect class="node-soft" x="570" y="708" width="300" height="90" rx="8"/>
-  <text class="title" x="720" y="742" text-anchor="middle">review_repair</text>
-  <text class="sub" x="720" y="759" text-anchor="middle">P0/P1 수정 작업 블록</text>
+  <text class="title" x="720" y="742" text-anchor="middle">재검토 안내</text>
+  <text class="sub" x="720" y="759" text-anchor="middle">필수 수정 항목</text>
   <text class="sub" x="720" y="776" text-anchor="middle">초안 수정 후 같은 경로 재검토</text>
   <rect class="node-accent" x="430" y="854" width="360" height="78" rx="8"/>
-  <text class="title" x="610" y="882" text-anchor="middle">publish_readiness</text>
-  <text class="sub" x="610" y="899" text-anchor="middle">pass 또는 conditional pass에서만 출력</text>
-  <text class="sub" x="610" y="916" text-anchor="middle">readiness checklist only</text>
+  <text class="title" x="610" y="882" text-anchor="middle">발행 준비 체크리스트</text>
+  <text class="sub" x="610" y="899" text-anchor="middle">통과 또는 조건부 통과</text>
+  <text class="sub" x="610" y="916" text-anchor="middle">사람 확인 checklist</text>
   <rect class="node-accent" x="850" y="862" width="292" height="64" rx="32"/>
   <text class="title" x="996" y="883" text-anchor="middle">팀의 반영 절차</text>
   <text class="sub" x="996" y="900" text-anchor="middle">사람이 외부 반영</text>
   <text class="sub" x="996" y="917" text-anchor="middle">plan-review는 publish하지 않음</text>
   <text class="note" x="70" y="920">보수성: 입력이 부족하면 저장하지 않고 부족 항목만 출력한다.</text>
-  <text class="note" x="70" y="940">발행 경계: publish_readiness는 readiness only이며 Product Docs SSOT, linked local resource를 자동 수정하지 않는다.</text>
+  <text class="note" x="70" y="940">발행 경계: 발행 준비 체크리스트는 안내용이며 Product Docs SSOT, linked local resource를 자동 수정하지 않는다.</text>
 </svg>
   </main>
 </body>

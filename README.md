@@ -1,6 +1,6 @@
 # COLO plugins
 
-Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs와 필요한 경우 tests를 관리합니다. 현재 이 저장소는 Claude Code와 Codex용 manifest만 제공하며, Cowork용 plugin manifest나 marketplace catalog는 포함하지 않습니다.
+Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs를 관리합니다. 현재 이 저장소는 Claude Code와 Codex용 manifest만 제공하며, Cowork용 plugin manifest나 marketplace catalog는 포함하지 않습니다.
 
 ## 빠른 시작
 
@@ -10,7 +10,6 @@ GitHub repository marketplace를 추가한 뒤 필요한 플러그인을 설치�
 
 ```bash
 claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins
-claude plugin install confluence-export-kit@inkwonjung-colosseum
 claude plugin install product-team-kit@inkwonjung-colosseum
 claude plugin install diagram-design@inkwonjung-colosseum
 claude plugin install logistics-expert-kit@inkwonjung-colosseum
@@ -27,7 +26,7 @@ Codex는 repository marketplace를 추가한 뒤 Codex 앱에서 `/plugins`를 �
 codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 ```
 
-스킬은 `$plan-format`, `$plan-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
+스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
@@ -37,11 +36,10 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `confluence-export-kit` | `0.3.3` | Confluence export 및 local export-index workflow. auth/export 기본값 설정, page/space/org/page-with-descendants export, export 후 자동 색인, 로컬 Markdown 재색인을 다룹니다. | `set-config`, `show-config`, `export-page`, `export-page-with-descendant`, `export-space`, `export-org`, `index-export` | [README](./confluence-export-kit/README.md) |
-| `product-team-kit` | `0.5.1` | 기획 입력을 기능설계서와 정책서 초안으로 정리하며, Product Docs SSOT 근거 패키지 기반 `plan-review`로 발행 전 충돌 여부와 착수 가능성을 확인합니다. | `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `diagram-design` | `1.0.1` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
-| `logistics-expert-kit` | `0.1.0` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
-| `ai-utility-kit` | `0.1.0` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
+| `product-team-kit` | `0.6.0` | 기획 입력을 기능설계서와 정책서 초안으로 정리하며, `.product-team-kit/config.json` 설정과 Product Docs SSOT 근거 기반 4축 점검(SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
+| `diagram-design` | `1.0.2` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
+| `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
+| `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
 
 ## 프로젝트 다이어그램
 
@@ -49,9 +47,8 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 
 | 다이어그램 | 설명 |
 |---|---|
-| [`confluence-export-kit-workflow.html`](./docs/diagrams/confluence-export-kit-workflow.html) | `set-config`의 고정 export 기본값, export scope 선택, `cme` 실행, 자동 `index-export` 흐름 |
 | [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence export를 Product Docs Markdown 후보로 가져오는 보조 문서 운영 흐름 |
-| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`, `plan-review`, 저장 보류, `review_repair`, `publish_readiness`, 팀 handoff를 요약한 generated overview |
+| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`, `plan-review`, 저장 보류, 재검토 안내, 발행 준비, 팀 handoff를 요약한 generated overview |
 | [`product-team-kit-workflow-analysis.html`](./docs/diagrams/product-team-kit-workflow-analysis.html) | 같은 source에서 생성한 상세 분석 view. 입력 보완, SSOT 근거 경계, 보수적 종료 조건, 발행 준비 경계를 함께 표시 |
 | [`diagram-design-workflow.html`](./docs/diagrams/diagram-design-workflow.html) | `diagram-design`의 타입 선택, style guide gate, taste gate 기반 HTML/SVG 생성 흐름 |
 
@@ -60,9 +57,9 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용합니다.
 
 ```text
-/confluence-export-kit:set-config --api-key <api-key> --email <email>
 /product-team-kit:plan-format
 /product-team-kit:plan-review
+/product-team-kit:set-config
 /diagram-design:diagram-design
 /logistics-expert-kit:logistics-scope
 /logistics-expert-kit:logistics-diagnose
@@ -77,9 +74,9 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 Codex는 설치된 플러그인의 skill invocation을 사용합니다.
 
 ```text
-$set-config --api-key <api-key> --email <email>
 $plan-format
 $plan-review
+$set-config
 $diagram-design
 $logistics-scope
 $logistics-diagnose
@@ -102,16 +99,10 @@ colo-plugins/
 │       └── marketplace.json        # Codex marketplace catalog
 ├── .claude-plugin/
 │   └── marketplace.json            # Claude Code marketplace catalog
-├── confluence-export-kit/
-│   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
-│   ├── skills/
-│   ├── scripts/
-│   ├── docs/
-│   └── tests/
 ├── product-team-kit/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
+│   ├── references/
 │   ├── skills/
 │   └── docs/
 ├── diagram-design/
@@ -125,14 +116,12 @@ colo-plugins/
 │   ├── skills/
 │   ├── references/
 │   ├── templates/
-│   ├── docs/
-│   └── tests/
+│   └── docs/
 ├── ai-utility-kit/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
 │   ├── skills/
-│   ├── docs/
-│   └── tests/
+│   └── docs/
 └── README.md
 ```
 
@@ -156,7 +145,6 @@ Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `sour
 
 ```bash
 claude plugin validate ./.claude-plugin/marketplace.json
-claude plugin validate ./confluence-export-kit
 claude plugin validate ./product-team-kit
 claude plugin validate ./diagram-design
 claude plugin validate ./logistics-expert-kit

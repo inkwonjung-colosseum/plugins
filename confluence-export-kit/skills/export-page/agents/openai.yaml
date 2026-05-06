@@ -1,8 +1,0 @@
-interface:
-  display_name: "Export Confluence Page"
-  short_description: "하나 이상의 개별 Confluence 페이지를 URL 기준으로 로컬 Markdown으로 내보냅니다."
-  brand_color: "#0052CC"
-  default_prompt: "다음 Confluence 페이지를 ./confluence로 내보내세요: <page-url> [<page-url> ...]"
-
-policy:
-  allow_implicit_invocation: true

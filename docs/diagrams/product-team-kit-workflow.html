@@ -93,11 +93,11 @@
   <main>
     <p class="eyebrow">Flowchart · product-team-kit</p>
     <h1>Planning input to team handoff workflow</h1>
-    <p class="summary">product-team-kit은 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 근거 기반 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.</p>
+    <p class="summary">product-team-kit은 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.</p>
 
-<svg viewBox="0 0 1180 940" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg viewBox="0 0 1180 1040" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">product-team-kit 기획 입력 검토 흐름</title>
-  <desc id="desc">plan-format은 초안 생성 가능성을 판단한다. 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력하고, 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 review_repair 또는 publish_readiness를 출력하며 외부 publish는 하지 않는다.</desc>
+  <desc id="desc">plan-format은 초안 생성 가능성을 판단한다. 입력이 부족하면 파일을 만들지 않고 부족 항목만 출력하고, 충분하면 기능설계서와 정책서 초안을 저장한다. plan-review는 재검토 안내 또는 발행 준비 체크리스트를 출력하며 외부 publish는 하지 않는다.</desc>
   <defs>
     <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
       <polygon points="0 0, 9 3.5, 0 7" fill="#4f5d75"/>
@@ -106,7 +106,7 @@
       <polygon points="0 0, 9 3.5, 0 7" fill="#eb6c36"/>
     </marker>
   </defs>
-  <rect width="1180" height="940" fill="#f5f5f5"/>
+  <rect width="1180" height="1040" fill="#f5f5f5"/>
   <path class="line-accent" d="M 590 104 L 590 150"/>
   <rect class="edge-label-bg" x="557" y="118" width="66" height="18" rx="3"/>
 <text class="edge-label" x="590" y="130" text-anchor="middle">입력 전달</text>
@@ -126,8 +126,8 @@
   <rect class="edge-label-bg" x="679" y="802" width="54" height="18" rx="3"/>
 <text class="edge-label" x="706" y="814" text-anchor="middle">재검토</text>
   <path class="line-accent" d="M 590 826 L 590 862"/>
-  <rect class="edge-label-bg" x="517" y="834" width="146" height="18" rx="3"/>
-<text class="edge-label" x="590" y="846" text-anchor="middle">pass / conditional pass</text>
+  <rect class="edge-label-bg" x="534" y="834" width="112" height="18" rx="3"/>
+<text class="edge-label" x="590" y="846" text-anchor="middle">통과 / 조건부 통과</text>
   <path class="line-accent" d="M 590 934 L 590 956"/>
   <rect class="node" x="450" y="42" width="280" height="62" rx="31"/>
   <text class="title" x="590" y="70" text-anchor="middle">기획 입력</text>
@@ -149,24 +149,24 @@
   <text class="sub" x="590" y="514" text-anchor="middle">기존 산출물 덮어쓰기 금지</text>
   <rect class="node" x="450" y="586" width="280" height="74" rx="8"/>
   <text class="title" x="590" y="612" text-anchor="middle">plan-review</text>
-  <text class="sub" x="590" y="629" text-anchor="middle">Product Docs SSOT 근거 패키지</text>
-  <text class="sub" x="590" y="646" text-anchor="middle">2 관점 보수 합성</text>
+  <text class="sub" x="590" y="629" text-anchor="middle">Product Docs SSOT 직접 읽기</text>
+  <text class="sub" x="590" y="646" text-anchor="middle">4축 보수 합성</text>
   <polygon class="node" points="590,704 750,765 590,826 430,765"/>
   <text class="title" x="590" y="762" text-anchor="middle">검토 결과</text>
-  <text class="sub" x="590" y="779" text-anchor="middle">수정 필요 &gt; conditional pass &gt; pass</text>
+  <text class="sub" x="590" y="779" text-anchor="middle">수정 필요 &gt; 조건부 통과 &gt; 통과</text>
   <rect class="node-soft" x="814" y="710" width="280" height="82" rx="8"/>
-  <text class="title" x="954" y="740" text-anchor="middle">review_repair</text>
-  <text class="sub" x="954" y="757" text-anchor="middle">P0/P1 수정 작업 블록</text>
+  <text class="title" x="954" y="740" text-anchor="middle">재검토 안내</text>
+  <text class="sub" x="954" y="757" text-anchor="middle">필수 수정 항목</text>
   <text class="sub" x="954" y="774" text-anchor="middle">초안 수정 후 같은 경로 재검토</text>
   <rect class="node-accent" x="420" y="862" width="340" height="72" rx="8"/>
-  <text class="title" x="590" y="887" text-anchor="middle">publish_readiness</text>
-  <text class="sub" x="590" y="904" text-anchor="middle">pass 또는 conditional pass에서만 출력</text>
-  <text class="sub" x="590" y="921" text-anchor="middle">readiness checklist only</text>
+  <text class="title" x="590" y="887" text-anchor="middle">발행 준비 체크리스트</text>
+  <text class="sub" x="590" y="904" text-anchor="middle">통과 또는 조건부 통과</text>
+  <text class="sub" x="590" y="921" text-anchor="middle">사람 확인 checklist</text>
   <rect class="node-accent" x="430" y="956" width="320" height="62" rx="31"/>
   <text class="title" x="590" y="976" text-anchor="middle">팀의 반영 절차</text>
   <text class="sub" x="590" y="993" text-anchor="middle">사람이 외부 반영</text>
   <text class="sub" x="590" y="1010" text-anchor="middle">plan-review는 publish하지 않음</text>
-  <text class="note" x="72" y="918">경계: planning/은 SSOT 근거가 아니며, publish_readiness는 외부 게시가 아니라 사람이 확인할 checklist다.</text>
+  <text class="note" x="72" y="918">경계: &lt;outputRoot&gt;/은 SSOT 근거가 아니며, 발행 준비 체크리스트는 사람이 확인할 항목이다.</text>
 </svg>
   </main>
 </body>

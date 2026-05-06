@@ -64,7 +64,6 @@ $logistics-risk 위험물 해외배송 프로세스 바꾸려 해
 - `references/` — 공통 물류 판단 기준과 안전 경계
 - `templates/` — 스킬별 권장 출력 형식
 - `docs/` — privacy policy와 terms of service
-- `tests/` — 구조 회귀 테스트
 
 ## 설치
 
@@ -86,6 +85,5 @@ marketplace 추가 후 Codex 앱의 `/plugins`에서 `logistics-expert-kit`을 �
 ## 검증
 
 ```bash
-python3 -m unittest logistics-expert-kit/tests/test_structure.py
 claude plugin validate ./logistics-expert-kit
 ```

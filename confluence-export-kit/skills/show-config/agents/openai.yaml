@@ -1,8 +1,0 @@
-interface:
-  display_name: "Show cme Configuration"
-  short_description: "현재 confluence-markdown-exporter 설정을 텍스트 또는 JSON으로 출력합니다."
-  brand_color: "#0052CC"
-  default_prompt: "현재 confluence-markdown-exporter 설정을 보여주세요."
-
-policy:
-  allow_implicit_invocation: true

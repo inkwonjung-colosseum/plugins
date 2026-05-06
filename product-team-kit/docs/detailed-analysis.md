@@ -1,0 +1,172 @@
+# product-team-kit 상세 분석
+
+작성일: 2026-05-06
+
+## 1. 정체성
+
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.0`, 라이선스는 MIT다.
+
+```text
+set-config
+  -> .product-team-kit/config.json
+
+plan-format
+  -> <outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/{기능설계서,정책서}.md
+       ↓
+plan-review
+  -> 통과 / 조건부 통과 / 수정 필요 / 올바른 검토 대상이 아님
+```
+
+핵심 정체성은 "로컬 설정", "기획 입력을 문서 초안으로 정리하는 formatter", "발행 전 검토 gate"의 분리다. `set-config`는 사용처 프로젝트의 설정만 갱신하고, `plan-format`은 생성 가능 여부를 먼저 판단한 뒤 초안을 저장하며, `plan-review`는 Product Docs SSOT 충돌, 명확성, 용어 일관성, downstream 착수 가능성을 4축으로 검토한다.
+
+## 2. 구조
+
+```text
+.claude-plugin/plugin.json    # Claude 매니페스트
+.codex-plugin/plugin.json     # Codex 매니페스트
+docs/                         # workflow, PRD, 기능 정의, 약관/정책
+references/config-contract.md # 세 skill 공유 로컬 설정 계약
+skills/set-config/
+  SKILL.md
+  agents/openai.yaml
+skills/plan-format/
+  SKILL.md                    # 3-step 본문 (config strict-exit + Gate First + 변환·저장 + 입력 dispatch + 분류 + marker)
+  agents/openai.yaml
+  templates/{기능설계서,정책서}.md
+  references/                 # storage-contract, output-contract
+skills/plan-review/
+  SKILL.md
+  agents/openai.yaml
+  references/                 # review-rules, output-format
+```
+
+현재 `plan-format` references는 2개 (`storage-contract.md`, `output-contract.md`)이며, `plan-review` references는 2개 (`review-rules.md`, `output-format.md`)다. plan-format 템플릿 2개, 공유 `config-contract.md`, `set-config`까지 더하면 주요 계약/템플릿 표면은 8개다. 입력 dispatch·분류·marker는 `plan-format/SKILL.md`에 모여 있고, review 판정·출력은 `review-rules.md`와 `output-format.md`에 분리되어 있다.
+
+## 3. 핵심 설계 원칙
+
+- **Local config first**: 사용처 프로젝트 루트의 `.product-team-kit/config.json`으로 `outputRoot`와 SSOT corpus 범위를 조정한다.
+- **Strict-exit**: `plan-format`은 config가 없거나 핵심 검증에 실패하면 파일 생성 없이 종료하고 `set-config`를 안내한다.
+- **Gate First**: 변환 가능 판정 전 파일 생성 금지. 부족하면 질문 루프 없이 보류 출력만 반환한다.
+- **No interview loop**: `plan-format`은 단일 패스다. 부족 항목만 출력하고 보강 템플릿은 만들지 않는다.
+- **역할 분리**: `plan-format`은 formatter, `plan-review`는 validator다. `plan-format`은 SSOT 검증을 하지 않고, `plan-review`는 초안을 직접 수정하지 않는다.
+- **좁은 Product Docs SSOT**: `<outputRoot>/`을 제외한 프로젝트 내 Markdown과 그 문서가 상대경로로 참조한 로컬 resource만 근거로 본다.
+- **보수적 취합**: 최종 결과는 `수정 필요 > 조건부 통과 > 통과` 순서로 결정한다. `착수 전 보강 필요` 역할이 하나라도 있으면 `수정 필요`다.
+
+## 4. set-config 동작
+
+`set-config`는 cwd의 git root 또는 cwd를 기준으로 `.product-team-kit/config.json`을 만든다. 인자는 받지 않고, 각 키를 대화형으로 확인한다.
+
+| 키 | 처리 |
+|---|---|
+| `version` | 항상 `1`로 저장 |
+| `outputRoot` | 단일 폴더명만 허용. 절대경로, `..`, 경로 구분자, 빈 문자열, 제어문자 거부 |
+| `ssot.include` | 줄바꿈/콤마 입력을 배열로 저장. 빈 배열이면 key 제거 후 기본 `Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md` 사용 |
+| `ssot.exclude` | 줄바꿈/콤마 입력을 배열로 저장. 빈 배열이면 key 제거 |
+
+검증 거부값은 저장하지 않고 같은 키에서 다시 입력받는다. 저장은 `.product-team-kit/config.json.tmp`를 쓴 뒤 rename하는 atomic write다. 기존 config의 다른 키는 보존한다.
+
+## 5. plan-format 동작
+
+### Step 1 strict-exit
+
+`<project-root>/.product-team-kit/config.json`을 읽어 다음 중 하나라도 해당하면 즉시 종료한다.
+
+- 파일 없음
+- JSON 파싱 실패
+- `version` 미일치 또는 누락
+- `outputRoot` 검증 거부
+
+종료 출력은 `output-contract.md`의 "설정 없음" 템플릿을 사용하고 `set-config`를 안내한다. 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]`로 처리하고 step 2로 진행한다.
+
+### Step 2 입력 dispatch와 Gate First
+
+| 종류 | 처리 |
+|---|---|
+| 빈 입력 또는 최소 입력 | 정보 부족 보류 |
+| 직접 텍스트 | 본문 그대로 사용 |
+| 기존 파일 | UTF-8 텍스트로 읽기 |
+| 기존 디렉터리 | 텍스트 파일 통합. 입력 크기 상한 없음 (검증 정확도 우선) |
+| 없는 path-like 입력 | 직접 텍스트로 폴백 |
+| 주제와 경로가 섞인 입력 | 주제와 경로를 모두 사용 |
+
+Gate First 4 조건:
+
+- 기능 목적 또는 기능명
+- 적용 대상 또는 업무 범위
+- 핵심 사용자 행동과 기대 결과
+- 주요 조건/정책/제약
+
+부서 경계 (디자인·API·DB·QA·운영·개발 작업 분해 heavy 입력이고 제품·업무 판단 정보 부족)도 보류 사유다. 기능설계서와 정책서 중 한쪽이 빈 골격에 가까우면 보류한다.
+
+### Step 3 변환·저장
+
+단일 LLM 패스로 기능설계서 → 정책서 순차 작성한다. 분리 컨텍스트 worker나 handoff artifact는 사용하지 않는다.
+
+저장 계약:
+
+- 저장 root는 config `outputRoot`이며 default는 `planning`이다.
+- 안전기능명은 NFC 정규화, 공백의 하이픈 변환, 금지 문자 제거, 50자 또는 120 bytes char-boundary truncation을 적용한다.
+- 저장 폴더는 `<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/`다.
+- timestamp는 Asia/Seoul 기준이다.
+- 충돌 시 `--01` ~ `--99` suffix를 순차 시도한다.
+- 두 파일은 같은 staging folder에 먼저 작성한다. 두 파일 존재 검증이 끝난 뒤 staging folder를 target folder로 rename하며, 실패 시 남은 staging/target 경로를 저장 실패 출력에 노출한다.
+
+## 6. plan-review 동작
+
+`plan-review`는 초안 폴더 또는 기능설계서/정책서 파일을 검토한다. 폴더 입력이면 기능설계서와 정책서를 함께 읽고, 단일 파일 입력이면 같은 폴더에서 짝문서를 찾는다. 짝문서가 없으면 단일 검토를 진행하되 `검증 한계`에 남긴다.
+
+Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
+
+4축 점검:
+
+| 축 | 확인 내용 |
+|---|---|
+| A. SSOT 충돌 | 초안 확정 문장과 current evidence 충돌 여부 |
+| B. 명확성 | marker, 모호 조건, 상태·권한·예외 판단 가능성 |
+| C. 용어 일관성 | 역할명, 상태명, 권한명, 화면명, 도메인 stem 통일성 |
+| D. 4역할 넘김 가능성 | 디자인, 개발, QA, 운영이 대화 기억 없이 다음 업무를 시작할 수 있는지 |
+
+출력은 YAML manifest가 아니라 사람용 markdown 리포트 하나다. 상단에 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서와의 충돌을 두고, 하단에 coverage, 읽은 근거, 읽지 않은 관련 후보, 제외 후보, 검증 한계, 상세 발견 항목을 둔다.
+
+결과별 출력:
+
+| 결과 | 추가 블록 |
+|---|---|
+| 통과 | 발행 준비 체크리스트 |
+| 조건부 통과 | 발행 전 확인 항목 + 발행 준비 체크리스트 |
+| 수정 필요 | 필수 수정 항목 + 재검토 안내 체크리스트 |
+| 올바른 검토 대상이 아님 | 다음 행동 안내 |
+
+## 7. 강점
+
+- Strict-exit + Gate First + 단일 패스로 불완전 산출물과 의도 외 실행을 최소화한다.
+- `set-config`로 프로젝트별 저장 위치와 SSOT corpus 범위를 조정할 수 있다.
+- 단일 SKILL.md에 입력 dispatch·분류·marker를 흡수해 cross-reference drift 위험을 낮췄다.
+- staging folder rename + char-boundary safe-name truncation + `--99` collision bound로 한쪽 final 문서만 남는 실패 모드를 줄이고 저장 실패 모드를 명시한다.
+- SSOT 범위가 좁고 명확해 "근거 없음" 거짓양성을 줄인다.
+- 보수적 합성 규칙으로 false pass를 차단한다.
+- 4 marker (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`) 정의가 plan-review 분류 규칙과 직결된다.
+- 역할별 readiness를 design, development, QA, operations로 나눠 downstream 책임을 분담한다.
+
+## 8. 약점과 리스크
+
+1. Strict-exit으로 config 없는 신규 환경은 첫 실행에서 바로 실패한다. README와 set-config 안내가 가이드지만 초기 마찰은 남는다.
+2. Markdown 전제가 강하다. 팀이 Notion 또는 Confluence를 쓰면 export snapshot만 SSOT 근거가 되므로 freshness risk가 자주 발생할 수 있다.
+3. 단일 기능명 가정이 강하다. 디렉터리 입력에 여러 기능이 섞이면 첫 후보로 묶일 수 있고 다기능 분리 메커니즘이 없다.
+4. 입력 크기 상한이 없어 큰 PRD 모음을 끝까지 읽을 수 있는 대신, 호출 환경의 메모리/시간 한계는 운영자가 책임진다.
+5. Asia/Seoul timestamp가 고정되어 다른 timezone 팀에는 혼선이 있을 수 있다.
+6. `plan-format`은 SSOT 검증을 하지 않기 때문에 SSOT와 충돌하는 항목이 `plan-review` 전까지 표면화되지 않고 재작업이 생길 수 있다.
+7. 9섹션 템플릿은 작은 기능에는 과할 수 있다. 빈 섹션 제거 규칙이 완화 장치지만 진입장벽은 남는다.
+8. `plan-review`가 직접 수정하지 않기 때문에 반복 수정과 재검토 루프를 사람이 수동 운영해야 한다.
+
+## 9. 확장 포인트
+
+- Multi-feature dispatcher: 디렉터리 입력을 기능 단위로 분리하고 N개 폴더를 생성한다.
+- 외부 SSOT adapter: Notion, Confluence MCP 등 외부 source를 근거로 확장한다. 단 SSOT 근거 정의를 함께 확장해야 한다.
+- `review -> repair -> re-review` 보조 흐름을 제공한다. 이 경우에도 Product Docs SSOT 자동 수정은 금지한다.
+- Asia/Seoul 고정을 config 또는 host locale 기준으로 바꾼다.
+- 문서 계약 회귀 테스트를 추가해 버전 drift, stale reference, 삭제된 출력 용어를 잡는다.
+
+## 10. 한 줄 요약
+
+`product-team-kit` 0.6.0은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

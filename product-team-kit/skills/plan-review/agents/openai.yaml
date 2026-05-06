@@ -1,6 +1,6 @@
 interface:
   display_name: plan-review
-  short_description: 정책서와 기능/화면설계서 묶음을 Product Docs SSOT 충돌·착수 가능성 관점에서 발행 전 검토합니다
+  short_description: 정책서와 기능/화면설계서 묶음을 Product Docs SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성으로 발행 전 검토합니다
   brand_color: "#0F766E"
   default_prompt: "다음 정책서/기능설계서 초안을 Product Docs SSOT 충돌과 착수 가능성 기준으로 발행 전 검토해줘: <초안 폴더 또는 기능설계서/정책서 파일경로>"
 policy:
@@ -8,12 +8,12 @@ policy:
   implicit_invocation:
     use_when:
       - 기존 기능설계서/정책서 초안 또는 초안 폴더를 검토해야 할 때
-      - 발행 전 검토, review-gate 판단, pass/conditional pass/수정 필요 판정이 목적일 때
+      - 발행 전 검토, 통과/조건부 통과/수정 필요 판정이 목적일 때
       - Product Docs SSOT 근거와 초안의 충돌, 누락, 디자인·개발·QA·운영 착수 가능성을 확인해야 할 때
     avoid_when:
       - 기획 입력을 기능설계서와 정책서 초안으로 생성해야 하는 경우에는 plan-format을 사용
       - 기능설계서/정책서 초안 경로가 아직 없고 생성과 검토를 함께 요청한 경우에는 plan-format을 먼저 사용
     sequencing:
       - 사람용 리포트에는 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서 충돌을 먼저 보여준다.
-      - pass 또는 conditional pass 결과에는 publish-readiness-contract 기준의 발행 준비 상세를 하단에 포함한다.
-      - 수정 필요 결과에는 review-rerun-contract 기준의 재검토용 상세 정보를 하단에 포함한다.
+      - 결과별 추가 블록과 상세 검토 기록은 output-format 기준으로 하단에 포함한다.
+      - YAML manifest 블록은 사용하지 않고 사람용 markdown 체크리스트로 출력한다.

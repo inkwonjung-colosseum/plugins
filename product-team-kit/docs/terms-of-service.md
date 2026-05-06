@@ -1,16 +1,17 @@
 # product-team-kit Terms of Service
 
-`product-team-kit` is a local workflow plugin for formatting planning input into 기능설계서 and 정책서 drafts, and reviewing those drafts with an evidence package before external publishing.
+`product-team-kit` is a local workflow plugin for configuring product-document draft settings, formatting planning input into 기능설계서 and 정책서 drafts, and reviewing those drafts with Product Docs SSOT evidence before external publishing.
 
 ## Intended Use
 
 Use this plugin to:
 
 - Draft 기능설계서 and 정책서 documents from user-provided planning input.
+- Create or update `.product-team-kit/config.json` with `set-config`.
 - Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
 - Return a save-hold with missing fields when the planning input is not enough to create both draft documents.
-- Review draft evidence and role-based readiness with `plan-review` before publishing through a separate external process.
-- Produce a planner-facing review summary and a publish-readiness checklist for human review when `plan-review` returns `통과` or `조건부 통과`.
+- Review SSOT conflict, clarity, terminology consistency, and role-based readiness with `plan-review` before publishing through a separate external process.
+- Produce a planner-facing review summary and a publish-preparation checklist for human review when `plan-review` returns `통과` or `조건부 통과`.
 
 ## Limitations
 
@@ -21,7 +22,7 @@ Use this plugin to:
 
 ## Publishing Rules
 
-This plugin does not publish directly to external systems. The `publish_readiness` output is a readiness checklist only, and `review_repair` is a follow-up review detail only. If a draft includes `[가정]`, confirmation questions, conflict warnings, or role-based readiness gaps, users should run `plan-review`, review the planner-facing summary and evidence details, and resolve or explicitly accept those items before using the draft in a publishing process.
+This plugin does not publish directly to external systems. The publish-preparation checklist and re-review checklist are screen-output guidance only. If a draft includes `[가정]`, confirmation questions, conflict warnings, or role-based readiness gaps, users should run `plan-review`, review the planner-facing summary and evidence details, and resolve or explicitly accept those items before using the draft in a publishing process.
 
 ## No Warranty
 

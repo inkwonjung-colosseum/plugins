@@ -340,7 +340,7 @@ Run before producing any diagram.
 - [ ] Would a table / paragraph do the same job? (If yes — don't draw.)
 - [ ] Loaded the matching `references/type-*.md`?
 
-**Remove test:**
+**Removal check:**
 - [ ] Can I remove any node? (Would a reader still understand?)
 - [ ] Can I merge any two nodes? (Do they always travel together?)
 - [ ] Can I remove any arrow? (Is the relationship obvious from layout?)

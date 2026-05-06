@@ -1,6 +1,6 @@
 {
   "name": "diagram-design",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "브랜드 스타일을 반영한 기술·제품 다이어그램을 독립 HTML/SVG로 만드는 Codex 플러그인입니다.",
   "author": {
     "name": "developjik",

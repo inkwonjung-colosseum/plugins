@@ -1,6 +1,8 @@
 # Storage Contract
 
-`plan-format`의 저장 위치, 안전기능명, timestamp, two-file write는 이 계약을 따른다. Python, Node.js, 별도 CLI helper 설치를 전제하지 않는다.
+`plan-format`의 저장 위치, 안전기능명, timestamp, 파일 write 규칙이다. Python·Node.js·별도 CLI helper 설치를 전제하지 않는다.
+
+저장 root 폴더명은 `../../../references/config-contract.md`의 `outputRoot`로 결정한다. default는 `planning`이며 본 문서의 `<outputRoot>` 표기는 그 값이다.
 
 ## 기능명과 안전기능명
 
@@ -22,7 +24,8 @@
 - `/`, `\`, `..`, 콜론, 따옴표, 와일드카드, 제어문자 제거 또는 하이픈 변환
 - zero-width, bidi control, invisible control 제거
 - 연속 하이픈 축약
-- 50자, UTF-8 120 bytes 이내 절단
+- 길이 한도: 50자 이내, UTF-8 120 bytes 이내
+- **char-boundary truncation**: byte 한도 초과 시 UTF-8 multi-byte char 경계 직전까지 round-down. 한 char가 byte 경계에서 쪼개지지 않도록 보장. 예: 한글 "기능정리관리화면" (24 bytes) + ... 형태에서 120 bytes 도달 직전 char 경계까지만 유지.
 - 비어있으면 `기능정리`
 
 ## 저장 기준 루트
@@ -33,32 +36,47 @@
 2. 프로젝트 루트를 식별할 수 없으면 입력 파일 또는 입력 디렉터리의 parent directory
 3. 존재하지 않는 path-like 입력 또는 직접 텍스트 입력이면 현재 작업 디렉터리
 
-Product Docs SSOT 후보 폴더 자체에는 직접 쓰지 않고, 해당 문서를 포함한 git root 또는 현재 작업 디렉터리 아래 `planning/`을 사용한다.
+Product Docs SSOT 후보 폴더 자체에는 직접 쓰지 않고, 해당 문서를 포함한 git root 또는 현재 작업 디렉터리 아래 `<outputRoot>/`을 사용한다.
 
 ## 저장 경로
 
-일반 입력 저장 경로:
+```
+<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_기능설계서.md
+<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
+```
 
-- `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_기능설계서.md`
-- `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md`
+`Asia/Seoul` timestamp로 새 폴더를 확보한다.
 
-`Asia/Seoul` timestamp로 새 폴더를 확보한다. 폴더명이 충돌하면 `--01`, `--02` suffix를 사용한다.
+## Collision suffix
 
-## 기존 산출물과 target precheck
+폴더명 충돌 시 `--01`, `--02`, ..., `--99` suffix를 순차 시도한다. `--99`까지 모두 충돌하면 `references/output-contract.md`의 "저장 실패" 템플릿(`실패 단계: folder`)을 반환한다. 같은 timestamp 단위로 99회 이상 호출은 비정상 사용으로 간주한다.
 
-입력 디렉터리에 기존 `[안전기능명]_기능설계서.md` 또는 `[안전기능명]_정책서.md`가 있어도 저장 보류 사유가 아니다. 이 파일들은 참고 입력으로만 읽고 덮어쓰지 않는다.
+## 기존 산출물
 
-새 timestamp 폴더와 collision suffix를 사용하므로 정상 실행은 기존 final 파일 때문에 hold되지 않는다. 선택된 target folder에 final 파일이 이미 있으면 race 또는 partial artifact로 보고 `output-contract.md`의 저장 실패 템플릿에 `precheck` 또는 `verify` 실패로 기록한다.
+입력 디렉터리에 기존 `[안전기능명]_기능설계서.md` 또는 `[안전기능명]_정책서.md`가 있어도 저장 보류 사유가 아니다. 참고 입력으로만 읽고 덮어쓰지 않는다. 새 timestamp 폴더 + collision suffix 사용으로 정상 실행은 기존 final 파일 때문에 hold되지 않는다.
 
-## two-file 저장 단위
+선택된 target folder가 이미 있으면 race 또는 이전 실패 잔여물로 보고 덮어쓰지 않는다. 다음 collision suffix를 시도하고, `--99`까지 모두 충돌하면 "저장 실패" 템플릿(`실패 단계: folder`)을 반환한다.
 
-두 문서는 하나의 저장 단위로 취급한다.
+## 저장 절차
 
-1. 같은 대상 폴더에 `[안전기능명]_기능설계서.md.tmp`, `[안전기능명]_정책서.md.tmp`를 쓴다.
-2. tmp write 전 target final 파일이 없어야 한다. 이미 있으면 덮어쓰지 않고 `precheck` 저장 실패를 반환한다.
-3. 두 tmp write가 모두 성공하기 전에는 final 파일명으로 rename하지 않는다.
-4. tmp write 또는 rename 실패 시 best-effort cleanup 후 저장 실패 출력을 반환한다.
-5. 저장 완료 성공 조건은 두 final 파일 존재와 남은 tmp 파일 0개다.
-6. cleanup 실패나 partial artifact가 있으면 남은 경로를 저장 실패 출력에 반드시 남긴다.
+두 문서는 하나의 저장 단위로 취급한다. final 파일은 staging folder 안에 먼저 쓰고, 두 파일 검증이 끝난 뒤 staging folder 전체를 target folder로 rename한다.
 
-저장된 초안은 `plan-review`의 검토 대상이지 Product Docs SSOT 근거가 아니다. `planning/` 하위 파일은 후속 검토에서 SSOT corpus에서 제외된다.
+1. 안전기능명·timestamp로 target folder 경로 결정. 충돌 시 collision suffix 적용 (위 규칙).
+2. target folder와 같은 parent 아래에 숨김 staging folder를 생성한다. staging folder 예: `<outputRoot>/.tmp-[안전기능명]--YYYY-MM-DD-HHMMSS[-suffix]`. 생성 실패 시 "저장 실패" (`실패 단계: folder`).
+3. staging folder 안에 `[안전기능명]_기능설계서.md`와 `[안전기능명]_정책서.md`를 final 파일명 그대로 쓴다. 둘 중 하나라도 write 실패 시 target folder는 만들지 않고 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: write`)를 반환한다.
+4. staging folder 안에 두 파일이 모두 존재하고 target folder가 여전히 존재하지 않는지 검증한다. 검증 실패 시 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: verify`)를 반환한다.
+5. staging folder를 target folder로 rename한다. rename 실패 시 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: rename`)를 반환한다.
+6. rename 후 target folder에 두 final 파일이 모두 존재하고 staging folder가 남아 있지 않은지 검증한다. 실패 시 "저장 실패" (`실패 단계: verify`)를 반환한다.
+7. 저장 완료 성공 조건: target folder에 두 final 파일이 모두 존재하고 staging folder가 남아 있지 않음.
+
+cleanup 실패나 애매한 rename 실패로 파일 또는 폴더가 남으면 "저장 실패" 출력의 `남은 파일 또는 폴더`에 반드시 노출한다. 정상 실패는 target folder 아래에 한쪽 문서만 남기지 않아야 한다.
+
+## Config 검증
+
+`<outputRoot>` 값이 config-contract 검증에서 거부되는 경우 strict-exit 사유다 (SKILL.md `## 1. 설정 확인`). 본 contract에 도달하기 전에 `references/output-contract.md`의 "설정 없음" 템플릿으로 종료된다.
+
+비치명 검증 거부 (unknown key, ssot 배열 element 비문자열 등)는 default fallback + `[설정 경고]`로 처리되어 본 contract 단계까지 도달한다. 이 경우 fallback된 값을 그대로 사용한다.
+
+## SSOT 경계
+
+저장된 초안은 `plan-review`의 검토 대상이지 Product Docs SSOT 근거가 아니다. `<outputRoot>/` 하위 파일은 후속 검토에서 SSOT corpus에서 제외된다.

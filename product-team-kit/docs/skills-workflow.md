@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로
 
-`product-team-kit`은 기획 입력을 로컬 초안 두 문서로 정리하고(`plan-format`), 외부 반영 전에 검토하는(`plan-review`) 2단계 제품팀 워크플로다.
+`product-team-kit`은 로컬 설정을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다.
 
 이 문서는 README의 빠른 시작보다 한 단계 자세히, 어떤 스킬을 언제 선택하고 어떤 산출물로 이어지는지 설명한다.
 
@@ -8,32 +8,68 @@
 
 | 스킬 | 역할 | 주요 입력 | 주요 산출물 | 다음 단계 |
 |---|---|---|---|---|
+| `set-config` | `.product-team-kit/config.json`을 대화형으로 만든다 | 현재 프로젝트 cwd, 기존 config | `version`, `outputRoot`, `ssot.include`, `ssot.exclude` | `plan-format` 또는 `plan-review` |
 | `plan-format` | 충분한 기획 입력을 기능설계서와 정책서 로컬 초안으로 나눈다 | 기획 노트, 회의록, AI 대화 결과물, 문서 스크랩, 파일 경로, 디렉터리 경로 | `[안전기능명]_기능설계서.md`, `[안전기능명]_정책서.md` | `plan-review` |
 | `plan-review` | 기능설계서/정책서 초안을 발행 전 gate로 검토한다 | 초안 폴더 또는 기능설계서/정책서 파일 | `통과`, `조건부 통과`, `수정 필요` 판단과 기획팀용 리포트 | 사람의 반영 또는 초안 수정 |
 
 ## 호출 방식
 
-| 환경 | plan-format | plan-review |
-|---|---|---|
-| Claude Code | `/product-team-kit:plan-format` | `/product-team-kit:plan-review` |
-| Codex | `$plan-format` | `$plan-review` |
+| 환경 | set-config | plan-format | plan-review |
+|---|---|---|---|
+| Claude Code | `/product-team-kit:set-config` | `/product-team-kit:plan-format` | `/product-team-kit:plan-review` |
+| Codex | `$set-config` | `$plan-format` | `$plan-review` |
 
 ## 전체 흐름
 
 ```mermaid
 flowchart TD
     A[기획 노트, 회의록, 파일, 디렉터리] --> B[plan-format]
-    B --> C{기능설계서/정책서 생성 가능?}
+    B --> B1{config.json 존재·유효?}
+    B1 -- 아니오 --> B2[strict-exit: 설정 없음 안내 + set-config]
+    B1 -- 예 --> C{기능설계서/정책서 생성 가능?}
     C -- 정보 부족 --> D[저장 보류: 부족 항목만 출력]
-    C -- 디자인/개발 상세만 많음 --> E[저장 보류: 제품·업무 판단 정보 부족 항목 출력]
     C -- 가능 --> F[기능설계서와 정책서 저장]
     F --> G[plan-review]
     G --> H{발행 전 gate 결과}
-    H -- 통과 --> I[발행 준비 상세 출력]
-    H -- 조건부 통과 --> J[확인 항목과 발행 준비 상세 출력]
-    H -- 수정 필요 --> K[먼저 고칠 항목과 재검토용 상세 정보 출력]
+    H -- 통과 --> I[발행 준비 체크리스트 출력]
+    H -- 조건부 통과 --> J[확인 항목과 발행 준비 체크리스트 출력]
+    H -- 수정 필요 --> K[먼저 고칠 항목과 재검토 안내 체크리스트 출력]
     K --> L[사람 또는 후속 작업이 초안 수정]
     L --> G
+```
+
+## Skill 0. set-config
+
+### 설명
+
+`set-config`는 사용처 프로젝트의 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신한다. 이 설정은 `plan-format`의 저장 root와 `plan-review`의 SSOT corpus 범위를 결정한다.
+
+### 선택 기준
+
+`set-config`를 선택한다:
+
+- `.product-team-kit/config.json`을 처음 만들어야 한다.
+- 초안 저장 root인 `outputRoot`를 바꿔야 한다.
+- `plan-review`가 읽을 Product Docs SSOT allow-list 또는 exclude glob을 조정해야 한다.
+
+`set-config`를 선택하지 않는다:
+
+- 기획 입력을 기능설계서/정책서로 변환해야 하는 경우: `plan-format`
+- 이미 생성된 초안을 검토해야 하는 경우: `plan-review`
+- 현재 effective config 확인만 필요한 경우: 설정 파일을 직접 읽어 확인
+
+### Workflow
+
+```mermaid
+flowchart TD
+    A[현재 프로젝트 cwd] --> B[config 위치 확정]
+    B --> C[기존 config 또는 default 읽기]
+    C --> D[outputRoot 확인]
+    D --> E[ssot.include 확인]
+    E --> F[ssot.exclude 확인]
+    F --> G{저장할까?}
+    G -- 저장 --> H[.product-team-kit/config.json atomic write]
+    G -- 취소 --> I[기존 파일 유지]
 ```
 
 ## Skill 1. plan-format
@@ -63,25 +99,19 @@ Product Docs SSOT 근거 검증은 하지 않는다. 검증은 `plan-review` 책
 
 ```mermaid
 flowchart TD
-    A[기획 입력 또는 파일/디렉터리 경로] --> B[입력 확인과 디스패치]
-    B --> B1[없는 path-like 입력은 직접 텍스트로 처리]
-    B --> B2[디렉터리는 읽을 수 있는 텍스트 파일을 상대경로 오름차순으로 통합]
+    A[기획 입력 또는 파일/디렉터리 경로] --> S1{Step 1: config.json 존재·유효?}
+    S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]
+    S1 -- 예 --> B[Step 2: 입력 dispatch]
+    B --> B1[없는 path-like는 직접 텍스트로 폴백]
+    B --> B2[디렉터리는 텍스트 파일을 상대경로 오름차순으로 통합]
     B1 --> C[기능명과 안전기능명 추출]
     B2 --> C
-    C --> D{초안 생성 가능 조건 충족?}
-    D -- 정보 부족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 디자인/개발 상세만 많음 --> F[저장 보류: 제품·업무 판단 정보 부족 항목 출력]
-    D -- 충족 --> H[공통 정리 기준 확정]
-    H --> I{분리 컨텍스트 사용 가능?}
-    I -- 예 --> J[기능설계서 worker]
-    I -- 예 --> K[정책서 worker]
-    I -- 아니오 --> L[동일 세션에서 기능설계서 후 정책서 순차 작성]
-    J --> M[최종 조정]
-    K --> M
-    L --> M
-    M --> N{two-file 저장 성공?}
+    C --> D{Gate First 4 조건 충족?}
+    D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
+    D -- 충족 --> H[Step 3: 단일 LLM 패스로 기능설계서·정책서 작성]
+    H --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
-    N -- 아니오 --> P[저장 실패와 precheck/partial artifact 안내]
+    N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
     O --> Q[다음 단계 안내: plan-review]
 ```
 
@@ -94,24 +124,24 @@ flowchart TD
 - 핵심 사용자 행동과 기대 결과: 행동 1개와 결과 1개
 - 주요 조건/정책/제약: 허용, 금지, 조건, 예외, 제한, 판단 기준 중 확인 가능
 
-기능설계서와 정책서 중 한쪽에 실질 내용이 거의 없으면 저장 보류한다. 디렉터리 입력은 입력 dispatch 계약에 따라 기본 제외 경로와 파일 100개, 파일당 512KB, 총 2MB 상한을 적용해 통합한다. 읽을 수 없는 파일과 상한 초과 파일은 저장 보류 사유가 아니라 출력의 `[입력 제외 항목]`에 남긴다. Python, Node.js, 별도 CLI helper 설치는 전제하지 않는다.
+기능설계서와 정책서 중 한쪽에 실질 내용이 거의 없으면 저장 보류한다. 디렉터리 입력은 입력 dispatch 계약에 따라 기본 제외 경로만 적용해 통합하며, 입력 크기 상한은 두지 않는다. 읽을 수 없는 파일은 저장 보류 사유가 아니라 출력의 `[입력 제외 항목]`에 남긴다. Python, Node.js, 별도 CLI helper 설치는 전제하지 않는다.
 
 ### 산출물
 
-일반 입력, 존재하지 않는 path-like 입력, 파일 입력, 디렉터리 입력은 새 timestamp 폴더에 저장한다:
+일반 입력, 존재하지 않는 path-like 입력, 파일 입력, 디렉터리 입력은 새 timestamp 폴더에 저장한다. `<outputRoot>` 기본값은 `planning`이다:
 
 ```text
-planning/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_기능설계서.md
-planning/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
+<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_기능설계서.md
+<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
 ```
 
 ## Skill 2. plan-review
 
 ### 설명
 
-`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌 여부와 디자인·개발·QA·운영 착수 가능성을 확인한다.
+`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성, 디자인·개발·QA·운영 착수 가능성을 4축으로 확인한다.
 
-검토 대상은 `planning/` 아래 초안일 수 있지만, `planning/` 파일은 SSOT 근거로 사용하지 않는다.
+검토 대상은 `<outputRoot>/` 아래 초안일 수 있지만, `<outputRoot>/` 파일은 SSOT 근거로 사용하지 않는다.
 
 ### 선택 기준
 
@@ -130,23 +160,19 @@ planning/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
 
 ```mermaid
 flowchart TD
-    A[초안 폴더 또는 기능설계서/정책서 파일] --> B[검토 대상 확정]
-    B --> C{지원 문서 타입인가?}
-    C -- 아니오 --> D[올바른 검토 대상이 아님 안내]
-    C -- 예 --> E[짝문서 확인]
-    E --> F[검토 대상 본문 직접 읽기]
-    F --> G[Product Docs SSOT 후보 탐색]
-    G --> H[관련 Markdown과 linked local resource 선택]
-    H --> I{근거 패키지 상태}
-    I -- failed --> J[수정 필요로 취합]
-    I -- completed 또는 limited --> K[근거 관점 검토]
-    I -- completed 또는 limited --> M[착수 가능성 관점 검토]
-    K --> N[발견 사항 병합]
-    M --> N
-    N --> O{가장 보수적인 결과}
-    O -- 통과 --> P[기획팀용 리포트와 publish_readiness 출력]
-    O -- 조건부 통과 --> Q[확인 항목과 publish_readiness 출력]
-    O -- 수정 필요 --> R[먼저 고칠 항목과 review_repair 출력]
+    A[초안 폴더 또는 기능설계서/정책서 파일] --> B[config 확인]
+    B --> C[검토 대상과 짝문서 확정]
+    C --> D{지원 문서 타입인가?}
+    D -- 아니오 --> E[올바른 검토 대상이 아님 안내]
+    D -- 예 --> F[검토 대상 본문 직접 읽기]
+    F --> G[키워드 추출]
+    G --> H[SSOT corpus와 linked local resource 직접 읽기]
+    H --> I[4축 점검]
+    I --> J[발견 사항 dedup과 보수 합성]
+    J --> K{최종 결과}
+    K -- 통과 --> L[기획팀용 리포트와 발행 준비 체크리스트 출력]
+    K -- 조건부 통과 --> M[확인 항목과 발행 준비 체크리스트 출력]
+    K -- 수정 필요 --> N[먼저 고칠 항목과 재검토 안내 체크리스트 출력]
 ```
 
 ### 결과 기준
@@ -158,7 +184,7 @@ flowchart TD
 | `수정 필요` | 충돌, 불명확한 규칙, 근거 없는 가정 때문에 디자인·개발·QA·운영 판단이 달라질 수 있다 |
 | `올바른 검토 대상이 아님` | 기능/화면설계서 또는 정책서 초안이 아닌 입력이라 검토를 수행하지 않는다 |
 
-최종 취합은 `수정 필요 > 조건부 통과 > 통과` 순서로 보수적으로 결정한다. `blocked` 역할이 있으면 `수정 필요`이며, `blocked`는 발행 준비 상세에 포함하지 않는다.
+최종 취합은 `수정 필요 > 조건부 통과 > 통과` 순서로 보수적으로 결정한다. 역할별 착수 가능성에 `착수 전 보강 필요`가 있으면 `수정 필요`로 취합한다.
 
 ## Routing Decision Tree
 
@@ -176,21 +202,23 @@ flowchart TD
 
 ## 산출물 경계
 
-- `planning/` 아래 산출물은 로컬 초안 템플릿이며 공식 팀 문서가 아니다.
+- `<outputRoot>/` 아래 산출물은 로컬 초안 템플릿이며 공식 팀 문서가 아니다.
 - `plan-format`은 외부 시스템에 직접 게시하지 않는다.
 - `plan-format`은 Product Docs SSOT 근거 검증을 수행하지 않는다.
-- `plan-review`는 초안을 직접 수정하지 않고, 기획팀용 리포트와 발행 준비 상세 또는 재검토용 상세 정보를 출력한다.
+- `plan-review`는 초안을 직접 수정하지 않고, 기획팀용 리포트와 발행 준비 체크리스트 또는 재검토 안내 체크리스트를 출력한다.
 - Product Docs SSOT는 현재 프로젝트의 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
-- 코드, 테스트, 설정, 빌드 산출물, dependency/vendor, 외부 URL, `planning/` 산출물은 SSOT 근거에서 제외한다.
+- 코드, 설정, 빌드 산출물, dependency/vendor, 외부 URL, `<outputRoot>/` 산출물은 SSOT 근거에서 제외한다.
 
 ## Reference Map
 
 | 주제 | 기준 파일 |
 |---|---|
 | 스킬 개요 | [`../README.md`](../README.md) |
-| `plan-format` 계약 | [`../skills/plan-format/SKILL.md`](../skills/plan-format/SKILL.md) |
+| 공유 설정 계약 | [`../references/config-contract.md`](../references/config-contract.md) |
+| `set-config` 계약 | [`../skills/set-config/SKILL.md`](../skills/set-config/SKILL.md) |
+| `plan-format` 계약 (3-step + 입력 dispatch + 분류 + marker) | [`../skills/plan-format/SKILL.md`](../skills/plan-format/SKILL.md) |
 | `plan-review` 계약 | [`../skills/plan-review/SKILL.md`](../skills/plan-review/SKILL.md) |
-| 저장 위치와 atomic write | [`../skills/plan-format/references/storage-contract.md`](../skills/plan-format/references/storage-contract.md) |
-| 사용자 출력 형식 | [`../skills/plan-format/references/output-contract.md`](../skills/plan-format/references/output-contract.md) |
-| `plan-format` worker 계약 | [`../skills/plan-format/references/worker-contract.md`](../skills/plan-format/references/worker-contract.md) |
-| `plan-review` gate 기준 | [`../skills/plan-review/references/review-gate.md`](../skills/plan-review/references/review-gate.md) |
+| `plan-format` 저장 위치·안전기능명·collision suffix | [`../skills/plan-format/references/storage-contract.md`](../skills/plan-format/references/storage-contract.md) |
+| `plan-format` 사용자 출력 형식 (저장 완료/보류/설정 없음/저장 실패) | [`../skills/plan-format/references/output-contract.md`](../skills/plan-format/references/output-contract.md) |
+| `plan-review` 판정·합성 규칙 | [`../skills/plan-review/references/review-rules.md`](../skills/plan-review/references/review-rules.md) |
+| `plan-review` 출력 템플릿 | [`../skills/plan-review/references/output-format.md`](../skills/plan-review/references/output-format.md) |

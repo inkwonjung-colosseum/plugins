@@ -1,6 +1,6 @@
 {
   "name": "logistics-expert-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "물류 이슈 범위 정의, 운영 진단, KPI 설계, 리스크 검토를 돕는 Codex 플러그인입니다.",
   "author": {
     "name": "developjik",
