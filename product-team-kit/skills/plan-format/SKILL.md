@@ -16,16 +16,26 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 ### 화면 출력 원칙
 
-실행 중 응답 텍스트에는 **현재 step 표시와 짧은 결과 신호만** 남긴다. 기능설계서/정책서 본문, 표 셀, mermaid 블록, 템플릿 원문, dispatch 중간 산출, 자체 검증 상세 로그를 응답 텍스트로 echo 금지. 본문은 Write 툴 호출로만 파일에 기록한다.
+실행 중 사용자에게 보이는 **유일한 텍스트 블록은 종료 분기에서 1회 출력하는 `references/output-contract.md` 템플릿**이다. 그 외 모든 mid-execution narration 금지.
 
-허용 신호 예시:
-- `step 1: config 확인 — 통과`
-- `step 2: gate 통과` 또는 `step 2: 보류 — 부족 항목 N개`
-- `step 3.1: dispatch 완료`
-- `step 3.2: 두 문서 작성 → 검증 통과` 또는 `검증 실패 — 사유 한 줄`
-- `step 3.2: 저장 절차 시작` / `저장 완료`
+금지 항목 (전부 출력 금지):
+- step 진입/완료 보고: `step 1: ...`, `step 2: gate 통과`, `step 3.1: dispatch 완료`, `step 3.2: 작성 직전`
+- file IO 안내: `templates read`, `templates 병렬 read`, `storage-contract read`, `output-contract read`, `timestamp 확인`
+- dispatch 중간 산출: `dispatch 결과: ...`, `안전기능명: ...`, `라벨 매핑: ...`, `용어 사전: ...`
+- 자체 검증 상세: `빈 골격 검사 통과`, `구조 일치 ✓`, `중복 없음`, `cross-bleed 없음`
+- 저장 진행: `staging folder 생성`, `verify OK`, `rename 완료`, `저장 절차 시작`
+- 본문 echo: `[기능설계서 초안]`, `[정책서 초안]`, markdown 섹션, 표, mermaid, metadata 줄
+- 추론·계획 narration: `이제 ~ 한다`, `~ 직전`, `~ 시작`, `~ 통과 후 ~ 진행`
 
-종료 분기에서 `references/output-contract.md` 템플릿을 1회 출력한다. 이게 사용자에게 보이는 유일한 결과 블록이다. 그 외 turn 중간 본문 echo·작성 가이드 출력 금지.
+내부 추론은 모두 thinking으로 처리한다. Read/Write 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 progress 안내 텍스트 삽입 금지.
+
+사용자가 보는 turn 마지막 결과는 분기별 1개:
+- step 1 strict-exit → `output-contract.md` "설정 없음" 템플릿
+- step 2 gate 미통과 → "저장 보류" 템플릿
+- step 3 저장 완료 → "저장 완료" 템플릿
+- step 3 저장 실패 → "저장 실패" 템플릿
+
+**예외**: 사용자 권한 승인 필요 (Bash, Write 툴 호출 시 Claude Code 권한 prompt)는 자동 표시되며 SKILL이 제어 불가. 모델이 추가 narration 붙이지 않으면 권한 prompt만 보인다.
 
 ### Lazy read 원칙
 
