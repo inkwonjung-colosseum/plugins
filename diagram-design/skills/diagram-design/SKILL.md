@@ -18,16 +18,16 @@ Thirteen diagram types. One shared design system, complexity budget, and taste g
 
 **Before generating your first diagram in a new project, verify the style guide has been customized.**
 
-Open [`references/style-guide.md`](references/style-guide.md) and check the default tokens. If they're still the shipped defaults (paper `#faf7f2`, ink `#1c1917`, accent `#b5523a` rust), **pause and ask the user**:
+Open [`references/style-guide.md`](references/style-guide.md) and check the default tokens. If they're still the shipped defaults (paper `#f5f5f5`, ink `#2d3142`, accent `#eb6c36` atomic-tangerine), **pause and ask the user**:
 
-> *"This is your first Schematic in this project. The style guide is still at the default (neutral stone + rust). Do you want to customize it to match your brand first? Options: (a) run onboarding — I'll pull colors and fonts from your website, (b) paste your tokens manually, (c) proceed with the default for now."*
+> *"This is your first diagram-design run in this project. The style guide is still at the default cool editorial skin (white-smoke + jet-black + atomic-tangerine). Do you want to customize it to match your brand first? Options: (a) run onboarding — I'll pull colors and fonts from your website, (b) paste your tokens manually, (c) proceed with the default for now."*
 
 Then branch:
 - **(a)** → follow [`references/onboarding.md`](references/onboarding.md) to fetch the site, extract palette + fonts, propose a diff, and write `style-guide.md`.
 - **(b)** → accept the user's tokens and write them into `style-guide.md` under a new "Custom tokens" section.
 - **(c)** → proceed; optionally remind the user they can run onboarding later.
 
-**Once the style guide has been customized** (or the user explicitly opted for default), skip this gate on subsequent runs. A simple way to detect customization: if the `accent` value in `style-guide.md` differs from `#b5523a`, assume custom.
+**Once the style guide has been customized** (or the user explicitly opted for default), skip this gate on subsequent runs. A simple way to detect customization: if the `accent` value in `style-guide.md` differs from `#eb6c36`, assume custom.
 
 Don't silently ship default-skinned diagrams into a branded project — that's the failure mode this gate exists to prevent.
 
@@ -39,11 +39,11 @@ Don't silently ship default-skinned diagrams into a branded project — that's t
 
 From `.impeccable.md`: *"Confident restraint. Earn every element. One color accent, two families, a small spacing vocabulary. If removing it wouldn't hurt the page, remove it."*
 
-Applied to schematics:
+Applied to diagrams:
 - Every node represents a distinct idea. Two nodes that always travel together are one node.
 - Every connection carries information. If the relationship is obvious from layout, remove the line.
 - Coral is **editorial, not a flag.** 1–2 focal nodes per diagram. Using it on 5 nodes erases the signal.
-- The schematic isn't done when everything is added. It's done when nothing can be removed.
+- The diagram isn't done when everything is added. It's done when nothing can be removed.
 
 **Target density: 4/10.** Enough to be technically complete. Not so dense it needs a guide. Above 9 nodes, it's probably two diagrams.
 
@@ -94,7 +94,7 @@ Rules of thumb:
 
 ## 4. Universal Anti-patterns
 
-These mark "AI slop" schematics of any type:
+These mark weak diagrams of any type:
 
 | Anti-pattern | Why it fails |
 |---|---|

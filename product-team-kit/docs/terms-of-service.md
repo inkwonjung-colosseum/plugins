@@ -1,6 +1,6 @@
 # product-team-kit Terms of Service
 
-`product-team-kit` is a local workflow plugin for configuring product-document draft settings, formatting planning input into 기능설계서 and 정책서 drafts, and reviewing those drafts with Product Docs SSOT evidence before external publishing.
+`product-team-kit` is a local workflow plugin for configuring product-document draft settings, formatting planning input into 기능설계서 and 정책서 drafts, and reviewing those drafts with Product Docs SSOT evidence before external publishing. The workflow reads config, input, templates, references, and SSOT corpus only in the branches where those files are needed.
 
 ## Intended Use
 
@@ -10,7 +10,7 @@ Use this plugin to:
 - Create or update `.product-team-kit/config.json` with `set-config`.
 - Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
 - Return a save-hold with missing fields when the planning input is not enough to create both draft documents.
-- Review SSOT conflict, clarity, terminology consistency, and role-based readiness with `plan-review` before publishing through a separate external process.
+- Review SSOT conflict, clarity, terminology consistency, and role-based readiness with `plan-review` before publishing through a separate external process. `plan-review` narrows Product Docs candidates with review-target keywords and reads only directly needed Markdown and linked local resources.
 - Produce a planner-facing review summary and a publish-preparation checklist for human review when `plan-review` returns `통과` or `조건부 통과`.
 
 ## Limitations

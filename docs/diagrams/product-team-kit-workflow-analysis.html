@@ -93,11 +93,11 @@
   <main>
     <p class="eyebrow">Workflow analysis · product-team-kit</p>
     <h1>기획 입력에서 팀 반영 전 검토까지</h1>
-    <p class="summary">상세 view는 같은 workflow source에서 생성된다. config strict-exit, 입력 보완, 저장 보류, 재검토 안내, 발행 준비 체크리스트, SSOT 근거 경계를 한 화면에서 확인한다.</p>
+    <p class="summary">상세 view는 같은 workflow source에서 생성된다. lazy read 경계, config strict-exit, 입력 보완, 저장 보류, 재검토 안내, 발행 준비 체크리스트, SSOT 근거 경계를 한 화면에서 확인한다.</p>
 
 <svg viewBox="0 0 640 1540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">product-team-kit workflow analysis</title>
-  <desc id="desc">기획 입력은 config 확인 후 plan-format으로 들어간다. plan-format과 plan-review는 config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 필수 수정 항목 또는 발행 준비 체크리스트를 출력한다. 팀 반영은 플러그인 밖의 사람 절차다.</desc>
+  <desc id="desc">기획 입력은 config 확인 후 plan-format으로 들어간다. plan-format과 plan-review는 각 파일을 필요한 sub-step에서만 읽고, config가 없거나 유효하지 않으면 strict-exit한다. plan-format은 부족 입력과 생성 가능 입력을 다르게 처리하고, plan-review는 필수 수정 항목 또는 발행 준비 체크리스트를 출력한다. 팀 반영은 플러그인 밖의 사람 절차다.</desc>
   <defs>
     <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
       <polygon points="0 0, 9 3.5, 0 7" fill="#4f5d75"/>
@@ -162,9 +162,10 @@
   <text class="sub" x="455" y="264" text-anchor="middle">set-config 안내</text>
   <text class="sub" x="455" y="281" text-anchor="middle">저장·검토 시작 안 함</text>
   <rect class="node-accent" x="90" y="236" width="220" height="82" rx="8"/>
-  <text class="title" x="200" y="266" text-anchor="middle">plan-format</text>
-  <text class="sub" x="200" y="283" text-anchor="middle">기능설계서/정책서 formatter</text>
-  <text class="sub" x="200" y="300" text-anchor="middle">질문 루프 없음</text>
+  <text class="title" x="200" y="258" text-anchor="middle">plan-format</text>
+  <text class="sub" x="200" y="275" text-anchor="middle">lazy read + config gate</text>
+  <text class="sub" x="200" y="292" text-anchor="middle">기능설계서/정책서 formatter</text>
+  <text class="sub" x="200" y="309" text-anchor="middle">질문 루프 없음</text>
   <polygon class="node" points="200,380 320,444 200,508 80,444"/>
   <text class="title" x="200" y="441" text-anchor="middle">초안 생성 가능?</text>
   <text class="sub" x="200" y="458" text-anchor="middle">목적, 대상, 행동, 정책 충족 여부</text>
@@ -186,13 +187,13 @@
   <text class="sub" x="180" y="988" text-anchor="middle">저장·검토 시작 안 함</text>
   <rect class="node" x="350" y="790" width="220" height="82" rx="8"/>
   <text class="title" x="460" y="812" text-anchor="middle">plan-review</text>
-  <text class="sub" x="460" y="829" text-anchor="middle">검토 대상·짝문서 확정</text>
-  <text class="sub" x="460" y="846" text-anchor="middle">Product Docs SSOT 직접 읽기</text>
+  <text class="sub" x="460" y="829" text-anchor="middle">lazy read + 짝문서 확정</text>
+  <text class="sub" x="460" y="846" text-anchor="middle">필요 SSOT corpus 읽기</text>
   <text class="sub" x="460" y="863" text-anchor="middle">4축 보수 합성</text>
   <rect class="node-soft" x="350" y="900" width="220" height="86" rx="8"/>
   <text class="title" x="460" y="932" text-anchor="middle">근거 경계</text>
   <text class="sub" x="460" y="949" text-anchor="middle">&lt;outputRoot&gt;/은 SSOT 근거 제외</text>
-  <text class="sub" x="460" y="966" text-anchor="middle">linked local resource만 확인</text>
+  <text class="sub" x="460" y="966" text-anchor="middle">필요 corpus만 lazy read</text>
   <polygon class="node" points="460,1032 580,1091 460,1150 340,1091"/>
   <text class="title" x="460" y="1080" text-anchor="middle">검토 결과</text>
   <text class="sub" x="460" y="1097" text-anchor="middle">수정 필요 &gt; 조건부 통과 &gt; 통과</text>
@@ -209,7 +210,7 @@
   <text class="title" x="320" y="1453" text-anchor="middle">팀의 반영 절차</text>
   <text class="sub" x="320" y="1470" text-anchor="middle">사람이 외부 반영</text>
   <text class="sub" x="320" y="1487" text-anchor="middle">plan-review는 publish하지 않음</text>
-  <text class="note" x="70" y="1518">보수성: config 치명 오류와 입력 부족은 저장/검토 전 단계에서 멈춘다.</text>
+  <text class="note" x="70" y="1518">토큰 경계: templates, references, SSOT corpus는 필요한 분기에서만 읽는다.</text>
   <text class="note" x="70" y="1538">발행 경계: 발행 준비 체크리스트는 안내용이며 Product Docs SSOT, linked local resource를 자동 수정하지 않는다.</text>
 </svg>
   </main>

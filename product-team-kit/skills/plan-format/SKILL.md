@@ -14,6 +14,24 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 산출물은 `<outputRoot>/` 아래 로컬 초안이며 **공식 팀 문서가 아니다**. Product Docs SSOT 검증과 착수 가능성 판단은 `plan-review` 책임이다.
 
+### Lazy read 원칙
+
+각 파일은 실제 필요한 step에서만 읽는다. 선행 step에서 미리 묶어 읽지 않는다. 종료 분기에서 안 쓰는 파일을 읽으면 토큰 낭비이며 **금지**한다.
+
+| 파일 | 읽는 시점 | 용도 |
+| --- | --- | --- |
+| `<project-root>/.product-team-kit/config.json` | step 1 시작 | strict-exit 판정 |
+| 입력 본문 / 파일 / 디렉터리 | step 2 dispatch 직전 | gate 판정과 dispatch 입력 |
+| `templates/기능설계서.md`, `templates/정책서.md` | step 3.2 worker 호출 직전 (병렬) | worker prompt 구성·merge 시 헤더 검증 |
+| `references/storage-contract.md` | step 3.3 merge 통과 후 저장 절차 진입 직전 | staging→write→verify→rename 절차 |
+| `references/output-contract.md` | 종료 출력 직전 (분기 확정 후 1회) | "설정 없음" / "저장 보류" / "저장 완료" 템플릿 |
+
+분기별 실제 읽기 순서:
+
+- **config fail**: `config.json` → `output-contract.md` → 종료
+- **gate 보류**: `config.json` → 입력 → `output-contract.md` → 종료
+- **정상 저장**: `config.json` → 입력 → `templates/*` (병렬) → worker 병렬 → merge → `storage-contract.md` → 저장 → `output-contract.md` → 종료
+
 ## 호출
 
 - Claude Code: `/product-team-kit:plan-format <기획 입력 또는 파일/디렉터리 경로>`
@@ -22,6 +40,8 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 기능명은 별도 인자로 받지 않는다. 입력 본문, 파일명, 디렉터리명에서 추출한다.
 
 ## 1. 설정 확인 (strict-exit)
+
+**이 step에서 읽는 파일**: `<project-root>/.product-team-kit/config.json` 하나만. templates·references·입력 파일은 읽지 않는다.
 
 `<project-root>/.product-team-kit/config.json`을 읽는다. `<project-root>`는 입력 기준 git root 또는 현재 작업 디렉터리다 (`../../references/config-contract.md` 동일 규칙).
 
@@ -32,11 +52,13 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 - `version` 미일치 또는 누락
 - `outputRoot` 검증 거부 (절대경로, `..`, 빈 문자열, 경로 구분자 포함, 비문자열)
 
-종료 출력은 `references/output-contract.md`의 "설정 없음" 템플릿을 사용하며 `set-config` 안내를 포함한다.
+종료 출력은 `references/output-contract.md`의 "설정 없음" 템플릿을 사용한다. 이 시점에 `output-contract.md`를 읽어 템플릿을 적용하고 `set-config` 안내를 포함한다. 종료 분기가 확정된 뒤에만 읽는다.
 
 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]` 블록으로 처리한다. 이 경우는 종료하지 않고 step 2로 진행한다.
 
 ## 2. Gate First 변환 가능 판정
+
+**이 step에서 읽는 파일**: 입력 (텍스트·파일·디렉터리). templates·references는 아직 읽지 않는다.
 
 입력을 dispatch (`## 입력 처리` 참조)한 뒤 아래 4 조건을 모두 충족하는지 확인한다. 통과 전에는 저장 폴더·임시 파일을 만들지 않는다.
 
@@ -53,17 +75,21 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 
 부서 경계 (제외 대상): 디자인 상세 (컬러·폰트·Figma), 최종 UX copy, QA 케이스, API 명세, DB schema, 운영 런북, 개발 작업 분해. 입력의 주된 내용이 위 디자인·개발·QA·운영 상세이고 제품·업무 판단 정보가 부족하면 보류한다.
 
-조건 미충족 시 `references/output-contract.md`의 "저장 보류" 템플릿으로 부족 항목만 출력하고 종료한다. 보강용 입력 템플릿·재실행 명령 블록·질문 섹션은 만들지 않는다.
+조건 미충족 시 `references/output-contract.md`의 "저장 보류" 템플릿으로 부족 항목만 출력하고 종료한다. 이 시점에 `output-contract.md`만 읽는다 (templates·storage-contract는 읽지 않는다). 보강용 입력 템플릿·재실행 명령 블록·질문 섹션은 만들지 않는다.
 
 `[미정]`/`[가정]`/`[확인 필요]`는 gate 통과 후 세부 보강용으로만 쓴다. gate 통과 전 부족분을 채우는 용도로 쓰지 않는다.
 
 ## 3. 변환 및 저장
 
+**이 step에서 읽는 파일**: step 3.2 직전 `templates/*.md` 2개 (병렬), step 3.3 merge 통과 후 `references/storage-contract.md`, 종료 출력 직전 `references/output-contract.md`. step 3 진입 시 한꺼번에 읽지 말고 sub-step별로 lazy read.
+
 `dispatch → worker A·B 병렬 작성 → merge` 3단계로 동작한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
 
-작성 시작 전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다. 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
+step 3.2 worker 호출 직전 `templates/기능설계서.md`와 `templates/정책서.md`를 읽는다 (두 파일 병렬). 두 산출물의 섹션 헤더(번호·제목), metadata 필드, 표 컬럼 헤더는 템플릿과 1:1로 일치시킨다. 섹션 추가·삭제·병합·재번역·순서 변경 금지. 본 SKILL.md의 모든 작성 규칙은 템플릿 구조를 깨지 않는 범위에서만 적용된다.
 
 ### 3.1 공통 dispatch (단일 패스)
+
+**읽는 파일**: 없음 (step 2에서 읽은 입력만 사용). templates는 step 3.2 직전에 읽는다.
 
 분류·고정 항목만 결정하고 본문 작성은 하지 않는다.
 
@@ -75,6 +101,8 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 기능명·역할명·용어 일관성은 이 단계에서만 결정한다. 두 worker는 dispatch 결과를 그대로 사용하고 재추출하지 않는다.
 
 ### 3.2 두 worker 병렬 작성
+
+**읽는 파일**: 호출 직전 `templates/기능설계서.md`, `templates/정책서.md` 2개를 병렬 read. 각 worker prompt에 자기 템플릿 원문을 그대로 포함시킨다.
 
 기능설계서 worker (`plan-format-feature-worker`)와 정책서 worker (`plan-format-policy-worker`)를 병렬 호출한다. main이 단일 어시스턴트 메시지에 두 Agent tool 호출 block을 동시 발행한다. 두 호출이 모두 회신될 때까지 step 3.3으로 가지 않는다.
 
@@ -98,6 +126,8 @@ worker 출력 규칙:
 worker는 채워진 markdown 본문 텍스트만 return한다. **worker는 파일을 쓰지 않는다.** 저장은 main이 step 3.3 merge 후 `references/storage-contract.md` 절차 (staging folder → 두 파일 write → verify → rename → verify)로 일괄 처리한다.
 
 ### 3.3 merge (단일 패스)
+
+**읽는 파일**: 없음 (templates는 3.2에서 읽음, worker 출력 검증에 재사용). 정상 merge 통과 후 저장 절차 진입 직전에만 `references/storage-contract.md`를 읽는다. 보류 분기는 `references/output-contract.md`만 읽는다.
 
 두 worker 결과를 합쳐 최종 산출을 만든다.
 
@@ -159,7 +189,9 @@ worker는 채워진 markdown 본문 텍스트만 return한다. **worker는 파�
 
 ### 저장과 출력
 
-저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 사용자 출력은 `references/output-contract.md`의 "저장 완료" / "저장 보류" / "설정 없음" 템플릿을 따른다.
+저장 위치·안전기능명·collision suffix는 `references/storage-contract.md`를 따른다. 이 파일은 step 3.3 merge 통과 후 저장 절차 직전에만 읽는다.
+
+사용자 출력은 `references/output-contract.md`의 "저장 완료" / "저장 보류" / "설정 없음" 템플릿을 따른다. 이 파일은 종료 분기가 확정된 직후 1회만 읽는다 (분기마다 동일).
 
 ## 입력 처리
 

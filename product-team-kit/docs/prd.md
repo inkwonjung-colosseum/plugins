@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.2
+- 대상 버전: product-team-kit 0.6.3
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -20,6 +20,7 @@
 
 - 기획 입력을 기능설계서와 정책서 두 초안으로 안정적으로 분리한다.
 - 사용처 프로젝트별 `.product-team-kit/config.json`으로 초안 저장 위치와 SSOT 검색 범위를 조정한다.
+- config, 입력, templates, references, SSOT corpus를 필요한 단계에서만 읽어 불필요한 선행 context 사용을 줄인다.
 - 입력이 부족한 경우 문서를 만들지 않고 부족 항목만 알려준다.
 - 생성된 초안이 공식 팀 문서가 아니라 로컬 검토 대상임을 명확히 한다.
 - 발행 전 검토에서 Product Docs SSOT 충돌, 명확성, 용어 일관성, 4역할 넘김 가능성을 보수적으로 판단한다.
@@ -40,6 +41,7 @@
 
 - 직접 텍스트, 파일, 디렉터리 기반 기획 입력 처리
 - `set-config`를 통한 `.product-team-kit/config.json` 생성/갱신
+- Lazy read 기반 실행: 종료 분기에서 쓰지 않는 templates, references, SSOT corpus를 읽지 않음
 - Gate First 기반 초안 생성 가능성 판정
 - 기능설계서와 정책서 동시 생성
 - `<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 규칙 (`outputRoot` 기본값: `planning`)
@@ -66,7 +68,7 @@ flowchart TD
     S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]
     S1 -- 예 --> C{초안 생성 가능?}
     C -- 아니오 --> D[저장 보류와 부족 항목 출력]
-    C -- 예 --> E[기능설계서와 정책서 로컬 저장]
+    C -- 예 --> E[필요 templates 읽기 후 로컬 저장]
     E --> F[plan-review]
     F --> G{발행 전 검토 결과}
     G -- 통과 --> H[팀 반영 절차로 handoff]
@@ -87,6 +89,7 @@ flowchart TD
 | PRD-07 | 검토 결과는 기획팀이 바로 행동할 수 있어야 한다. | 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서 충돌이 상단에 표시된다. |
 | PRD-08 | 검토는 보수적으로 취합한다. | 필수 수정 또는 `착수 전 보강 필요` 역할이 있으면 최종 결과는 `수정 필요`다. |
 | PRD-09 | Claude Code와 Codex에서 같은 제품 계약을 유지한다. | 양쪽 manifest가 같은 이름, 버전, 스킬 경로를 가리킨다. |
+| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 키워드 매칭된 SSOT corpus만 읽는다. |
 
 ## 8. 성공 기준
 
@@ -96,11 +99,13 @@ flowchart TD
 | 문서 분리 품질 | 정책 판단과 화면 동작이 한 문서에 중복되지 않는다. |
 | 검토 실행 가능성 | 검토 결과만 보고 기획자가 먼저 할 일을 판단할 수 있다. |
 | 발행 안전성 | Product Docs SSOT 충돌과 근거 부족이 `통과`로 완화되지 않는다. |
+| 읽기 효율성 | 종료 분기에서 사용하지 않는 templates, references, SSOT corpus를 선행 read하지 않는다. |
 | 플랫폼 일관성 | Claude Code와 Codex 문서, manifest, README의 스킬명과 버전이 일치한다. |
 
 ## 9. 비기능 요구사항
 
 - 로컬 우선: 입력, 초안, 검토는 현재 프로젝트의 로컬 파일을 기준으로 한다.
+- 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, worker에는 main이 확정한 본문과 근거 패키지만 전달한다.
 - 안전한 쓰기: 두 문서를 같은 staging folder에 먼저 작성하고 검증 후 target folder로 rename한다. 기존 target은 덮어쓰지 않으며 충돌 시 collision suffix `--01`~`--99`로 새 폴더를 확보한다.
 - 근거 제한: 외부 URL이나 코드 파일을 Product Docs SSOT 근거로 사용하지 않는다.
 - 문서 가독성: 기획팀이 먼저 읽을 수 있는 한국어 리포트를 우선한다.

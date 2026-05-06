@@ -65,7 +65,7 @@
 
     <svg viewBox="0 0 1000 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
       <title id="title">diagram-design 주요 workflow</title>
-      <desc id="desc">다이어그램 요청이 전달 가치 확인, style guide gate, 타입별 reference와 template 선택, taste gate를 거쳐 standalone HTML/SVG 파일로 완성되는 흐름.</desc>
+      <desc id="desc">다이어그램 요청이 전달 가치 확인, style guide 기본 토큰 확인, 타입별 reference와 assets template 선택, taste gate를 거쳐 standalone HTML/SVG 파일로 완성되는 흐름.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
@@ -85,8 +85,8 @@
       <line x1="500" y1="376" x2="500" y2="416" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
       <line x1="500" y1="464" x2="500" y2="504" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
 
-      <rect x="640" y="228" width="72" height="16" rx="2" fill="#f5f5f5"/>
-      <text x="676" y="240" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">DEFAULT?</text>
+      <rect x="640" y="228" width="88" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="684" y="240" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">DEFAULT TOKENS?</text>
       <rect x="480" y="476" width="40" height="16" rx="2" fill="#f5f5f5"/>
       <text x="500" y="488" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">PASS</text>
 
@@ -98,24 +98,24 @@
       <text x="500" y="156" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">diagram vs prose/table</text>
 
       <polygon points="500,192 600,240 500,288 400,240" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Style guide gate</text>
-      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">brand tokens</text>
+      <text x="500" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Style guide 확인</text>
+      <text x="500" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">#f5f5f5 / #2d3142 / #eb6c36</text>
 
       <rect x="728" y="216" width="160" height="48" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
       <text x="808" y="236" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">브랜드 토큰 조정</text>
-      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">onboarding or manual</text>
+      <text x="808" y="252" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">onboarding or manual tokens</text>
 
       <rect x="388" y="328" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="500" y="348" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">타입 선택</text>
-      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">architecture / flow / sequence / er ...</text>
+      <text x="500" y="364" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">13 types: architecture / flow / er ...</text>
 
       <rect x="388" y="416" width="224" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="500" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Reference + template</text>
-      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">type refs + light/dark/full assets</text>
+      <text x="500" y="452" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">type refs + ../assets variants</text>
 
       <rect x="388" y="504" width="224" height="56" rx="28" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
       <text x="500" y="528" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Taste gate 통과</text>
-      <text x="500" y="544" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">standalone html/svg</text>
+      <text x="500" y="544" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">self-contained html/svg</text>
 
       <line x1="40" y1="588" x2="960" y2="588" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
       <text x="40" y="608" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">LEGEND</text>

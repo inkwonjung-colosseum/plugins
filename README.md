@@ -36,8 +36,8 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `product-team-kit` | `0.6.2` | 기획 입력을 기능설계서와 정책서 초안으로 정리하며, `.product-team-kit/config.json` 설정과 Product Docs SSOT 근거 기반 4축 점검(SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `diagram-design` | `1.0.2` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
+| `product-team-kit` | `0.6.3` | 기획 입력을 기능설계서와 정책서 초안으로 정리하며, `.product-team-kit/config.json` 설정, 단계별 lazy read, Product Docs SSOT 근거 기반 4축 점검(SSOT 충돌·명확성·용어 일관성·4역할 넘김 가능성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
+| `diagram-design` | `1.0.3` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
 
@@ -48,8 +48,8 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 | 다이어그램 | 설명 |
 |---|---|
 | [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence export를 Product Docs Markdown 후보로 가져오는 보조 문서 운영 흐름 |
-| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`, `plan-review`, 저장 보류, 재검토 안내, 발행 준비, 팀 handoff를 요약한 generated overview |
-| [`product-team-kit-workflow-analysis.html`](./docs/diagrams/product-team-kit-workflow-analysis.html) | 같은 source에서 생성한 상세 분석 view. 입력 보완, SSOT 근거 경계, 보수적 종료 조건, 발행 준비 경계를 함께 표시 |
+| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `plan-format`, `plan-review`, lazy read, 저장 보류, 재검토 안내, 발행 준비, 팀 handoff를 요약한 generated overview |
+| [`product-team-kit-workflow-analysis.html`](./docs/diagrams/product-team-kit-workflow-analysis.html) | 같은 source에서 생성한 상세 분석 view. lazy read, 입력 보완, SSOT 근거 경계, 보수적 종료 조건, 발행 준비 경계를 함께 표시 |
 | [`diagram-design-workflow.html`](./docs/diagrams/diagram-design-workflow.html) | `diagram-design`의 타입 선택, style guide gate, taste gate 기반 HTML/SVG 생성 흐름 |
 
 ## 사용 문법
@@ -150,6 +150,12 @@ claude plugin validate ./product-team-kit
 claude plugin validate ./diagram-design
 claude plugin validate ./logistics-expert-kit
 claude plugin validate ./ai-utility-kit
+```
+
+generated 다이어그램 source를 바꾼 경우에는 HTML 산출물이 최신인지 확인합니다.
+
+```bash
+python3 docs/diagrams/render_product_team_kit_workflow.py --check
 ```
 
 문서만 수정한 경우에도 Markdown diff에 공백 문제가 없는지 확인합니다.

@@ -106,7 +106,7 @@ $diagram-design
 ### Claude Code
 
 ```bash
-claude plugin marketplace add inkwonjung-colosseum/plugins
+claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins
 claude plugin install diagram-design@inkwonjung-colosseum
 ```
 

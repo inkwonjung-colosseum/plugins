@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-06
-- 대상 버전: product-team-kit 0.6.2
+- 대상 버전: product-team-kit 0.6.3
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -12,12 +12,13 @@
 |---|---|---|
 | 설정 | set-config | `.product-team-kit/config.json`을 대화형으로 생성/갱신한다. |
 | 초안 생성 | Step 1 strict-exit | `.product-team-kit/config.json` 미존재·검증 실패 시 즉시 종료, set-config 안내. |
+| 공통 | Lazy read | config, 입력, templates, references, SSOT corpus를 필요한 단계에서만 읽는다. |
 | 입력 처리 | 입력 dispatch | 직접 텍스트, 파일, 디렉터리, 혼합 입력을 기획 입력으로 읽는다. |
 | 초안 생성 | Gate First | 초안 생성 가능 여부를 판단한다. |
 | 초안 생성 | 문서 분리 | 입력을 기능설계서와 정책서로 나눈다. |
 | 초안 생성 | 로컬 저장 | 두 문서를 timestamp 폴더에 저장한다. |
 | 발행 전 검토 | 검토 대상 확정 | 기능설계서/정책서 bundle을 검토 대상으로 확정한다. |
-| 발행 전 검토 | Product Docs SSOT 근거 | 관련 Markdown과 linked local resource를 직접 읽는다. |
+| 발행 전 검토 | Product Docs SSOT 근거 | 키워드로 좁힌 관련 Markdown과 필요한 linked local resource만 읽는다. |
 | 발행 전 검토 | review | 충돌, 명확성, 용어 일관성, 4역할 넘김 가능성을 보수적으로 판정한다. |
 | 플랫폼 | Claude Code / Codex 지원 | 같은 `skills/`를 양쪽 manifest에서 사용한다. |
 
@@ -40,7 +41,7 @@
 
 ### 3.1 Step 1 — Strict-exit (config 확인)
 
-`<project-root>/.product-team-kit/config.json` 부재, JSON 파싱 실패, `version` 미일치, `outputRoot` 검증 거부 시 즉시 종료한다. 종료 출력은 "설정 없음" 템플릿이며 Claude Code/Codex 양쪽 set-config 호출 안내를 포함한다. 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]`로 처리하고 step 2로 진행한다.
+`<project-root>/.product-team-kit/config.json` 부재, JSON 파싱 실패, `version` 미일치, `outputRoot` 검증 거부 시 즉시 종료한다. 이 단계에서는 config와 종료 출력 템플릿만 읽고, 입력 본문, templates, storage contract는 읽지 않는다. 종료 출력은 "설정 없음" 템플릿이며 Claude Code/Codex 양쪽 set-config 호출 안내를 포함한다. 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]`로 처리하고 step 2로 진행한다.
 
 ### 3.2 Step 2 — 입력 dispatch와 Gate First
 
@@ -65,11 +66,11 @@ Gate First 조건은 모두 식별되어야 한다.
 | 핵심 사용자 행동과 기대 결과 | 사용자 행동 1개와 사용자에게 보이는 결과 1개 이상 |
 | 주요 조건 / 정책 / 제약 | 허용, 금지, 조건, 예외, 제한, 판단 기준 중 업무 판단 기준 1개 이상 |
 
-조건 미충족 시 저장 보류를 반환하고 파일을 만들지 않는다. 입력이 디자인, API, DB, QA, 운영, 개발 작업 상세에 치우쳐 제품·업무 판단 정보가 부족한 경우도 저장 보류로 통합 처리한다 (보류 출력의 `이유` 필드와 `[제외된 상세 유형]` sub-block에 성격 명시).
+조건 미충족 시 저장 보류를 반환하고 파일을 만들지 않는다. 이 분기에서는 입력과 저장 보류 출력 템플릿만 사용하며, templates나 storage contract는 읽지 않는다. 입력이 디자인, API, DB, QA, 운영, 개발 작업 상세에 치우쳐 제품·업무 판단 정보가 부족한 경우도 저장 보류로 통합 처리한다 (보류 출력의 `이유` 필드와 `[제외된 상세 유형]` sub-block에 성격 명시).
 
 ### 3.3 Step 3 — 문서 분리
 
-dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤 기능설계서 worker와 정책서 worker가 각 문서 본문을 작성한다. main은 두 결과를 merge하고, 중복·marker·빈 골격 신호를 확인한 뒤 저장한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤, worker 호출 직전에 기능설계서/정책서 templates를 읽는다. 기능설계서 worker와 정책서 worker가 각 문서 본문을 작성하고, main은 두 결과를 merge해 중복·marker·빈 골격 신호를 확인한다. storage contract는 merge 통과 후 저장 절차에 들어가기 직전에만 읽는다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 | 입력 성격 | 귀속 문서 |
 |---|---|
@@ -110,7 +111,7 @@ dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤 기능설�
 
 ### 4.2 Product Docs SSOT 근거 기록
 
-Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
+Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상에서 추출한 기능명, 정책명, 도메인, 역할명, 상태명, 권한명, 화면명, 핵심 조건·예외 키워드로 후보를 좁힌 뒤 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
 
 근거에서 제외하는 항목:
 
@@ -119,11 +120,11 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 - 외부 URL
 - Markdown에서 참조하지 않은 독립 resource
 
-근거 기록은 사람용 리포트 하단의 `읽은 근거`, `읽지 않은 관련 후보`, `제외 후보`, `검증 한계`로 남긴다. 핵심 근거를 확보하지 못하면 최종 결과는 보수적으로 낮춘다.
+키워드 추출이 실패하면 worker를 실행하지 않고 `수정 필요`로 종료한다. 키워드 추출은 성공했지만 SSOT corpus 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C/D축은 검토 대상 본문만으로 점검한다. 근거 기록은 사람용 리포트 하단의 `읽은 근거`, `읽지 않은 관련 후보`, `제외 후보`, `검증 한계`로 남긴다. 핵심 근거를 확보하지 못하면 최종 결과는 보수적으로 낮춘다.
 
 ### 4.3 review gate
 
-점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고, A/B/C/D worker는 각 축 발견 사항만 작성하며, main이 dedup, 보수 합성, 결과 판정, 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 rules/corpus만 읽는다. A/B/C/D worker는 inline으로 전달된 검토 대상과 근거 패키지에서 각 축 발견 사항만 작성하며, main이 dedup, 보수 합성, 결과 판정, 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 | 판정 | 의미 |
 |---|---|
@@ -176,7 +177,7 @@ flowchart TD
     S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]
     S1 -- 예 --> D{Step 2: Gate First 통과?}
     D -- 아니오 --> E[저장 보류]
-    D -- 예 --> F[Step 3: 기능설계서·정책서 저장]
+    D -- 예 --> F[Step 3: templates 읽기 후 기능설계서·정책서 저장]
     F --> G
     G --> H{검토 결과}
     H -- 통과 --> I[발행 준비 체크리스트]
@@ -189,6 +190,6 @@ flowchart TD
 ## 7. 변경 관리 기준
 
 - 새 스킬은 PRD의 제공 범위와 제외 범위를 먼저 갱신한 뒤 추가한다.
-- 스킬 계약 변경은 `skills/*/SKILL.md`, `references/`, README, `docs/skills-workflow.md`에 같은 의미로 반영한다.
+- 스킬 계약 변경은 `skills/*/SKILL.md`, `references/`, README, `docs/skills-workflow.md`, PRD/기능 정의 문서에 같은 의미로 반영한다.
 - 다이어그램은 `docs/diagrams/product-team-kit-workflow.source.json`을 source로 사용한다.
 - 외부 발행 기능을 추가하려면 현재의 수동 handoff 경계를 별도 요구사항으로 재검토한다.

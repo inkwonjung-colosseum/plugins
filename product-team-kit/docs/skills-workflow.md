@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로
 
-`product-team-kit`은 로컬 설정을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다.
+`product-team-kit`은 로컬 설정을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
 
 이 문서는 README의 빠른 시작보다 한 단계 자세히, 어떤 스킬을 언제 선택하고 어떤 산출물로 이어지는지 설명한다.
 
@@ -11,6 +11,13 @@
 | `set-config` | `.product-team-kit/config.json`을 대화형으로 만든다 | 현재 프로젝트 cwd, 기존 config | `version`, `outputRoot`, `ssot.include`, `ssot.exclude` | `plan-format` 또는 `plan-review` |
 | `plan-format` | 충분한 기획 입력을 기능설계서와 정책서 로컬 초안으로 나눈다 | 기획 노트, 회의록, AI 대화 결과물, 문서 스크랩, 파일 경로, 디렉터리 경로 | `[안전기능명]_기능설계서.md`, `[안전기능명]_정책서.md` | `plan-review` |
 | `plan-review` | 기능설계서/정책서 초안을 발행 전 gate로 검토한다 | 초안 폴더 또는 기능설계서/정책서 파일 | `통과`, `조건부 통과`, `수정 필요` 판단과 기획팀용 리포트 | 사람의 반영 또는 초안 수정 |
+
+## Lazy read 기준
+
+| 스킬 | 먼저 읽는 것 | 통과 후 읽는 것 | 종료 분기에서 읽지 않는 것 |
+|---|---|---|---|
+| `plan-format` | `.product-team-kit/config.json` | 입력, templates, storage/output contract | config 실패 시 입력/templates/storage contract, 저장 보류 시 templates/storage contract |
+| `plan-review` | `.product-team-kit/config.json`, 검토 대상 타입 | 검토 대상 본문, `review-rules.md`, 키워드 매칭 SSOT corpus, `output-format.md` | config 실패·문서 타입 실패 시 review rules/SSOT corpus, SSOT 매칭 0건 시 corpus 본문 |
 
 ## 호출 방식
 
@@ -28,7 +35,7 @@ flowchart TD
     B1 -- 아니오 --> B2[strict-exit: 설정 없음 안내 + set-config]
     B1 -- 예 --> C{기능설계서/정책서 생성 가능?}
     C -- 정보 부족 --> D[저장 보류: 부족 항목만 출력]
-    C -- 가능 --> F[기능설계서와 정책서 저장]
+    C -- 가능 --> F[templates 읽기 후 기능설계서와 정책서 저장]
     F --> G[plan-review]
     G --> H{발행 전 gate 결과}
     H -- 통과 --> I[발행 준비 체크리스트 출력]
@@ -76,7 +83,7 @@ flowchart TD
 
 ### 설명
 
-`plan-format`은 기획 입력을 기능설계서와 정책서 초안으로 정리하는 formatting 스킬이다. 입력이 충분한지 먼저 판단하고, 충분하면 두 문서를 하나의 저장 단위로 생성한다.
+`plan-format`은 기획 입력을 기능설계서와 정책서 초안으로 정리하는 formatting 스킬이다. config를 먼저 확인하고, 통과한 뒤에만 입력을 읽어 충분한지 판단한다. 입력이 충분하면 templates를 읽고 두 문서를 하나의 저장 단위로 생성한다.
 
 입력이 부족하면 질문하지 않고 저장 보류를 반환한다. 보류 출력에는 부족 항목만 포함하고 보강용 입력 템플릿은 만들지 않는다.
 
@@ -108,7 +115,7 @@ flowchart TD
     B2 --> C
     C --> D{Gate First 4 조건 충족?}
     D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 충족 --> H[Step 3: dispatch 후 worker A·B 작성과 merge]
+    D -- 충족 --> H[Step 3: templates lazy read 후 worker A·B 작성과 merge]
     H --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
     N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
@@ -124,7 +131,7 @@ flowchart TD
 - 핵심 사용자 행동과 기대 결과: 행동 1개와 결과 1개
 - 주요 조건/정책/제약: 허용, 금지, 조건, 예외, 제한, 판단 기준 중 확인 가능
 
-기능설계서와 정책서 중 한쪽에 실질 내용이 거의 없으면 저장 보류한다. 디렉터리 입력은 입력 dispatch 계약에 따라 기본 제외 경로만 적용해 통합하며, 입력 크기 상한은 두지 않는다. 읽을 수 없는 파일은 저장 보류 사유가 아니라 출력의 `[입력 제외 항목]`에 남긴다. Python, Node.js, 별도 CLI helper 설치는 전제하지 않는다.
+기능설계서와 정책서 중 한쪽에 실질 내용이 거의 없으면 저장 보류한다. 이때 templates, storage contract, 저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 입력 dispatch 계약에 따라 기본 제외 경로만 적용해 통합하며, 입력 크기 상한은 두지 않는다. 읽을 수 없는 파일은 저장 보류 사유가 아니라 출력의 `[입력 제외 항목]`에 남긴다. Python, Node.js, 별도 CLI helper 설치는 전제하지 않는다.
 
 ### 산출물
 
@@ -139,7 +146,7 @@ flowchart TD
 
 ### 설명
 
-`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성, 디자인·개발·QA·운영 착수 가능성을 4축으로 확인한다.
+`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성, 디자인·개발·QA·운영 착수 가능성을 4축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
 
 검토 대상은 `<outputRoot>/` 아래 초안일 수 있지만, `<outputRoot>/` 파일은 SSOT 근거로 사용하지 않는다.
 
@@ -166,13 +173,16 @@ flowchart TD
     D -- 아니오 --> E[올바른 검토 대상이 아님 안내]
     D -- 예 --> F[검토 대상 본문 직접 읽기]
     F --> G[키워드 추출]
-    G --> H[SSOT corpus와 linked local resource 직접 읽기]
-    H --> I[4축 worker 점검]
-    I --> J[발견 사항 dedup과 보수 합성]
-    J --> K{최종 결과}
-    K -- 통과 --> L[기획팀용 리포트와 발행 준비 체크리스트 출력]
-    K -- 조건부 통과 --> M[확인 항목과 발행 준비 체크리스트 출력]
-    K -- 수정 필요 --> N[먼저 고칠 항목과 재검토 안내 체크리스트 출력]
+    G --> H{SSOT 후보 매칭?}
+    H -- 1건 이상 --> I[필요 corpus와 linked local resource 읽기]
+    H -- 0건 --> I0[A축 검증 대상 없음 처리]
+    I --> J[4축 worker 점검]
+    I0 --> J
+    J --> K[발견 사항 dedup과 보수 합성]
+    K --> L{최종 결과}
+    L -- 통과 --> M[기획팀용 리포트와 발행 준비 체크리스트 출력]
+    L -- 조건부 통과 --> N[확인 항목과 발행 준비 체크리스트 출력]
+    L -- 수정 필요 --> O[먼저 고칠 항목과 재검토 안내 체크리스트 출력]
 ```
 
 ### 결과 기준
@@ -205,7 +215,9 @@ flowchart TD
 - `<outputRoot>/` 아래 산출물은 로컬 초안 템플릿이며 공식 팀 문서가 아니다.
 - `plan-format`은 외부 시스템에 직접 게시하지 않는다.
 - `plan-format`은 Product Docs SSOT 근거 검증을 수행하지 않는다.
+- `plan-format`은 config 실패나 저장 보류 분기에서 templates와 storage contract를 읽지 않는다.
 - `plan-review`는 초안을 직접 수정하지 않고, 기획팀용 리포트와 발행 준비 체크리스트 또는 재검토 안내 체크리스트를 출력한다.
+- `plan-review`는 config 실패, 문서 타입 실패, SSOT 키워드 추출 실패 분기에서 불필요한 corpus read와 worker 실행을 하지 않는다.
 - Product Docs SSOT는 현재 프로젝트의 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
 - 코드, 설정, 빌드 산출물, dependency/vendor, 외부 URL, `<outputRoot>/` 산출물은 SSOT 근거에서 제외한다.
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confluence export as Product Docs source workflow</title>
+  <title>Confluence export as Product Docs candidate workflow</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,12 +64,12 @@
 </head>
 <body>
   <main class="frame">
-    <p class="eyebrow">Swimlane · planning workflow</p>
-    <h1>Confluence export as Project Docs source flow</h1>
+    <p class="eyebrow">Swimlane · product-team-kit</p>
+    <h1>Confluence export as Product Docs candidate flow</h1>
 
     <svg viewBox="0 0 1120 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
       <title id="title">Confluence export 보조 문서 workflow</title>
-      <desc id="desc">Confluence export Markdown을 Product Docs SSOT 후보 중 하나로 다루고, 기획 입력은 plan-format으로 기능설계서와 정책서 초안으로 저장한 뒤 plan-review를 거쳐 사람이 팀의 반영 절차로 넘기는 swimlane 다이어그램.</desc>
+      <desc id="desc">Confluence export Markdown을 읽기 전용 Product Docs 후보로 다루고, 기획 입력은 lazy read, config strict-exit, Gate First를 통과한 뒤 plan-format으로 기능설계서와 정책서 초안을 저장한다. plan-review는 필요한 SSOT corpus만 읽어 4축 검토를 수행하고, 통과 또는 조건부 통과 결과만 사람이 팀 반영 절차로 넘긴다.</desc>
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
@@ -119,16 +119,16 @@
 
       <rect x="144" y="40" width="144" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
       <text x="216" y="64" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Export 원본</text>
-      <text x="216" y="80" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">source of truth</text>
+      <text x="216" y="80" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">external source</text>
 
       <rect x="976" y="56" width="112" height="64" rx="6" fill="#ffffff" stroke="#2e5aa8" stroke-width="1"/>
       <text x="1032" y="80" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Confluence</text>
       <text x="1032" y="96" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">manual update</text>
 
       <rect x="400" y="144" width="156" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
-      <text x="478" y="168" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">로컬 스냅샷</text>
+      <text x="478" y="168" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Product Docs 후보</text>
       <text x="478" y="184" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">read-only markdown</text>
-      <text x="478" y="198" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">registry · index · tree</text>
+      <text x="478" y="198" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">필요할 때만 근거로 read</text>
 
       <rect x="144" y="300" width="188" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
       <text x="238" y="324" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">기획 입력</text>
@@ -136,36 +136,36 @@
 
       <rect x="668" y="300" width="112" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="724" y="324" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-format</text>
-      <text x="724" y="340" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">format only</text>
+      <text x="724" y="340" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">lazy read + gate</text>
 
       <polygon points="932,280 1008,332 932,384 856,332" fill="#ffffff" stroke="#eb6c36" stroke-width="1"/>
-      <text x="932" y="326" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">초안 생성 가능?</text>
-      <text x="932" y="342" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">필수 입력 확인</text>
+      <text x="932" y="326" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Gate First 통과?</text>
+      <text x="932" y="342" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">목적·대상·행동·정책</text>
 
       <rect x="644" y="424" width="208" height="56" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
       <text x="748" y="446" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">저장 보류</text>
-      <text x="748" y="462" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">보완 질문만 반환</text>
+      <text x="748" y="462" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">부족 항목만 출력</text>
 
       <rect x="892" y="452" width="200" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
       <text x="992" y="476" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">초안 폴더 저장</text>
       <text x="992" y="492" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">기능설계서 + 정책서</text>
-      <text x="992" y="506" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">planning/[name]--timestamp/</text>
+      <text x="992" y="506" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">&lt;outputRoot&gt;/[name]--timestamp/</text>
 
       <polygon points="992,548 1072,596 992,644 912,596" fill="#ffffff" stroke="#eb6c36" stroke-width="1"/>
       <text x="992" y="580" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">plan-review</text>
-      <text x="992" y="596" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">evidence / scope / execution</text>
-      <text x="992" y="610" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">보수적 결과</text>
+      <text x="992" y="596" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">lazy SSOT / clarity / terms</text>
+      <text x="992" y="610" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">4역할 readiness</text>
 
       <rect x="700" y="600" width="192" height="56" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
-      <text x="796" y="622" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">팀 handoff</text>
-      <text x="796" y="638" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">사람이 반영 여부 결정</text>
+      <text x="796" y="622" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">팀 반영 준비</text>
+      <text x="796" y="638" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">사람이 외부 반영</text>
 
       <line x1="40" y1="704" x2="1080" y2="704" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
       <text x="40" y="724" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEGEND</text>
       <rect x="128" y="716" width="24" height="12" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
       <text x="164" y="726" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Source / snapshot</text>
       <rect x="328" y="716" width="24" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-      <text x="364" y="726" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Planner-owned draft</text>
+      <text x="364" y="726" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Local draft</text>
       <polygon points="572,722 584,716 596,722 584,728" fill="#ffffff" stroke="#eb6c36" stroke-width="1"/>
       <text x="608" y="726" fill="#4f5d75" font-size="8" font-family="'Geist', sans-serif">Gate</text>
       <line x1="728" y1="724" x2="760" y2="724" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>

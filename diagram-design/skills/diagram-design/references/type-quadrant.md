@@ -16,10 +16,10 @@
 - Missing axis names.
 
 ## Examples
-- `assets/example-quadrant.html` — minimal light
-- `assets/example-quadrant-dark.html` — minimal dark
-- `assets/example-quadrant-full.html` — full editorial
-- `assets/example-quadrant-consultant.html` — consultant special (see below)
+- `../assets/example-quadrant.html` — minimal light
+- `../assets/example-quadrant-dark.html` — minimal dark
+- `../assets/example-quadrant-full.html` — full editorial
+- `../assets/example-quadrant-consultant.html` — consultant special (see below)
 
 ---
 

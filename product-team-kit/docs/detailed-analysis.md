@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.2`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.3`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -17,7 +17,7 @@ plan-review
   -> 통과 / 조건부 통과 / 수정 필요 / 올바른 검토 대상이 아님
 ```
 
-핵심 정체성은 "로컬 설정", "기획 입력을 문서 초안으로 정리하는 formatter", "발행 전 검토 gate"의 분리다. `set-config`는 사용처 프로젝트의 설정만 갱신하고, `plan-format`은 생성 가능 여부를 먼저 판단한 뒤 초안을 저장하며, `plan-review`는 Product Docs SSOT 충돌, 명확성, 용어 일관성, downstream 착수 가능성을 4축으로 검토한다.
+핵심 정체성은 "로컬 설정", "기획 입력을 문서 초안으로 정리하는 formatter", "발행 전 검토 gate"의 분리다. `set-config`는 사용처 프로젝트의 설정만 갱신하고, `plan-format`은 생성 가능 여부를 먼저 판단한 뒤 초안을 저장하며, `plan-review`는 Product Docs SSOT 충돌, 명확성, 용어 일관성, downstream 착수 가능성을 4축으로 검토한다. 두 실행 스킬은 lazy read 원칙을 공유해 종료 분기에서 쓰지 않는 templates, references, SSOT corpus를 선행 read하지 않는다.
 
 ## 2. 구조
 
@@ -47,6 +47,7 @@ skills/plan-review/
 
 - **Local config first**: 사용처 프로젝트 루트의 `.product-team-kit/config.json`으로 `outputRoot`와 SSOT corpus 범위를 조정한다.
 - **Strict-exit**: `plan-format`은 config가 없거나 핵심 검증에 실패하면 파일 생성 없이 종료하고 `set-config`를 안내한다.
+- **Lazy read**: config 실패, gate 보류, unsupported input, SSOT 0건 같은 종료/우회 분기에서 쓰지 않는 파일은 읽지 않는다.
 - **Gate First**: 변환 가능 판정 전 파일 생성 금지. 부족하면 질문 루프 없이 보류 출력만 반환한다.
 - **No interview loop**: `plan-format`은 단일 패스다. 부족 항목만 출력하고 보강 템플릿은 만들지 않는다.
 - **역할 분리**: `plan-format`은 formatter, `plan-review`는 validator다. `plan-format`은 SSOT 검증을 하지 않고, `plan-review`는 초안을 직접 수정하지 않는다.
@@ -70,14 +71,14 @@ skills/plan-review/
 
 ### Step 1 strict-exit
 
-`<project-root>/.product-team-kit/config.json`을 읽어 다음 중 하나라도 해당하면 즉시 종료한다.
+`<project-root>/.product-team-kit/config.json`을 읽어 다음 중 하나라도 해당하면 즉시 종료한다. 이 분기에서는 입력 본문, templates, storage contract를 읽지 않는다.
 
 - 파일 없음
 - JSON 파싱 실패
 - `version` 미일치 또는 누락
 - `outputRoot` 검증 거부
 
-종료 출력은 `output-contract.md`의 "설정 없음" 템플릿을 사용하고 `set-config`를 안내한다. 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]`로 처리하고 step 2로 진행한다.
+종료 출력은 종료 분기가 확정된 뒤 `output-contract.md`의 "설정 없음" 템플릿을 읽어 사용하고 `set-config`를 안내한다. 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열)는 default fallback + `[설정 경고]`로 처리하고 step 2로 진행한다.
 
 ### Step 2 입력 dispatch와 Gate First
 
@@ -97,11 +98,11 @@ Gate First 4 조건:
 - 핵심 사용자 행동과 기대 결과
 - 주요 조건/정책/제약
 
-부서 경계 (디자인·API·DB·QA·운영·개발 작업 분해 heavy 입력이고 제품·업무 판단 정보 부족)도 보류 사유다. 기능설계서와 정책서 중 한쪽이 빈 골격에 가까우면 보류한다.
+부서 경계 (디자인·API·DB·QA·운영·개발 작업 분해 heavy 입력이고 제품·업무 판단 정보 부족)도 보류 사유다. 기능설계서와 정책서 중 한쪽이 빈 골격에 가까우면 보류한다. 저장 보류에서는 `output-contract.md`만 읽고, templates와 `storage-contract.md`는 읽지 않는다.
 
 ### Step 3 변환·저장
 
-dispatch → worker A·B 병렬 작성 → merge 3단계로 작성한다. dispatch는 기능명, 안전기능명, 역할명, 용어, 입력 단편 라벨을 고정한다. 기능설계서 worker는 `feature`와 `both`의 사용자 결과·가능 행위만 작성하고, 정책서 worker는 `policy`와 `both`의 판단 기준만 작성한다. main은 두 결과를 merge하며 중복, marker 합산, 빈 골격 신호를 확인한 뒤 저장한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+dispatch → worker A·B 병렬 작성 → merge 3단계로 작성한다. dispatch는 기능명, 안전기능명, 역할명, 용어, 입력 단편 라벨을 고정한다. worker 호출 직전에만 기능설계서/정책서 templates를 읽고, 기능설계서 worker는 `feature`와 `both`의 사용자 결과·가능 행위만 작성하며, 정책서 worker는 `policy`와 `both`의 판단 기준만 작성한다. main은 두 결과를 merge하며 중복, marker 합산, 빈 골격 신호를 확인한다. 저장 절차에 들어갈 때만 `storage-contract.md`를 읽는다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 저장 계약:
 
@@ -114,9 +115,9 @@ dispatch → worker A·B 병렬 작성 → merge 3단계로 작성한다. dispat
 
 ## 6. plan-review 동작
 
-`plan-review`는 초안 폴더 또는 기능설계서/정책서 파일을 검토한다. 폴더 입력이면 기능설계서와 정책서를 함께 읽고, 단일 파일 입력이면 같은 폴더에서 짝문서를 찾는다. 짝문서가 없으면 단일 검토를 진행하되 `검증 한계`에 남긴다.
+`plan-review`는 초안 폴더 또는 기능설계서/정책서 파일을 검토한다. 먼저 config를 확인하고, 치명 오류면 `output-format.md`만 읽어 종료한다. 폴더 입력이면 기능설계서와 정책서를 함께 읽고, 단일 파일 입력이면 같은 폴더에서 짝문서를 찾는다. 지원하지 않는 문서 타입이면 `review-rules.md`와 SSOT corpus를 읽지 않고 `올바른 검토 대상이 아님`으로 종료한다. 짝문서가 없으면 단일 검토를 진행하되 `검증 한계`에 남긴다.
 
-Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
+Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상에서 키워드를 먼저 추출하고, 키워드 매칭 후보가 1건 이상일 때만 해당 corpus 본문과 필요한 linked local resource를 읽는다. 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C/D축은 검토 대상 본문만으로 점검한다.
 
 4축 점검:
 
@@ -127,7 +128,7 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 | C. 용어 일관성 | 역할명, 상태명, 권한명, 화면명, 도메인 stem 통일성 |
 | D. 4역할 넘김 가능성 | 디자인, 개발, QA, 운영이 대화 기억 없이 다음 업무를 시작할 수 있는지 |
 
-점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고, A/B/C/D worker는 각 축 발견 사항만 작성한다. main은 발견 사항 dedup, 보수 합성, 결과 판정, 사람용 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+점검 실행은 dispatch → 4축 worker 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 `review-rules.md` 섹션과 근거 패키지를 worker prompt에 inline으로 전달한다. A/B/C/D worker는 각 축 발견 사항만 작성하고 직접 파일을 추가로 읽지 않는다. main은 발견 사항 dedup, 보수 합성, 결과 판정, 사람용 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
 출력은 YAML manifest가 아니라 사람용 markdown 리포트 하나다. 상단에 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서와의 충돌을 두고, 하단에 coverage, 읽은 근거, 읽지 않은 관련 후보, 제외 후보, 검증 한계, 상세 발견 항목을 둔다.
 
@@ -143,6 +144,7 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 ## 7. 강점
 
 - Strict-exit + Gate First + 단일 패스로 불완전 산출물과 의도 외 실행을 최소화한다.
+- Lazy read 계약으로 config 실패, 저장 보류, SSOT 매칭 0건 같은 분기의 context 낭비와 예기치 않은 근거 확대를 줄인다.
 - `set-config`로 프로젝트별 저장 위치와 SSOT corpus 범위를 조정할 수 있다.
 - 단일 SKILL.md에 입력 dispatch·분류·marker를 흡수해 cross-reference drift 위험을 낮췄다.
 - staging folder rename + char-boundary safe-name truncation + `--99` collision bound로 한쪽 final 문서만 남는 실패 모드를 줄이고 저장 실패 모드를 명시한다.
@@ -156,7 +158,7 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 1. Strict-exit으로 config 없는 신규 환경은 첫 실행에서 바로 실패한다. README와 set-config 안내가 가이드지만 초기 마찰은 남는다.
 2. Markdown 전제가 강하다. 팀이 Notion 또는 Confluence를 쓰면 export snapshot만 SSOT 근거가 되므로 freshness risk가 자주 발생할 수 있다.
 3. 단일 기능명 가정이 강하다. 디렉터리 입력에 여러 기능이 섞이면 첫 후보로 묶일 수 있고 다기능 분리 메커니즘이 없다.
-4. 입력 크기 상한이 없어 큰 PRD 모음을 끝까지 읽을 수 있는 대신, 호출 환경의 메모리/시간 한계는 운영자가 책임진다.
+4. Lazy read는 내부 references와 SSOT corpus를 늦게 읽게 하지만, Gate First를 위해 선택된 입력 자체는 끝까지 읽는다. 큰 PRD 모음을 넣으면 호출 환경의 메모리/시간 한계는 여전히 운영자가 책임진다.
 5. Asia/Seoul timestamp가 고정되어 다른 timezone 팀에는 혼선이 있을 수 있다.
 6. `plan-format`은 SSOT 검증을 하지 않기 때문에 SSOT와 충돌하는 항목이 `plan-review` 전까지 표면화되지 않고 재작업이 생길 수 있다.
 7. 9섹션 템플릿은 작은 기능에는 과할 수 있다. 빈 섹션 제거 규칙이 완화 장치지만 진입장벽은 남는다.
@@ -172,4 +174,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.6.2는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. 산출물 신뢰성과 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.6.3은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. lazy read, 산출물 신뢰성, 발행 전 검토 경계는 좋아졌고, 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
