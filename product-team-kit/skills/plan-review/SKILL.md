@@ -181,6 +181,7 @@ worker는 합성·결과 4종 판정·리포트 작성을 하지 않는다. 본�
 - 결과 4종 판정 — `references/review-rules.md`의 `## 결과 4종 기준` + `## 보수 합성 우선순위` 적용 (상단 list 기준).
 - main A축 발견 0건 + 2 worker 모두 `<!-- worker-flag: no-findings -->` + `완료 전 자체 점검` 통과 → `통과`.
 - worker 발견 사항 형식이 7 필드(제목/위치/분류/발견 유형/근거 인용/영향/최소 수정 또는 확인 조건)와 어긋나면 1회 retry, 2회 어긋나면 `검증 한계`에 기록 후 보수 합성. main A축 발견은 main이 직접 7 필드 형식으로 작성하므로 retry 대상이 아니다.
+- 표 형식 보정: worker 출력이 `review-rules.md ## 발견 사항 필드 → 표 출력 형식 (GFM)`을 어겼으면 (separator 행 누락, leading/trailing `|` 누락, cell 안 unescaped `|`로 컬럼 어긋남) main이 cell escape·separator 행 보정만 적용해 하단 블록에 노출한다. 보정 적용 사실은 `검증 한계`에 `<worker> 출력 형식 보정 적용` 한 줄 남긴다. 보정해도 컬럼 수가 맞지 않으면 해당 worker 블록을 fenced ` ```text ``` ` 원본 텍스트로 노출하고 사유를 `검증 한계`에 명시. main A축, 상단 통합 list도 동일 GFM 형식을 따른다.
 - `references/output-format.md` 템플릿으로 사람용 리포트 출력. 템플릿을 감싼 ````text ... ```` 또는 ```text ... ``` fence는 docs 가독성용이므로 **출력에 포함하지 않는다**. fence 내부 본문만 raw markdown으로 출력한다. 설정 경고는 dispatch 모은 목록 사용.
 - 조기 판정 / 올바른 검토 대상이 아님 분기는 하단 agent 원본 블록을 출력하지 않는다.
 

@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.7.2`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.7.3`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -175,4 +175,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.7.2는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용하고 B/C worker만 유지해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.7.3은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용하고 B/C worker만 유지해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
