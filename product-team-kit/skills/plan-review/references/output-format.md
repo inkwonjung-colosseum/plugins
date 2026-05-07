@@ -75,10 +75,10 @@ contract_version: 5
 
 - 헤더와 데이터 행 모두 leading/trailing `|`로 감싼다.
 - 헤더 바로 아래에 `|---|---|---|---|---|---|---|` separator 행 1개(7 컬럼).
-- cell 안 `|`는 `\|`로 escape (전각 `｜` 치환 금지).
+- cell 안 `|`는 `\|`로 escape — **backtick·HTML 안에 있어도 동일** (GFM 파서가 column separator로 해석). 전각 `｜` 치환 금지.
 - cell 안 줄바꿈은 공백 또는 `<br>`로 치환.
 
-이 규칙을 어긴 worker 출력은 main이 cell escape·separator 행 보정 후 노출하고 `검증 한계`에 보정 사실을 남긴다. 보정으로 컬럼 수를 맞출 수 없으면 해당 worker 블록을 fenced ` ```text ``` `로 노출한다.
+이 규칙은 상단 합의 결과 표(기준 문서와의 충돌, 필수 수정 항목, 발행 전 확인 항목, 참고 항목)와 하단 agent 원본 블록 모두에 적용된다. 이 규칙을 어긴 worker 출력은 main이 cell escape·separator 행 보정 후 노출하고 `검증 한계`에 보정 사실을 남긴다. 보정으로 컬럼 수를 맞출 수 없으면 해당 worker 블록을 fenced ` ```text ``` `로 노출한다. main 자신의 상단 표·A축 표에도 같은 escape를 적용한다.
 
 ## 결과별 추가 블록
 

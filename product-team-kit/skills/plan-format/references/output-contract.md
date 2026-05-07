@@ -2,6 +2,10 @@
 
 `plan-format`의 사용자 출력 기준이다. step 1 strict-exit, step 2 gate, step 3 변환 결과를 확정한 뒤 아래 4 템플릿 중 하나를 사용한다.
 
+> **출력 금지 — fence wrapper**: 아래 템플릿(`설정 없음`/`저장 완료`/`저장 보류`/`저장 실패`)은 docs 가독성 위해 ` ```text ... ``` ` fence로 감싸 두었다. 실제 사용자 출력에는 이 fence를 포함하지 않는다. fence **내부 본문만** raw markdown(헤더·목록·표 등)으로 그대로 출력한다. ` ```text `/` ``` ` 같은 fence 라인을 출력에 포함하면 사용자 화면에서 전체 출력이 코드 블록으로 렌더되어 표·목록이 깨진다.
+
+> **표 cell escape**: 템플릿 안 표(`[미확정·가정 항목]` 등)의 cell에 `|` 문자가 들어가면 반드시 `\|`로 escape한다. backtick·HTML 안에 있어도 동일 적용 (GFM 파서가 column separator로 해석). 헤더 행과 separator 행은 예외. cell 안 줄바꿈은 공백 또는 `<br>`로 치환하고 빈 cell은 `—` 또는 `없음`으로 채운다.
+
 ## 공통 규칙
 
 - 본 contract 템플릿은 종료 분기에서 1회만 출력한다. 실행 중 step 표시 외에 다른 사용자 출력 블록을 만들지 않는다.

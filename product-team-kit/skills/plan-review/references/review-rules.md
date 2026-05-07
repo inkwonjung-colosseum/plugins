@@ -123,13 +123,19 @@ contract_version: 5
 
 1. 헤더 행과 데이터 행 모두 **leading/trailing `|` 필수**: `| 제목 | 위치 | 분류 | 발견 유형 | 근거 인용 | 영향 | 최소 수정 또는 확인 조건 |`.
 2. 헤더 바로 아래에 **separator 행** 1개: `|---|---|---|---|---|---|---|` (7 컬럼). 컬럼 수가 다르면 행 그대로 plain text로 렌더되어 표가 깨진다.
-3. **cell 안 `|`는 `\|`로 escape한다**. 전각 `｜` 치환은 금지(의미 변형). 근거 인용에 원문 표 헤더(`| 액션 | 대상 채널 |` 등)나 역할 구분자(`사용자 | 액션`)가 들어오는 경우가 잦으니 항상 escape 적용.
+3. **cell 안 `|`는 `\|`로 escape한다 — backtick·HTML 안에 있어도 동일 적용**. GFM table 파서는 backtick code span 안 `|`를 column separator로 해석하는 경우가 많아 escape 없이 두면 컬럼 수가 어긋난다. 전각 `｜` 치환은 금지(의미 변형). 근거 인용에 원문 표 헤더(`\| 액션 \| 대상 채널 \|` 등), 역할 구분자(`사용자 \| 액션`), 용어 정의 행(`Active \| 활성화`)이 들어오는 경우가 잦으니 항상 escape 적용.
 4. cell 안 줄바꿈은 1칸 공백 또는 `<br>`로 치환한다. 실제 개행을 cell 안에 넣지 않는다.
-5. cell 안 backtick·HTML은 그대로 둔다. cell 양 끝 공백 1칸은 가독성용으로 허용.
+5. cell 안 backtick·HTML 그 자체는 그대로 둔다 (가독성). 단 backtick 안 `|`는 3번 룰에 따라 반드시 escape한다. cell 양 끝 공백 1칸은 가독성용으로 허용.
 6. 빈 cell은 `—`(em dash) 또는 `없음`으로 채운다. 빈 문자열은 사용하지 않는다.
 7. 표 외부에 추가 prose가 필요하면 표 위 또는 표 아래 별도 단락에 둔다. 표 직속 행 사이에 prose를 끼우지 않는다.
 
-이 규칙은 worker 출력 계약과 `output-format.md` 하단 agent 블록 형식의 단일 진실 소스다. 워커가 1·2번 어김(separator 행 누락, leading/trailing pipe 누락) 또는 3번 어김(escape 안 한 pipe로 컬럼 어긋남)을 했으면 `## 합성 규칙`의 retry/검증 한계 처리를 적용한다.
+이 규칙은 worker 출력 계약과 `output-format.md` 하단 agent 블록 형식의 단일 진실 소스다. 워커가 1·2번 어김(separator 행 누락, leading/trailing pipe 누락) 또는 3번 어김(escape 안 한 pipe로 컬럼 어긋남, backtick 안 unescaped `|` 포함)을 했으면 `## 합성 규칙`의 retry/검증 한계 처리를 적용한다.
+
+main 보정 단계 cell escape 알고리즘 (단일 진실 소스):
+- 각 cell 내부에서 leading/trailing 외 `|` 문자가 unescaped 상태(`\|` 직전이 `\\` 아님)이면 모두 `\|`로 치환한다.
+- backtick code span(` `...` `, `` ``...`` ``), HTML tag 안의 `|`도 동일하게 escape 대상이다. backtick·HTML 자체는 보존한다.
+- 헤더 행과 separator 행은 escape 대상에서 제외한다 (구분자 역할).
+- escape 후 cell `|` 카운트가 0이 될 때까지 반복 적용. 컬럼 수가 헤더와 일치하면 보정 성공.
 
 ### 분류 기준
 

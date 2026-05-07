@@ -51,6 +51,8 @@ Read/Write/Bash 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트
 - 저장 완료 → "저장 완료" 템플릿
 - 저장 실패 → "저장 실패" 템플릿
 
+템플릿을 감싼 ` ```text ... ``` ` fence는 docs 가독성용이며 **실제 출력에 포함하지 않는다**. fence 내부 본문만 raw markdown으로 출력한다 (`output-contract.md ## 출력 금지 — fence wrapper`). 표 cell 안 `|`는 backtick·HTML 안에 있어도 `\|`로 escape한다 (`output-contract.md ## 표 cell escape`).
+
 **예외**: 사용자 권한 승인 필요 (Bash, Write 툴 호출 시 Claude Code 권한 prompt)는 자동 표시되며 SKILL이 제어 불가. 모델이 추가 narration 붙이지 않으면 step 헤더 + 권한 prompt만 보인다.
 
 ### Lazy read 원칙
