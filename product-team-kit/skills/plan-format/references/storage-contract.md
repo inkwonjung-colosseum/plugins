@@ -45,11 +45,11 @@ Product Docs SSOT 후보 폴더 자체에는 직접 쓰지 않고, 해당 문서
 <outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/[안전기능명]_정책서.md
 ```
 
-`Asia/Seoul` timestamp로 새 폴더를 확보한다.
+`Asia/Seoul` timestamp로 새 폴더를 확보한다. 폴더명 구분자는 안전기능명·timestamp 사이, timestamp·collision suffix 사이 모두 **이중 대시 `--`** 로 통일한다. 안전기능명은 안전화 단계에서 연속 대시가 단일 대시로 축약되므로(`## 기능명과 안전기능명` 참조) 안전기능명에 `--`이 등장할 수 없어 구분자와 충돌하지 않는다.
 
 ## Collision suffix
 
-폴더명 충돌 시 `--01`, `--02`, ..., `--99` suffix를 순차 시도한다. `--99`까지 모두 충돌하면 `references/output-contract.md`의 "저장 실패" 템플릿(`실패 단계: folder`)을 반환한다. 같은 timestamp 단위로 99회 이상 호출은 비정상 사용으로 간주한다.
+폴더명 충돌 시 `--01`, `--02`, ..., `--99` suffix를 timestamp **뒤에** 순차로 붙여 시도한다. 최종 폴더명은 `[안전기능명]--YYYY-MM-DD-HHMMSS--NN` 형태다 (예: `결제승인--2026-05-07-103045--01`). `--99`까지 모두 충돌하면 `references/output-contract.md`의 "저장 실패" 템플릿(`실패 단계: folder`)을 반환한다. 같은 timestamp 단위로 99회 이상 호출은 비정상 사용으로 간주한다.
 
 ## 기존 산출물
 
@@ -62,8 +62,8 @@ Product Docs SSOT 후보 폴더 자체에는 직접 쓰지 않고, 해당 문서
 두 문서는 하나의 저장 단위로 취급한다. final 파일은 staging folder 안에 먼저 쓰고, 두 파일 검증이 끝난 뒤 staging folder 전체를 target folder로 rename한다.
 
 1. 안전기능명·timestamp로 target folder 경로 결정. 충돌 시 collision suffix 적용 (위 규칙).
-2. target folder와 같은 parent 아래에 숨김 staging folder를 생성한다. staging folder 예: `<outputRoot>/.tmp-[안전기능명]--YYYY-MM-DD-HHMMSS[-suffix]`. 생성 실패 시 "저장 실패" (`실패 단계: folder`).
-3. staging folder 안에 `[안전기능명]_기능설계서.md`와 `[안전기능명]_정책서.md`를 final 파일명 그대로 쓴다. 둘 중 하나라도 write 실패 시 target folder는 만들지 않고 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: write`)를 반환한다.
+2. target folder와 같은 parent 아래에 숨김 staging folder를 생성한다. staging folder 예: `<outputRoot>/.tmp-[안전기능명]--YYYY-MM-DD-HHMMSS` (collision suffix 적용 시 `<outputRoot>/.tmp-[안전기능명]--YYYY-MM-DD-HHMMSS--NN`). 생성 실패 시 "저장 실패" (`실패 단계: folder`).
+3. staging folder 안에 `[안전기능명]_기능설계서.md`와 `[안전기능명]_정책서.md`를 final 파일명 그대로 쓴다. 두 파일 Write 툴 호출은 단일 메시지에 동시 발행한다 (병렬). 둘 중 하나라도 write 실패 시 target folder는 만들지 않고 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: write`)를 반환한다.
 4. staging folder 안에 두 파일이 모두 존재하고 target folder가 여전히 존재하지 않는지 검증한다. 검증 실패 시 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: verify`)를 반환한다.
 5. staging folder를 target folder로 rename한다. rename 실패 시 staging folder를 best-effort cleanup한 뒤 "저장 실패" (`실패 단계: rename`)를 반환한다.
 6. rename 후 target folder에 두 final 파일이 모두 존재하고 staging folder가 남아 있지 않은지 검증한다. 실패 시 "저장 실패" (`실패 단계: verify`)를 반환한다.
@@ -73,7 +73,7 @@ cleanup 실패나 애매한 rename 실패로 파일 또는 폴더가 남으면 "
 
 ## Config 검증
 
-`<outputRoot>` 값이 config-contract 검증에서 거부되는 경우 strict-exit 사유다 (SKILL.md `## 1. 설정 확인`). 본 contract에 도달하기 전에 `references/output-contract.md`의 "설정 없음" 템플릿으로 종료된다.
+`<outputRoot>` 값이 config-contract 검증에서 거부되는 경우 strict-exit 사유다 (`../SKILL.md` `## 1. 설정 확인`). 본 contract에 도달하기 전에 `output-contract.md`의 "설정 없음" 템플릿으로 종료된다.
 
 비치명 검증 거부 (unknown key, ssot 배열 element 비문자열 등)는 default fallback + `[설정 경고]`로 처리되어 본 contract 단계까지 도달한다. 이 경우 fallback된 값을 그대로 사용한다.
 

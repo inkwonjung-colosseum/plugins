@@ -26,6 +26,7 @@ contract_version: 4
 | `수정 필요` | 수정 필요 |
 | `수정 필요 (조기 판정)` | 수정 필요 (조기 판정) |
 | unsupported input | 올바른 검토 대상이 아님 |
+| config fatal | 치명 설정 오류 |
 
 발견 분류 라벨:
 
@@ -75,6 +76,7 @@ contract_version: 4
 - **조건부 통과**: 발행 전 확인 항목 표 + 발행 준비 체크리스트.
 - **수정 필요**: 필수 수정 항목 표 + 재검토 안내 체크리스트.
 - **올바른 검토 대상이 아님**: 다음 행동 안내만. 하단 agent 블록도 출력하지 않는다.
+- **치명 설정 오류**: 사유 + `set-config` 안내만. 하단 agent 블록도 출력하지 않는다.
 
 `발행 준비 체크리스트`와 `재검토 안내 체크리스트`는 사람용 markdown 체크박스 list로만 출력한다. YAML manifest는 사용하지 않는다.
 
@@ -107,13 +109,18 @@ contract_version: 4
 
 검토 기준: 3축 점검 (SSOT 충돌, 명확성, 용어 일관성)
 
-Coverage:
-| 검토 | 상태 | 발견 항목 수 | 근거 |
-|---|---|---:|---|
-| A. SSOT 충돌 | [completed|검증 대상 없음] | 0 | [SSOT corpus 요약 또는 `corpus 0건`] |
-| B. 명확성 | completed | 0 | 본문 직접 점검 |
-| C. 용어 일관성 | completed | 0 | 본문 직접 점검 |
-| 3축 합산 (dedup 후) | completed | 0 | — |
+Coverage (`통과`는 필수 수정·발행 전 확인 0건이 조건이며, 참고 항목은 ≥0건 가능):
+| 검토 | 상태 | 발견 항목 수 (필수 수정 / 발행 전 확인 / 참고) | 근거 |
+|---|---|---|---|
+| A. SSOT 충돌 | [completed|검증 대상 없음] | 0 / 0 / [참고 건수] | [SSOT corpus 요약 또는 `corpus 0건`] |
+| B. 명확성 | completed | 0 / 0 / [참고 건수] | 본문 직접 점검 |
+| C. 용어 일관성 | completed | 0 / 0 / [참고 건수] | 본문 직접 점검 |
+| 3축 합산 (dedup 후) | completed | 0 / 0 / [참고 합계] | — |
+
+참고 항목 (≥1건일 때만 출력):
+| 제목 | 위치 | 근거 인용 | 영향 |
+|---|---|---|---|
+| [제목] | [문서 > 섹션] | [짧은 인용] | [영향] |
 
 읽은 근거:
 - path: [상대경로] / kind: [markdown|linked_local_resource] / source_type: [policy|prd|requirement|feature|screen|operations|qa|unknown] / role: [primary|supporting|conflict_candidate|context_only] / version: [vX.Y|unversioned|unknown] / current_evidence: [true|false] / status: [current|draft|archive|deprecated|unknown] / freshness: [explicit_current|dated|undated|unknown]
@@ -342,9 +349,9 @@ Coverage:
 ## 올바른 검토 대상이 아님
 
 ```text
-올바른 검토 대상이 아님
-
+판정: 올바른 검토 대상이 아님
 검토 대상: [파일경로]
+
 사유: plan-review는 plan-format으로 작성한 기능/화면설계서 또는 정책서 초안만 검토합니다. 상위설계서나 다른 문서 타입은 이 gate의 지원 대상이 아닙니다.
 
 다음 행동:
@@ -353,6 +360,28 @@ Coverage:
 3. Claude Code: /product-team-kit:plan-review <초안 폴더 또는 기능설계서/정책서 파일경로>
 4. Codex: $plan-review <초안 폴더 또는 기능설계서/정책서 파일경로>
 ```
+
+## 치명 설정 오류
+
+`.product-team-kit/config.json`이 없거나 검증을 통과하지 못하면 plan-review는 사전 점검 1에서 즉시 종료한다. step 헤더는 출력하지 않는다 (`SKILL.md ## 진행 표시 원칙` 참조). 사유는 `references/config-contract.md ## 치명 설정 오류`의 항목 중 해당하는 것만 한 줄로 명시한다.
+
+```text
+판정: 치명 설정 오류
+검토 대상: [입력 경로]
+
+사유: .product-team-kit/config.json 검증 실패. plan-review는 이후 단계(입력 타입 검증·SSOT 탐색·3축 점검)를 수행하지 않습니다.
+- [구체 사유: 파일 없음 / JSON 파싱 실패 / 파일 읽기 실패 / version 누락·불일치 / outputRoot 검증 거부 중 해당 항목]
+
+다음 행동:
+1. set-config로 .product-team-kit/config.json을 생성하거나 갱신하세요.
+   - Claude Code: /product-team-kit:set-config
+   - Codex: $set-config
+2. 설정 저장 후 같은 경로로 plan-review를 다시 실행하세요.
+   - Claude Code: /product-team-kit:plan-review [검토 대상 경로]
+   - Codex: $plan-review [검토 대상 경로]
+```
+
+치명 오류는 본 사유 라인에 한 번만 명시한다. 비치명 경고만 `[설정 경고]` 블록을 사용한다.
 
 ## 출력 순서
 
@@ -368,7 +397,7 @@ Coverage:
 8. Agent별 원본 블록 (A → B → C 순)
 9. `[설정 경고]` 블록 (있을 때만, 한 번)
 
-조기 판정·올바른 검토 대상이 아님 분기는 8번 블록을 출력하지 않는다.
+조기 판정·올바른 검토 대상이 아님·치명 설정 오류 분기는 8번 블록을 출력하지 않는다. 치명 설정 오류 분기는 5·6·7번도 출력하지 않으며 1~3번(판정·검토 대상·사유·다음 행동)만 출력한다.
 
 ## 금지 행동
 

@@ -16,8 +16,8 @@
 
 | 스킬 | 먼저 읽는 것 | 통과 후 읽는 것 | 종료 분기에서 읽지 않는 것 |
 |---|---|---|---|
-| `plan-format` | `.product-team-kit/config.json` | 입력, templates, storage/output contract | config 실패 시 입력/templates/storage contract, 저장 보류 시 templates/storage contract |
-| `plan-review` | `.product-team-kit/config.json`, 검토 대상 타입 | 검토 대상 본문, `review-rules.md`, 키워드 매칭 SSOT corpus, `output-format.md` | config 실패·문서 타입 실패 시 review rules/SSOT corpus, SSOT 매칭 0건 시 corpus 본문 |
+| `plan-format` | `.product-team-kit/config.json` | 입력, templates, storage/output contract | config 실패 시 입력/templates/storage contract, gate 보류 시 templates/storage contract, 검증 실패 보류 시 storage contract |
+| `plan-review` | `.product-team-kit/config.json`, 검토 대상 타입 | 검토 대상 본문, `review-rules.md`, corpus 매칭 후 좁힌 SSOT corpus, `output-format.md` | config 실패·문서 타입 실패 시 review rules/SSOT corpus, SSOT 매칭 0건 시 corpus 본문 |
 
 ### plan-review 종료 분기별 lazy read 경계
 
@@ -26,7 +26,7 @@
 | config 치명 오류 | X | X | X |
 | 지원하지 않는 문서 타입 | X | X | X |
 | 조기 판정 (수정 필요) | X | X | X |
-| SSOT 키워드 추출 실패 | O | X | X |
+| SSOT corpus 추출 실패 | O | X | X |
 | SSOT 매칭 0건 | O | X | O (B/C 본문만) |
 | 정상 | O | O (축소 후보만) | O |
 
@@ -117,7 +117,7 @@ flowchart TD
 
 Product Docs SSOT 근거 검증은 하지 않는다. 검증은 `plan-review` 책임이다.
 
-`plan-format`은 파일 크기와 무관하게 main이 기능설계서와 정책서 본문을 같은 턴에 직접 작성한다. 기능설계서/정책서 worker로 분리하지 않으며, 큰 입력의 비용은 섹션 6~9 압축, 표 의미 보존 검증, 중복/cross-bleed 국소 repair로 제어한다.
+`plan-format`은 파일 크기와 무관하게 main이 기능설계서와 정책서 본문을 같은 턴에 직접 작성한다. 기능설계서/정책서 worker로 분리하지 않으며, 큰 입력의 비용은 섹션 6 이상 tail 압축(표 row 셀을 marker 또는 `해당 없음` fill 문구로 채움 — 빈 위치 보존 원칙), 표 컬럼 일치 검증, 중복/cross-bleed 국소 repair로 제어한다.
 
 ### 선택 기준
 
@@ -138,15 +138,18 @@ Product Docs SSOT 근거 검증은 하지 않는다. 검증은 `plan-review` 책
 flowchart TD
     A[기획 입력 또는 파일/디렉터리 경로] --> S1{Step 1: config.json 존재·유효?}
     S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]
-    S1 -- 예 --> B[Step 2: 입력 dispatch]
+    S1 -- 예 --> B[Step 2: 입력 + gate 경량 분류]
     B --> B1[없는 path-like는 직접 텍스트로 폴백]
     B --> B2[디렉터리는 텍스트 파일을 상대경로 오름차순으로 통합]
-    B1 --> C[기능명과 안전기능명 추출]
-    B2 --> C
-    C --> D{Gate First 4 조건 충족?}
-    D -- 미충족 --> E[저장 보류: 부족 항목만 출력]
-    D -- 충족 --> H[Step 3: templates lazy read 후 main 직접 작성과 main 검증]
-    H --> N{저장 성공?}
+    B1 --> D{Gate First 4 조건 충족?}
+    B2 --> D
+    D -- 미충족 --> E[gate 보류: 부족 항목만 출력]
+    D -- 충족 --> G[Step 3: dispatch 라벨 매핑·용어 사전·안전기능명 결정]
+    G --> H[Step 4: templates 병렬 read 후 main 직접 작성과 main 검증]
+    H --> V{빈 골격·구조 일치·중복·라벨 cross-bleed 통과?}
+    V -- 실패 --> R[검증 실패 보류: 발생 step과 사유 출력]
+    V -- 통과 --> S[Step 5: storage-contract read 후 staging→두 파일 병렬 write→verify→rename→verify]
+    S --> N{저장 성공?}
     N -- 예 --> O[기능설계서와 정책서 저장 완료]
     N -- 아니오 --> P[저장 실패: staging/target 경로 안내]
     O --> Q[다음 단계 안내: plan-review]
@@ -190,6 +193,7 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 |---|---|---|
 | 저장 완료 | "저장 완료" | `plan-review` 다음 단계 안내 |
 | 입력 부족 (Gate First 미통과) | "저장 보류" — 부족 항목만 | 보강 후 재실행 (보강용 입력 템플릿·질문 섹션 안 만듦) |
+| 검증 실패 보류 (빈 골격·구조 불일치 retry 2회 fail) | "저장 보류" — `이유` 필드에 발생 step 명시 | 입력 보강 후 재실행 (storage-contract 안 읽음) |
 | config 없음/실패 | "설정 없음" | `set-config` 안내 |
 | 저장 단계 실패 | "저장 실패" | staging/target 경로 안내 |
 
@@ -218,8 +222,10 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 | 기준 | 임계값 |
 |---|---|
 | 핵심 섹션(상태·권한·예외·처리기준)의 `[미정]` | 3개 이상 |
-| 필수 섹션(1~5) 중 실질 내용 없는 섹션 | 2개 이상 |
+| 필수 섹션(1~5) 중 실질 내용 없는 섹션 (`해당 없음` 단일 row 또는 marker만으로 채워진 경우 포함) | 2개 이상 |
 | `[충돌 후보]` 누계 | 3개 이상 |
+
+임계값은 `skills/plan-review/references/review-rules.md`의 `## 조기 판정 임계값`을 단일 진실 소스로 따른다.
 
 ### 선택 기준
 
@@ -243,7 +249,7 @@ flowchart TD
     C --> D{지원 문서 타입인가?}
     D -- 아니오 --> E[올바른 검토 대상이 아님 안내]
     D -- 예 --> F[검토 대상 본문 직접 읽기]
-    F --> G[키워드 추출]
+    F --> G[corpus 추출 (키워드·도메인·역할명·상태·권한 등)]
     G --> H{SSOT 후보 매칭?}
     H -- 1건 이상 --> I[필요 corpus와 linked local resource 읽기]
     H -- 0건 --> I0[A축 검증 대상 없음 처리]
@@ -288,7 +294,7 @@ flowchart TD
 - `plan-format`은 Product Docs SSOT 근거 검증을 수행하지 않는다.
 - `plan-format`은 config 실패나 저장 보류 분기에서 templates와 storage contract를 읽지 않는다.
 - `plan-review`는 초안을 직접 수정하지 않고, 기획팀용 리포트와 발행 준비 체크리스트 또는 재검토 안내 체크리스트를 출력한다.
-- `plan-review`는 config 실패, 문서 타입 실패, SSOT 키워드 추출 실패 분기에서 불필요한 corpus read와 worker 실행을 하지 않는다.
+- `plan-review`는 config 실패, 문서 타입 실패, SSOT corpus 추출 실패 분기에서 불필요한 corpus read와 worker 실행을 하지 않는다.
 - Product Docs SSOT는 현재 프로젝트의 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다.
 - 코드, 설정, 빌드 산출물, dependency/vendor, 외부 URL, `<outputRoot>/` 산출물은 SSOT 근거에서 제외한다.
 

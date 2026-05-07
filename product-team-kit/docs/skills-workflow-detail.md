@@ -79,26 +79,28 @@ dispatch가 입력 단편마다 4개 라벨 중 하나를 부여: `feature` / `p
 | `[확인 필요]` | 결정자 답변/후속 확인 필요 | gate 통과 후 세부 보강용 | 이유·결정 주체·후속 확인 방법 함께 |
 | `[충돌 후보]` | 입력 내부 모순/중복/상충 | dispatch 시 발견 | 저장 차단 사유 아님. SSOT 충돌은 plan-review 책임 |
 
+별도로 `해당 없음`은 marker 4종이 아닌 **셀 fill 문구**다. 입력에 명백히 해당 정보가 없을 때 빈 셀 대신 사용한다. 분류·합산·`미결 사항` 색인 대상이 아니며 `plan-review` review-rules 분류에도 들어가지 않는다.
+
 규칙:
 
 - 결정이 쓰이는 본문 문장 또는 표 셀에 inline 표시
-- 문서당 marker 1건 이상 → 문서 끝에 `## 미확정·가정·확인 필요` 섹션 append + 항목 색인
-- 두 문서 marker 합산을 화면 출력 `[미확정·가정 항목]` / `확인 필요 질문` 섹션에 1회만 반영
+- 문서당 marker 1건 이상 → `미결 사항` 섹션 (기능설계서 `## 8. 미결 사항`, 정책서 `## 10. 미결 사항`) 표에 항목 색인 (인덱스·항목·설명) 채움. marker 0건이면 row 1 의 항목·설명 셀을 `해당 없음`으로 채우고 인덱스 컬럼은 `1` 유지 (row·섹션 삭제 금지). 별도 `## 미확정·가정·확인 필요` 섹션은 만들지 않음
+- 두 문서 marker 합산을 화면 출력 `[미확정·가정 항목]` / `확인 필요 질문` 섹션에 1회만 반영. 0건이면 화면 출력 섹션 생략 (본문 미결 사항 표는 위 규칙대로 유지)
 - gate 통과 전 부족분 채우는 용도로 쓰지 않음 (gate fail이면 보류, marker로 우회 금지)
 - `[확인 필요]`(inline) ≠ `확인 필요 질문`(출력 섹션 헤더)
 
 ### 1.4 main 검증 4가지
 
-Step 3.2 본문 작성 후 저장 절차 진입 전 main이 수행한다. 모두 통과 시에만 `references/storage-contract.md`를 읽는다.
+Step 4 본문 작성 후 저장 절차 진입 전 main이 수행한다. 모두 통과 시에만 `references/storage-contract.md`를 읽는다.
 
 | 검사 | 실패 시 동작 |
 |---|---|
-| 빈 골격 검사 | 각 문서 섹션 1~5에 입력 근거 기반의 non-marker 문장 또는 표 행이 없으면 step 2 보류로 되돌림. `output-contract.md` "저장 보류" 출력. 부족 항목에 빈 골격 분석 결과 추가 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족") |
-| 구조 일치 검사 | 9개 섹션 헤더(번호·제목)와 metadata 필드가 템플릿과 1:1인지 기계적으로 확인. 표는 컬럼명·순서·개수 exact match가 아니라 명백한 placeholder 반복, 필수 의미 손실, 업무 계약 누락만 확인. 섹션·metadata가 어긋나면 1회 구조 수정 retry, 2회 어긋나면 step 2 보류 fallback |
+| 빈 골격 검사 | 각 문서 섹션 1~5에 입력 근거 기반의 substance(marker·`해당 없음`이 아닌 문장 또는 표 셀)가 없으면 검증 실패 보류 분기로 전환. 다음 헤더부터 `Step 5: 보류 출력`로 단축하고 `output-contract.md` "저장 보류" 템플릿 출력 (`이유` 필드에 "step 4 검증 실패 — 빈 골격" 명시). 부족 항목에 빈 골격 분석 결과 추가 (예: "정책서 본문이 빈 골격 — policy 라벨 단편 부족") |
+| 구조 일치 검사 | 기능설계서 1~8 (8=미결 사항), 정책서 1~10 (10=미결 사항) 섹션 헤더(번호·제목)와 admonition metadata 필드가 템플릿과 1:1인지 기계적으로 확인. 표는 컬럼명·컬럼 순서·컬럼 수가 템플릿과 동일해야 하며, 비어 있는 row·셀은 marker(`[미정]`/`[확인 필요]`) 또는 `해당 없음` fill 문구로 채움 (빈 셀 금지, row·컬럼 자체 삭제 금지). 섹션·metadata·표 컬럼이 어긋나면 1회 **국소 수정 retry** (어긋난 섹션·metadata·표 컬럼만 수정, 본문 재생성 금지), 2회 어긋나면 검증 실패 보류 fallback (`Step 5: 보류 출력` 단축, `이유` 필드에 "step 4 검증 실패 — 구조 불일치" 명시) |
 | 중복 검사 | 같은 항목이 양쪽 문서에 중복 등장하면 전체 문서를 재작성하지 않고 위반 문장·행·셀만 국소 repair. 분류 기준 표에 따라 한쪽에만 남기고 다른 쪽 중복은 삭제 또는 이동 |
 | 라벨 범위 검사 (cross-bleed) | 정책서의 화면 동작 또는 기능설계서의 판단 기준처럼 라벨 범위 위반이 있으면 전체 문서를 재작성하지 않고 위반 문장·행·셀만 이동·삭제·재서술 |
 
-저장 절차: staging folder 생성 → 두 파일 write → verify → rename → verify. main이 일괄 처리.
+저장 절차: staging folder 생성 → 두 final 파일 **병렬 write** (단일 메시지에 동시 발행) → verify → rename → verify. verify·rename·종료 verify는 순차 유지. main이 일괄 처리.
 
 ### 1.5 분기별 실제 읽기 순서
 
@@ -106,7 +108,8 @@ Step 3.2 본문 작성 후 저장 절차 진입 전 main이 수행한다. 모두
 |---|---|
 | config fail | `config.json` → `output-contract.md` → 종료 |
 | gate 보류 | `config.json` → 입력 → `output-contract.md` → 종료 |
-| 정상 저장 | `config.json` → 입력 → `templates/*` (병렬) → main 직접 작성·main 검증 → `storage-contract.md` → 저장 → `output-contract.md` → 종료 |
+| 검증 실패 보류 | `config.json` → 입력 → `templates/*` (병렬) → main 직접 작성·main 검증 실패 (빈 골격 또는 구조 불일치 retry 2회 fail) → `output-contract.md` → 종료 (`storage-contract.md` 안 읽음) |
+| 정상 저장 | `config.json` → 입력 → `templates/*` (병렬) → main 직접 작성·main 검증 → `storage-contract.md` → 두 파일 병렬 저장 → `output-contract.md` → 종료 |
 
 종료 분기에서 안 쓰는 파일을 읽으면 토큰 낭비이며 **금지**.
 
@@ -134,7 +137,7 @@ main A축과 2 worker 모두 같은 7 필드 표 형식으로 반환.
 
 ### 2.3 SSOT corpus 후보 인덱스 스캔
 
-키워드 매칭 후보가 1개 이상이면 전문 read 전에 인덱스 스캔으로 축소.
+corpus 매칭 후보가 1개 이상이면 전문 read 전에 인덱스 스캔으로 축소.
 
 ```
 1. 후보 파일 listing                       (review-rules.md SSOT corpus 선택 규칙)
@@ -149,8 +152,8 @@ main A축과 2 worker 모두 같은 7 필드 표 형식으로 반환.
 
 | 케이스 | 처리 |
 |---|---|
-| (a) 키워드 추출 성공 + 매칭 0건 | A축 `검증 대상 없음` + B/C worker 본문 점검 진행 |
-| (b) 키워드 추출 실패 | worker spawn 없이 즉시 `수정 필요`로 종료 |
+| (a) corpus 추출 성공 + 매칭 0건 | A축 `검증 대상 없음` + B/C worker 본문 점검 진행 |
+| (b) corpus 추출 실패 | worker spawn 없이 즉시 `수정 필요`로 종료 |
 
 ### 2.4 merge·dedup·보수 합성 규칙
 
@@ -175,7 +178,7 @@ main A축 발견 + 2 worker(B/C) 발견 합치기. `references/review-rules.md`�
 | config 치명 | `config.json` → `output-format.md` → 종료(`set-config` 안내) |
 | 입력 타입 fail (상위설계서 등) | `config.json` → 본문(타입 확인) → `output-format.md` → 종료 |
 | 조기 판정 (수정 필요) | `config.json` → 본문/짝문서 → `output-format.md` → 종료 (review-rules·SSOT corpus·worker 안 함) |
-| SSOT 키워드 추출 실패 | `config.json` → 본문/짝문서 → `review-rules.md` → `output-format.md` → 종료 (worker spawn 안 함) |
+| SSOT corpus 추출 실패 | `config.json` → 본문/짝문서 → `review-rules.md` → `output-format.md` → 종료 (worker spawn 안 함) |
 | SSOT 매칭 0건 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing 후 0건 확인 → main A축 `검증 대상 없음` + 2 worker(B/C) 본문 점검 → merge → `output-format.md` |
 | 정상 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing → corpus 본문 read → main A축 점검 + 2 worker(B/C) → merge → `output-format.md` |
 
@@ -198,7 +201,7 @@ sequenceDiagram
         M-->>U: "수정 필요 (조기 판정)" 종료
     else 정상 진행
         M->>FS: read review-rules.md
-        Note over M: 키워드 추출
+        Note over M: corpus 추출
         M->>FS: SSOT corpus listing + 상위 20줄 인덱스 스캔
         alt 매칭 0건 (추출 실패)
             M->>FS: read output-format.md
@@ -267,12 +270,13 @@ flowchart TD
 | config 치명 (파일 없음, JSON 파싱, version, outputRoot) | plan-format / plan-review | strict-exit + `set-config` 안내 |
 | CLAUDE.md/AGENTS.md 관리 marker 불완전 | set-config | 해당 파일 변경 안 함 + `agent-guide-write` 저장 실패 보고 |
 | 입력 디렉터리 일부 파일 read 실패 (바이너리, 권한, UTF-8) | plan-format | 실행 막지 않고 `[입력 제외 항목]`에 경로·이유 |
-| 구조 일치 main 검증 1회 실패 | plan-format | 1회 구조 수정 retry |
-| 구조 일치 main 검증 2회 실패 | plan-format | step 2 보류 fallback |
+| 빈 골격 main 검증 실패 | plan-format | 검증 실패 보류 분기 (`Step 5: 보류 출력`) — `이유` 필드에 "step 4 검증 실패 — 빈 골격" 명시 |
+| 구조 일치 main 검증 1회 실패 | plan-format | 1회 국소 수정 retry (어긋난 섹션·metadata·표 컬럼만, 본문 재생성 금지) |
+| 구조 일치 main 검증 2회 실패 | plan-format | 검증 실패 보류 fallback (`Step 5: 보류 출력`) — `이유` 필드에 "step 4 검증 실패 — 구조 불일치" 명시 |
 | worker 7 필드 형식 어긋남 1회 | plan-review | 1회 retry |
 | worker 7 필드 형식 어긋남 2회 | plan-review | `검증 한계`에 기록 후 보수 합성 |
 | Agent 병렬 호출 불가 환경 | plan-review | 단일 패스 fallback (main 순차 점검) |
-| SSOT 키워드 추출 실패 | plan-review | worker spawn 없이 즉시 `수정 필요` |
+| SSOT corpus 추출 실패 | plan-review | worker spawn 없이 즉시 `수정 필요` |
 | SSOT 매칭 0건 (추출 성공) | plan-review | A축 `검증 대상 없음` + B/C 본문만 점검 |
 | 짝문서 없음 | plan-review | 단일 검토 진행 + `검증 한계`에 `짝문서 없음` 기록. 다른 문서 정책/기능 판단 의존 시 분류 상향 |
 

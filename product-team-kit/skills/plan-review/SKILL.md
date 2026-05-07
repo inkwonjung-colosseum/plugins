@@ -21,16 +21,19 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 | 파일 | 읽는 시점 | 용도 |
 | --- | --- | --- |
 | `<project-root>/.product-team-kit/config.json` | 사전 점검 1 시작 | strict-exit 판정, outputRoot/ssot 확정 |
-| 검토 대상 본문 + 짝문서 | 사전 점검 2 입력 타입 검증 통과 후 | 키워드 추출, 3축 점검 입력 |
-| `references/review-rules.md` | SSOT corpus 선택 규칙 적용 직전 (`## SSOT corpus 선택 규칙` + `## 3축 점검 기준` 한 번에) | corpus listing, main A축 점검, B/C worker prompt inline |
+| 검토 대상 본문 + 짝문서 | 사전 점검 2 입력 타입 검증 통과 후 | 타입 판정 보강, 키워드 추출, 3축 점검 입력 |
+| `references/review-rules.md` | 키워드 추출 직후, 조기 판정 평가 직전 (`## 조기 판정 임계값` + `## SSOT corpus 선택 규칙` + `## 3축 점검 기준` + `## [미정]/[가정] 처리` + `## 발견 사항 필드` 한 번에) | 조기 판정, corpus listing, main A축 점검, B/C worker prompt inline |
 | SSOT corpus 본문 | 키워드 매칭 후보 ≥1개 확인 후 | main A축 SSOT 충돌 점검 |
 | `references/output-format.md` | 종료 출력 직전 (분기 확정 후 1회) | "올바른 검토 대상이 아님" / 결과 4종 리포트 |
+
+타입 판정 룰은 `references/review-rules.md`의 `## 검토 대상 타입 판정`을 단일 진실 소스로 따른다. 본문 read 후 룰을 적용한다.
 
 분기별 실제 읽기 순서:
 
 - **config 치명**: `config.json` → `output-format.md` → 종료 (`set-config` 안내)
-- **입력 타입 fail** (상위설계서 등): `config.json` → 본문 (타입 확인) → `output-format.md` → 종료
-- **SSOT 키워드 추출 실패**: `config.json` → 본문/짝문서 → `review-rules.md` → `output-format.md` → 종료 (worker spawn 안 함)
+- **입력 타입 fail** (상위설계서 등): `config.json` → 본문 (타입 판정) → `output-format.md` → 종료
+- **SSOT corpus 추출 실패**: `config.json` → 본문/짝문서 → `review-rules.md` → `output-format.md` → 종료 (worker spawn 안 함)
+- **조기 판정**: `config.json` → 본문/짝문서 → `review-rules.md` → 조기 판정 임계값 충족 확인 → `output-format.md` → 종료 (SSOT corpus·worker spawn 없음)
 - **SSOT 매칭 0건**: `config.json` → 본문/짝문서 → `review-rules.md` → corpus 후보 listing 후 0건 확인 → main A축 "검증 대상 없음" 처리 + 2 worker 병렬(B/C) 본문 점검 → merge → `output-format.md`
 - **정상**: `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing → corpus 본문 read → main A축 점검 + 2 worker 병렬(B/C) → merge → `output-format.md`
 
@@ -40,14 +43,14 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 
 형식: `Step N/M: <step 이름>` (M은 분기별 총 step 수, 사전 결정)
 
-분기별 step 시퀀스:
+분기별 step 시퀀스 (config 검증은 모든 분기에서 silent — 헤더 미출력):
 
-- **config 치명** (M=2): `Step 1/2: 설정 확인` → `Step 2/2: 종료 출력`
-- **입력 타입 fail** (M=3): `Step 1/3: 설정 확인` → `Step 2/3: 입력 타입 검증` → `Step 3/3: 종료 출력`
-- **SSOT 키워드 추출 실패** (M=4): `Step 1/4: 설정 확인` → `Step 2/4: 검토 대상 read` → `Step 3/4: 키워드 추출` → `Step 4/4: 종료 출력`
-- **조기 판정** (M=4): `Step 1/4: 설정 확인` → `Step 2/4: 검토 대상 read` → `Step 3/4: 조기 판정` → `Step 4/4: 종료 출력`
-- **SSOT 매칭 0건** (M=6): `Step 1/6: 설정 확인` → `Step 2/6: 검토 대상 read` → `Step 3/6: SSOT corpus 탐색` → `Step 4/6: 3축 점검 (A 검증 대상 없음 + B/C 병렬)` → `Step 5/6: merge` → `Step 6/6: 리포트 출력`
-- **정상** (M=6): `Step 1/6: 설정 확인` → `Step 2/6: 검토 대상 read` → `Step 3/6: SSOT corpus 탐색` → `Step 4/6: 3축 점검 (A + B/C 병렬)` → `Step 5/6: merge` → `Step 6/6: 리포트 출력`
+- **config 치명**: 헤더 없음. `output-format.md` 종료 템플릿만 출력.
+- **입력 타입 fail** (M=2): `Step 1/2: 입력 타입 검증` → `Step 2/2: 종료 출력`
+- **SSOT corpus 추출 실패** (M=3): `Step 1/3: 검토 대상 read` → `Step 2/3: SSOT corpus 탐색` → `Step 3/3: 종료 출력`
+- **조기 판정** (M=3): `Step 1/3: 검토 대상 read` → `Step 2/3: 조기 판정` → `Step 3/3: 종료 출력`
+- **SSOT 매칭 0건** (M=5): `Step 1/5: 검토 대상 read` → `Step 2/5: SSOT corpus 탐색` → `Step 3/5: 3축 점검 (A 검증 대상 없음 + B/C 병렬)` → `Step 4/5: merge` → `Step 5/5: 리포트 출력`
+- **정상** (M=5): `Step 1/5: 검토 대상 read` → `Step 2/5: SSOT corpus 탐색` → `Step 3/5: 3축 점검 (A + B/C 병렬)` → `Step 4/5: merge` → `Step 5/5: 리포트 출력`
 
 step 헤더 외 금지 항목 (전부 출력 금지):
 
@@ -56,13 +59,16 @@ step 헤더 외 금지 항목 (전부 출력 금지):
 - 추론·계획 narration: `조기 판정 기준 미달`, `3축 점검 완료`, `최종 리포트 출력`, `이제 ~ 한다`
 - 본문 echo: 검토 대상 본문, SSOT corpus 본문, 표 미리보기, marker 인용
 
-내부 추론은 thinking으로 처리한다. Read/Bash/Agent 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 진행 안내 텍스트 삽입 금지.
+Read/Bash/Agent 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트 보고 불필요. Tool 호출 사이에 진행 안내 텍스트 삽입 금지.
 
 분기 결정 시점:
 
-- 분기 확정 전(Step 1 진입 시점)에는 일단 정상 분기(M=6) 헤더로 시작한다.
-- 분기 변경 시점(예: Step 1 후 config 치명 발견)에 다음 step 헤더부터 새 M 값으로 출력한다. 이전 헤더는 정정하지 않는다.
-- 사전 점검(`## 사전 점검` 1~4)은 Step 1과 Step 2에 분산된다. config 검증 = Step 1, 입력 타입·짝문서 탐색 = Step 2.
+- **config 검증은 silent**로 수행한다. step 헤더를 출력하지 않는다. config 치명 종료면 헤더 없이 곧장 `output-format.md` 종료 템플릿만 출력한다.
+- 첫 step 헤더(`Step 1/M: ...`)는 config 검증 통과 후 분기가 확정 가능한 시점에 출력한다.
+  - 입력 타입 fail 분기: 첫 헤더 = `Step 1/2: 입력 타입 검증` (총 M=2, `Step 2/2: 종료 출력`).
+  - 그 외 분기: 첫 헤더 = `Step 1/M: 검토 대상 read` (M은 분기별 표대로).
+- 키워드 추출 후 조기 판정·SSOT 매칭 결과로 M이 추가 확정되면 다음 step 헤더부터 확정된 M 값으로 출력한다. 이전 헤더는 정정하지 않는다. 정상 시작점이 추정 가능한 분기는 정상 분기(M=5) 가정으로 진행하다 확정 시점에 새 M으로 전환한다.
+- 사전 점검(`## 사전 점검` 1~4)은 silent config(점검 1) + Step 1(점검 2~4)로 분산된다. config 검증은 silent, 입력 타입·짝문서 탐색은 Step 1 = `검토 대상 read` (또는 입력 타입 fail 분기에서 `입력 타입 검증`).
 
 사용자가 보는 turn 마지막 결과는 Step N/N (마지막 step) 직후 `references/output-format.md` 템플릿 1회 출력이다.
 
@@ -92,12 +98,12 @@ step 헤더 외 금지 항목 (전부 출력 금지):
 
 ## 사전 점검
 
-**진행 표시 매핑**: 1번 = `Step 1/M: 설정 확인`, 2~4번 = `Step 2/M: 검토 대상 read`. step 헤더는 각 step 진입 시점에만 1회 출력하고 sub-action narration은 추가하지 않는다 (`## 진행 표시 원칙`).
+**진행 표시 매핑**: 1번 = silent (헤더 미출력), 2~4번 = `Step 1/M: 검토 대상 read` (입력 타입 fail 분기는 `Step 1/2: 입력 타입 검증`). step 헤더는 각 step 진입 시점에만 1회 출력하고 sub-action narration은 추가하지 않는다 (`## 진행 표시 원칙`).
 
 **이 단계에서 읽는 파일**: `config.json` (1번), 검토 대상 본문 + 짝문서 (2~4번 통과 후). `review-rules.md`·SSOT corpus·`output-format.md`는 아직 읽지 않는다.
 
 1. `.product-team-kit/config.json` 존재 여부를 확인하고 `outputRoot`, `ssot.include`, `ssot.exclude`를 확정한다. 파일 없음, JSON 파싱 실패, `version` 미일치, `outputRoot` 검증 거부는 치명 설정 오류로 즉시 종료하고 `set-config` 사용을 안내한다. 종료 출력은 `output-format.md`를 이 시점에 read해 적용한다. 비치명 검증 거부만 default fallback과 `[설정 경고]`로 처리한다.
-2. 검토 대상이 기능설계서/정책서 초안 파일 또는 그 묶음 폴더인지 확인한다. 다른 문서 타입(상위설계서 등)이면 검토를 수행하지 않고 `output-format.md`를 read해 `올바른 검토 대상이 아님` 템플릿으로 종료한다. `review-rules.md`·SSOT corpus는 read하지 않는다.
+2. 검토 대상이 기능설계서/정책서 초안 파일 또는 그 묶음 폴더인지 `references/review-rules.md`의 `## 검토 대상 타입 판정` 룰로 확인한다 (파일명 stem suffix `*_기능설계서.md`/`*_정책서.md`, H1 제목, 폴더 입력 시 내부 ≥1개 매칭). 다른 문서 타입(상위설계서 등)이면 검토를 수행하지 않고 `output-format.md`를 read해 `올바른 검토 대상이 아님` 템플릿으로 종료한다. 본 룰을 본문 read만으로 평가할 수 없을 때만 `review-rules.md`의 본 섹션을 미리 read한다 (이외 SSOT corpus·`review-rules.md` 본 섹션 외부는 read하지 않음).
 3. 입력이 폴더면 같은 폴더의 기능설계서와 정책서를 함께 검토 대상으로 잡는다. 입력이 단일 파일이면 같은 폴더에서 `plan-format` 산출 파일명인 `[안전기능명]_기능설계서.md` / `[안전기능명]_정책서.md`의 같은 stem을 우선해 짝문서를 찾는다.
 4. 짝문서가 없으면 단일 검토를 진행하고 `검증 한계`에 `짝문서 없음`을 기록한다. 검토 대상이 명시적으로 다른 문서의 정책/기능 판단에 의존하면 분류를 `필수 수정` 또는 `발행 전 확인`으로 올린다.
 
@@ -115,7 +121,7 @@ step 헤더 외 금지 항목 (전부 출력 금지):
 
 `dispatch → main A축 점검 + 2 worker(B/C) 병렬 → merge` 3단계로 동작한다. SSOT corpus는 main이 보유·사용하므로 A축은 main이 직접 점검하고, 본문만 보는 B/C만 worker로 분리한다. 병렬 호출 환경이 없거나 입력이 작아 분리 비용이 더 큰 경우 단일 패스 fallback으로 진행해도 결과 형식은 동일해야 한다.
 
-**진행 표시 매핑**: dispatch의 SSOT corpus 탐색·매칭 = `Step 3/M: SSOT corpus 탐색`. main A축 점검 + 2 worker 병렬 = `Step 4/M: 3축 점검`. merge = `Step 5/M: merge`. 종료 출력 = `Step 6/M: 리포트 출력`. 조기 판정 종료 분기는 `Step 3/4: 조기 판정` → `Step 4/4: 종료 출력`로 단축한다 (`## 진행 표시 원칙`).
+**진행 표시 매핑**: dispatch의 SSOT corpus 탐색·매칭 = `Step 2/M: SSOT corpus 탐색`. main A축 점검 + 2 worker 병렬 = `Step 3/M: 3축 점검`. merge = `Step 4/M: merge`. 종료 출력 = `Step 5/M: 리포트 출력`. 조기 판정 종료 분기는 `Step 2/3: 조기 판정` → `Step 3/3: 종료 출력`로 단축한다 (`## 진행 표시 원칙`).
 
 ### dispatch (단일 패스)
 
@@ -127,18 +133,14 @@ step 헤더 외 금지 항목 (전부 출력 금지):
 - 입력 타입 검증 — 기능설계서/정책서가 아니면 `output-format.md`를 read해 `올바른 검토 대상이 아님` 템플릿으로 종료.
 - 검토 대상 본문 read + 짝문서 탐색·read (`## 사전 점검` 4단계 그대로).
 - 키워드 추출 (기능명, 정책명, 도메인, 역할명, 상태명, 권한명, 화면명, 핵심 조건·예외).
-- **조기 판정** — 검토 대상 본문만으로 아래 기준 확인:
-  - 핵심 섹션(상태·권한·예외·처리기준) `[미정]` 3개 이상
-  - 필수 섹션(1~5) 중 2개 이상 실질 내용 없음
-  - `[충돌 후보]` 3개 이상
-  기준 충족 시 `output-format.md`를 read해 `수정 필요 (조기 판정)` 템플릿으로 종료. SSOT corpus 탐색·main A축 점검·worker spawn·merge를 수행하지 않는다.
-- `review-rules.md` read — 이 시점에서 한 번만. `## SSOT corpus 선택 규칙`은 main이 직접 적용, `## 3축 점검 기준` 중 A축은 main 자체 사용, B/C는 worker prompt에 inline.
+- `review-rules.md` read — 이 시점에서 한 번만. `## 조기 판정 임계값` + `## SSOT corpus 선택 규칙` + `## 3축 점검 기준`을 함께 적용한다. A축·SSOT 선택 규칙은 main 자체 사용, B/C는 worker prompt에 inline (review-rules.md `## 3축 점검 기준 → B. 명확성`에 Marker 4종 정의 inline 포함).
+- **조기 판정** — `review-rules.md`의 `## 조기 판정 임계값`을 검토 대상 본문(+짝문서)에 적용한다. 임계값 1개 이상 충족 시 `output-format.md`를 read해 `수정 필요 (조기 판정)` 템플릿으로 종료. SSOT corpus 탐색·main A축 점검·worker spawn·merge를 수행하지 않는다. 임계값은 본 SKILL.md에서 중복 정의하지 않는다.
 - SSOT corpus 후보 listing — `review-rules.md`의 `## SSOT corpus 선택 규칙` 따름.
 - **SSOT 후보 인덱스 스캔** — 후보 파일 상위 20줄을 Bash 1회 호출로 일괄 읽기. archive/deprecated/낮은 버전/키워드 미매칭 문서를 과거 맥락으로 분류하고 전문 읽기에서 제외. 상세 규칙은 `review-rules.md` 규칙 4.5.
 - **키워드 매칭 핵심 후보 ≥1개** → 축소된 후보만 전문 read. **0건** → main A축을 "검증 대상 없음"으로 처리, corpus 본문 read skip.
 - SSOT corpus 0건 분기 — `review-rules.md`의 (a) 추출 성공 + 매칭 0건 / (b) 추출 실패 처리. 추출 실패는 worker spawn 없이 즉시 `수정 필요` 결과로 종료한다. 이 시점에 `output-format.md`를 read해 적용.
 - **main A축 SSOT 충돌 점검** — corpus 본문(또는 0건 신호)과 검토 대상 본문을 비교해 `review-rules.md`의 `## 3축 점검 기준 → A. SSOT 충돌` + `## 발견 사항 필드` 7 필드 형식으로 발견 사항 list 작성. 발견 0건이면 내부적으로 no-findings 동등 처리. corpus 0건(추출 성공)이면 발견 0건 + A축 `검증 대상 없음`으로 표기.
-- 2 worker(B/C) 분배 데이터 준비 — `review-rules.md`의 `## 3축 점검 기준` 중 B/C 섹션을 각 worker prompt에 inline.
+- 2 worker(B/C) 분배 데이터 준비 — `review-rules.md`의 `## 3축 점검 기준` 중 B/C 섹션과 `## 발견 사항 필드`를 각 worker prompt에 inline. B worker 에는 `## [미정]/[가정] 처리` 섹션도 추가 inline (Marker 분류 기준).
 
 ### 2 worker(B/C) 병렬 작성
 
@@ -151,8 +153,8 @@ main이 단일 어시스턴트 메시지에 Agent tool 호출 2 block 동시 발
 | 책임 | 입력 |
 |---|---|
 | main (A축 SSOT 충돌) | dispatch 결과 + SSOT corpus 본문 + review-rules.md A축 (자체 사용) |
-| `plan-review-clarity-worker` (B축) | dispatch 결과 (본문만) + review-rules.md B축 inline |
-| `plan-review-terminology-worker` (C축) | dispatch 결과 (본문만) + review-rules.md C축 inline |
+| `plan-review-clarity-worker` (B축) | dispatch 결과 (본문만) + review-rules.md B축 inline (Marker 4종 정의 포함) + `## [미정]/[가정] 처리` 섹션 inline + `## 발견 사항 필드` inline |
+| `plan-review-terminology-worker` (C축) | dispatch 결과 (본문만) + review-rules.md C축 inline + `## 발견 사항 필드` inline |
 
 각 worker는 `references/review-rules.md`의 `## 발견 사항 필드` 7 필드 표 형식으로 발견 사항만 return한다. 발견 0건 시 응답 끝에 `<!-- worker-flag: no-findings -->` 한 줄 명시.
 
