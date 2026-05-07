@@ -14,7 +14,7 @@ The plugin instructions guide the host agent to read:
 
 ## Data Written
 
-The plugin does not directly include network publishing instructions in the current planning workflow. `plan-format` does not validate Product Docs SSOT conflicts, and `plan-review` reads only the Product Docs Markdown candidates narrowed by review-target keywords plus explicitly needed local resources to build an evidence record for SSOT conflict, clarity, and terminology consistency review before external publishing.
+The plugin does not directly include network publishing instructions in the current planning workflow. `plan-format` does not validate Product Docs SSOT conflicts, and `plan-review` reads only the Product Docs Markdown candidates narrowed by review-target keywords plus explicitly needed local resources to build an evidence record for SSOT conflict and terminology consistency review before external publishing.
 
 Expected write operations:
 
@@ -27,7 +27,7 @@ The plugin instructions prohibit modifying Product Docs SSOT evidence sources du
 
 Before using generated drafts as publish-ready material, users should check:
 
-- Review gate status for `[가정]`, confirmation questions, and clarity/terminology gaps.
+- Review gate status for SSOT conflicts and terminology gaps.
 - Source freshness and authority of the Product Docs SSOT evidence.
 - Publish-preparation checklist items when `plan-review` returns `통과` or `조건부 통과`.
 - Required-fix and re-review checklist items when `plan-review` returns `수정 필요`.

@@ -2,13 +2,13 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-07
-- 대상 버전: product-team-kit 0.7.3
+- 대상 버전: product-team-kit 0.7.4
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
 ## 1. 한 줄 요약
 
-`product-team-kit`은 비구조 기획 입력을 로컬 기능설계서와 정책서 초안으로 정리하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 충돌, 명확성, 용어 일관성을 검토하는 제품팀 도구다.
+`product-team-kit`은 비구조 기획 입력을 로컬 기능설계서와 정책서 초안으로 정리하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 충돌과 용어 일관성을 검토하는 제품팀 도구다.
 
 ## 2. 문제 정의
 
@@ -23,7 +23,7 @@
 - config, 입력, templates, references, SSOT corpus를 필요한 단계에서만 읽어 불필요한 선행 context 사용을 줄인다.
 - 입력이 부족한 경우 문서를 만들지 않고 부족 항목만 알려준다.
 - 생성된 초안이 공식 팀 문서가 아니라 로컬 검토 대상임을 명확히 한다.
-- 발행 전 검토에서 Product Docs SSOT 충돌, 명확성, 용어 일관성을 보수적으로 판단한다.
+- 발행 전 검토에서 Product Docs SSOT 충돌과 용어 일관성을 보수적으로 판단한다.
 - Claude Code와 Codex 양쪽에서 같은 스킬 계약으로 사용할 수 있게 한다.
 
 ## 4. 대상 사용자
@@ -45,7 +45,7 @@
 - Gate First 기반 초안 생성 가능성 판정
 - 기능설계서와 정책서 동시 생성
 - `<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 규칙 (`outputRoot` 기본값: `planning`)
-- Product Docs SSOT 근거 기반 3축 발행 전 검토
+- Product Docs SSOT 근거 기반 2축(SSOT 충돌·용어 일관성) 발행 전 검토
 - `통과`, `조건부 통과`, `수정 필요`, `올바른 검토 대상이 아님` 판정
 
 ### 제외 범위
@@ -84,11 +84,11 @@ flowchart TD
 | PRD-03 | 입력이 부족하거나 config가 없으면 파일을 만들지 않는다. | config 부재·검증 실패 시 strict-exit으로 set-config 안내, 정보 부족 시 기능 목적/적용 범위/사용자 행동/주요 조건 중 부족한 항목을 출력한다. |
 | PRD-04 | 충분한 입력은 기능설계서와 정책서 두 문서로 분리한다. | 화면/흐름/사용자 결과는 기능설계서, 규칙/조건/예외/제한은 정책서에 배치된다. |
 | PRD-05 | 저장된 초안은 공식 팀 문서가 아님을 표시한다. | 산출물과 출력에 로컬 초안, 팀 문서 미반영, 공식 팀 문서 아님이 드러난다. |
-| PRD-06 | 발행 전 검토는 Product Docs SSOT를 근거로 3축을 점검한다. | `<outputRoot>/` 산출물, 코드, 설정, 외부 URL은 SSOT 근거에서 제외되고, SSOT 충돌·명확성·용어 일관성이 함께 판정된다. 초안 자체가 과도하게 미완성인 경우 SSOT 탐색 전 `수정 필요 (조기 판정)`으로 종료한다. |
+| PRD-06 | 발행 전 검토는 Product Docs SSOT를 근거로 2축을 점검한다. | `<outputRoot>/` 산출물, 코드, 설정, 외부 URL은 SSOT 근거에서 제외되고, SSOT 충돌과 용어 일관성이 함께 판정된다. 마커 자체로는 결과를 낮추지 않는다. |
 | PRD-07 | 검토 결과는 기획팀이 바로 행동할 수 있어야 한다. | 판정, 한 줄 결론, 먼저 할 일, 기준 문서 충돌이 상단에 표시된다. |
 | PRD-08 | 검토는 보수적으로 취합한다. | 필수 수정 항목이 있으면 최종 결과는 `수정 필요`다. |
 | PRD-09 | Claude Code와 Codex에서 같은 제품 계약을 유지한다. | 양쪽 manifest가 같은 이름, 버전, 스킬 경로를 가리킨다. |
-| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 조기 판정과 상단 인덱스 스캔을 거쳐 축소된 SSOT corpus만 읽는다. plan-format은 디렉터리 입력에서 기본 제외 경로를 적용한 뒤 입력 크기·파일 개수 상한을 두지 않고 읽기 대상 텍스트 전체 확인 후 source index와 gate 근거 맵으로 압축하며, 전체 확인 실패 시 일부 근거만으로 저장하지 않는다. |
+| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 상단 인덱스 스캔을 거쳐 축소된 SSOT corpus만 읽는다. plan-format은 디렉터리 입력에서 기본 제외 경로를 적용한 뒤 입력 크기·파일 개수 상한을 두지 않고 읽기 대상 텍스트 전체 확인 후 source index와 gate 근거 맵으로 압축하며, 전체 확인 실패 시 일부 근거만으로 저장하지 않는다. |
 
 ## 8. 성공 기준
 
@@ -99,12 +99,13 @@ flowchart TD
 | 검토 실행 가능성 | 검토 결과만 보고 기획자가 먼저 할 일을 판단할 수 있다. |
 | 발행 안전성 | Product Docs SSOT 충돌과 근거 부족이 `통과`로 완화되지 않는다. |
 | 읽기 효율성 | 종료 분기에서 사용하지 않는 templates, references, SSOT corpus를 선행 read하지 않는다. |
+| 마커 노이즈 차단 | plan-format이 채운 마커(`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`)만으로 plan-review 결과가 낮춰지지 않는다. |
 | 플랫폼 일관성 | Claude Code와 Codex 문서, manifest, README의 스킬명과 버전이 일치한다. |
 
 ## 9. 비기능 요구사항
 
 - 로컬 우선: 입력, 초안, 검토는 현재 프로젝트의 로컬 파일을 기준으로 한다.
-- 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, plan-review worker에는 main이 확정한 검토 대상 본문과 해당 축 기준만 전달한다. SSOT corpus는 main A축 점검에서만 사용한다.
+- 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, plan-review B worker(용어 일관성)에는 main이 확정한 검토 대상 본문과 해당 축 기준만 전달한다. SSOT corpus는 main A축 점검에서만 사용한다.
 - 무제한 입력 처리: plan-format은 디렉터리 입력에서 기본 제외 경로를 적용한 뒤 입력 크기와 파일 개수 상한을 두지 않는다. truncate, 첫 N개 파일만 읽기, 샘플링은 금지하고, 읽기 대상 텍스트 전체를 확인하지 못하면 저장 보류로 종료한다.
 - 안전한 쓰기: 두 문서를 같은 staging folder에 먼저 작성하고 검증 후 target folder로 rename한다. 기존 target은 덮어쓰지 않으며 충돌 시 collision suffix `--01`~`--99`로 새 폴더를 확보한다.
 - 근거 제한: 외부 URL이나 코드 파일을 Product Docs SSOT 근거로 사용하지 않는다.

@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로
 
-`product-team-kit`은 로컬 설정과 프로젝트 agent 안내 파일을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 3축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
+`product-team-kit`은 로컬 설정과 프로젝트 agent 안내 파일을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 2축(SSOT 충돌·용어 일관성)으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
 
 이 문서는 README의 빠른 시작보다 한 단계 자세히, 어떤 스킬을 언제 선택하고 어떤 산출물로 이어지는지 설명한다.
 
@@ -25,9 +25,8 @@
 |---|:---:|:---:|:---:|
 | config 치명 오류 | X | X | X |
 | 지원하지 않는 문서 타입 | X | X | X |
-| 조기 판정 (수정 필요) | X | X | X |
 | SSOT corpus 추출 실패 | O | X | X |
-| SSOT 매칭 0건 | O | X | O (B/C 본문만) |
+| SSOT 매칭 0건 | O | X | O (B 본문만) |
 | 정상 | O | O (축소 후보만) | O |
 
 ## SSOT 근거 경계
@@ -174,7 +173,7 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 부서 경계 (제외 대상): 디자인 상세(컬러·폰트·Figma), 최종 UX copy, QA 케이스, API 명세, DB schema, 운영 런북, 개발 작업 분해. 위 상세가 입력의 주된 내용이고 제품·업무 판단 정보가 부족하면 보류한다.
 
-조건 미충족 시 templates·storage contract·저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 기본 제외 경로를 적용한 뒤 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 통합한다. 입력 크기와 파일 개수 상한은 없고, truncate·첫 N개 파일만 읽기·일부 파일 샘플링은 금지한다. 읽기 대상 텍스트 전체를 확인하지 못하면 일부 근거만으로 저장하지 않고 저장 보류로 종료한다. 읽을 수 없는 파일은 보류 사유가 아니라 `[입력 제외 항목]`에 남긴다. Python·Node·CLI helper 설치 전제 없음.
+조건 미충족 시 templates·storage contract·저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 기본 제외 경로를 적용한 뒤 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 통합한다. 입력 크기와 파일 개수 상한은 없고, truncate·첫 N개 파일만 읽기·일부 파일 샘플링은 금지한다. 읽기 대상 텍스트 전체를 확인하지 못하면 일부 근거만으로 저장하지 않고 저장 보류로 종료한다. 읽을 수 없는 파일은 보류 사유가 아니며, 저장 완료 시 `[읽기 제외 항목]`, 저장 보류 시 기존 `[입력 제외 항목]`에 남긴다. Python·Node·CLI helper 설치 전제 없음.
 
 ### 산출물
 
@@ -201,31 +200,18 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 ### 설명
 
-`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성을 3축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
+`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌과 용어 일관성을 2축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
 
 검토 대상은 `<outputRoot>/` 아래 초안일 수 있지만, `<outputRoot>/` 파일은 SSOT 근거로 사용하지 않는다.
 
-### 3축 정의
+### 2축 정의
 
 | 축 | 점검 대상 | 담당 | 비고 |
 |---|---|---|---|
 | A. SSOT 충돌 | 초안 확정 문장 vs Product Docs SSOT current evidence | main 직접 | corpus 0건 시 `검증 대상 없음` |
-| B. 명확성 | `[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]` marker 처리, 모호 문장, 결정 가능 수준 | `plan-review-clarity-worker` | 본문만 |
-| C. 용어 일관성 | 역할명·상태명·권한명·화면명·도메인 stem 통일성 | `plan-review-terminology-worker` | 본문만 |
+| B. 용어 일관성 | 역할명·상태명·권한명·화면명·도메인 stem 통일성 | `plan-review-terminology-worker` | 본문만 |
 
-발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록. 합성 우선순위: `수정 필요 > 조건부 통과 > 통과`.
-
-### 조기 수정 판정 기준
-
-검토 대상 본문만으로 아래 1개 이상 충족 시 SSOT corpus 탐색·worker 실행 없이 `수정 필요 (조기 판정)`으로 종료.
-
-| 기준 | 임계값 |
-|---|---|
-| 핵심 섹션(상태·권한·예외·처리기준)의 `[미정]` | 3개 이상 |
-| 필수 섹션(1~5) 중 실질 내용 없는 섹션 (`해당 없음` 단일 row 또는 marker만으로 채워진 경우 포함) | 2개 이상 |
-| `[충돌 후보]` 누계 | 3개 이상 |
-
-임계값은 `skills/plan-review/references/review-rules.md`의 `## 조기 판정 임계값`을 단일 진실 소스로 따른다.
+발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록. 합성 우선순위: `수정 필요 > 조건부 통과 > 통과`. 마커(`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`) 자체는 plan-format 책임 영역이며, plan-review는 마커 자체로 결과를 낮추지 않는다. 다만 마커 본문이 SSOT와 충돌하거나 용어 어긋남에 해당하면 각 축 발견으로 기록한다.
 
 ### 선택 기준
 
@@ -233,7 +219,7 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 - 기존 초안 폴더나 기능설계서/정책서 파일을 검토해야 한다.
 - 외부 공유 또는 팀 문서 반영 전에 통과 여부를 판단해야 한다.
-- Product Docs SSOT와 초안 사이의 충돌, 명확성, 용어 일관성을 확인해야 한다.
+- Product Docs SSOT와 초안 사이의 충돌, 용어 일관성을 확인해야 한다.
 
 `plan-review`를 선택하지 않는다:
 
@@ -253,7 +239,7 @@ flowchart TD
     G --> H{SSOT 후보 매칭?}
     H -- 1건 이상 --> I[필요 corpus와 linked local resource 읽기]
     H -- 0건 --> I0[A축 검증 대상 없음 처리]
-    I --> J[main A축 점검 + B/C worker 점검]
+    I --> J[main A축 점검 + B worker(용어 일관성) 점검]
     I0 --> J
     J --> K[발견 사항 dedup과 보수 합성]
     K --> L{최종 결과}

@@ -31,7 +31,7 @@
       },
       "review": {
         "title": "plan-review",
-        "lines": ["lazy read + 짝문서 확정", "필요 SSOT corpus 읽기", "3축 보수 합성"]
+        "lines": ["lazy read + 짝문서 확정", "필요 SSOT corpus 읽기", "2축 보수 합성"]
       },
       "evidence": {
         "title": "근거 경계",
@@ -70,7 +70,7 @@
       "document_title": "product-team-kit workflow",
       "eyebrow": "Flowchart · product-team-kit",
       "heading": "Planning input to team handoff workflow",
-      "summary": "product-team-kit은 필요한 파일을 단계별로 lazy read한다. set-config로 config와 agent 안내 블록을 먼저 정렬하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 3축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
+      "summary": "product-team-kit은 필요한 파일을 단계별로 lazy read한다. set-config로 config와 agent 안내 블록을 먼저 정렬하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 2축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
       "svg": {
         "width": 1180,
         "height": 1040,
