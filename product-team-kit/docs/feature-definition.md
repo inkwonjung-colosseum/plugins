@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-07
-- 대상 버전: product-team-kit 0.7.1
+- 대상 버전: product-team-kit 0.7.2
 - 관련 PRD: [prd.md](./prd.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -25,7 +25,7 @@
 
 ## 2. set-config
 
-`set-config`는 사용처 프로젝트 루트의 `.product-team-kit/config.json`을 생성하거나 갱신한다. cwd의 git root가 있으면 git root를 기준으로 하고, 없으면 cwd를 기준으로 한다. config 저장이 성공하면 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 사용자 선택 없이 항상 생성·갱신한다.
+`set-config`는 사용처 프로젝트 루트의 `.product-team-kit/config.json`을 생성하거나 갱신한다. cwd의 git root가 있으면 git root를 기준으로 하고, 없으면 cwd를 기준으로 한다. `outputRoot`, `ssot.include`, `ssot.exclude`는 한 번의 질문 묶음으로 확인하고 다른 값이 필요한 키만 batch로 입력받는다. config 저장이 성공하면 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 사용자 선택 없이 항상 생성·갱신한다.
 
 수집하는 키:
 
@@ -36,7 +36,7 @@
 | `ssot.include` | 빈 값이면 key 제거 | plan-review SSOT allow-list glob. 제거 시 기본 `Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md` 사용 |
 | `ssot.exclude` | 빈 값이면 key 제거 | plan-review SSOT 추가 제외 glob |
 
-검증 거부값은 저장하지 않고 같은 키에서 재입력받는다. config 저장은 `.product-team-kit/config.json.tmp` 작성 후 rename하는 atomic write로 수행한다. `CLAUDE.md`/`AGENTS.md`는 기존 사용자 내용을 보존하고 `<!-- product-team-kit:start -->` / `<!-- product-team-kit:end -->` 관리 블록만 replace 또는 append한다. marker가 한쪽만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
+검증 거부값은 저장하지 않고 거부된 키만 재입력받는다. 저장 전 project root, 대상 경로, `outputRoot`, `ssot` 배열 또는 제거 상태, `version: 1`, 거부값 없음 여부를 자체 점검한다. config 저장은 기존 object를 base로 managed key만 merge한 뒤 `.product-team-kit/config.json.tmp` 작성 후 rename하는 atomic write로 수행한다. `CLAUDE.md`/`AGENTS.md`는 기존 사용자 내용을 보존하고 `<!-- product-team-kit:start -->` / `<!-- product-team-kit:end -->` 관리 블록만 replace 또는 append한다. marker가 한쪽만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
 
 ## 3. plan-format
 
@@ -52,11 +52,11 @@
 |---|---|---|
 | 직접 텍스트 | 입력 본문 전체를 기획 입력으로 사용 | `사용자 입력` |
 | 기존 파일 경로 | UTF-8 텍스트를 읽어 기획 입력으로 사용 | `로컬 확인: <파일경로>` |
-| 기존 디렉터리 경로 | 읽을 수 있는 텍스트 파일을 상대경로 오름차순으로 통합 | 읽은 텍스트 파일 수 |
+| 기존 디렉터리 경로 | 기본 제외 경로를 뺀 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 상대경로 오름차순으로 통합 | 읽은 텍스트 파일 수 |
 | 없는 path-like 입력 | 경로 오류로 종료하지 않고 직접 텍스트로 처리 | `사용자 입력` |
 | 주제 + 경로 혼합 | 사용자 문장과 로컬 파일/디렉터리 내용을 함께 사용 | 사용자 입력과 로컬 확인 정보 |
 
-디렉터리 입력은 `.git`, `node_modules`, `<outputRoot>`, `dist`, `build`, `coverage`, `.cache`, `vendor`, `__pycache__`를 제외한다. 입력 크기 상한은 두지 않으며, 검증 정확도를 위해 무거워도 끝까지 읽는다.
+디렉터리 입력은 기본 제외 경로를 적용한 뒤 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 읽는다. 입력 크기와 파일 개수 상한은 두지 않으며, truncate·첫 N개 파일만 읽기·일부 파일 샘플링은 금지한다. 읽기 대상 텍스트 전체를 확인한 뒤 source index와 gate 근거 맵으로 압축하고, 읽기 대상 텍스트 전체를 확인하지 못하면 일부 근거만으로 저장하지 않고 저장 보류로 종료한다.
 
 Gate First 조건은 모두 식별되어야 한다.
 
@@ -71,7 +71,7 @@ Gate First 조건은 모두 식별되어야 한다.
 
 ### 3.3 Step 3 — 문서 분리
 
-dispatch에서 기능명·역할명·용어·라벨을 고정한 뒤, 본문 작성 직전에 기능설계서/정책서 templates를 읽는다. main은 두 문서 본문을 같은 턴에서 단일 패스로 작성하고, 헤더 일치, 빈 골격, 중복 항목, 라벨 cross-bleed, marker 합산을 자체 검증한다. storage contract는 자체 검증 통과 후 저장 절차에 들어가기 직전에만 읽는다.
+dispatch에서 기능명·역할명·용어·라벨·source index·gate 근거 맵을 고정한 뒤, 본문 작성 직전에 기능설계서/정책서 templates를 읽는다. main은 두 문서 본문을 같은 턴에서 단일 패스로 작성하고, 헤더 일치, 빈 골격, 중복 항목, 라벨 cross-bleed, marker 합산을 자체 검증한다. storage contract는 자체 검증 통과 후 저장 절차에 들어가기 직전에만 읽는다.
 
 | 입력 성격 | 귀속 문서 |
 |---|---|

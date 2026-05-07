@@ -1,6 +1,6 @@
 ---
 name: plan-review
-description: "plan-format으로 작성한 정책서와 기능/화면설계서 묶음을 외부 발행 전에 Product Docs SSOT 충돌, 명확성, 용어 일관성 측면에서 검토하는 스킬."
+description: "Use when an existing plan-format 기능/화면설계서·정책서 초안 또는 초안 폴더를 외부 발행 전에 검토하고 통과/조건부 통과/수정 필요 판정을 내려야 할 때."
 argument-hint: "<초안 폴더 또는 기능설계서/정책서 파일경로>"
 ---
 
@@ -13,6 +13,14 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 Markdow
 `<outputRoot>`과 SSOT corpus 범위는 `../../references/config-contract.md`를 따라 결정한다. `outputRoot`의 default는 `planning`이며, `<outputRoot>/**`은 항상 SSOT exclude에 자동 포함된다. `ssot.include`가 지정되면 SSOT corpus를 그 glob 안으로 좁히고, 미지정/빈 배열이면 default `Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md`를 사용한다. `ssot.exclude`는 default 제외(`.git/`, `vendor/`, `node_modules/`, `build/`, `dist/`, `.cache/`, `generated/`)에 누적한다.
 
 판정 기준, 합성 규칙, 3축 점검 기준, 근거 패키지 형식은 `references/review-rules.md`를 단일 기준으로 따른다. 최종 출력 형식은 `references/output-format.md`를 따른다. 사람용 리포트 하나로 출력하며 별도 YAML manifest 블록은 사용하지 않는다.
+
+## 빠른 판정 원칙
+
+- `통과`는 발견 사항이 없다는 뜻이 아니라, **검토 대상·config·SSOT corpus 탐색·3축 점검·출력 형식**이 모두 성립했고 필수 수정/발행 전 확인 항목이 0건이라는 뜻이다.
+- config 치명 오류, 올바르지 않은 입력 타입, SSOT corpus 추출 실패는 정상 3축 검토 결과로 포장하지 않고 지정된 종료 분기로 즉시 끝낸다.
+- SSOT corpus 추출은 성공했지만 매칭이 0건인 경우만 A축을 `검증 대상 없음`으로 처리할 수 있다. 후보가 있었는데 읽지 못했거나 비용 때문에 생략한 경우는 `통과` 금지다.
+- 대화 컨텍스트, 작성자 의도, 기억에만 있는 사실은 근거가 아니다. 검토 대상 본문 또는 읽은 Product Docs SSOT 근거에 없으면 근거 부족으로 처리한다.
+- `plan-review`는 초안, Product Docs SSOT, 팀 문서 export, linked resource, 외부 시스템을 수정하거나 게시하지 않는다. 필요한 최소 수정/확인 조건만 제시한다.
 
 ## Lazy read 원칙
 
@@ -88,7 +96,7 @@ Read/Bash/Agent 툴 호출은 Claude Code UI가 자동 표시하므로 텍스트
 - 기존 기능설계서/정책서 초안 또는 초안 폴더 검토
 - 발행 전 검토, 통과/조건부 통과/수정 필요 판정
 - Product Docs SSOT 근거와 초안의 충돌, 명확성, 용어 일관성 확인
-- 이미 생성된 초안의 품질 평가
+- 이미 생성된 초안 검토
 
 다음 의도에서는 `plan-review`를 선택하지 않는다.
 
@@ -171,10 +179,23 @@ worker는 합성·결과 4종 판정·리포트 작성을 하지 않는다. 본�
 - **상단 통합용**: main A축 발견 + 2 worker(B/C) 발견 사항을 합쳐 `references/review-rules.md`의 `## 합성 규칙` 적용 (위치+제목+근거 정규화 dedup, NFC, 보수 분류). 축·내부 ID 컬럼은 두지 않는다.
 - **하단 agent 원본용**: main A축 / B worker / C worker 각 발견을 dedup 없이 그대로 보존해 출력. 같은 발견이 여러 agent에 걸치면 양쪽 모두 노출된다.
 - 결과 4종 판정 — `references/review-rules.md`의 `## 결과 4종 기준` + `## 보수 합성 우선순위` 적용 (상단 list 기준).
-- main A축 발견 0건 + 2 worker 모두 `<!-- worker-flag: no-findings -->` → `통과`.
+- main A축 발견 0건 + 2 worker 모두 `<!-- worker-flag: no-findings -->` + `완료 전 자체 점검` 통과 → `통과`.
 - worker 발견 사항 형식이 7 필드(제목/위치/분류/발견 유형/근거 인용/영향/최소 수정 또는 확인 조건)와 어긋나면 1회 retry, 2회 어긋나면 `검증 한계`에 기록 후 보수 합성. main A축 발견은 main이 직접 7 필드 형식으로 작성하므로 retry 대상이 아니다.
-- `references/output-format.md` 템플릿으로 사람용 리포트 출력. 설정 경고는 dispatch 모은 목록 사용.
+- `references/output-format.md` 템플릿으로 사람용 리포트 출력. 템플릿을 감싼 ````text ... ```` 또는 ```text ... ``` fence는 docs 가독성용이므로 **출력에 포함하지 않는다**. fence 내부 본문만 raw markdown으로 출력한다. 설정 경고는 dispatch 모은 목록 사용.
 - 조기 판정 / 올바른 검토 대상이 아님 분기는 하단 agent 원본 블록을 출력하지 않는다.
+
+### 완료 전 자체 점검
+
+최종 리포트를 출력하기 직전에 아래를 확인한다. 하나라도 실패하면 `references/review-rules.md`의 `## 통과 금지 조건`과 `## 보수 합성 우선순위`를 적용해 결과를 보수적으로 조정하고, 실패 이유를 `검증 한계` 또는 지정된 종료 템플릿에 남긴다.
+
+1. 검토 대상이 기능/화면설계서 또는 정책서 초안인지 확인했다.
+2. `.product-team-kit/config.json` 치명 오류가 없고, 비치명 경고는 `[설정 경고]`에 모았다.
+3. SSOT corpus 탐색은 성공했으며, 매칭 0건이면 `SSOT corpus 0건 (관련 Markdown 부재)`로 명시했다.
+4. 매칭된 핵심 후보와 필요한 linked local resource를 읽었거나, 읽지 못한 이유를 `읽지 않은 관련 후보`/`검증 한계`에 남겼다.
+5. A/B/C 발견 사항은 7필드 형식이며, 형식 실패 worker는 retry 후에도 실패하면 `검증 한계`에 남겼다.
+6. 모든 판정 근거가 검토 대상 본문 또는 읽은 근거에 있고, 대화 컨텍스트만으로 만든 주장은 없다.
+7. 결과가 `통과`라면 필수 수정·발행 전 확인이 0건이고, `통과 금지 조건`에 해당하는 신호가 없다.
+8. 최종 출력은 `references/output-format.md` 순서와 라벨을 따른다.
 
 현재 대화 컨텍스트는 근거가 아니다. 대화에서 알게 된 배경, 의도, 작성 당시 판단은 검토 대상 파일 또는 SSOT 근거에 없으면 근거 부족으로 본다.
 

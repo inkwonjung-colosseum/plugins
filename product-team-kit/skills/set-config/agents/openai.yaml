@@ -2,7 +2,7 @@ interface:
   display_name: set-config
   short_description: .product-team-kit/config.json과 CLAUDE.md/AGENTS.md product-team-kit 안내 블록을 갱신합니다
   brand_color: "#0F766E"
-  default_prompt: 설정을 바꿔줘
+  default_prompt: product-team-kit 설정을 바꿔줘
 policy:
   allow_implicit_invocation: true
   implicit_invocation:
@@ -17,17 +17,20 @@ policy:
       - 현재 effective config 확인만 원하는 경우에는 .product-team-kit/config.json을 직접 읽도록 안내
     sequencing:
       - 본 skill은 ../../references/config-contract.md를 schema와 검증 단일 기준으로 따른다.
-      - 키 입력 순서는 outputRoot, ssot.include, ssot.exclude다.
+      - 질문 배열 순서는 outputRoot, ssot.include, ssot.exclude다.
       - ssot.include의 default는 Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md다.
-      - 각 키마다 두 옵션(현재값 유지, 다른 값 입력)을 AskUserQuestion으로 묻는다.
-      - 다른 값 입력을 고르면 일반 대화 prompt 한 번으로 새 값을 받는다.
-      - 입력값은 config-contract 검증 규칙으로 검증하고 거부 시 같은 키에서 재입력받는다.
+      - 3개 키(outputRoot, ssot.include, ssot.exclude)는 단일 AskUserQuestion 호출에 questions 배열로 묶어 한 번에 묻는다. 키별로 따로 호출하지 않는다.
+      - AskUserQuestion 또는 Codex Plan mode 사용자 입력 도구가 없으면 같은 내용을 일반 대화 prompt 하나로 제시하고 응답을 기다린다. 도구가 없다는 이유로 기본값을 추정 저장하지 않는다.
+      - 각 question은 두 옵션(현재값 유지, 다른 값 입력)을 가진다.
+      - 다른 값 입력을 고른 키들에 대해서만 일반 대화 prompt로 새 값을 batch로 받는다.
+      - 입력값은 config-contract 검증 규칙으로 일괄 검증하고 거부된 키들만 모아 단일 AskUserQuestion으로 재입력받는다.
       - 검증 거부값은 저장하지 않는다. runtime의 치명 설정 오류 또는 비치명 fallback 처리와 다르다.
-      - 모든 키 입력 후 변경 요약을 보여주고 저장/취소 확인을 받는다.
-      - 저장은 .product-team-kit/config.json으로 atomic write한다.
+      - 모든 키 입력 후 project root, 대상 경로, outputRoot 검증, ssot 배열 또는 제거 상태, version=1, 거부값 없음 여부를 자체 점검한다. 실패하면 저장하지 않고 재입력받는다.
+      - 변경 요약을 보여주고 저장/취소 확인을 받는다.
+      - 저장은 기존 config object를 base로 version/outputRoot/ssot.include/ssot.exclude만 갱신하는 merge 후 .product-team-kit/config.json으로 atomic write한다.
       - config 저장 성공 후 CLAUDE.md와 AGENTS.md를 선택 없이 항상 생성·갱신한다.
       - CLAUDE.md/AGENTS.md는 product-team-kit:start/end 관리 블록만 replace 또는 append하고 기존 사용자 내용은 보존한다.
       - CLAUDE.md/AGENTS.md에 start 또는 end marker가 하나만 있으면 해당 파일은 변경하지 않고 agent-guide-write 실패로 보고한다.
-      - 기존 config의 다른 키는 보존한다 (merge).
+      - 기존 config의 top-level unknown key와 ssot object 안 unknown sub-key는 보존한다.
       - version은 항상 1로 고정 저장한다. 사용자에게 묻지 않는다.
       - Python, Node.js, 별도 CLI helper 설치를 전제하지 않는다.

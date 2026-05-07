@@ -6,15 +6,15 @@
 
 ## 0. set-config 상세
 
-`set-config`는 cwd의 git root 또는 cwd를 `<project-root>`로 잡고 `.product-team-kit/config.json`을 저장한다. config 저장이 성공하면 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록도 선택 없이 항상 생성·갱신한다.
+`set-config`는 cwd의 git root 또는 cwd를 `<project-root>`로 잡고 `.product-team-kit/config.json`을 저장한다. `outputRoot`, `ssot.include`, `ssot.exclude`는 한 번의 질문 묶음으로 확인하고 다른 값이 필요한 키만 batch로 입력받는다. config 저장이 성공하면 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록도 선택 없이 항상 생성·갱신한다.
 
 ```mermaid
 flowchart TD
     A[현재 프로젝트 cwd] --> B[project root 확정]
     B --> C[기존 config 또는 default seed]
-    C --> D[outputRoot 입력·검증]
-    D --> E[ssot.include 입력·검증]
-    E --> F[ssot.exclude 입력·검증]
+    C --> D[3개 키 batch 확인]
+    D --> E[다른 값 선택 키만 batch 입력]
+    E --> F[일괄 검증 + 저장 전 자체 점검]
     F --> G{저장 확인}
     G -- 취소 --> X[변경 없음]
     G -- 저장 --> H[config.json.tmp write 후 rename]
@@ -42,18 +42,24 @@ Agent 안내 파일 규칙:
 | 빈 입력 / 최소 입력 | 입력 없음 또는 기능명/키워드만 | 정보 부족 보류 | `사용자 입력` |
 | 직접 텍스트 | 경로로 해석 불가 | 입력 본문 전체 사용 | `사용자 입력` |
 | 기존 파일 경로 | 파일 존재 | UTF-8 텍스트 사용 | `로컬 확인: <파일경로>` |
-| 기존 디렉터리 경로 | 디렉터리 존재 | 텍스트 파일을 상대경로 오름차순으로 통합 | `로컬 확인: <디렉터리경로> (읽은 텍스트 파일 N개)` |
+| 기존 디렉터리 경로 | 디렉터리 존재 | 기본 제외 경로를 뺀 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 상대경로 오름차순으로 통합 | `로컬 확인: <디렉터리경로> (읽은 텍스트 파일 N개)` |
 | 없는 path-like | `/`·확장자·구분자 포함하나 미존재 | 직접 텍스트로 폴백 | `사용자 입력` |
 | 주제 + 경로 혼합 | 문장 + 기존 경로 포함 | 사용자 문장 + 로컬 경로 내용 함께 사용 | `사용자 입력` + `로컬 확인: <경로>` |
 
 디렉터리 입력 처리:
 
-- 기본 제외 경로: `.git`, `node_modules`, `<outputRoot>`, `dist`, `build`, `coverage`, `.cache`, `vendor`, `__pycache__`
+- 기본 제외 경로: `.git`, `node_modules`, `dist`, `build`, `coverage`, `.cache`, `vendor`, `__pycache__`
 - 바이너리·권한 오류·UTF-8 디코딩 실패 → 실행 막지 않고 `[입력 제외 항목]`에 경로·이유 기록
 - 기존 `_기능설계서.md` / `_정책서.md`는 참고 입력일 뿐 보류 사유 아님. 새 산출물은 항상 새 timestamp 폴더에 저장
-- `<outputRoot>` 자체나 그 하위 입력은 일반 입력처럼 읽되 저장은 storage-contract 규칙에 따름
+- `<outputRoot>` 자체나 그 하위 입력도 사용자가 제공한 입력이면 일반 입력처럼 읽음
 
-입력 크기 상한 없음. 호출 환경의 메모리/시간 한계는 운영자 책임.
+입력 크기·파일 개수 상한 없음은 의도된 계약이다. 기본 제외 경로 적용 후 남은 읽기 대상 텍스트는 truncate, 첫 N개 파일만 읽기, 일부 파일 샘플링 없이 모두 확인한다. 읽기 대상 텍스트 전체를 확인한 뒤 source index(경로/제목/heading/기능 후보/정책 후보/제외 후보)와 gate 근거 맵(기능 목적, 적용 대상, 핵심 행동, 기대 결과, 업무 판단 기준)을 만든다. 도구 실패나 환경 한계로 읽기 대상 텍스트 전체를 확인하지 못하면 일부 근거만으로 저장하지 않고 저장 보류로 종료한다.
+
+다기능 입력 처리:
+
+- 명시 주제, 파일명, 디렉터리명, 반복 등장 제목 순서로 주 기능 하나를 선택한다.
+- 선택되지 않은 기능 후보는 본문에 섞지 않고 원본 문서 피드백 또는 입력 제외 항목으로 남긴다.
+- 서로 독립적인 기능 후보 중 주 기능을 보수적으로 고를 수 없으면 저장 보류다. 한 호출에서 여러 timestamp 폴더를 만들지 않는다.
 
 ### 1.2 분류 기준 (귀속 라벨)
 

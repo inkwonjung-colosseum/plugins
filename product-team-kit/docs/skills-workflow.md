@@ -75,7 +75,7 @@ flowchart TD
 
 ### 설명
 
-`set-config`는 사용처 프로젝트의 `.product-team-kit/config.json`과 프로젝트 agent 안내 블록을 함께 대화형으로 만들거나 갱신한다. config 저장이 성공하면 같은 프로젝트 루트의 `CLAUDE.md`와 `AGENTS.md`에 product-team-kit 관리 블록을 항상 생성·갱신한다. 이 설정은 `plan-format`의 저장 root와 `plan-review`의 SSOT corpus 범위를 결정하고, agent 안내 블록은 일반 agent가 해당 SSOT 범위를 먼저 읽도록 안내한다.
+`set-config`는 사용처 프로젝트의 `.product-team-kit/config.json`과 프로젝트 agent 안내 블록을 함께 대화형으로 만들거나 갱신한다. `outputRoot`, `ssot.include`, `ssot.exclude`는 한 번의 질문 묶음으로 확인하고, 다른 값이 필요한 키만 batch로 입력받는다. config 저장이 성공하면 같은 프로젝트 루트의 `CLAUDE.md`와 `AGENTS.md`에 product-team-kit 관리 블록을 항상 생성·갱신한다. 이 설정은 `plan-format`의 저장 root와 `plan-review`의 SSOT corpus 범위를 결정하고, agent 안내 블록은 일반 agent가 해당 SSOT 범위를 먼저 읽도록 안내한다.
 
 ### 선택 기준
 
@@ -97,9 +97,9 @@ flowchart TD
 flowchart TD
     A[현재 프로젝트 cwd] --> B[config 위치 확정]
     B --> C[기존 config 또는 default 읽기]
-    C --> D[outputRoot 확인]
-    D --> E[ssot.include 확인]
-    E --> F[ssot.exclude 확인]
+    C --> D[3개 키 batch 확인]
+    D --> E[다른 값 선택 키만 batch 입력]
+    E --> F[일괄 검증 + 저장 전 자체 점검]
     F --> G{저장할까?}
     G -- 저장 --> H[.product-team-kit/config.json atomic write]
     H --> J[CLAUDE.md와 AGENTS.md 관리 블록 upsert]
@@ -117,7 +117,7 @@ flowchart TD
 
 Product Docs SSOT 근거 검증은 하지 않는다. 검증은 `plan-review` 책임이다.
 
-`plan-format`은 파일 크기와 무관하게 main이 기능설계서와 정책서 본문을 같은 턴에 직접 작성한다. 기능설계서/정책서 worker로 분리하지 않으며, 큰 입력의 비용은 섹션 6 이상 tail 압축(표 row 셀을 marker 또는 `해당 없음` fill 문구로 채움 — 빈 위치 보존 원칙), 표 컬럼 일치 검증, 중복/cross-bleed 국소 repair로 제어한다.
+`plan-format`은 파일 크기와 무관하게 main이 기능설계서와 정책서 본문을 같은 턴에 직접 작성한다. 기능설계서/정책서 worker로 분리하지 않으며, 입력 크기와 파일 개수 상한은 두지 않는다. 큰 입력은 기본 제외 경로 적용 후 남은 읽기 대상 텍스트를 자르거나 샘플링하지 않고 전체 확인한 뒤 source index와 gate 근거 맵으로 압축한다. 비용은 섹션 6 이상 tail 압축(표 row 셀을 marker 또는 `해당 없음` fill 문구로 채움 — 빈 위치 보존 원칙), 표 컬럼 일치 검증, 중복/cross-bleed 국소 repair로 제어한다.
 
 ### 선택 기준
 
@@ -140,7 +140,7 @@ flowchart TD
     S1 -- 아니오 --> S1X[strict-exit: 설정 없음 + set-config 안내]
     S1 -- 예 --> B[Step 2: 입력 + gate 경량 분류]
     B --> B1[없는 path-like는 직접 텍스트로 폴백]
-    B --> B2[디렉터리는 텍스트 파일을 상대경로 오름차순으로 통합]
+    B --> B2[디렉터리는 기본 제외 후 읽기 대상 텍스트로 source index 생성]
     B1 --> D{Gate First 4 조건 충족?}
     B2 --> D
     D -- 미충족 --> E[gate 보류: 부족 항목만 출력]
@@ -174,7 +174,7 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 부서 경계 (제외 대상): 디자인 상세(컬러·폰트·Figma), 최종 UX copy, QA 케이스, API 명세, DB schema, 운영 런북, 개발 작업 분해. 위 상세가 입력의 주된 내용이고 제품·업무 판단 정보가 부족하면 보류한다.
 
-조건 미충족 시 templates·storage contract·저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 dispatch 계약에 따라 기본 제외 경로만 적용해 통합한다. 입력 크기 상한 없음. 읽을 수 없는 파일은 보류 사유가 아니라 `[입력 제외 항목]`에 남긴다. Python·Node·CLI helper 설치 전제 없음.
+조건 미충족 시 templates·storage contract·저장 폴더는 만들거나 읽지 않는다. 디렉터리 입력은 기본 제외 경로를 적용한 뒤 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일을 통합한다. 입력 크기와 파일 개수 상한은 없고, truncate·첫 N개 파일만 읽기·일부 파일 샘플링은 금지한다. 읽기 대상 텍스트 전체를 확인하지 못하면 일부 근거만으로 저장하지 않고 저장 보류로 종료한다. 읽을 수 없는 파일은 보류 사유가 아니라 `[입력 제외 항목]`에 남긴다. Python·Node·CLI helper 설치 전제 없음.
 
 ### 산출물
 

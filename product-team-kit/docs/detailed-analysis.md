@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.7.1`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.7.2`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -57,7 +57,7 @@ skills/plan-review/
 
 ## 4. set-config 동작
 
-`set-config`는 cwd의 git root 또는 cwd를 기준으로 `.product-team-kit/config.json`을 만든다. 인자는 받지 않고, 각 키를 대화형으로 확인한다. config 저장 성공 후 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 선택 없이 항상 생성·갱신한다.
+`set-config`는 cwd의 git root 또는 cwd를 기준으로 `.product-team-kit/config.json`을 만든다. 인자는 받지 않고, `outputRoot`, `ssot.include`, `ssot.exclude`를 한 번의 질문 묶음으로 확인한 뒤 다른 값이 필요한 키만 batch로 입력받는다. config 저장 성공 후 같은 root의 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 선택 없이 항상 생성·갱신한다.
 
 | 키 | 처리 |
 |---|---|
@@ -66,7 +66,7 @@ skills/plan-review/
 | `ssot.include` | 줄바꿈/콤마 입력을 배열로 저장. 빈 배열이면 key 제거 후 기본 `Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md` 사용 |
 | `ssot.exclude` | 줄바꿈/콤마 입력을 배열로 저장. 빈 배열이면 key 제거 |
 
-검증 거부값은 저장하지 않고 같은 키에서 다시 입력받는다. config 저장은 `.product-team-kit/config.json.tmp`를 쓴 뒤 rename하는 atomic write다. 기존 config의 다른 키는 보존한다. `CLAUDE.md`와 `AGENTS.md`는 기존 사용자 내용을 보존하고 product-team-kit start/end 관리 블록만 replace 또는 append한다. marker가 한쪽만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
+검증 거부값은 저장하지 않고 거부된 키만 다시 입력받는다. 저장 전 project root, 대상 경로, `outputRoot`, `ssot` 배열 또는 제거 상태, `version: 1`, 거부값 없음 여부를 자체 점검한다. config 저장은 기존 object를 base로 managed key만 merge한 뒤 `.product-team-kit/config.json.tmp`를 쓰고 rename하는 atomic write다. 기존 config의 top-level unknown key와 `ssot` unknown sub-key는 보존한다. `CLAUDE.md`와 `AGENTS.md`는 기존 사용자 내용을 보존하고 product-team-kit start/end 관리 블록만 replace 또는 append한다. marker가 한쪽만 있으면 해당 파일은 변경하지 않고 `agent-guide-write` 실패로 보고한다.
 
 ## 5. plan-format 동작
 
@@ -88,7 +88,7 @@ skills/plan-review/
 | 빈 입력 또는 최소 입력 | 정보 부족 보류 |
 | 직접 텍스트 | 본문 그대로 사용 |
 | 기존 파일 | UTF-8 텍스트로 읽기 |
-| 기존 디렉터리 | 텍스트 파일 통합. 입력 크기 상한 없음 (검증 정확도 우선) |
+| 기존 디렉터리 | 기본 제외 경로를 뺀 하위의 모든 읽을 수 있는 UTF-8 텍스트 파일 통합. 입력 크기·파일 개수 상한 없음. 전체 확인 후 source index와 gate 근거 맵으로 압축 |
 | 없는 path-like 입력 | 직접 텍스트로 폴백 |
 | 주제와 경로가 섞인 입력 | 주제와 경로를 모두 사용 |
 
@@ -103,7 +103,7 @@ Gate First 4 조건:
 
 ### Step 3 변환·저장
 
-dispatch → 단일 패스 작성 → 자체 검증 3단계로 작성한다. dispatch는 기능명, 안전기능명, 역할명, 용어, 입력 단편 라벨을 고정한다. 본문 작성 직전에만 기능설계서/정책서 templates를 읽고, main이 `feature`와 `both`의 사용자 결과·가능 행위는 기능설계서에, `policy`와 `both`의 판단 기준은 정책서에 배치한다. 작성 후 main은 헤더 일치, 빈 골격, 중복 항목, 라벨 cross-bleed, marker 합산을 자체 검증한다. 저장 절차에 들어갈 때만 `storage-contract.md`를 읽는다.
+dispatch → 단일 패스 작성 → 자체 검증 3단계로 작성한다. dispatch는 기능명, 안전기능명, 역할명, 용어, 입력 단편 라벨, source index, gate 근거 맵을 고정한다. 본문 작성 직전에만 기능설계서/정책서 templates를 읽고, main이 `feature`와 `both`의 사용자 결과·가능 행위는 기능설계서에, `policy`와 `both`의 판단 기준은 정책서에 배치한다. 작성 후 main은 헤더 일치, 빈 골격, 중복 항목, 라벨 cross-bleed, marker 합산을 자체 검증한다. 저장 절차에 들어갈 때만 `storage-contract.md`를 읽는다.
 
 저장 계약:
 
@@ -146,6 +146,7 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 - Strict-exit + Gate First + 단일 패스로 불완전 산출물과 의도 외 실행을 최소화한다.
 - Lazy read 계약으로 config 실패, 저장 보류, SSOT 매칭 0건 같은 분기의 context 낭비와 예기치 않은 근거 확대를 줄인다.
+- 입력 크기·파일 개수 상한 없음 계약을 유지하면서도 기본 제외 경로 적용 후 남은 읽기 대상 텍스트에 대한 truncate·샘플링 금지, source index, gate 근거 맵, 읽기 대상 텍스트 전체 확인 실패 시 저장 보류로 부분 근거 저장 위험을 낮췄다.
 - `set-config`로 프로젝트별 저장 위치와 SSOT corpus 범위를 조정하고, agent가 같은 SSOT 범위를 우선 조회하도록 `CLAUDE.md`/`AGENTS.md` 안내 블록을 남길 수 있다.
 - 단일 SKILL.md에 입력 dispatch·분류·marker를 흡수해 cross-reference drift 위험을 낮췄다.
 - staging folder rename + char-boundary safe-name truncation + `--99` collision bound로 한쪽 final 문서만 남는 실패 모드를 줄이고 저장 실패 모드를 명시한다.
@@ -157,8 +158,8 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 1. Strict-exit으로 config 없는 신규 환경은 첫 실행에서 바로 실패한다. README와 set-config 안내가 가이드지만 초기 마찰은 남는다. 한 번 set-config를 실행하면 agent 안내 블록도 같이 생겨 이후 프로젝트 재진입 시 SSOT 경계 혼선은 줄어든다.
 2. Markdown 전제가 강하다. 팀이 Notion 또는 Confluence를 쓰면 export snapshot만 SSOT 근거가 되므로 freshness risk가 자주 발생할 수 있다.
-3. 단일 기능명 가정이 강하다. 디렉터리 입력에 여러 기능이 섞이면 첫 후보로 묶일 수 있고 다기능 분리 메커니즘이 없다.
-4. Lazy read는 내부 references와 SSOT corpus를 늦게 읽게 하지만, Gate First를 위해 선택된 입력 자체는 끝까지 읽는다. 큰 PRD 모음을 넣으면 호출 환경의 메모리/시간 한계는 여전히 운영자가 책임진다.
+3. 단일 기능명 가정이 강하다. 디렉터리 입력에 여러 기능이 섞이면 주 기능을 선택하고 나머지는 피드백/제외로 남기지만, 자동 다중 폴더 생성은 하지 않는다.
+4. Lazy read는 내부 references와 SSOT corpus를 늦게 읽게 하지만, Gate First를 위해 기본 제외 경로 적용 후 남은 읽기 대상 입력은 끝까지 읽는다. 큰 PRD 모음은 source index로 압축하더라도 호출 환경의 메모리/시간 한계 영향을 받을 수 있다.
 5. Asia/Seoul timestamp가 고정되어 다른 timezone 팀에는 혼선이 있을 수 있다.
 6. `plan-format`은 SSOT 검증을 하지 않기 때문에 SSOT와 충돌하는 항목이 `plan-review` 전까지 표면화되지 않고 재작업이 생길 수 있다.
 7. 9섹션 템플릿은 작은 기능에는 과할 수 있다. 빈 섹션 제거 규칙이 완화 장치지만 진입장벽은 남는다.
@@ -174,4 +175,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.7.1은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용하고 B/C worker만 유지해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.7.2는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용하고 B/C worker만 유지해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

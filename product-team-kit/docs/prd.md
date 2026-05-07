@@ -2,7 +2,7 @@
 
 - 문서 상태: 초안
 - 기준일: 2026-05-07
-- 대상 버전: product-team-kit 0.7.1
+- 대상 버전: product-team-kit 0.7.2
 - 관련 기능 문서: [feature-definition.md](./feature-definition.md)
 - 관련 문서: [README](../README.md), [skills-workflow.md](./skills-workflow.md)
 
@@ -80,7 +80,7 @@ flowchart TD
 | ID | 요구사항 | 수용 기준 |
 |---|---|---|
 | PRD-01 | 사용자는 기획 입력을 직접 텍스트, 파일, 디렉터리로 제공할 수 있다. | 입력 처리 결과에 출처와 제외 항목이 표시된다. |
-| PRD-02 | 사용자는 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신할 수 있고, 같은 root의 agent 안내 파일도 자동으로 정렬된다. | `set-config`가 `outputRoot`, `ssot.include`, `ssot.exclude`를 수집하고 `version: 1`로 저장한 뒤 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 선택 없이 항상 생성·갱신한다. |
+| PRD-02 | 사용자는 `.product-team-kit/config.json`을 대화형으로 만들거나 갱신할 수 있고, 같은 root의 agent 안내 파일도 자동으로 정렬된다. | `set-config`가 `outputRoot`, `ssot.include`, `ssot.exclude`를 한 번의 질문 묶음으로 확인하고, 다른 값이 필요한 키만 batch로 입력받은 뒤 저장 전 검증·저장 확인을 거쳐 `version: 1`로 저장한다. 저장 성공 후 `CLAUDE.md`와 `AGENTS.md` product-team-kit 관리 블록을 선택 없이 항상 생성·갱신한다. |
 | PRD-03 | 입력이 부족하거나 config가 없으면 파일을 만들지 않는다. | config 부재·검증 실패 시 strict-exit으로 set-config 안내, 정보 부족 시 기능 목적/적용 범위/사용자 행동/주요 조건 중 부족한 항목을 출력한다. |
 | PRD-04 | 충분한 입력은 기능설계서와 정책서 두 문서로 분리한다. | 화면/흐름/사용자 결과는 기능설계서, 규칙/조건/예외/제한은 정책서에 배치된다. |
 | PRD-05 | 저장된 초안은 공식 팀 문서가 아님을 표시한다. | 산출물과 출력에 로컬 초안, 팀 문서 미반영, 공식 팀 문서 아님이 드러난다. |
@@ -88,7 +88,7 @@ flowchart TD
 | PRD-07 | 검토 결과는 기획팀이 바로 행동할 수 있어야 한다. | 판정, 한 줄 결론, 먼저 할 일, 기준 문서 충돌이 상단에 표시된다. |
 | PRD-08 | 검토는 보수적으로 취합한다. | 필수 수정 항목이 있으면 최종 결과는 `수정 필요`다. |
 | PRD-09 | Claude Code와 Codex에서 같은 제품 계약을 유지한다. | 양쪽 manifest가 같은 이름, 버전, 스킬 경로를 가리킨다. |
-| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 조기 판정과 상단 인덱스 스캔을 거쳐 축소된 SSOT corpus만 읽는다. |
+| PRD-10 | 각 스킬은 필요한 단계에서만 파일을 읽는다. | config 실패 시 입력/templates/references를 읽지 않고, 저장 보류 시 storage contract를 읽지 않으며, plan-review는 조기 판정과 상단 인덱스 스캔을 거쳐 축소된 SSOT corpus만 읽는다. plan-format은 디렉터리 입력에서 기본 제외 경로를 적용한 뒤 입력 크기·파일 개수 상한을 두지 않고 읽기 대상 텍스트 전체 확인 후 source index와 gate 근거 맵으로 압축하며, 전체 확인 실패 시 일부 근거만으로 저장하지 않는다. |
 
 ## 8. 성공 기준
 
@@ -105,6 +105,7 @@ flowchart TD
 
 - 로컬 우선: 입력, 초안, 검토는 현재 프로젝트의 로컬 파일을 기준으로 한다.
 - 단계별 읽기: 각 스킬은 분기가 확정된 뒤 필요한 파일만 읽고, plan-review worker에는 main이 확정한 검토 대상 본문과 해당 축 기준만 전달한다. SSOT corpus는 main A축 점검에서만 사용한다.
+- 무제한 입력 처리: plan-format은 디렉터리 입력에서 기본 제외 경로를 적용한 뒤 입력 크기와 파일 개수 상한을 두지 않는다. truncate, 첫 N개 파일만 읽기, 샘플링은 금지하고, 읽기 대상 텍스트 전체를 확인하지 못하면 저장 보류로 종료한다.
 - 안전한 쓰기: 두 문서를 같은 staging folder에 먼저 작성하고 검증 후 target folder로 rename한다. 기존 target은 덮어쓰지 않으며 충돌 시 collision suffix `--01`~`--99`로 새 폴더를 확보한다.
 - 근거 제한: 외부 URL이나 코드 파일을 Product Docs SSOT 근거로 사용하지 않는다.
 - 문서 가독성: 기획팀이 먼저 읽을 수 있는 한국어 리포트를 우선한다.

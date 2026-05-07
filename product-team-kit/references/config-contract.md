@@ -41,7 +41,7 @@
 | Key | 타입 | default | 사용 skill | 의미 |
 | --- | --- | --- | --- | --- |
 | `version` | integer | (필수, 현재 `1`) | 세 skill | schema 버전. runtime 미일치 시 `plan-format`과 `plan-review`는 즉시 실패하고, `set-config`는 항상 1 저장 |
-| `outputRoot` | string | `planning` | `set-config`, `plan-format`, `plan-review` | 초안 저장 root 폴더명. `plan-format` 저장 경로와 디렉터리 입력 제외 경로, `plan-review` SSOT exclude 자동 추가에 사용 |
+| `outputRoot` | string | `planning` | `set-config`, `plan-format`, `plan-review` | 초안 저장 root 폴더명. `plan-review` SSOT exclude 자동 추가에 사용 |
 | `ssot.include` | string array | `["Product Team Space/Product Department/Colonova Product/_AI_ 정책서 & 기능설계서/**/*.md"]` | `set-config`, `plan-review` | SSOT corpus allow-list glob. 미지정/빈 배열이면 Product Team Space의 `_AI_ 정책서 & 기능설계서` Markdown을 기본 근거로 사용 |
 | `ssot.exclude` | string array | (없음) | `set-config`, `plan-review` | SSOT corpus 추가 제외 glob. 기존 default 제외에 누적. `<outputRoot>/**`은 항상 자동 포함 |
 
@@ -119,7 +119,7 @@ CLI 인자 > `.product-team-kit/config.json` > 본 contract와 각 skill contrac
 
 | Config key | 영향 받는 contract |
 | --- | --- |
-| `outputRoot` | `skills/plan-format/references/storage-contract.md` 저장 경로, `skills/plan-format/SKILL.md` `## 입력 처리`의 디렉터리 제외 경로, `skills/plan-review`의 SSOT exclude 자동 추가 (`<outputRoot>/**`) |
+| `outputRoot` | `skills/plan-format/references/storage-contract.md` 저장 경로, `skills/plan-review`의 SSOT exclude 자동 추가 (`<outputRoot>/**`) |
 | `ssot.include` | `skills/plan-review/SKILL.md` "Product Docs SSOT" 정의, `skills/plan-review/references/review-rules.md`의 SSOT corpus 선택 규칙 |
 | `ssot.exclude` | `skills/plan-review/references/review-rules.md`의 SSOT corpus 선택 규칙(default 제외에 누적) |
 | `CLAUDE.md`, `AGENTS.md` 안내 블록 | schema key는 아니지만 `set-config` 저장 성공 후 항상 생성·갱신된다. 일반 agent가 Product Docs SSOT 범위를 `.product-team-kit/config.json` 기준으로 우선 조회하도록 안내한다. |
