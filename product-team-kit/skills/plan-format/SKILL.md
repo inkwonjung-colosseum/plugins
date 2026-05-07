@@ -12,7 +12,7 @@ argument-hint: "<기획 입력 | 파일 | 디렉터리>"
 2. 입력 기반 변환 가능 여부 Gate (불가 시 종료)
 3. 템플릿 변환·저장 + 부족 항목 화면 출력
 
-산출물은 `<outputRoot>/` 아래 로컬 초안이며 **공식 팀 문서가 아니다**. Product Docs SSOT 검증과 착수 가능성 판단은 `plan-review` 책임이다.
+산출물은 `<outputRoot>/` 아래 로컬 초안이며 **공식 팀 문서가 아니다**. Product Docs SSOT 충돌, 명확성, 용어 일관성 검토는 `plan-review` 책임이다.
 
 ### 진행 표시 원칙
 
@@ -255,7 +255,7 @@ main이 dispatch 결과를 single source로 사용해 두 문서를 같은 턴�
 ## 역할 경계
 
 - `plan-format`은 사용자가 준 입력·파일·디렉터리만 읽는다.
-- Product Docs SSOT 검색·검증·착수 가능성 판단은 `plan-review` 책임.
+- Product Docs SSOT 검색·충돌 검증·명확성·용어 일관성 판단은 `plan-review` 책임.
 - `[충돌 후보]`는 입력 내부 모순·중복·상충에만 사용.
 - 상위설계서는 지원하지 않음.
 - 기존 산출물은 덮어쓰지 않음.

@@ -4,7 +4,7 @@
 
 ## 1. 정체성
 
-`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.6.9`, 라이선스는 MIT다.
+`product-team-kit`은 기획 입력을 로컬 초안 2종, 즉 기능설계서와 정책서로 생성하고, 팀 문서 반영 전에 Product Docs SSOT 근거로 검토하는 도구다. Claude Code와 Codex 양쪽을 지원하며, 현재 로컬 매니페스트 기준 버전은 `0.7.0`, 라이선스는 MIT다.
 
 ```text
 set-config
@@ -18,14 +18,14 @@ plan-review
   -> 통과 / 조건부 통과 / 수정 필요 / 올바른 검토 대상이 아님
 ```
 
-핵심 정체성은 "로컬 설정과 agent 안내", "기획 입력을 문서 초안으로 정리하는 formatter", "발행 전 검토 gate"의 분리다. `set-config`는 사용처 프로젝트의 설정과 agent 안내 블록을 갱신하고, `plan-format`은 생성 가능 여부를 먼저 판단한 뒤 초안을 저장하며, `plan-review`는 Product Docs SSOT 충돌, 명확성, 용어 일관성, downstream 착수 가능성을 4축으로 검토한다. 두 실행 스킬은 lazy read 원칙을 공유해 종료 분기에서 쓰지 않는 templates, references, SSOT corpus를 선행 read하지 않는다.
+핵심 정체성은 "로컬 설정과 agent 안내", "기획 입력을 문서 초안으로 정리하는 formatter", "발행 전 검토 gate"의 분리다. `set-config`는 사용처 프로젝트의 설정과 agent 안내 블록을 갱신하고, `plan-format`은 생성 가능 여부를 먼저 판단한 뒤 초안을 저장하며, `plan-review`는 Product Docs SSOT 충돌, 명확성, 용어 일관성을 3축으로 검토한다. 두 실행 스킬은 lazy read 원칙을 공유해 종료 분기에서 쓰지 않는 templates, references, SSOT corpus를 선행 read하지 않는다.
 
 ## 2. 구조
 
 ```text
 .claude-plugin/plugin.json    # Claude 매니페스트
 .codex-plugin/plugin.json     # Codex 매니페스트
-agents/                       # plan-review B/C/D 내부 worker 정의
+agents/                       # plan-review B/C 내부 worker 정의
 docs/                         # workflow, PRD, 기능 정의, 약관/정책
 references/config-contract.md # 세 skill 공유 로컬 설정 계약
 skills/set-config/
@@ -118,9 +118,9 @@ dispatch → 단일 패스 작성 → 자체 검증 3단계로 작성한다. dis
 
 `plan-review`는 초안 폴더 또는 기능설계서/정책서 파일을 검토한다. 먼저 config를 확인하고, 치명 오류면 `output-format.md`만 읽어 종료한다. 폴더 입력이면 기능설계서와 정책서를 함께 읽고, 단일 파일 입력이면 같은 폴더에서 짝문서를 찾는다. 지원하지 않는 문서 타입이면 `review-rules.md`와 SSOT corpus를 읽지 않고 `올바른 검토 대상이 아님`으로 종료한다. 짝문서가 없으면 단일 검토를 진행하되 `검증 한계`에 남긴다.
 
-Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상 본문만으로 핵심 섹션 `[미정]`, 빈 필수 섹션, `[충돌 후보]`가 과도하면 `수정 필요 (조기 판정)`으로 종료한다. 조기 판정이 아니면 검토 대상에서 키워드를 추출하고, 후보 파일 상위 20줄 인덱스로 archive/deprecated/낮은 버전/키워드 미매칭 문서를 제외한 뒤 핵심 후보만 전문으로 읽는다. 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C/D축은 검토 대상 본문만으로 점검한다.
+Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 정책, PRD/요구사항, 기능/화면 설계, 운영/QA 판단 Markdown과 그 Markdown이 상대경로로 참조한 로컬 resource다. `plan-review`는 검토 대상 본문만으로 핵심 섹션 `[미정]`, 빈 필수 섹션, `[충돌 후보]`가 과도하면 `수정 필요 (조기 판정)`으로 종료한다. 조기 판정이 아니면 검토 대상에서 키워드를 추출하고, 후보 파일 상위 20줄 인덱스로 archive/deprecated/낮은 버전/키워드 미매칭 문서를 제외한 뒤 핵심 후보만 전문으로 읽는다. 매칭이 0건이면 A축은 `검증 대상 없음`으로 처리하고, B/C축은 검토 대상 본문만으로 점검한다.
 
-4축 점검:
+3축 점검:
 
 | 축 | 확인 내용 |
 |---|---|
@@ -128,11 +128,10 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 | A. SSOT 충돌 | 초안 확정 문장과 current evidence 충돌 여부 |
 | B. 명확성 | marker, 모호 조건, 상태·권한·예외 판단 가능성 |
 | C. 용어 일관성 | 역할명, 상태명, 권한명, 화면명, 도메인 stem 통일성 |
-| D. 4역할 넘김 가능성 | 디자인, 개발, QA, 운영이 대화 기억 없이 다음 업무를 시작할 수 있는지 |
 
-점검 실행은 dispatch → main A축 점검 + 3 worker(B/C/D) 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 `review-rules.md` 섹션을 준비한다. A축 SSOT 충돌은 corpus를 보유한 main이 직접 점검하고, B/C/D worker는 검토 대상 본문과 자기 축 기준만 받아 발견 사항만 작성한다. main은 모든 발견 사항 dedup, 보수 합성, 결과 판정, 사람용 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
+점검 실행은 dispatch → main A축 점검 + 2 worker(B/C) 병렬 → merge 3단계다. dispatch가 검토 대상, 키워드, SSOT 후보를 고정하고 필요한 `review-rules.md` 섹션을 준비한다. A축 SSOT 충돌은 corpus를 보유한 main이 직접 점검하고, B/C worker는 검토 대상 본문과 자기 축 기준만 받아 발견 사항만 작성한다. main은 모든 발견 사항 dedup, 보수 합성, 결과 판정, 사람용 리포트 출력을 담당한다. 병렬 worker 호출이 불가능한 환경에서는 같은 결과 형식으로 단일 패스 fallback을 사용한다.
 
-출력은 YAML manifest가 아니라 사람용 markdown 리포트 하나다. 상단에 판정, 한 줄 결론, 먼저 할 일, 역할별 착수 가능성, 기준 문서와의 충돌을 두고, 하단에 coverage, 읽은 근거, 읽지 않은 관련 후보, 제외 후보, 검증 한계, 상세 발견 항목을 둔다.
+출력은 YAML manifest가 아니라 사람용 markdown 리포트 하나다. 상단에 판정, 한 줄 결론, 먼저 할 일, 기준 문서와의 충돌을 두고, 하단에 coverage, 읽은 근거, 읽지 않은 관련 후보, 제외 후보, 검증 한계, 상세 발견 항목을 둔다.
 
 결과별 출력:
 
@@ -153,7 +152,6 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 - SSOT 범위가 좁고 명확해 "근거 없음" 거짓양성을 줄인다.
 - 보수적 합성 규칙으로 false pass를 차단한다.
 - 4 marker (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`) 정의가 plan-review 분류 규칙과 직결된다.
-- 역할별 readiness를 design, development, QA, operations로 나눠 downstream 책임을 분담한다.
 
 ## 8. 약점과 리스크
 
@@ -176,4 +174,4 @@ Product Docs SSOT는 `<outputRoot>/`을 제외한 현재 프로젝트의 제품 
 
 ## 10. 한 줄 요약
 
-`product-team-kit` 0.6.9는 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.
+`product-team-kit` 0.7.0은 `set-config` + `plan-format` + `plan-review`의 세 표면으로 정리됐다. set-config는 config와 agent 안내 블록을 함께 정렬하고, plan-format은 별도 작성 worker 없이 단일 패스 작성과 자체 검증을 수행하며, plan-review는 SSOT corpus를 main A축 점검에만 사용하고 B/C worker만 유지해 worker 입력 범위를 줄인다. 남은 핵심 리스크는 신규 config 마찰, Markdown SSOT 전제, 단일 기능명 가정이다.

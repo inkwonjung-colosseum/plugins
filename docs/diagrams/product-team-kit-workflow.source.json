@@ -31,7 +31,7 @@
       },
       "review": {
         "title": "plan-review",
-        "lines": ["lazy read + 짝문서 확정", "필요 SSOT corpus 읽기", "4축 보수 합성"]
+        "lines": ["lazy read + 짝문서 확정", "필요 SSOT corpus 읽기", "3축 보수 합성"]
       },
       "evidence": {
         "title": "근거 경계",
@@ -70,7 +70,7 @@
       "document_title": "product-team-kit workflow",
       "eyebrow": "Flowchart · product-team-kit",
       "heading": "Planning input to team handoff workflow",
-      "summary": "product-team-kit은 필요한 파일을 단계별로 lazy read한다. set-config로 config와 agent 안내 블록을 먼저 정렬하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 4축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
+      "summary": "product-team-kit은 필요한 파일을 단계별로 lazy read한다. set-config로 config와 agent 안내 블록을 먼저 정렬하고, 기획 입력을 기능설계서와 정책서 초안으로 정리한 뒤 Product Docs SSOT 기반 3축 검토를 거쳐, 사람이 팀 반영 절차로 넘길 수 있는 상태만 구조화한다.",
       "svg": {
         "width": 1180,
         "height": 1040,
@@ -123,7 +123,7 @@
         {"x": 40, "y": 58, "w": 560, "h": 260, "label": "1. input formatting"},
         {"x": 40, "y": 350, "w": 560, "h": 360, "label": "2. format gate"},
         {"x": 40, "y": 750, "w": 560, "h": 520, "label": "3. review gate"},
-        {"x": 40, "y": 1300, "w": 560, "h": 200, "label": "4. publish readiness"}
+        {"x": 40, "y": 1300, "w": 560, "h": 200, "label": "4. publish gate"}
       ],
       "nodes": [
         {"ref": "input", "kind": "pill", "class": "node", "x": 70, "y": 112, "w": 220, "h": 62},

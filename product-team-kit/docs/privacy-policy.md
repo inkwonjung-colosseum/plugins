@@ -14,20 +14,20 @@ The plugin instructions guide the host agent to read:
 
 ## Data Written
 
-The plugin does not directly include network publishing instructions in the current planning workflow. `plan-format` does not validate Product Docs SSOT conflicts, and `plan-review` reads only the Product Docs Markdown candidates narrowed by review-target keywords plus explicitly needed local resources to build an evidence record for SSOT conflict, clarity, terminology consistency, and downstream-readiness review before external publishing.
+The plugin does not directly include network publishing instructions in the current planning workflow. `plan-format` does not validate Product Docs SSOT conflicts, and `plan-review` reads only the Product Docs Markdown candidates narrowed by review-target keywords plus explicitly needed local resources to build an evidence record for SSOT conflict, clarity, and terminology consistency review before external publishing.
 
 Expected write operations:
 
 - Create 기능설계서 and 정책서 drafts under `<outputRoot>/[안전기능명]--YYYY-MM-DD-HHMMSS/`; the default `<outputRoot>` is `planning`.
 - Create or update local product-team-kit settings when the user invokes `set-config`: `.product-team-kit/config.json`, then the product-team-kit managed block in project-root `CLAUDE.md` and `AGENTS.md`.
 
-The plugin instructions prohibit modifying Product Docs SSOT evidence sources during review. External URLs are not automatically read as evidence. `plan-review` returns one planner-facing markdown report with a verdict, role readiness, evidence details, and either a publish-preparation checklist or a re-review checklist. These outputs do not write to Confluence, Product Docs SSOT, linked local resources, or external systems. Config failure, unsupported input, and SSOT no-match branches do not read unused templates, review rules, or corpus bodies.
+The plugin instructions prohibit modifying Product Docs SSOT evidence sources during review. External URLs are not automatically read as evidence. `plan-review` returns one planner-facing markdown report with a verdict, evidence details, and either a publish-preparation checklist or a re-review checklist. These outputs do not write to Confluence, Product Docs SSOT, linked local resources, or external systems. Config failure, unsupported input, and SSOT no-match branches do not read unused templates, review rules, or corpus bodies.
 
 ## Confirmation Requirements
 
 Before using generated drafts as publish-ready material, users should check:
 
-- Review gate status for `[가정]`, confirmation questions, and role-based readiness gaps.
+- Review gate status for `[가정]`, confirmation questions, and clarity/terminology gaps.
 - Source freshness and authority of the Product Docs SSOT evidence.
 - Publish-preparation checklist items when `plan-review` returns `통과` or `조건부 통과`.
 - Required-fix and re-review checklist items when `plan-review` returns `수정 필요`.

@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로
 
-`product-team-kit`은 로컬 설정과 프로젝트 agent 안내 파일을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 4축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
+`product-team-kit`은 로컬 설정과 프로젝트 agent 안내 파일을 먼저 잡고(`set-config`), 기획 입력을 로컬 초안 두 문서로 정리한 뒤(`plan-format`), 외부 반영 전에 3축으로 검토하는(`plan-review`) 제품팀 워크플로다. `plan-format`과 `plan-review`는 필요한 파일을 필요한 단계에서만 읽는 lazy read 계약을 따른다.
 
 이 문서는 README의 빠른 시작보다 한 단계 자세히, 어떤 스킬을 언제 선택하고 어떤 산출물로 이어지는지 설명한다.
 
@@ -27,7 +27,7 @@
 | 지원하지 않는 문서 타입 | X | X | X |
 | 조기 판정 (수정 필요) | X | X | X |
 | SSOT 키워드 추출 실패 | O | X | X |
-| SSOT 매칭 0건 | O | X | O (B/C/D 본문만) |
+| SSOT 매칭 0건 | O | X | O (B/C 본문만) |
 | 정상 | O | O (축소 후보만) | O |
 
 ## SSOT 근거 경계
@@ -197,20 +197,19 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 ### 설명
 
-`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성, 디자인·개발·QA·운영 착수 가능성을 4축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
+`plan-review`는 `plan-format`으로 저장한 기능설계서/정책서 초안을 외부 반영 전에 검토하는 gate다. 템플릿 모양만 보는 검사가 아니라, Product Docs SSOT 충돌, 명확성, 용어 일관성을 3축으로 확인한다. 다만 SSOT corpus는 먼저 키워드로 좁히고, 직접 관련된 Markdown과 필요한 linked local resource만 읽는다.
 
 검토 대상은 `<outputRoot>/` 아래 초안일 수 있지만, `<outputRoot>/` 파일은 SSOT 근거로 사용하지 않는다.
 
-### 4축 정의
+### 3축 정의
 
 | 축 | 점검 대상 | 담당 | 비고 |
 |---|---|---|---|
 | A. SSOT 충돌 | 초안 확정 문장 vs Product Docs SSOT current evidence | main 직접 | corpus 0건 시 `검증 대상 없음` |
 | B. 명확성 | `[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]` marker 처리, 모호 문장, 결정 가능 수준 | `plan-review-clarity-worker` | 본문만 |
 | C. 용어 일관성 | 역할명·상태명·권한명·화면명·도메인 stem 통일성 | `plan-review-terminology-worker` | 본문만 |
-| D. 4역할 넘김 가능성 | design·development·qa·operations 각각이 대화 기억 없이 다음 업무 시작 가능 여부 | `plan-review-readiness-worker` | 본문만, readiness 4행 표 추가 반환 |
 
-발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록. 합성 우선순위: `수정 필요 > 조건부 통과 > 통과`. D readiness `blocked` 1개라도 있으면 `수정 필요`.
+발견 사항은 분류(필수 수정 / 발행 전 확인 / 참고)와 함께 기록. 합성 우선순위: `수정 필요 > 조건부 통과 > 통과`.
 
 ### 조기 수정 판정 기준
 
@@ -228,7 +227,7 @@ Step 2에서 입력 dispatch 후 아래 4 조건을 모두 충족해야 통과. 
 
 - 기존 초안 폴더나 기능설계서/정책서 파일을 검토해야 한다.
 - 외부 공유 또는 팀 문서 반영 전에 통과 여부를 판단해야 한다.
-- Product Docs SSOT와 초안 사이의 충돌, 누락, 착수 가능성을 확인해야 한다.
+- Product Docs SSOT와 초안 사이의 충돌, 명확성, 용어 일관성을 확인해야 한다.
 
 `plan-review`를 선택하지 않는다:
 
@@ -248,7 +247,7 @@ flowchart TD
     G --> H{SSOT 후보 매칭?}
     H -- 1건 이상 --> I[필요 corpus와 linked local resource 읽기]
     H -- 0건 --> I0[A축 검증 대상 없음 처리]
-    I --> J[main A축 점검 + B/C/D worker 점검]
+    I --> J[main A축 점검 + B/C worker 점검]
     I0 --> J
     J --> K[발견 사항 dedup과 보수 합성]
     K --> L{최종 결과}
@@ -263,10 +262,10 @@ flowchart TD
 |---|---|
 | `통과` | 중요한 가정, 충돌, 필수 수정, 발행 전 확인, 검증 한계가 없고 근거가 충분하다 |
 | `조건부 통과` | 남은 문제가 명시적이고 기획자가 발행 전에 확인하거나 수용할 수 있다 |
-| `수정 필요` | 충돌, 불명확한 규칙, 근거 없는 가정 때문에 디자인·개발·QA·운영 판단이 달라질 수 있다 |
+| `수정 필요` | 충돌, 불명확한 규칙, 근거 없는 가정 때문에 발행 판단이 달라질 수 있다 |
 | `올바른 검토 대상이 아님` | 기능/화면설계서 또는 정책서 초안이 아닌 입력이라 검토를 수행하지 않는다 |
 
-최종 취합은 `수정 필요 > 조건부 통과 > 통과` 순서로 보수적으로 결정한다. 역할별 착수 가능성에 `착수 전 보강 필요`가 있으면 `수정 필요`로 취합한다.
+최종 취합은 `수정 필요 > 조건부 통과 > 통과` 순서로 보수적으로 결정한다.
 
 ## Routing Decision Tree
 

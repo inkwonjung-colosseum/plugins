@@ -1,6 +1,6 @@
 # product-team-kit 스킬 워크플로 상세
 
-`skills-workflow.md`를 보강하는 구현 디테일 문서다. 분기별 lazy read 순서, dispatch 분류 기준, marker 정의, plan-format main 검증 항목, plan-review main + worker 분담, SSOT corpus 인덱스 스캔, merge 합성 규칙, 병렬 시퀀스, fallback 동작을 정리한다.
+`skills-workflow.md`를 보강하는 구현 디테일 문서다. 분기별 lazy read 순서, dispatch 분류 기준, marker 정의, plan-format main 검증 항목, plan-review main + 2 worker 분담, SSOT corpus 인덱스 스캔, merge 합성 규칙, 병렬 시퀀스, fallback 동작을 정리한다.
 
 상위 개요와 결정 트리는 [`./skills-workflow.md`](./skills-workflow.md)에 있다. 이 문서는 SKILL.md 단일 진실 소스를 깨지 않으며, 차이가 보이면 SKILL.md가 우선이다.
 
@@ -114,22 +114,21 @@ Step 3.2 본문 작성 후 저장 절차 진입 전 main이 수행한다. 모두
 
 ### 2.1 main vs worker 분담
 
-A축은 SSOT corpus를 main이 보유·사용하므로 main이 직접 점검. B/C/D는 본문만 보면 되므로 worker로 분리해 병렬 호출.
+A축은 SSOT corpus를 main이 보유·사용하므로 main이 직접 점검. B/C는 본문만 보면 되므로 worker로 분리해 병렬 호출.
 
 | 책임 | 입력 | 출력 |
 |---|---|---|
-| main (A축 SSOT 충돌) | dispatch 결과 + SSOT corpus 본문 + `review-rules.md` A축 | 8 필드 발견 사항 list |
-| `plan-review-clarity-worker` (B축) | dispatch 결과(본문만) + B축 inline | 8 필드 발견 사항만 |
-| `plan-review-terminology-worker` (C축) | dispatch 결과(본문만) + C축 inline | 8 필드 발견 사항만 |
-| `plan-review-readiness-worker` (D축) | dispatch 결과(본문만) + D축 inline | 8 필드 발견 사항 + readiness 4행 표 |
+| main (A축 SSOT 충돌) | dispatch 결과 + SSOT corpus 본문 + `review-rules.md` A축 | 7 필드 발견 사항 list |
+| `plan-review-clarity-worker` (B축) | dispatch 결과(본문만) + B축 inline | 7 필드 발견 사항만 |
+| `plan-review-terminology-worker` (C축) | dispatch 결과(본문만) + C축 inline | 7 필드 발견 사항만 |
 
 worker는 합성·결과 4종 판정·리포트 작성 안 함. 본문 수정·파일 write 안 함. 모두 main의 merge가 일괄 처리.
 
 발견 0건 worker는 응답 끝에 `<!-- worker-flag: no-findings -->` 한 줄 명시.
 
-### 2.2 발견 사항 8 필드 형식
+### 2.2 발견 사항 7 필드 형식
 
-main A축과 3 worker 모두 같은 8 필드 표 형식으로 반환.
+main A축과 2 worker 모두 같은 7 필드 표 형식으로 반환.
 
 상세 필드명·예시는 `references/review-rules.md`의 `## 발견 사항 필드`를 단일 진실 소스로 따른다. 형식 어긋나면 1회 retry, 2회 어긋나면 `검증 한계`에 기록 후 보수 합성. main A축은 main이 직접 작성하므로 retry 대상 아님.
 
@@ -150,37 +149,26 @@ main A축과 3 worker 모두 같은 8 필드 표 형식으로 반환.
 
 | 케이스 | 처리 |
 |---|---|
-| (a) 키워드 추출 성공 + 매칭 0건 | A축 `검증 대상 없음` + B/C/D worker 본문 점검 진행 |
+| (a) 키워드 추출 성공 + 매칭 0건 | A축 `검증 대상 없음` + B/C worker 본문 점검 진행 |
 | (b) 키워드 추출 실패 | worker spawn 없이 즉시 `수정 필요`로 종료 |
 
 ### 2.4 merge·dedup·보수 합성 규칙
 
-main A축 발견 + 3 worker(B/C/D) 발견 합치기. `references/review-rules.md`의 `## 합성 규칙` + `## 결과 4종 기준` + `## 보수 합성 우선순위` 적용.
+출력은 2층. 상단 통합 list는 dedup·보수 합성 적용. 하단 agent별 원본 블록은 raw 그대로 노출 (dedup·재합성 금지). 자세한 출력 구조는 `references/output-format.md`의 `## 출력 2층 구조`.
 
-| 단계 | 규칙 |
-|---|---|
-| dedup | 위치 + 제목 + 근거 정규화 (NFC) |
-| 분류 합성 | 보수 분류 (필수 수정 > 발행 전 확인 > 참고) |
-| 결과 4종 판정 | 수정 필요 > 조건부 통과 > 통과 우선순위 |
-| D readiness 검증 | `blocked` 1개라도 → 수정 필요. 4행 미만이면 1회 retry, 2회 누락 시 해당 역할 `n/a` + 사유 `worker 응답 누락` |
-| 통과 조건 | main A축 발견 0건 + 3 worker 모두 `<!-- worker-flag: no-findings -->` + readiness 모두 `ready`/`n/a` |
+main A축 발견 + 2 worker(B/C) 발견 합치기. `references/review-rules.md`의 `## 합성 규칙` + `## 결과 4종 기준` + `## 보수 합성 우선순위` 적용.
+
+| 단계 | 규칙 | 적용 면 |
+|---|---|---|
+| dedup | 위치 + 제목 + 근거 정규화 (NFC) | 상단 통합 |
+| 분류 합성 | 보수 분류 (필수 수정 > 발행 전 확인 > 참고) | 상단 통합 |
+| 결과 4종 판정 | 수정 필요 > 조건부 통과 > 통과 우선순위 | 판정 헤더 |
+| 통과 조건 | main A축 발견 0건 + 2 worker 모두 `<!-- worker-flag: no-findings -->` | 판정 헤더 |
+| raw 노출 | dedup·재합성 없이 agent 출력 그대로 | 하단 agent 원본 |
 
 현재 대화 컨텍스트는 근거 아님. 대화에서 알게 된 배경·의도·작성 당시 판단은 검토 대상 파일 또는 SSOT 근거에 없으면 근거 부족.
 
-### 2.5 D worker readiness 표
-
-D worker는 8 필드 발견 사항 외에 readiness 4행 표를 추가 반환.
-
-| 역할 | 상태 | 사유 | 위치 |
-|---|---|---|---|
-| design | ready / conditional / blocked / n/a | … | … |
-| development | … | … | … |
-| qa | … | … | … |
-| operations | … | … | … |
-
-`blocked` 1개라도 있으면 merge 단계에서 최종 결과 `수정 필요`로 끌어올림.
-
-### 2.6 분기별 실제 읽기 순서
+### 2.5 분기별 실제 읽기 순서
 
 | 분기 | 읽기 순서 |
 |---|---|
@@ -188,10 +176,10 @@ D worker는 8 필드 발견 사항 외에 readiness 4행 표를 추가 반환.
 | 입력 타입 fail (상위설계서 등) | `config.json` → 본문(타입 확인) → `output-format.md` → 종료 |
 | 조기 판정 (수정 필요) | `config.json` → 본문/짝문서 → `output-format.md` → 종료 (review-rules·SSOT corpus·worker 안 함) |
 | SSOT 키워드 추출 실패 | `config.json` → 본문/짝문서 → `review-rules.md` → `output-format.md` → 종료 (worker spawn 안 함) |
-| SSOT 매칭 0건 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing 후 0건 확인 → main A축 `검증 대상 없음` + 3 worker(B/C/D) 본문 점검 → merge → `output-format.md` |
-| 정상 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing → corpus 본문 read → main A축 점검 + 3 worker(B/C/D) → merge → `output-format.md` |
+| SSOT 매칭 0건 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing 후 0건 확인 → main A축 `검증 대상 없음` + 2 worker(B/C) 본문 점검 → merge → `output-format.md` |
+| 정상 | `config.json` → 본문/짝문서 → `review-rules.md` → corpus listing → corpus 본문 read → main A축 점검 + 2 worker(B/C) → merge → `output-format.md` |
 
-### 2.7 main + 3 worker 병렬 시퀀스
+### 2.6 main + 2 worker 병렬 시퀀스
 
 ```mermaid
 sequenceDiagram
@@ -199,7 +187,6 @@ sequenceDiagram
     participant M as main
     participant B as B worker (clarity)
     participant C as C worker (terminology)
-    participant D as D worker (readiness)
     participant FS as Filesystem (SSOT corpus)
 
     U->>M: /plan-review <폴더>
@@ -222,16 +209,13 @@ sequenceDiagram
             end
 
             par main A축 + 병렬 worker
-                M->>M: A축 SSOT 충돌 점검 (8 필드)
+                M->>M: A축 SSOT 충돌 점검 (7 필드)
             and
                 M->>B: dispatch + review-rules.md B축
-                B-->>M: B축 발견 사항 (8 필드 또는 no-findings)
+                B-->>M: B축 발견 사항 (7 필드 또는 no-findings)
             and
                 M->>C: dispatch + review-rules.md C축
-                C-->>M: C축 발견 사항 (8 필드 또는 no-findings)
-            and
-                M->>D: dispatch + review-rules.md D축
-                D-->>M: D축 발견 사항 + readiness 4행
+                C-->>M: C축 발견 사항 (7 필드 또는 no-findings)
             end
 
             Note over M: merge — dedup, 보수 합성, 결과 4종 판정
@@ -241,17 +225,16 @@ sequenceDiagram
     end
 ```
 
-### 2.8 fallback (병렬 호출 불가 환경)
+### 2.7 fallback (병렬 호출 불가 환경)
 
-Codex, MCP 단일 패스 환경 등 Agent 병렬 호출이 불가능하면 단일 패스 fallback. main이 4축을 순차 점검한다.
+Codex, MCP 단일 패스 환경 등 Agent 병렬 호출이 불가능하면 단일 패스 fallback. main이 3축을 순차 점검한다.
 
 ```mermaid
 flowchart TD
     A[fallback 진입] --> B[main A축 SSOT 충돌]
     B --> C[main B축 명확성]
     C --> D[main C축 용어 일관성]
-    D --> E[main D축 4역할 readiness]
-    E --> F[merge - dedup 보수 합성 결과 4종]
+    D --> F[merge - dedup 보수 합성 결과 4종]
     F --> G[output-format.md 적용 후 리포트]
 ```
 
@@ -286,13 +269,11 @@ flowchart TD
 | 입력 디렉터리 일부 파일 read 실패 (바이너리, 권한, UTF-8) | plan-format | 실행 막지 않고 `[입력 제외 항목]`에 경로·이유 |
 | 구조 일치 main 검증 1회 실패 | plan-format | 1회 구조 수정 retry |
 | 구조 일치 main 검증 2회 실패 | plan-format | step 2 보류 fallback |
-| worker 8 필드 형식 어긋남 1회 | plan-review | 1회 retry |
-| worker 8 필드 형식 어긋남 2회 | plan-review | `검증 한계`에 기록 후 보수 합성 |
-| D readiness 4행 미만 1회 | plan-review | 1회 retry |
-| D readiness 4행 미만 2회 | plan-review | 누락 역할 `n/a` + 사유 `worker 응답 누락` |
+| worker 7 필드 형식 어긋남 1회 | plan-review | 1회 retry |
+| worker 7 필드 형식 어긋남 2회 | plan-review | `검증 한계`에 기록 후 보수 합성 |
 | Agent 병렬 호출 불가 환경 | plan-review | 단일 패스 fallback (main 순차 점검) |
 | SSOT 키워드 추출 실패 | plan-review | worker spawn 없이 즉시 `수정 필요` |
-| SSOT 매칭 0건 (추출 성공) | plan-review | A축 `검증 대상 없음` + B/C/D 본문만 점검 |
+| SSOT 매칭 0건 (추출 성공) | plan-review | A축 `검증 대상 없음` + B/C 본문만 점검 |
 | 짝문서 없음 | plan-review | 단일 검토 진행 + `검증 한계`에 `짝문서 없음` 기록. 다른 문서 정책/기능 판단 의존 시 분류 상향 |
 
 ## 5. Reference Map
@@ -307,6 +288,6 @@ flowchart TD
 | `plan-format` 출력 contract | [`../skills/plan-format/references/output-contract.md`](../skills/plan-format/references/output-contract.md) |
 | `plan-format` 템플릿 | [`../skills/plan-format/templates/`](../skills/plan-format/templates/) |
 | `plan-review` 계약 | [`../skills/plan-review/SKILL.md`](../skills/plan-review/SKILL.md) |
-| `plan-review` 판정·합성 규칙 (8 필드 / 합성 / 결과 4종 / 보수 합성 / SSOT corpus 선택) | [`../skills/plan-review/references/review-rules.md`](../skills/plan-review/references/review-rules.md) |
+| `plan-review` 판정·합성 규칙 (7 필드 / 합성 / 결과 4종 / 보수 합성 / SSOT corpus 선택) | [`../skills/plan-review/references/review-rules.md`](../skills/plan-review/references/review-rules.md) |
 | `plan-review` 출력 템플릿 | [`../skills/plan-review/references/output-format.md`](../skills/plan-review/references/output-format.md) |
-| `plan-review` B/C/D worker | [`../agents/`](../agents/) |
+| `plan-review` B/C worker | [`../agents/`](../agents/) |

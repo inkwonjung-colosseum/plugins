@@ -10,7 +10,7 @@ Use this plugin to:
 - Create or update local product-team-kit settings with `set-config`: `.product-team-kit/config.json`, then the product-team-kit managed block in project-root `CLAUDE.md` and `AGENTS.md`.
 - Record `[미정]`, `[가정]`, and confirmation questions without treating them as verified facts.
 - Return a save-hold with missing fields when the planning input is not enough to create both draft documents.
-- Review SSOT conflict, clarity, terminology consistency, and role-based readiness with `plan-review` before publishing through a separate external process. `plan-review` narrows Product Docs candidates with review-target keywords and reads only directly needed Markdown and linked local resources.
+- Review SSOT conflict, clarity, and terminology consistency with `plan-review` before publishing through a separate external process. `plan-review` narrows Product Docs candidates with review-target keywords and reads only directly needed Markdown and linked local resources.
 - Produce a planner-facing review summary and a publish-preparation checklist for human review when `plan-review` returns `통과` or `조건부 통과`.
 
 ## Limitations
@@ -22,7 +22,7 @@ Use this plugin to:
 
 ## Publishing Rules
 
-This plugin does not publish directly to external systems. The publish-preparation checklist and re-review checklist are screen-output guidance only. If a draft includes `[가정]`, confirmation questions, conflict warnings, or role-based readiness gaps, users should run `plan-review`, review the planner-facing summary and evidence details, and resolve or explicitly accept those items before using the draft in a publishing process.
+This plugin does not publish directly to external systems. The publish-preparation checklist and re-review checklist are screen-output guidance only. If a draft includes `[가정]`, confirmation questions, conflict warnings, or clarity/terminology gaps, users should run `plan-review`, review the planner-facing summary and evidence details, and resolve or explicitly accept those items before using the draft in a publishing process.
 
 ## No Warranty
 
