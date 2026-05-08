@@ -217,23 +217,24 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  H[# 기능명<br/>입력 처리 / 출처 / 미결 / 입력 제외 / 저장]
+  H["# 기능명<br/>입력 처리 / 출처 / 미결 /<br/>입력 제외 (카테고리 분포) / 저장"]
   H --> P[## 정책서<br/>10 섹션]
   P --> F[## 기능설계서<br/>8 섹션]
   F --> SR{URL fetch +<br/>이미지 처리<br/>≥ 1건?}
   SR -->|예| ST[## 출처 표]
-  SR -->|아니오| EX
-  ST --> EX{입력 제외 ≥ 1건?}
-  EX -->|예| EXB[## 입력 제외 항목]
-  EX -->|아니오| RV
-  EXB --> RV
-  RV{--no-self-review?}
-  RV -->|아니오| RVB[## 자체 검증<br/>6개 카테고리]
+  SR -->|아니오| EXB
+  ST --> EXB["## 입력 제외 항목<br/>항상 출력<br/>(0건 = '없음', ≥1건 = 5필드 항목 list)"]
+  EXB --> RV{--no-self-review?}
+  RV -->|아니오| RVB[## 자체 검증<br/>6개 카테고리<br/>F5는 본문 누락 + cross-ref 3종]
   RV -->|예| END[종료]
   RVB --> END
 ```
 
-블록 순서: **변환 본문 → 출처 → 입력 제외 → 자체 검증**. 빈 블록은 통째 생략.
+블록 순서: **변환 본문 → 출처 → 입력 제외 → 자체 검증**. `## 입력 제외 항목`은 항상 등장 (0건도 명시 출력). `## 출처`·`## 자체 검증`은 조건부 생략.
+
+입력 제외 카테고리 10종 (§6.3) — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재`. 각 항목은 5필드(카테고리·위치·인용·처리·설명).
+
+자체 검증 F5(누락) sub-label 3종 — `cross-ref-fetch` (출처 list 실패) / `cross-ref-scope` (§2 명시 제외) / `cross-ref-tbd` (미결 §). 입력 제외 §과 어긋나면 발견.
 
 ## 10. 출처 list status 분류
 
@@ -290,4 +291,5 @@ flowchart TD
 | `skills/planning-format/templates/기능설계서.md` | 8 섹션 표 골격 |
 | `skills/planning-format/templates/정책서.md` | 10 섹션 표 골격 |
 | `docs/planning-review-workflow.md` | planning-review 스킬 별도 워크플로 |
-| `docs/prd/prd-0.2.0.md` | 본 스킬 분할 + Google 라우팅 fix PRD |
+| `docs/prd/prd-0.2.0.md` | 스킬 분할 + Google 라우팅 fix PRD |
+| `docs/prd/prd-0.2.1.md` | 입력 제외 항목 10종 확장 + 항상 출력 + 처리 줄 + F5 cross-ref 3종 PRD |

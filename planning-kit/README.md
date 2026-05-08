@@ -81,10 +81,12 @@ $planning-review
 1. **정책서 본문** (10 섹션 markdown, 코드 펜스로 감싼 형태)
 2. **기능설계서 본문** (8 섹션 markdown, 코드 펜스로 감싼 형태)
 3. **출처 list** (URL fetch나 이미지 처리가 1건 이상일 때만)
-4. **입력 제외 항목** (변환 본문에 반영하지 않은 입력 조각이 있을 때만)
+4. **입력 제외 항목** (항상 출력. 0건이면 `없음` 1줄. 변환 본문에 반영 안 한 입력 조각을 10 카테고리로 분류 + 항목별 `처리` 줄로 본문·출처·미결 § cross-reference)
 5. **자체 검증 결과** (`통과` 또는 `발견 N건`, 6개 카테고리 카운트 포함)
 
-자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5) / Markdown syntax lint(F6).
+자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5, sub: `cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`) / Markdown syntax lint(F6).
+
+입력 제외 10 카테고리 — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재`. 헤더 `- 입력 제외:` 줄에 카테고리별 분포 표기.
 
 ### planning-review 출력
 
@@ -103,8 +105,8 @@ $planning-review
 
 | 옵션 | 동작 |
 |---|---|
-| `--save` | `./.planning-kit/<기능명>/정책서.md`, `./.planning-kit/<기능명>/기능설계서.md` 저장. 충돌 시 `-2`/`-3` suffix. 자체 검증 보고서·출처 list는 저장 안 함. |
-| `--no-self-review` | 자체 품질 검증 블록 출력 생략. 변환 본문 + 출처 list만. |
+| `--save` | `./.planning-kit/<기능명>/정책서.md`, `./.planning-kit/<기능명>/기능설계서.md` 저장. 충돌 시 `-2`/`-3` suffix. 자체 검증 보고서·출처 list·입력 제외 §은 디스크 저장 안 함 (화면 only). |
+| `--no-self-review` | 자체 품질 검증 블록 출력 생략. 변환 본문 + 출처 list + 입력 제외 §은 그대로 출력 (입력 제외 §은 끄지 않음). |
 | `--no-fetch` | 본문에서 URL이 발견되어도 fetch하지 않음. URL 분기 인자도 fetch 안 함. connector fallback도 봉쇄. |
 | `--no-image` | 모든 이미지 시드(인자·디렉터리·추출·fetch·data URI)를 무시. multimodal 호출 0건 |
 
@@ -197,7 +199,8 @@ planning-kit/
 │       ├── prd-0.1.0.md
 │       ├── prd-0.1.1.md
 │       ├── prd-0.1.2.md
-│       └── prd-0.2.0.md                  # 본 release (스킬 분할 + Google 라우팅 fix)
+│       ├── prd-0.2.0.md                  # 스킬 분할 + Google 라우팅 fix
+│       └── prd-0.2.1.md                  # 본 release (입력 제외 10종 + 항상 출력 + F5 cross-ref)
 └── skills/
     ├── planning-format/
     │   ├── SKILL.md
@@ -219,9 +222,9 @@ planning-kit/
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.0)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.1)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.0) |
+| 항목 | product-team-kit | planning-kit (0.2.1) |
 |---|---|---|
 | Skill 수 | 3 | 2 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
@@ -240,7 +243,7 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리(planning-format) + 외부 3축(planning-review). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
 | SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 후 직접 read (외부 fetch 본문·이미지 해석은 corpus 미포함) |
@@ -267,6 +270,12 @@ planning-kit/
   - Google Workspace connector 라우팅이 자원별 tool 시퀀스로 구체화 (이전엔 추상적이라 인증돼 있어도 fallback 후보 0이던 케이스 정정).
   - `planning-review`에 R2(검증가능성)·R3(의존·영향) 축 신규.
   - 카탈로그 평가 보정: 자원 조회 도구가 1개 이상 노출되면 인증된 것으로 간주 (`authenticate` 노출 여부 무관). 다른 connector(Atlassian·Figma·Slack·Notion)에도 일반화 적용.
+- **0.2.0 → 0.2.1**: 출력 markdown micro-breaking. `planning-review`·인자·`--save`·connector 동작 변경 없음.
+  - 입력 제외 § 카테고리 5종 → 10종 (`디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` 추가).
+  - 입력 제외 § 블록 항상 출력 (0건 = `없음`). 0.2.0의 "≥1건일 때만" 정책 deprecated.
+  - 항목 형식에 `처리` 줄 추가 (4필드 → 5필드). 변환 본문·출처 list·미결 § cross-reference 위치를 1줄로 명시.
+  - 헤더 `- 입력 제외:` 줄에 카테고리 분포 괄호 표기.
+  - 자체 검증 F5(누락)에 cross-reference 3종 추가 (`cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`). 본문 누락 + 추적 누락 모두 발견.
 
 ---
 
