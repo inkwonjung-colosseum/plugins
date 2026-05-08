@@ -1,0 +1,116 @@
+---
+name: planning-review
+description: "planning-format 산출물(정책서·기능설계서 두 본문)을 외부 SSOT corpus 충돌·acceptance criteria 검증가능성·의존 영향 분석 3축으로 점검할 때 사용한다. 직전 turn의 planning-format 출력, 디렉터리·파일 경로, raw markdown 텍스트 모두 입력 받는다."
+argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdown>] [--ssot-include <glob>] [--axes <list>]"
+---
+
+# planning-review
+
+## 인자
+
+위치 인자 0개 또는 1~2개:
+
+- **0개** = conversation 참조 모드. 직전 turn의 `planning-format` 출력에서 두 본문 추출.
+- **1개 (디렉터리)** = `정책서*.md` + `기능설계서*.md` 자동 검색.
+- **1개 (파일)** = 본문 안 두 섹션 자동 분리. 헤더 `# 정책서`/`## 정책서`/`# 기능설계서`/`## 기능설계서` 또는 코드 펜스 ` ```markdown ... ``` ` 식별.
+- **1개 (raw markdown 텍스트)** = 따옴표로 감싼 markdown. 두 본문 모두 포함 시 자동 분리.
+- **2개** = `<정책서> <기능설계서>` 또는 역순 (헤더로 자동 식별).
+
+| 인자 | 기본값 | 설명 |
+|---|---|---|
+| `--ssot-include <glob>` | (없음) | SSOT corpus glob. default = 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 자동 제외). R1·R3 corpus 공유. |
+| `--axes <list>` | `ssot,ac,deps` | 점검 축 콤마 구분. 빈 값이면 sanity check. |
+
+## 동작 시퀀스
+
+### Step 1: 입력 dispatch + sanity check
+
+토큰 수에 따라 분기 → 본문 분리 → 빈 본문 검사. 식별 실패 시 sanity check 메시지 출력 후 종료.
+
+| 케이스 | 메시지 |
+|---|---|
+| conversation 모드 + 직전 planning-format 출력 없음 | `직전 turn에서 planning-format 출력을 찾을 수 없습니다. 경로 또는 markdown을 인자로 주세요.` |
+| 1개 인자 + 본문 식별 실패 | `정책서·기능설계서 두 본문을 식별할 수 없습니다. 헤더(# 정책서 / # 기능설계서) 또는 별도 파일/경로로 주세요.` |
+| 한쪽 본문 비어 있음 | `<정책서 또는 기능설계서>가 비어 있습니다. planning-format 산출물을 확인하세요.` |
+| `--axes` 빈 값 | `--axes에 점검 축을 1개 이상 지정하세요. (ssot, ac, deps)` |
+| 인자 3개+ | `정책서·기능설계서 외 추가 인자는 받지 않습니다.` |
+
+### Step 2: 검증 축 점검
+
+`--axes` 활성 축만 main 단일 패스. 각 축은 reference 적재 후 그대로 따른다.
+
+| 축 | 키 | 적재 reference | 발견 sub-category |
+|---|---|---|---|
+| R1. SSOT 충돌 | `ssot` | `references/ssot-rules.md` | (단일) |
+| R2. Acceptance Criteria 검증가능성 | `ac` | `references/ac-rules.md` | 정량성 / 상태 / 행위자 / 결과 관찰 |
+| R3. 의존·영향 분석 | `deps` | `references/deps-rules.md` | 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 (발견·권고 분류) |
+
+R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
+
+### Step 3: 발견 합산 + 결과
+
+같은 발견이 두 축에 걸치면 한 번만 기록. 우선순위: **R1 > R3 > R2**.
+
+- 모든 활성 축 발견 0건 → `통과`
+- ≥1건 → `발견 N건` (R3 `권고`도 카운트 포함)
+
+## 출력 포맷
+
+````markdown
+# planning-review: [기능명]
+
+- 입력: [경로 list / "직전 planning-format 출력 (conversation)" / "직접 입력 markdown"]
+- 점검 축: [ssot, ac, deps]
+- SSOT corpus: [매칭 N개 / 매칭 0개 (검증 대상 없음)]
+- SSOT 검색 키워드: [keyword1, keyword2, ...]
+
+---
+
+## 리뷰 결과: [통과 | 발견 N건]
+
+- SSOT 충돌: N건 (활성 시)
+- 검증가능성: N건 (활성 시)
+- 영향 분석: N건 (활성 시, 발견+권고 합계)
+
+### SSOT 충돌
+(≥1건일 때만)
+1. [제목]
+   - 위치: [정책서/기능설계서 §섹션] vs [SSOT 파일 §섹션]
+   - 근거: "[변환 본문 인용]" vs "[SSOT 인용]"
+   - 영향: [한 줄]
+   - 제안: [최소 수정 또는 확인 조건]
+
+### 검증가능성
+(≥1건일 때만)
+1. [제목]
+   - 카테고리: [정량성 / 상태 / 행위자 / 결과 관찰]
+   - 위치: [정책서/기능설계서 §섹션]
+   - 근거: "[변환 본문 인용]"
+   - 영향: [한 줄]
+   - 제안: [최소 수정]
+
+### 영향 분석
+(≥1건일 때만)
+1. [제목]
+   - 분류: [발견 / 권고]
+   - 카테고리: [정책 변경 / 상태 전이 / 권한·역할 / 외부 의존]
+   - 위치: [정책서/기능설계서 §섹션]
+   - 영향 후보: [SSOT 파일 path list]
+   - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용]"
+   - 영향: [한 줄]
+   - 제안: [후속 검토 조건]
+````
+
+규칙:
+
+- 활성 안 한 축의 sub-section은 통째 생략.
+- `SSOT 검색 키워드` 줄은 R1 활성 시에만.
+- `SSOT corpus` 카운트 줄은 R1 또는 R3 활성 시에만 (corpus 공유).
+
+## 참고 파일
+
+- `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·매칭·발견 형식.
+- `references/ac-rules.md` — R2 4 sub-category 기준.
+- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견·권고 분류.
+
+변환·자체 품질 점검·`--save`는 `planning-format` 스킬에서 별도 처리. 자세한 절차는 `skills/planning-format/SKILL.md`.

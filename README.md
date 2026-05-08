@@ -27,7 +27,7 @@ Codex는 repository marketplace를 추가한 뒤 Codex 앱에서 `/plugins`를 �
 codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 ```
 
-스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$formalize`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
+스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$planning-format`, `$planning-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
@@ -38,7 +38,7 @@ codex marketplace add https://github.com/inkwonjung-colosseum/plugins
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `product-team-kit` | `0.7.5` | 기획 입력을 기능설계서와 정책서 초안으로 단일 패스 작성·자체 검증하며, `.product-team-kit/config.json`과 `CLAUDE.md`/`AGENTS.md` 안내 블록 설정, 단계별 lazy read, Product Docs SSOT 근거 기반 2축 점검(SSOT 충돌·용어 일관성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `planning-kit` | `0.1.2` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 같은 응답에서 자동 리뷰(자체 품질 + SSOT 충돌)까지 출력하는 단일 스킬 플러그인. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킵니다. 로컬 파일 저장 없이 화면 output으로만 반환합니다. | `formalize` | [README](./planning-kit/README.md) |
+| `planning-kit` | `0.2.0` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 점검하는 `planning-format`과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 검증하는 `planning-review` 두 스킬 구조. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킵니다. Google Workspace는 자원별 tool 시퀀스(`read_file_content` → `download_file_content` → `get_file_metadata`)와 Sheets gid·range fragment 처리를 지원합니다. default 화면 output, `--save`로 `./.planning-kit/<기능명>/`에 두 본문 저장. | `planning-format`, `planning-review` | [README](./planning-kit/README.md) |
 | `diagram-design` | `1.0.3` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
@@ -62,6 +62,8 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 /product-team-kit:plan-format
 /product-team-kit:plan-review
 /product-team-kit:set-config
+/planning-kit:planning-format
+/planning-kit:planning-review
 /diagram-design:diagram-design
 /logistics-expert-kit:logistics-scope
 /logistics-expert-kit:logistics-diagnose
@@ -79,6 +81,8 @@ Codex는 설치된 플러그인의 skill invocation을 사용합니다.
 $plan-format
 $plan-review
 $set-config
+$planning-format
+$planning-review
 $diagram-design
 $logistics-scope
 $logistics-diagnose
@@ -107,6 +111,13 @@ colo-plugins/
 │   ├── agents/
 │   ├── references/
 │   ├── skills/
+│   └── docs/
+├── planning-kit/
+│   ├── .claude-plugin/plugin.json
+│   ├── .codex-plugin/plugin.json
+│   ├── skills/
+│   │   ├── planning-format/
+│   │   └── planning-review/
 │   └── docs/
 ├── diagram-design/
 │   ├── .claude-plugin/plugin.json
@@ -149,6 +160,7 @@ Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `sour
 ```bash
 claude plugin validate ./.claude-plugin/marketplace.json
 claude plugin validate ./product-team-kit
+claude plugin validate ./planning-kit
 claude plugin validate ./diagram-design
 claude plugin validate ./logistics-expert-kit
 claude plugin validate ./ai-utility-kit

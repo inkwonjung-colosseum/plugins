@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.1.2",
-  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 같은 응답에서 자동 리뷰까지 출력하는 단일 스킬 플러그인. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 로컬 파일 저장 없이 화면 output으로만 결과를 반환한다.",
+  "version": "0.2.0",
+  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. Google Workspace는 자원별 tool 시퀀스(read_file_content → download_file_content → get_file_metadata)와 Sheets gid·range fragment 처리를 지원한다. planning-format은 default 화면 output, --save 옵션으로 ./.planning-kit/<기능명>/ 경로에 두 본문 저장 가능.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
