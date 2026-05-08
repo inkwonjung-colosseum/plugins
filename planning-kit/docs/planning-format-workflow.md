@@ -162,15 +162,15 @@ flowchart TD
   NA --> RD[templates/기능설계서.md + 정책서.md 병렬 Read]
   RD --> WR[main이 같은 턴에서<br/>두 본문 직접 작성]
   WR --> LD{셀 list 합류 ≥2?<br/>0.2.3}
-  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.x [용도] 보조 표<br/>다층 재귀 가능 (§N.x.y)"]
+  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.M [용도] 보조 표 (§N row K)<br/>순차 §N.1·§N.2 (0.2.4)<br/>다층 도트 chain §N.M.K"]
   LD -->|동질 enum<br/>동일 동작·ref| KEEP[합류 유지]
   AUX --> NSR{--no-self-review?}
   KEEP --> NSR
   NSR -->|예| OUT[변환 본문만 출력]
   NSR -->|아니오| SR[references/self-review-rules.md Read]
 
-  SR --> F1[F1. 섹션 충실도]
-  SR --> F2[F2. 라벨 cross-bleed]
+  SR --> F1[F1. 섹션 충실도<br/>sub-§ 인식 0.2.4]
+  SR --> F2[F2. 라벨 cross-bleed<br/>sub-§ 인식 0.2.4]
   SR --> F3[F3. 용어 일관성]
   SR --> F4[F4. 정책-기능 매핑]
   SR --> F5[F5. 누락]
@@ -195,7 +195,11 @@ flowchart TD
 
 라벨 매핑 안 되는 조각·중복·근거 부족 조각은 입력 제외 추적으로. 근거 부족 셀은 inline `[TBD]`. marker `[TBD]` 1종만.
 
-list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main이 항목별 속성·동작·정책 ref 이질성을 매 케이스 판단. 이질이면 부모 § 안 sub-§(`### N.x [용도] 보조 표`)로 분해, 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 다시 list 합류면 같은 룰 재귀(`§N.x.y`, depth cap 없음). 8/10 섹션 골격 변경 없음, sub-§만 동적 추가. 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
+list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main이 항목별 속성·동작·정책 ref 이질성을 매 케이스 판단. 이질이면 부모 § 안 sub-§(`### N.M [용도] 보조 표`)로 분해, 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 다시 list 합류면 같은 룰 재귀(`§N.M.K`, depth cap 없음). 8/10 섹션 골격 변경 없음, sub-§만 동적 추가. 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
+
+보조 표 번호 정밀화 (0.2.4): 부모 § 안 보조 표 번호는 순차 부여(`§N.1`·`§N.2`·...), 다층 도트 chain(`§N.M.K`). 임의 letter(`§N.x`) 금지. 헤더 backlink(`### N.M [용도] 보조 표 (§N row K)`)로 분해 row 위치 추적 — row 식별 못 하면 부모 §만(`(§N)`).
+
+검증 sub-§ 인식 (0.2.4): F1·F2 자체 검증, R1·R2·R3 외부 검증 모두 sub-§(`### N.M ... 보조 표`) 본문을 점검 대상으로 인식. 부모 § 룰 그대로 sub-§ 확장.
 
 외부 SSOT corpus 충돌·acceptance criteria·의존 영향은 `planning-review` 스킬이 별도 처리.
 
@@ -237,9 +241,11 @@ flowchart LR
 
 블록 순서: **변환 본문 → 출처 → 입력 제외 → 자체 검증**. `## 입력 제외 항목`은 항상 등장 (0건도 명시 출력). `## 출처`·`## 자체 검증`은 조건부 생략.
 
-입력 제외 카테고리 10종 (§6.3) — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재`. 각 항목은 5필드(카테고리·위치·인용·처리·설명).
+입력 제외 카테고리 11종 (`exclusion-rules.md` §1) — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` / `충돌 후보`(0.2.4 신규). 각 항목은 5필드(카테고리·위치·인용·처리·설명). 위치 필드는 `[출처 N](URL#anchor)` markdown link 형식 (0.2.4) — 외부 source 특정 위치 1-hop 점프.
 
 자체 검증 F5(누락) sub-label 3종 — `cross-ref-fetch` (출처 list 실패) / `cross-ref-scope` (§2 명시 제외) / `cross-ref-tbd` (미결 §). 입력 제외 §과 어긋나면 발견.
+
+`## 출처` list URL = deep link 형식 (0.2.4) — anchor 지원 source(Confluence·Docs·Slides·Notion·Sheets·Figma·Slack)는 fragment 포함, 추출 실패 = page-level fallback.
 
 ## 10. 출처 list status 분류
 
@@ -290,11 +296,13 @@ flowchart TD
 
 | 파일 | 역할 |
 |---|---|
-| `skills/planning-format/SKILL.md` | 동작 시퀀스 골격 (Step 1~9) |
-| `skills/planning-format/references/connector-routing.md` | 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace 자원별 tool 시퀀스·gid/range 처리·fallback 케이스 표·sanity check·status 표기 |
-| `skills/planning-format/references/self-review-rules.md` | 자체 품질 6개 카테고리 (F1~F6) 점검 기준 |
+| `skills/planning-format/SKILL.md` | orchestration only (Step 1~9 high-level + lazy read 지시) (0.2.4) |
+| `skills/planning-format/references/conversion-rules.md` | multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·backlink (0.2.4 신규) |
+| `skills/planning-format/references/exclusion-rules.md` | 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (0.2.4 신규) |
+| `skills/planning-format/references/output-contract.md` | 출력 포맷·헤더 줄·`--save`·`## 출처` list deep link·분기별 헤더 (0.2.4 신규, save 흡수) |
+| `skills/planning-format/references/connector-routing.md` | 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace 자원별 tool 시퀀스·gid/range 처리·fallback 케이스 표·sanity check·status 표기·**§11 connector별 anchor 추출 (0.2.4)** |
+| `skills/planning-format/references/self-review-rules.md` | 자체 품질 6개 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (0.2.4) |
 | `skills/planning-format/templates/기능설계서.md` | 8 섹션 표 골격 |
 | `skills/planning-format/templates/정책서.md` | 10 섹션 표 골격 |
 | `docs/planning-review-workflow.md` | planning-review 스킬 별도 워크플로 |
-| `docs/prd/prd-0.2.0.md` | 스킬 분할 + Google 라우팅 fix PRD |
-| `docs/prd/prd-0.2.1.md` | 입력 제외 항목 10종 확장 + 항상 출력 + 처리 줄 + F5 cross-ref 3종 PRD |
+| `docs/prd/prd-0.2.4.md` | sub-§ 정밀화·SKILL 분해·deep link·11 카테고리 PRD |

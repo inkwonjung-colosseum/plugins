@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.3",
-  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 입력 제외 §은 10 카테고리로 변환 본문 미합류 조각을 항상 추적하고, 자체 검증 F5는 cross-reference 3종을 함께 점검한다. 0.2.2부터 planning-review가 SSOT *.md 본문 안 외부 링크도 재귀 fetch해 corpus에 합류시킨다. 0.2.3부터 planning-format이 표 셀 list ≥2 합류 작성 시 항목 이질성을 판단해 부모 § 안 sub-§(보조 표)로 분해, 동질 enum은 합류 유지한다.",
+  "version": "0.2.4",
+  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 입력 제외 §은 11 카테고리(0.2.4 신규 충돌 후보 포함)로 변환 본문 미합류 조각을 항상 추적하고 위치 필드는 markdown link 형식으로 외부 source 특정 위치까지 1-hop 점프한다. 자체 검증 F5는 cross-reference 3종을 함께 점검한다. 0.2.2부터 planning-review가 SSOT *.md 본문 안 외부 링크도 재귀 fetch해 corpus에 합류시킨다. 0.2.3부터 planning-format이 표 셀 list ≥2 합류 작성 시 항목 이질성을 판단해 부모 § 안 sub-§(보조 표)로 분해, 동질 enum은 합류 유지한다. 0.2.4부터 보조 표 번호 순차 부여(§N.1·§N.2)·헤더 backlink·F1·F2·R1·R2·R3 검증의 sub-§ 인식·Confluence·Docs·Slides·Notion 4종 connector anchor 추출이 추가됐다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "planning-kit",
     "shortDescription": "기획 초안 → planning-format(변환 + 자체 품질) + planning-review(외부 SSOT·AC·의존 영향)",
-    "longDescription": "두 스킬 분리(planning-format 변환+자체 검증 / planning-review 외부 SSOT·AC·의존 영향 3축). 텍스트·파일·디렉터리·URL(다중)·이미지 입력을 정책서·기능설계서로 변환하고 입력 제외 §은 항상 출력. 0.2.2부터 review가 SSOT *.md 안 외부 링크도 재귀 fetch해 corpus에 합류. 0.2.3부터 표 셀 list 이질이면 sub-§(보조 표) 분해. Atlassian·Figma·Google·Slack·Notion connector fallback.",
+    "longDescription": "두 스킬 분리(planning-format 변환+자체 검증 / planning-review 외부 SSOT·AC·의존 영향 3축). 텍스트·파일·디렉터리·URL(다중)·이미지 입력을 정책서·기능설계서로 변환하고 입력 제외 §은 항상 출력. 0.2.2부터 review가 SSOT *.md 안 외부 링크도 재귀 fetch해 corpus에 합류. 0.2.3부터 표 셀 list 이질이면 sub-§(보조 표) 분해. 0.2.4부터 §N.1·§N.2 순차 + 헤더 backlink + F1·F2·R1·R2·R3 sub-§ 인식 + Confluence·Docs·Slides·Notion anchor 추출 + 충돌 후보 카테고리 + 위치 markdown link. Atlassian·Figma·Google·Slack·Notion connector fallback.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

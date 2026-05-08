@@ -52,6 +52,8 @@ argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdow
 
 `--axes` 활성 축만 main 단일 패스. 각 축은 reference 적재 후 그대로 따른다.
 
+**sub-§ 인식 (0.2.4)**: R1·R2·R3 모두 산출물 부모 § + sub-§(`### N.M ... 보조 표`) 본문을 함께 점검 대상으로 본다. 절차 detail은 각 reference 그대로 — 부모 § 룰을 sub-§ 본문에 자연 확장.
+
 | 축 | 키 | 적재 reference | 발견 sub-category |
 |---|---|---|---|
 | R1. SSOT 충돌 | `ssot` | `references/ssot-rules.md` | (단일) |

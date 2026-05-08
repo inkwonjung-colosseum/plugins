@@ -1,4 +1,4 @@
-# planning-kit
+# planning-kit (0.2.4)
 
 기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format` 스킬과, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review` 스킬로 구성된 플러그인.
 
@@ -84,9 +84,9 @@ $planning-review
 4. **입력 제외 항목** (항상 출력. 0건이면 `없음` 1줄. 변환 본문에 반영 안 한 입력 조각을 10 카테고리로 분류 + 항목별 `처리` 줄로 본문·출처·미결 § cross-reference)
 5. **자체 검증 결과** (`통과` 또는 `발견 N건`, 6개 카테고리 카운트 포함)
 
-자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5, sub: `cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`) / Markdown syntax lint(F6).
+자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5, sub: `cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`) / Markdown syntax lint(F6). F1·F2는 sub-§(보조 표) 본문도 점검 (0.2.4).
 
-입력 제외 10 카테고리 — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재`. 헤더 `- 입력 제외:` 줄에 카테고리별 분포 표기.
+입력 제외 11 카테고리 — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` / `충돌 후보`(0.2.4 신규). 헤더 `- 입력 제외:` 줄에 카테고리별 분포 표기. 위치 필드는 `[출처 N](URL#anchor)` markdown link 형식으로 외부 source 특정 위치까지 1-hop 점프 (0.2.4).
 
 ### planning-review 출력
 
@@ -178,9 +178,9 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 ### 2. 외부 검증 — `planning-review` 호출 시 (3축)
 
-- **R1. SSOT 충돌**: 변환 본문 확정 문장이 프로젝트 폴더 안 다른 `*.md`와 어긋나는지. 키워드 grep → 매칭 file Read → 직접 비교. fetch한 외부 URL 본문·multimodal 이미지 해석은 corpus에 포함하지 않음(외부·일회성).
-- **R2. Acceptance criteria 검증가능성**: 정책서 §5·§6, 기능설계서 §5·§7 확정 문장이 테스트 가능한 형태인지. 정량성 / 상태 / 행위자 / 결과 관찰가능성 4개 sub-category.
-- **R3. 의존·영향 분석**: 이번 산출물이 다른 SSOT 문서·기능에 미치는 파급 효과. 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 4개 sub-category. `발견`(단정적 충돌) / `권고`(검토 권장) 분류.
+- **R1. SSOT 충돌**: 변환 본문 확정 문장이 프로젝트 폴더 안 다른 `*.md`와 어긋나는지. 키워드 grep → 매칭 file Read → 직접 비교. fetch한 외부 URL 본문·multimodal 이미지 해석은 corpus에 포함하지 않음(외부·일회성). sub-§ 본문 포함 (0.2.4).
+- **R2. Acceptance criteria 검증가능성**: 정책서 §5·§6, 기능설계서 §5·§7 + 그 안 sub-§(보조 표) 확정 문장이 테스트 가능한 형태인지 (0.2.4). 정량성 / 상태 / 행위자 / 결과 관찰가능성 4개 sub-category.
+- **R3. 의존·영향 분석**: 이번 산출물이 다른 SSOT 문서·기능에 미치는 파급 효과. 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 4개 sub-category. 영향 후보 키워드는 부모 § + sub-§ 합집합에서 추출 (0.2.4). `발견`(단정적 충돌) / `권고`(검토 권장) 분류.
 
 리뷰 결과 헤더에 **SSOT 검색 키워드 list**가 그대로 노출된다 — 매칭 0건이거나 통과여도 키워드 줄은 출력 (R1 활성 시).
 
@@ -206,16 +206,20 @@ planning-kit/
 │       ├── prd-0.2.0.md                  # 스킬 분할 + Google 라우팅 fix
 │       ├── prd-0.2.1.md                  # 입력 제외 10종 + 항상 출력 + F5 cross-ref
 │       ├── prd-0.2.2.md                  # R1 link follow + 입력 제외 § R3 보조 신호
-│       └── prd-0.2.3.md                  # 본 release (표 셀 list 분해 판단 + 보조 표 sub-§)
+│       ├── prd-0.2.3.md                  # 표 셀 list 분해 판단 + 보조 표 sub-§
+│       └── prd-0.2.4.md                  # 본 release (sub-§ 정밀화·SKILL 분해·deep link·11 카테고리)
 └── skills/
     ├── planning-format/
-    │   ├── SKILL.md
+    │   ├── SKILL.md                      # orchestration only (0.2.4)
     │   ├── templates/
     │   │   ├── 기능설계서.md
     │   │   └── 정책서.md
     │   └── references/
-    │       ├── self-review-rules.md      # 자체 품질 6 카테고리
-    │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback 케이스
+    │       ├── conversion-rules.md       # multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·backlink (0.2.4)
+    │       ├── exclusion-rules.md        # 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·marker 1종 (0.2.4)
+    │       ├── output-contract.md        # 출력 포맷·헤더 줄·--save·출처 list deep link (0.2.4)
+    │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식)
+    │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback·§11 connector별 anchor 추출 (0.2.4)
     └── planning-review/
         ├── SKILL.md
         └── references/
@@ -228,16 +232,16 @@ planning-kit/
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.3)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.4)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.3) |
+| 항목 | product-team-kit | planning-kit (0.2.4) |
 |---|---|---|
 | Skill 수 | 3 | 2 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
 | 입력 분기 | 텍스트·파일·디렉터리 | 텍스트·파일·디렉터리·URL(다중)·이미지 |
 | URL fetch / 이미지 multimodal | 없음 | 모든 분기 공통 (본문 추출 + 재귀, cap 없음). 인증 게이트는 MCP/connector fallback (Atlassian·Figma·Google Workspace·Slack·Notion). Google Workspace는 자원별 tool 시퀀스 + Sheets gid·range fragment 처리. |
 | Agent worker | 1 (terminology) | 0 |
-| Reference 수 | 5 | 5 (planning-format: self-review-rules + connector-routing / planning-review: ssot-rules + ac-rules + deps-rules) |
+| Reference 수 | 5 | 8 (planning-format: conversion-rules + exclusion-rules + output-contract + self-review-rules + connector-routing / planning-review: ssot-rules + ac-rules + deps-rules) |
 | Template 수 | 2 (정책서 + 기능설계서) | 2 (정책서 + 기능설계서) |
 | 산출물 | 정책서 + 기능설계서 2 file (`<outputRoot>/.../*.md`) | 화면 output (default) + `--save` 시 `./.planning-kit/<기능명>/` 2 file |
 | 파일 IO | mkdir + Write 호출 (항상) | `--save`일 때만 |
@@ -249,8 +253,8 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) |
-| 입력 제외 처리 | 없음 | 10 카테고리 + 처리 줄 + R3 보조 신호 (0.2.2) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) |
+| 입력 제외 처리 | 없음 | 11 카테고리 (`충돌 후보` 0.2.4 신규) + 처리 줄 + 위치 markdown link (0.2.4) + R3 보조 신호 (0.2.2) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
 | SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 + 직접 read + 매칭 file 본문 안 외부 링크 재귀 fetch (cap 없음, connector fallback) |
@@ -296,6 +300,15 @@ planning-kit/
   - 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
   - 8/10 섹션 골격 변경 없음. sub-§만 동적 추가.
   - 다운스트림 파서: 부모 § 안 sub-§을 child로 인식해야 함.
+- **0.2.3 → 0.2.4**: 출력 markdown **추가·micro-change**. 인자 변경 없음, `planning-review` 동작 변경 없음 (sub-§ 인식 외).
+  - **sub-§ 정밀화** — 보조 표 번호 부모 § 안 순차 부여(`§N.1`·`§N.2`, 다층 도트 chain `§N.M.K`, 임의 letter 금지). 헤더 backlink (`### 4.1 ... (§4 row 3)`) — row 식별 못 하면 부모 §만. `구조 변환` 처리 줄에 sub-§ 위치 명시 (`정책서 §5.1·§5.2`).
+  - **검증 sub-§ 인식** — `planning-format` F1·F2 자체 검증, `planning-review` R1·R2·R3 외부 검증 모두 sub-§(`### N.M ... 보조 표`) 본문을 점검 대상으로 인식. 부모 § 룰 그대로 sub-§ 확장.
+  - **SKILL.md 분해** — `planning-format/SKILL.md` orchestration only (~120 line). 세부 룰 3종 신규 reference로 split: `conversion-rules.md`(multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·backlink) / `exclusion-rules.md`(11 카테고리·5필드·처리 줄·우선순위) / `output-contract.md`(출력 포맷·헤더 줄·`--save`·출처 list deep link). lazy read.
+  - **입력 제외 § + 출처 list deep link** — `## 출처` list URL이 page-level → deep link 형식(`URL#취소-정책` / `#heading=h.xyz` 등). 입력 제외 § 5필드 위치 필드 = `[출처 N](URL)` markdown link. 정책서·기능설계서 본문은 cite 없음 (결정문서 깨끗 유지).
+  - **connector별 anchor 추출** (Confluence·Docs·Slides·Notion 4종 신규) — `connector-routing.md` §11. Sheets·Figma·Slack은 0.1.x부터 이미 지원. 추출 실패 = page-level URL fallback.
+  - **충돌 후보 카테고리 추가** — 입력 제외 § 11 카테고리(#11 끝 배치). 같은 사실 ≥2 다른 값 시 1순위 합류 + 나머지 추적. 본문 셀 1순위 미명확 = `[TBD]` + cross-ref. marker 1종(`[TBD]`) 정책 유지.
+  - **신규 인자·옵션 0건**. 기존 인자·옵션·planning-review 동작·재귀 fetch·multimodal·sanity check 그대로 (sub-§ 인식 + connector anchor 추출 외).
+  - 다운스트림 파서 영향: 보조 표 헤더 backlink 괄호 + 입력 제외 § 위치 필드 markdown link + 출처 list URL deep link fragment + `충돌 후보` 카테고리.
 
 ---
 

@@ -125,3 +125,57 @@ connector 경유 본문도 자식 URL을 추출해 visited queue로 push (`is_fo
 | 통합 본문 추출 0byte | `통합 본문이 비어 있습니다. URL 본문 확인 후 다시 시도하세요.` |
 
 `## 자체 검증` 블록 없이 단독 한 줄 + 입력 URL list로 출력.
+
+## 11. connector별 anchor 추출 (deep link, 0.2.4)
+
+`output-contract.md` §5의 `## 출처` list URL deep link 형식과 `exclusion-rules.md` §4.1 입력 제외 § 위치 markdown link를 위해, anchor 지원 source는 deep link 형식으로 저장한다. 추출 실패·미지원 source = page-level URL fallback (link는 작동, 점프는 page 단위).
+
+| Source | Anchor 형식 | 추출 방법 | 도입 |
+|---|---|---|---|
+| Google Sheets | `URL#gid=<id>&range=<cell>` | URL fragment 그대로 (이미 §3.5) | 0.1.1 |
+| Figma | `URL?node-id=<id>` | URL query 그대로 | 0.1.2 |
+| Slack thread | thread 영구링크 | URL 자체 영구링크 | 0.1.2 |
+| **Confluence** | `URL#<heading-id>` | Atlassian MCP body XHTML `<h1 id="..."`/`<h2 id="...">` 등 추출. 본문 합류 § heading id 매핑. | **0.2.4 신규** |
+| **Google Docs** | `URL#heading=h.<digest>` | `read_file_content` 응답에서 heading anchor 추출. heading text → digest 매핑. | **0.2.4 신규** |
+| **Google Slides** | `URL#slide=id.<id>` | slide ID를 응답에서 추출. | **0.2.4 신규** |
+| **Notion** | `URL#<block-id>` | Notion connector 응답에서 block id 추출 (best-effort). | **0.2.4 신규** |
+| Jira | page-level (anchor 없음) | summary·description 단위는 anchor 없음. comment ref 시 `#comment-<id>` 가능. | 부분 |
+| 기타 (WebFetch HTML) | heading id 있으면 추출 | `<h*> id="..."` parsing. 없으면 page-level. | best-effort |
+
+### 11.1 Confluence heading id
+
+- Atlassian MCP `getConfluencePage` body XHTML에 `<ac:structured-macro>` 무관 `<h1>`/`<h2>`/`<h3>`/... 태그의 `id` 속성 추출.
+- heading id가 없으면 heading text를 slug 변환 (공백 → `-`, 한글 그대로). 변환 결과가 페이지 내 unique이면 사용, 그 외 page-level.
+- 본문 합류 § heading id 매핑은 main 판단. 입력 제외 § 항목 인용이 특정 heading 본문에서 발췌된 경우 그 heading id 사용.
+
+### 11.2 Google Docs heading anchor
+
+- `read_file_content` 응답에서 heading 항목의 anchor (`heading=h.<digest>`) 추출.
+- heading text → digest 매핑이 응답에 없으면 page-level fallback.
+- Docs URL 끝 `?tab=...&headingId=...` 형식이 응답에 등장하면 그대로 사용.
+
+### 11.3 Google Slides slide id
+
+- `read_file_content` 또는 `get_file_metadata` 응답에서 slide id (`id.<id>`) 추출.
+- 슬라이드 단위 anchor: `URL#slide=id.<id>`.
+- slide id 추출 실패 = page-level.
+
+### 11.4 Notion block id
+
+- Notion connector 응답에서 block id (32자 dash 구분 또는 raw 32자) 추출.
+- Notion page URL 마지막 `-<32자>` 형태가 page id, 안쪽 block은 응답 본문의 block id 매칭.
+- 추출 실패 = page-level (best-effort).
+
+### 11.5 anchor 매칭 — 입력 제외 § 항목 단위
+
+같은 source가 여러 항목 위치로 분산 인용될 때 각 항목별로 가장 가까운 anchor 사용. 매칭 우선순위:
+
+1. 항목 인용 내용이 source 특정 § 본문에서 발췌된 명확한 경우 → 해당 § anchor.
+2. 항목이 source 전체에 걸친 일반 정보 → page-level URL.
+3. 매칭 불확실 → page-level URL.
+
+main 판단. 강제 매핑 룰 없음.
+
+### 11.6 visited set 영향
+
+URL normalize는 fragment 제거 그대로 (§6). visited set은 fragment 무관 같은 자원 1번만 fetch. 출처 list 표 행 URL은 fragment 포함 deep link로 저장 — visited와 별도 컬럼.
