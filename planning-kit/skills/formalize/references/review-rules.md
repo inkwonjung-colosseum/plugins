@@ -5,8 +5,8 @@
 ## 용어
 
 - **변환 본문**: 같은 턴에서 main이 메모리에 작성한 정책서·기능설계서 markdown.
-- **입력**: 사용자가 `formalize`에 넘긴 텍스트·파일·디렉터리 원문.
-- **SSOT corpus**: 현재 프로젝트 폴더 안 모든 `*.md` 파일. `.git/`, `node_modules/`만 자동 제외. `--ssot-include <glob>`이 있으면 해당 glob으로 좁힌다.
+- **입력**: 사용자가 `formalize`에 넘긴 텍스트·파일·디렉터리·URL·이미지 원문 + 재귀 fetch한 외부 페이지 본문 + multimodal 해석 텍스트의 통합.
+- **SSOT corpus**: **현재 프로젝트 폴더 안 모든 `*.md` 파일만**. `.git/`, `node_modules/` 자동 제외. `--ssot-include <glob>`이 있으면 해당 glob으로 좁힌다. fetch한 외부 URL 본문·multimodal 이미지 해석 텍스트는 SSOT corpus에 포함하지 않는다 (외부·일회성).
 - **확정 문장**: 변환 본문 중 [TBD]가 아닌 단정 표현.
 
 ## A. 본문 자체 품질 (Self-Review)
@@ -53,10 +53,12 @@
 ### B1. SSOT corpus 추출
 
 1. 변환 본문에서 키워드 추출: 기능명, 도메인 stem, 역할명, 상태명, 권한명, 정책 핵심어.
-2. 프로젝트 폴더(`pwd` 기준)에서 `find . -name '*.md'` 실행. 노이즈 폴더 자동 제외 (`.git`, `node_modules`).
-3. `--ssot-include <glob>` 인자가 있으면 해당 glob으로 좁힌다.
-4. 키워드를 `grep -l` 또는 `rg -l`로 본문 매칭 → 매칭 file 목록 확정.
-5. 매칭 file을 `Read` 툴로 직접 읽는다 (인덱스 스캔 단계 없음).
+2. 추출 키워드 list는 **출력 §리뷰 결과 헤더 줄에 그대로 노출**한다 (사용자가 검색 범위·매칭 근거를 검증할 수 있도록). 카테고리 구분 없이 단순 list. 매칭 0건이거나 SSOT 점검 skip이라도 키워드 줄은 출력한다 — 단, `--no-review`로 리뷰 자체를 건너뛰면 키워드 줄도 없음.
+3. 프로젝트 폴더(`pwd` 기준)에서 `find . -name '*.md'` 실행. 노이즈 폴더 자동 제외 (`.git`, `node_modules`).
+4. `--ssot-include <glob>` 인자가 있으면 해당 glob으로 좁힌다.
+5. 키워드를 `grep -l` 또는 `rg -l`로 본문 매칭 → 매칭 file 목록 확정.
+6. 매칭 file을 `Read` 툴로 직접 읽는다 (인덱스 스캔 단계 없음).
+7. fetch한 외부 URL 본문·multimodal 이미지 해석 텍스트는 SSOT corpus에 포함하지 않는다 (외부 문서·일회성, 충돌 비교 대상 아님).
 
 ### B2. 매칭 0건 처리
 
