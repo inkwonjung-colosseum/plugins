@@ -1,6 +1,6 @@
 # connector-routing
 
-`planning-format`의 fetch 단계 lookup data — 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지.
+`planning-format`의 fetch 단계 lookup data — 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지. **0.2.2부터 `planning-review`도 같이 사용** — R1 SSOT corpus link follow에서 매칭 *.md 본문 안 외부 URL을 fetch + connector fallback으로 합류시킬 때 본 reference를 그대로 공유 적재한다 (별도 복제 없음).
 
 ## 1. 인증 게이트 휴리스틱
 

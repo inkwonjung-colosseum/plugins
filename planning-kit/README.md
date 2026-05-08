@@ -90,12 +90,13 @@ $planning-review
 
 ### planning-review 출력
 
-1. **헤더** — 입력·점검 축·SSOT corpus·SSOT 검색 키워드
+1. **헤더** — 입력·입력 제외 § 분리 카운트(0.2.2)·점검 축·SSOT corpus(매칭 + 외부 fetch 성공/실패)·SSOT 검색 키워드
 2. **리뷰 결과** — `통과` 또는 `발견 N건`, 3축 카운트
-3. **발견 list** — 활성 축별 sub-section
-   - **SSOT 충돌** (R1): 변환 본문 vs 다른 *.md 파일 표기·결정·임계값 어긋남
+3. **SSOT 출처** (0.2.2) — link follow 1건 이상이면 매칭 *.md + 자식 URL/이미지 표 (origin·상태·본문 사용 컬럼)
+4. **발견 list** — 활성 축별 sub-section
+   - **SSOT 충돌** (R1): 변환 본문 vs 다른 *.md 파일 + 매칭 *.md 본문 안 외부 link follow 본문(0.2.2) 표기·결정·임계값 어긋남
    - **검증가능성** (R2): 정량성 / 상태 / 행위자 / 결과 관찰가능성
-   - **영향 분석** (R3): 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 — 발견·권고 분류
+   - **영향 분석** (R3): 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 — 발견·권고 분류. 입력 제외 § 보조 신호로 만들어진 항목은 `근거`에 cross-ref (0.2.2)
 
 ---
 
@@ -116,6 +117,8 @@ $planning-review
 |---|---|
 | `--ssot-include <glob>` | SSOT corpus glob. default = 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 자동 제외). R1·R3 corpus 공유. |
 | `--axes <list>` | 점검할 축. `ssot,ac,deps` 콤마 구분. default = 셋 다 활성. |
+| `--no-ssot-fetch` | SSOT corpus *.md 본문 안 외부 URL fetch + connector fallback 봉쇄. 매칭 file 본문만 corpus. (0.2.2) |
+| `--no-ssot-image` | SSOT corpus 본문 안 이미지 참조·fetch image content-type 응답 multimodal 호출 0건. URL fetch는 별도 (`--no-ssot-fetch`로 봉쇄). (0.2.2) |
 
 cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두지 않는다 — **cap 없음 정책** (품질·검증 > 토큰 절약). cycle은 visited set으로만 차단.
 
@@ -196,11 +199,13 @@ planning-kit/
 │   ├── planning-format-workflow.md       # planning-format 흐름 mermaid
 │   ├── planning-review-workflow.md       # planning-review 흐름 mermaid
 │   └── prd/
+│       ├── README.md                     # PRD chain 안내 (0.2.2 신규)
 │       ├── prd-0.1.0.md
 │       ├── prd-0.1.1.md
 │       ├── prd-0.1.2.md
 │       ├── prd-0.2.0.md                  # 스킬 분할 + Google 라우팅 fix
-│       └── prd-0.2.1.md                  # 본 release (입력 제외 10종 + 항상 출력 + F5 cross-ref)
+│       ├── prd-0.2.1.md                  # 입력 제외 10종 + 항상 출력 + F5 cross-ref
+│       └── prd-0.2.2.md                  # 본 release (R1 link follow + 입력 제외 § R3 보조 신호)
 └── skills/
     ├── planning-format/
     │   ├── SKILL.md
@@ -222,9 +227,9 @@ planning-kit/
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.1)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.2)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.1) |
+| 항목 | product-team-kit | planning-kit (0.2.2) |
 |---|---|---|
 | Skill 수 | 3 | 2 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
@@ -244,9 +249,10 @@ planning-kit/
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
 | 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`) |
-| 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리(planning-format) + 외부 3축(planning-review). SSOT 검색 키워드 노출 |
+| 입력 제외 처리 | 없음 | 10 카테고리 + 처리 줄 + R3 보조 신호 (0.2.2) |
+| 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
-| SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 후 직접 read (외부 fetch 본문·이미지 해석은 corpus 미포함) |
+| SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 + 직접 read + 매칭 file 본문 안 외부 링크 재귀 fetch (cap 없음, connector fallback) |
 | 검토 결과 | 3종 (통과/조건부/수정 필요) | 2종 (통과/발견 N건) |
 | 출력 구조 | 2층 (상단 합의 + 하단 agent 원본) | 1층 (각 스킬 단일 응답) |
 | GFM cell escape | 단일 진실 소스 알고리즘 | 없음 (numbered list) |
@@ -276,6 +282,14 @@ planning-kit/
   - 항목 형식에 `처리` 줄 추가 (4필드 → 5필드). 변환 본문·출처 list·미결 § cross-reference 위치를 1줄로 명시.
   - 헤더 `- 입력 제외:` 줄에 카테고리 분포 괄호 표기.
   - 자체 검증 F5(누락)에 cross-reference 3종 추가 (`cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`). 본문 누락 + 추적 누락 모두 발견.
+- **0.2.1 → 0.2.2**: `planning-review` 출력 markdown micro-breaking. `planning-format` 동작·인자·출력 변경 없음.
+  - **R1 SSOT corpus link follow** — 매칭 *.md 본문 안 외부 URL을 자동 fetch + connector fallback (`connector-routing.md` 공유 적재)으로 corpus body에 합류. 트리거: R1 또는 R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off.
+  - 신규 옵션 `--no-ssot-fetch` / `--no-ssot-image`. 둘 다 ON이면 0.2.1 동작과 동등.
+  - `## SSOT 출처` 블록 신규 (link follow 1건 이상일 때만). 매칭 *.md + 자식 URL/이미지 + origin·상태·본문 사용 컬럼.
+  - `planning-review`가 입력 제외 § 분리 + R3 영향 후보 산출의 **보조 신호**로 활용 (`fetch 실패` / `범위 외` / `구조 변환` / `디테일 축약` 신호, `원문 정의 부재` + 5종 무관). 헤더 `입력 제외 §:` 줄 신규.
+  - `SSOT corpus:` 줄에 외부 fetch 카운트 추가 (`매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`).
+  - Codex `plugin.json` longDescription 압축 (~700자 → ≤300자).
+  - PRD chain 안내 (`docs/prd/README.md` 신규).
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.1",
-  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 입력 제외 §은 10 카테고리로 변환 본문 미합류 조각을 항상 추적하고, 자체 검증 F5는 cross-reference 3종을 함께 점검한다.",
+  "version": "0.2.2",
+  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 입력 제외 §은 10 카테고리로 변환 본문 미합류 조각을 항상 추적하고, 자체 검증 F5는 cross-reference 3종을 함께 점검한다. 0.2.2부터 planning-review가 SSOT *.md 본문 안 외부 링크도 재귀 fetch해 corpus에 합류시킨다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "planning-kit",
     "shortDescription": "기획 초안 → planning-format(변환 + 자체 품질) + planning-review(외부 SSOT·AC·의존 영향)",
-    "longDescription": "두 스킬 분리 구조. planning-format은 텍스트·파일·디렉터리·URL(다중)·이미지 입력을 정책서·기능설계서 두 본문으로 변환하고 같은 응답에서 6개 카테고리 자체 품질 검증(섹션 충실도·라벨 cross-bleed·용어 일관성·정책-기능 매핑·누락·markdown lint)까지 수행합니다. 본문 안 URL과 이미지 참조를 자동 추출해 재귀 fetch + multimodal 해석으로 합류시키며 (cap 없음), 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 자식 링크까지 따라갑니다. Google Workspace는 자원별 tool 시퀀스(read_file_content → download_file_content → get_file_metadata)와 Sheets gid·range fragment 처리를 지원합니다. planning-review는 산출물(직전 turn 또는 디렉터리·파일·raw markdown)을 받아 외부 SSOT 충돌·acceptance criteria 검증가능성·의존·영향 분석 3축으로 점검합니다. planning-format은 default 화면 output, --save로 ./.planning-kit/<기능명>/ 경로에 두 본문 저장 가능. 0.2.1부터 입력 제외 §은 항상 출력되며 10 카테고리(다른 기능 후보·라벨 미매핑·중복·근거 부족 무시·포맷 노이즈·디테일 축약·범위 외·구조 변환·fetch 실패·원문 정의 부재)와 처리 줄로 변환 본문·출처 list·미결 § cross-reference를 명시합니다. 자체 검증 F5는 본문 누락 + cross-reference 3종(cross-ref-fetch / cross-ref-scope / cross-ref-tbd)을 함께 점검합니다.",
+    "longDescription": "두 스킬 분리(planning-format 변환+자체 검증 / planning-review 외부 SSOT·AC·의존 영향 3축). 텍스트·파일·디렉터리·URL(다중)·이미지 입력을 정책서·기능설계서 두 본문으로 변환하고 입력 제외 §은 항상 출력. 0.2.2부터 review가 SSOT *.md 안 외부 링크도 재귀 fetch해 corpus에 합류시킨다. Atlassian·Figma·Google Workspace·Slack·Notion connector fallback 지원.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

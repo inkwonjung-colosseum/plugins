@@ -1,7 +1,7 @@
 ---
 name: planning-review
 description: "planning-format 산출물(정책서·기능설계서 두 본문)을 외부 SSOT corpus 충돌·acceptance criteria 검증가능성·의존 영향 분석 3축으로 점검할 때 사용한다. 직전 turn의 planning-format 출력, 디렉터리·파일 경로, raw markdown 텍스트 모두 입력 받는다."
-argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdown>] [--ssot-include <glob>] [--axes <list>]"
+argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdown>] [--ssot-include <glob>] [--axes <list>] [--no-ssot-fetch] [--no-ssot-image]"
 ---
 
 # planning-review
@@ -12,20 +12,33 @@ argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdow
 
 - **0개** = conversation 참조 모드. 직전 turn의 `planning-format` 출력에서 두 본문 추출.
 - **1개 (디렉터리)** = `정책서*.md` + `기능설계서*.md` 자동 검색.
-- **1개 (파일)** = 본문 안 두 섹션 자동 분리. 헤더 `# 정책서`/`## 정책서`/`# 기능설계서`/`## 기능설계서` 또는 코드 펜스 ` ```markdown ... ``` ` 식별.
-- **1개 (raw markdown 텍스트)** = 따옴표로 감싼 markdown. 두 본문 모두 포함 시 자동 분리.
+- **1개 (파일)** = 본문 안 두 섹션 자동 분리. 헤더 `# 정책서`/`## 정책서`/`# 기능설계서`/`## 기능설계서` 또는 코드 펜스 ` ```markdown ... ``` ` 식별. 0.2.2부터 `## 입력 제외 항목` 블록도 함께 분리.
+- **1개 (raw markdown 텍스트)** = 따옴표로 감싼 markdown. 두 본문 + 입력 제외 § 모두 포함 시 자동 분리.
 - **2개** = `<정책서> <기능설계서>` 또는 역순 (헤더로 자동 식별).
 
 | 인자 | 기본값 | 설명 |
 |---|---|---|
 | `--ssot-include <glob>` | (없음) | SSOT corpus glob. default = 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 자동 제외). R1·R3 corpus 공유. |
 | `--axes <list>` | `ssot,ac,deps` | 점검 축 콤마 구분. 빈 값이면 sanity check. |
+| `--no-ssot-fetch` | off (즉 link follow 활성) | SSOT corpus *.md 본문 안 외부 URL fetch + connector fallback 봉쇄. 매칭 file 본문만 corpus에 들어간다. |
+| `--no-ssot-image` | off (즉 image multimodal 활성) | SSOT corpus 본문 안 이미지 참조·fetch image content-type 응답 multimodal 호출 0건. URL fetch는 그대로 (`--no-ssot-fetch`와 독립). |
+
+`--no-ssot-fetch` / `--no-ssot-image`는 `planning-format`의 `--no-fetch` / `--no-image`와 의미가 비슷하지만 대상이 다름 — planning-format은 입력 본문, planning-review는 SSOT corpus 본문.
 
 ## 동작 시퀀스
 
 ### Step 1: 입력 dispatch + sanity check
 
 토큰 수에 따라 분기 → 본문 분리 → 빈 본문 검사. 식별 실패 시 sanity check 메시지 출력 후 종료.
+
+본문 분리 우선순위 (0.2.2 신규):
+
+1. `# 정책서` / `## 정책서` 헤더 → 정책서 본문.
+2. `# 기능설계서` / `## 기능설계서` 헤더 → 기능설계서 본문.
+3. `## 입력 제외 항목` 헤더 → 입력 제외 § 본문 (옵션 — 부재해도 sanity check 아님, 0.2.0 산출물 호환).
+4. 위 3종 중 정책서·기능설계서가 둘 다 매칭 안 되면 sanity check.
+
+분리 결과는 메모리에만. `--axes` 활성 무관 분리 단계는 항상 시도.
 
 | 케이스 | 메시지 |
 |---|---|
@@ -47,6 +60,26 @@ argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdow
 
 R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
 
+#### R1 link follow (0.2.2 신규)
+
+- **트리거**: R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off.
+- **공유 reference**: `../planning-format/references/connector-routing.md`를 1회 Read 적재해 그대로 사용 (별도 복제 없음). 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지 모두 거기에 있다.
+- **절차**: 매칭 *.md 본문 안 URL·이미지 추출 → fetch queue + image queue 시드 → 재귀 fetch + connector fallback → 외부 본문 + 이미지 해석 결과 corpus body에 합류. visited set으로 cycle 방지. **cap 없음**.
+- **이미지 multimodal**: `--no-ssot-image` ON이면 image content-type 응답 합류 안 함. URL fetch는 별도.
+- **출처 list**: link follow 1건 이상이면 `## SSOT 출처` 블록 출력 (§출력 포맷).
+
+자세한 절차는 `references/ssot-rules.md` §R1.4·§R1.5.
+
+#### R3 입력 제외 § 보조 신호 (0.2.2 신규)
+
+R3 활성 + Step 1에서 입력 제외 § 분리 성공 시 카테고리별 가중치 적용:
+
+- `fetch 실패` / `범위 외` / `구조 변환` / `디테일 축약` → R3 영향 후보 보조 신호 (default 분류 `권고`).
+- `원문 정의 부재` → R3 corpus 매칭에서 제외 (충돌 단정 불가).
+- `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` → 무시.
+
+자세한 절차·헤더 카운트 K 산출은 `references/deps-rules.md` §R3.2.1.
+
 ### Step 3: 발견 합산 + 결과
 
 같은 발견이 두 축에 걸치면 한 번만 기록. 우선순위: **R1 > R3 > R2**.
@@ -60,8 +93,9 @@ R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
 # planning-review: [기능명]
 
 - 입력: [경로 list / "직전 planning-format 출력 (conversation)" / "직접 입력 markdown"]
+- 입력 제외 §: 분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)
 - 점검 축: [ssot, ac, deps]
-- SSOT corpus: [매칭 N개 / 매칭 0개 (검증 대상 없음)]
+- SSOT corpus: 매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)
 - SSOT 검색 키워드: [keyword1, keyword2, ...]
 
 ---
@@ -71,6 +105,9 @@ R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
 - SSOT 충돌: N건 (활성 시)
 - 검증가능성: N건 (활성 시)
 - 영향 분석: N건 (활성 시, 발견+권고 합계)
+
+## SSOT 출처
+(link follow 1건 이상일 때만, §R1.5 표 형식)
 
 ### SSOT 충돌
 (≥1건일 때만)
@@ -96,7 +133,7 @@ R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
    - 카테고리: [정책 변경 / 상태 전이 / 권한·역할 / 외부 의존]
    - 위치: [정책서/기능설계서 §섹션]
    - 영향 후보: [SSOT 파일 path list]
-   - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용]"
+   - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용 또는 입력 제외 § cross-reference]"
    - 영향: [한 줄]
    - 제안: [후속 검토 조건]
 ````
@@ -105,12 +142,24 @@ R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
 
 - 활성 안 한 축의 sub-section은 통째 생략.
 - `SSOT 검색 키워드` 줄은 R1 활성 시에만.
-- `SSOT corpus` 카운트 줄은 R1 또는 R3 활성 시에만 (corpus 공유).
+- `SSOT corpus` 줄 형식:
+  - link follow 1건 이상 시도: `매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`. K = 본문 합류 성공 자원, J = fetch 실패·인증·content-type skip 등.
+  - link 0건: `매칭 N개`.
+  - 매칭 0건: `매칭 0개 (검증 대상 없음)`.
+  - R1·R3 모두 비활성: 줄 통째 미출력.
+- `입력 제외 §` 줄 형식:
+  - 분리 성공: `분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)`. K = `fetch 실패 + 범위 외 + 구조 변환 + 디테일 축약` 합. `원문 정의 부재` + 5종(`다른 기능 후보`/`라벨 미매핑`/`중복`/`근거 부족 무시`/`포맷 노이즈`) = `R3 무관 N-K건`.
+  - 분리 성공 + 0건 (`없음` 본문): `분리 0건`.
+  - 분리 실패 또는 0.2.0 이전 산출물 (블록 부재): `없음 (또는 0.2.0 이전 산출물)`.
+  - R3 비활성이면 K건 표기는 하되 R3 점검에 적용 안 됨 (보조 신호 단계 skip).
+- `## SSOT 출처` 블록 위치: `## 리뷰 결과` 다음, 발견 sub-section 위. R1·R3 모두 비활성·매칭 0건·`--no-ssot-fetch`·link 0건이면 통째 생략.
+- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 `"[입력 제외 § fetch 실패 항목 cross-reference]"` 형태로 출처 표시.
 
 ## 참고 파일
 
-- `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·매칭·발견 형식.
+- `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·매칭·발견 형식·link follow·출처 list.
 - `references/ac-rules.md` — R2 4 sub-category 기준.
-- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견·권고 분류.
+- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견·권고 분류 + 입력 제외 § 보조 신호.
+- `../planning-format/references/connector-routing.md` — link follow에서 공유 적재. 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기.
 
 변환·자체 품질 점검·`--save`는 `planning-format` 스킬에서 별도 처리. 자세한 절차는 `skills/planning-format/SKILL.md`.
