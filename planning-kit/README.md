@@ -69,7 +69,7 @@ $formalize 주문 취소 정책 정리해줘. 사용자가 결제 후 24시간 �
 | `--no-fetch` | 본문에서 URL이 발견되어도 fetch하지 않는다. URL 분기 인자도 fetch 안 함. 디버그·오프라인용 |
 | `--no-image` | 모든 이미지 시드(인자·디렉터리·추출·fetch·data URI)를 무시. multimodal 호출 0건 |
 
-cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두지 않는다 — 0.1.1은 **cap 없음 정책** (품질·검증 > 토큰 절약). cycle은 visited set으로만 차단.
+cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두지 않는다 — **cap 없음 정책** (품질·검증 > 토큰 절약). cycle은 visited set으로만 차단.
 
 예:
 
@@ -82,15 +82,17 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 ---
 
-## URL 분기·재귀 fetch
+## URL 분기·재귀 fetch + connector fallback
 
 - 인자가 1개 이상의 `^https?://` 토큰이면 URL 분기로 진입. 모든 URL을 fetch → 본문 추출 → 통합.
 - 텍스트/파일/디렉터리 분기에서도 입력 본문 안 URL을 자동 추출해 fetch.
 - 추출 본문 안에 또 외부 링크가 있으면 **재귀로 따라간다** (depth·pages·body 크기 cap 없음). 호스트 제한 없음 — 외부 도메인도 그대로.
 - visited set으로 cycle·중복 방지 (URL normalize: fragment 제거, trailing `/`, 트래킹 query `utm_*`/`fbclid`/`gclid`/... 제거, 호스트 lowercase, query 키 정렬).
-- 인증 게이트·지원 안 하는 content-type(`application/pdf`, `video/*`, `audio/*`, ...)·timeout·4xx/5xx는 본문 합류에서 제외하되 호출은 종료하지 않고 `## 출처` list에 사유 기록. **루트 URL이 모두 실패한 경우만** 한 줄 sanity check로 종료.
+- 0.1.2부터 **connector fallback** 추가: 1차 `WebFetch`가 인증 게이트·4xx·5xx·timeout으로 실패하면, 호스트가 알려진 외부 서비스(Atlassian Confluence/Jira·Figma·Google Workspace·Slack·Notion)면 MCP/connector 경유 접근을 한 번 더 시도한다. 0.1.1까지 인증 게이트로 skip되던 자식 링크가 합류될 수 있다 (예: Confluence root → Figma 자식 → 본문 합류). connector가 인증 안 붙은 환경에서는 자연스럽게 비활성 (별도 옵션 없음).
+- 출처 list `상태` 컬럼에 `200 (via WebFetch)` / `200 (via Figma MCP)` / `인증 필요 (Slack MCP 미인증)` 형태로 fetch 경로가 표기된다. 헤더 `입력 처리` 줄에 connector 합류 1건 이상이면 `(MCP 경유 K개)` 카운트가 추가된다.
+- 인증 게이트·지원 안 하는 content-type·timeout·4xx/5xx는 fallback까지 거친 뒤 본문 합류에서 제외하되 호출은 종료하지 않고 `## 출처` list에 사유 기록. **루트 URL이 모두 실패한 경우만** 한 줄 sanity check로 종료.
 
-상세 명세는 `skills/formalize/SKILL.md` §3 참조.
+상세 명세: `skills/formalize/SKILL.md` §3, lookup data: `skills/formalize/references/connector-routing.md`, 다이어그램: `docs/formalize-workflow.md`.
 
 ---
 
@@ -106,7 +108,7 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 지원 확장자: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.bmp`, `.heic`, `.svg`. 크기·개수 cap 없음. 별도 OCR·외부 vision 서비스 사용 안 함 (Claude multimodal 능력만).
 
-상세 명세는 `skills/formalize/SKILL.md` §4 참조.
+상세 명세는 `skills/formalize/SKILL.md` §4 참조. 다이어그램은 `docs/formalize-workflow.md` §6.
 
 ---
 
@@ -134,17 +136,20 @@ planning-kit/
 ├── .codex-plugin/plugin.json
 ├── README.md
 ├── docs/
+│   ├── formalize-workflow.md       # 전체 흐름 mermaid 다이어그램
 │   └── prd/
 │       ├── prd-0.1.0.md
-│       └── prd-0.1.1.md            # 본 release
+│       ├── prd-0.1.1.md
+│       └── prd-0.1.2.md            # 본 release (connector fallback)
 └── skills/
     └── formalize/
-        ├── SKILL.md
+        ├── SKILL.md                # 동작 시퀀스 골격
         ├── templates/
         │   ├── 기능설계서.md
         │   └── 정책서.md
         └── references/
-            └── review-rules.md
+            ├── review-rules.md             # 자동 리뷰 2축 점검 기준
+            └── connector-routing.md        # 호스트 매핑·fallback 케이스 표·sanity check 메시지
 ```
 
 ---
@@ -158,9 +163,9 @@ planning-kit/
 | Skill 수 | 3 | 1 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 1번 (`formalize`) |
 | 입력 분기 | 텍스트·파일·디렉터리 | 텍스트·파일·디렉터리·URL(다중)·이미지 |
-| URL fetch / 이미지 multimodal | 없음 | 모든 분기 공통 (본문 추출 + 재귀, cap 없음) |
+| URL fetch / 이미지 multimodal | 없음 | 모든 분기 공통 (본문 추출 + 재귀, cap 없음). 인증 게이트는 MCP/connector fallback (Atlassian·Figma·Google·Slack·Notion). |
 | Agent worker | 1 (terminology) | 0 |
-| Reference 수 | 5 | 1 |
+| Reference 수 | 5 | 2 (review-rules + connector-routing) |
 | Template 수 | 2 (정책서 + 기능설계서) | 2 (정책서 + 기능설계서) |
 | 산출물 | 정책서 + 기능설계서 2 file (`<outputRoot>/.../*.md`) | 정책서 + 기능설계서 본문 화면 output (저장 안 함) |
 | 파일 IO | mkdir + Write 호출 | 없음 |
@@ -180,15 +185,16 @@ planning-kit/
 | 출력 구조 | 2층 (상단 합의 + 하단 agent 원본) | 1층 (출처 list 포함) |
 | GFM cell escape | 단일 진실 소스 알고리즘 | 없음 (numbered list) |
 | 진행 표시 | step header 시퀀스 통제 | 자유 |
-| 추정 size | ~1850 line | ~720 line |
+| 추정 size | ~1850 line | ~480 line (SKILL + references) |
 
 두 플러그인은 **별도 동작하며 병행 사용 가능**하다. `planning-kit`은 파일을 만들지 않으므로 `<outputRoot>` 충돌 같은 이슈가 없다.
 
 ---
 
-## 호환성 (0.1.0 → 0.1.1)
+## 호환성
 
-순수 추가 변경. 기존 호출은 모두 동일하게 동작한다. 단, 0.1.0에서 URL 문자열을 텍스트 인자로 그대로 넣어 변환했던 경우 0.1.1에서는 URL 분기로 흘러 fetch가 일어난다 — URL을 단순 텍스트로 처리하고 싶다면 `--no-fetch` 또는 다른 텍스트와 섞어 따옴표로 감싼다.
+- **0.1.0 → 0.1.1**: 순수 추가. 기존 호출 동일 동작. 0.1.0에서 URL 문자열을 텍스트 인자로 그대로 넣었던 경우 0.1.1에서는 URL 분기로 흘러 fetch가 일어난다 — URL을 단순 텍스트로 처리하고 싶으면 `--no-fetch` 또는 다른 텍스트와 섞어 따옴표로 감싼다.
+- **0.1.1 → 0.1.2**: 순수 추가. 인자·옵션·파일 구조·출력 본문 형식 동일. 0.1.1까지 인증 게이트로 skip되던 URL이 connector를 통해 합류될 수 있고, 출처 list `상태`에 `via X` 표기가 추가된다. connector가 인증 안 붙은 환경에서는 동작이 0.1.1과 거의 동일.
 
 ---
 
