@@ -1,0 +1,20 @@
+{
+  "name": "planning-kit",
+  "version": "0.1.0",
+  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 같은 응답에서 자동 리뷰까지 출력하는 단일 스킬 플러그인. 로컬 파일 저장 없이 화면 output으로만 결과를 반환한다.",
+  "author": {
+    "name": "developjik",
+    "email": "developjik@users.noreply.github.com",
+    "url": "https://github.com/developjik"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "planning",
+    "product",
+    "documentation",
+    "claude-plugin"
+  ],
+  "skills": "./skills/"
+}
