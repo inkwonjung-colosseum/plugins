@@ -161,8 +161,11 @@ flowchart TD
   CB[통합 본문] --> NA[기능명 추출<br/>1순위 1개만]
   NA --> RD[templates/기능설계서.md + 정책서.md 병렬 Read]
   RD --> WR[main이 같은 턴에서<br/>두 본문 직접 작성]
-
-  WR --> NSR{--no-self-review?}
+  WR --> LD{셀 list 합류 ≥2?<br/>0.2.3}
+  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.x [용도] 보조 표<br/>다층 재귀 가능 (§N.x.y)"]
+  LD -->|동질 enum<br/>동일 동작·ref| KEEP[합류 유지]
+  AUX --> NSR{--no-self-review?}
+  KEEP --> NSR
   NSR -->|예| OUT[변환 본문만 출력]
   NSR -->|아니오| SR[references/self-review-rules.md Read]
 
@@ -191,6 +194,8 @@ flowchart TD
 - 규칙·조건·예외 승인·역할 책임·상태 전이·연동 정책 → 정책서.
 
 라벨 매핑 안 되는 조각·중복·근거 부족 조각은 입력 제외 추적으로. 근거 부족 셀은 inline `[TBD]`. marker `[TBD]` 1종만.
+
+list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main이 항목별 속성·동작·정책 ref 이질성을 매 케이스 판단. 이질이면 부모 § 안 sub-§(`### N.x [용도] 보조 표`)로 분해, 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 다시 list 합류면 같은 룰 재귀(`§N.x.y`, depth cap 없음). 8/10 섹션 골격 변경 없음, sub-§만 동적 추가. 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
 
 외부 SSOT corpus 충돌·acceptance criteria·의존 영향은 `planning-review` 스킬이 별도 처리.
 

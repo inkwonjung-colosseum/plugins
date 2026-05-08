@@ -78,8 +78,8 @@ $planning-review
 
 ### planning-format 출력
 
-1. **정책서 본문** (10 섹션 markdown, 코드 펜스로 감싼 형태)
-2. **기능설계서 본문** (8 섹션 markdown, 코드 펜스로 감싼 형태)
+1. **정책서 본문** (10 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.x ... 보조 표`)에 분해 (0.2.3, main 판단)
+2. **기능설계서 본문** (8 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.x ... 보조 표`)에 분해 (0.2.3, main 판단)
 3. **출처 list** (URL fetch나 이미지 처리가 1건 이상일 때만)
 4. **입력 제외 항목** (항상 출력. 0건이면 `없음` 1줄. 변환 본문에 반영 안 한 입력 조각을 10 카테고리로 분류 + 항목별 `처리` 줄로 본문·출처·미결 § cross-reference)
 5. **자체 검증 결과** (`통과` 또는 `발견 N건`, 6개 카테고리 카운트 포함)
@@ -205,7 +205,8 @@ planning-kit/
 │       ├── prd-0.1.2.md
 │       ├── prd-0.2.0.md                  # 스킬 분할 + Google 라우팅 fix
 │       ├── prd-0.2.1.md                  # 입력 제외 10종 + 항상 출력 + F5 cross-ref
-│       └── prd-0.2.2.md                  # 본 release (R1 link follow + 입력 제외 § R3 보조 신호)
+│       ├── prd-0.2.2.md                  # R1 link follow + 입력 제외 § R3 보조 신호
+│       └── prd-0.2.3.md                  # 본 release (표 셀 list 분해 판단 + 보조 표 sub-§)
 └── skills/
     ├── planning-format/
     │   ├── SKILL.md
@@ -227,9 +228,9 @@ planning-kit/
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.2)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.3)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.2) |
+| 항목 | product-team-kit | planning-kit (0.2.3) |
 |---|---|---|
 | Skill 수 | 3 | 2 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
@@ -248,7 +249,7 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) |
 | 입력 제외 처리 | 없음 | 10 카테고리 + 처리 줄 + R3 보조 신호 (0.2.2) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
@@ -290,6 +291,11 @@ planning-kit/
   - `SSOT corpus:` 줄에 외부 fetch 카운트 추가 (`매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`).
   - Codex `plugin.json` longDescription 압축 (~700자 → ≤300자).
   - PRD chain 안내 (`docs/prd/README.md` 신규).
+- **0.2.2 → 0.2.3**: `planning-format` 출력 markdown **추가만** (sub-§). 인자·옵션·`planning-review` 변경 없음.
+  - **list 분해 판단** — 표 셀에 list 항목 ≥2 합류 작성 시 main이 항목별 속성·동작·정책 ref 이질성을 매 케이스 판단. 이질이면 부모 § 안 sub-§(`### N.x [용도] 보조 표`)로 분해, 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 또 list 합류면 다층 재귀(`### N.x.y`, depth cap 없음).
+  - 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
+  - 8/10 섹션 골격 변경 없음. sub-§만 동적 추가.
+  - 다운스트림 파서: 부모 § 안 sub-§을 child로 인식해야 함.
 
 ---
 

@@ -52,35 +52,31 @@ URL 한 개씩 dequeue → normalize → visited 검사 → §3.2 fetch → 본�
 
 #### 3.2 fetch 시퀀스 (URL 1개)
 
-fetch 단계 진입 직전 1회 `references/connector-routing.md`를 `Read`로 적재 — 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지가 모두 거기에 있다.
+fetch 단계 진입 직전 1회 `references/connector-routing.md`를 Read 적재. 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기·sanity check 메시지 모두 거기에.
 
 1. **WebFetch** 1회 GET (timeout 30초, redirect ≤5).
 2. 응답 분류:
-   - 200 OK + `text/html|markdown|plain|xhtml` → 본문 추출 → 합류. via=WebFetch.
-   - 200 OK + `image/*` → image queue. via=WebFetch.
-   - 그 외 (지원 안 하는 content-type / 401 / 403 / 인증 게이트 휴리스틱 / 4xx / 5xx / timeout / network error) → §3.3 fallback.
-
-본문 추출은 `<main>`/`<article>` 우선, 없으면 `<body>`에서 `<nav>`/`<aside>`/`<header>`/`<footer>`/`<script>`/`<style>` 제거. 표·헤딩·리스트 markdown 유지.
+   - 200 OK + `text/html|markdown|plain|xhtml` → 의미 있는 본문 영역 추출(`<main>`/`<article>` 우선, navigation·boilerplate 제외) → 합류 (via=WebFetch).
+   - 200 OK + `image/*` → image queue (via=WebFetch).
+   - 그 외 (지원 안 하는 content-type / 401 / 403 / 인증 게이트 / 4xx / 5xx / timeout / network error) → §3.3 fallback.
 
 #### 3.3 connector fallback
 
-`references/connector-routing.md` 매핑표·런타임 추론·fallback 케이스 표·Google Workspace §3.4·gid/range §3.5를 그대로 따른다. 매핑 lookup 호스트는 **원래 입력된 URL의 호스트** (redirect 최종 호스트 X). connector 응답 본문도 자식 URL을 추출해 visited queue에 push.
+`references/connector-routing.md` 그대로. 매핑 lookup 호스트 = 원 입력 URL 호스트 (redirect 최종 X). connector 응답 본문도 자식 URL 추출해 queue push.
 
 #### 3.4 URL 분기 sanity check
 
-루트 URL이 **모두** 본문 합류 실패하면 호출 종료. 일부만 실패면 §출처 list에 사유만 기록하고 진행. 5종 메시지는 `references/connector-routing.md` §8. sanity check 메시지는 `## 자체 검증` 블록 없이 단독 한 줄 + 입력 URL list로 출력.
-
-텍스트·파일·디렉터리 분기는 §2 sanity check만 적용. 본문 추출 URL이 모두 fetch 실패해도 원본 본문으로 변환 진행.
+루트 URL **모두** 합류 실패면 호출 종료 (메시지 = `connector-routing.md` §8). 일부 실패면 §출처 list에 사유만. 텍스트·파일·디렉터리 분기는 §2 sanity check만 — 본문 추출 URL fetch 실패해도 원본으로 진행.
 
 ### Step 4: 이미지 multimodal 처리
 
-지원 확장자: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.bmp`, `.heic`, `.svg`. 크기·개수 cap 없음, resize 안 함. `.svg`는 raw XML도 본문 포함하고 multimodal 해석도 시도.
+지원 확장자: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.bmp`, `.heic`, `.svg`. 크기·개수 cap 없음, resize 안 함. `.svg`는 raw XML + multimodal 해석 둘 다 시도.
 
 이미지 시드 5경로: 인자 파일·디렉터리·본문 추출(markdown image / HTML img / 상대 경로 resolve)·fetch image content-type 결과·data URI.
 
-각 이미지에 대해 main이 자기 자신에게 multimodal 해석 요청 — 안의 텍스트(라벨·헤더·캡션)를 그대로 옮기고, 다이어그램·플로우는 노드·간선·열·행으로 재구성, 화면 캡처는 화면 요소·흐름을 글로 기술, 추측은 `추정:` 접두로 명시. 결과는 `=== [출처 N] 이미지: <파일명 또는 URL> ===` 헤더와 함께 본문 합류.
+각 이미지에 대해 main이 multimodal 해석 — 안의 텍스트(라벨·캡션) 옮기고 다이어그램·플로우·화면 요소를 글로 기술. 추측은 `추정:` 접두. 결과는 `=== [출처 N] 이미지: <파일명 또는 URL> ===` 헤더와 함께 본문 합류.
 
-실패는 본문 합류 안 하고 출처 list에 사유 기록 (`미지원 이미지 포맷`/`image read 실패`/`빈 해석 결과`). 호출 종료 사유 아님.
+실패(`미지원 이미지 포맷`/`image read 실패`/`빈 해석 결과`)는 출처 list에 사유 기록, 호출 종료 사유 아님.
 
 ### Step 5: 통합 본문 합류 형식
 
@@ -108,6 +104,8 @@ Google Sheets는 `references/connector-routing.md` §3.5 헤더 형식(gid·rang
 
 **변환 본문(정책서·기능설계서)에 합류하지 않은 모든 입력 조각**은 §6.3 입력 제외 항목 추적으로 (10 카테고리 중 1개로 라벨링). 라벨 미매핑·중복·범위 외·구조 변환·fetch 실패·원문 정의 부재 등 사유 무관 catch-all. 근거 부족 셀은 inline `[TBD]`. 빈 row·빈 섹션 삭제 허용. **marker는 `[TBD]` 1종만** (`[미정]`/`[가정]`/`[확인 필요]`/`[충돌 후보]`/`해당 없음` 사용 금지).
 
+**list 분해 판단**: 한 셀에 list 항목 ≥2 합류 작성 시, main이 항목별 속성(타입)·동작(클릭/overlay/non-MVP)·정책 ref(§ cross-link)·검증·[TBD]·non-MVP 등 이질성을 평가한다. 이질이면 부모 § 안 sub-§(`### N.x [용도] 보조 표`)로 분해(본 셀엔 `§N.x 참조` 1행만, 컬럼 set은 list 성격에 맞춰 main 결정, 권장 최소 = `순번`·`항목`·`비고`), 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 다시 list 합류면 같은 룰 재귀(`§N.x.y`, depth cap 없음). 8/10 섹션 골격은 변경 없고 sub-§만 동적 추가. 판단 형식화(Q-list·체크리스트·카운트 룰) 없음 — main 자유 판단.
+
 #### 6.3 입력 제외 항목 추적 (10 카테고리)
 
 변환 본문(정책서·기능설계서)에 합류하지 않은 모든 입력 조각을 다음 10종 카테고리 중 하나로 라벨링해 입력 제외 §에 기록.
@@ -132,13 +130,9 @@ Google Sheets는 `references/connector-routing.md` §3.5 헤더 형식(gid·rang
 다른 기능 후보 > 라벨 미매핑 > 중복 > 근거 부족 무시 > 포맷 노이즈
 ```
 
-**6~10 판정 휴리스틱**:
-
-- `디테일 축약`: 라벨이 본문 셀에 매핑됐으나 디테일을 본 문서에 합류시키면 F2 cross-bleed가 발견될 가능성.
-- `범위 외`: 정책서/기능설계서 §2 표 셀의 키워드와 입력 본문 키워드 매칭 / 입력 본문 자체가 "후속 과제"·"별도 정의"·"다른 도메인" 마커.
-- `구조 변환`: 입력 표·list·다이어그램의 의미가 분해 합류. 분해 위치 1개 이상 식별 가능. 의미가 빠지면 `디테일 축약` 또는 `라벨 미매핑`.
-- `fetch 실패`: 출처 list `본문 사용 = X` 행 중 입력에서 인용·참조된 자원만. 단순 부수 링크는 본 카테고리에 안 넣고 출처 list에만.
-- `원문 정의 부재`: 입력 측 결손이면 본 카테고리. 변환 측 매핑 결손이면 `라벨 미매핑`.
+경계 처리:
+- `fetch 실패`는 입력에서 인용·참조된 자원만. 단순 부수 링크는 출처 list에만.
+- `원문 정의 부재`는 입력 측 결손, `라벨 미매핑`은 변환 측 매핑 결손.
 
 #### 6.4 입력 제외 항목 5필드 형식
 
@@ -170,28 +164,11 @@ Google Sheets는 `references/connector-routing.md` §3.5 헤더 형식(gid·rang
 
 매핑·합류 위치를 식별 못 하면 `본문 미합류`로 폴백.
 
-#### 6.6 변환 본문·미결 §과의 일관성 규칙
-
-다음 3 규칙은 §7 자체 검증 F5 cross-reference에서 자동 점검되므로 본문 작성 시 미리 만족시킨다:
-
-- 정책서 §10 / 기능설계서 §8 미결 항목 중 "원문 정의 부재" 사유는 입력 제외 §에 `원문 정의 부재` 카테고리로 1대1 등장.
-- 정책서 §2 / 기능설계서 §2 제외 범위 키워드가 입력 본문에 매칭되면 입력 제외 §에 `범위 외` 항목으로 ≥1건 등장.
-- `## 출처` list `본문 사용 = X` 행 중 인용·참조 자원은 입력 제외 §에 `fetch 실패` 카테고리로 등장.
-
 ### Step 7: 자체 품질 검증
 
-`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리 단일 패스 점검:
+`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) 단일 패스 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두 봄. 기준·예시·발견 형식 모두 reference 그대로.
 
-- **F1. 섹션 충실도** / **F2. 라벨 cross-bleed** / **F3. 용어 일관성** / **F4. 정책-기능 매핑** / **F5. 누락** / **F6. Markdown syntax lint**
-
-F5는 다음 4 점검을 모두 본다:
-
-1. 입력의 명시 사실(역할·상태·기능명·수치 임계)이 두 본문·입력 제외 §에 모두 부재 (기존 점검).
-2. **fetch 실패 cross-reference** (sub: `cross-ref-fetch`): 출처 list `본문 사용 = X` 행 중 입력 인용·참조 자원이 입력 제외 §에 `fetch 실패` 카테고리로 등장 안 함.
-3. **명시 제외 cross-reference** (sub: `cross-ref-scope`): 정책서/기능설계서 §2 제외 범위 키워드가 입력에 매칭되는데 입력 제외 §에 `범위 외` 항목 부재.
-4. **[TBD] cross-reference** (sub: `cross-ref-tbd`): 미결 § 항목 중 "원문 명시 없음"·"원문 정의 부재"·"입력 미정"·"원본 본문에 없음" 표현이 있는데 입력 제외 §에 `원문 정의 부재` 항목 부재.
-
-기준·예시·발견 형식은 reference 그대로. 6 카테고리 모두 0건이면 `통과`, 어느 한쪽이라도 ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않는다 (planning-review가 처리).
+6 카테고리 모두 0건이면 `통과`, ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
 
 ### Step 8: `--save` 처리
 
@@ -252,7 +229,7 @@ F5는 다음 4 점검을 모두 본다:
 ## 정책서
 
 ```markdown
-[10 섹션]
+[10 섹션 + (선택) 보조 표 sub-§ — §6.2 list 분해 판단 결과로 동적 등장]
 ```
 
 ---
@@ -260,7 +237,7 @@ F5는 다음 4 점검을 모두 본다:
 ## 기능설계서
 
 ```markdown
-[8 섹션]
+[8 섹션 + (선택) 보조 표 sub-§ — §6.2 list 분해 판단 결과로 동적 등장]
 ```
 
 ---
@@ -330,6 +307,7 @@ F5는 다음 4 점검을 모두 본다:
 - URL fetch + 이미지 모두 0건이면 `## 출처` 통째 생략.
 - `--no-self-review`면 `## 자체 검증` 통째 생략.
 - 블록 순서: 변환 본문 → 출처 → 입력 제외 → 자체 검증.
+- 두 본문 안 `### N.x [용도] 보조 표` sub-§은 §6.2 list 분해 판단 결과로 부모 § 다음 줄에 동적 등장. 8/10 섹션 골격은 변경 없음. 자체 검증·헤더 메타라인은 보조 표 무관.
 
 ### 7.1 헤더 줄 형식
 

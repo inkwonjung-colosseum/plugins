@@ -60,25 +60,13 @@ argument-hint: "[<정책서·기능설계서 경로 | 디렉터리 | raw markdow
 
 R1·R3 corpus 공유 (`--ssot-include`). R2는 본문 자체만.
 
-#### R1 link follow (0.2.2 신규)
+#### R1 link follow (0.2.2)
 
-- **트리거**: R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off.
-- **공유 reference**: `../planning-format/references/connector-routing.md`를 1회 Read 적재해 그대로 사용 (별도 복제 없음). 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지 모두 거기에 있다.
-- **절차**: 매칭 *.md 본문 안 URL·이미지 추출 → fetch queue + image queue 시드 → 재귀 fetch + connector fallback → 외부 본문 + 이미지 해석 결과 corpus body에 합류. visited set으로 cycle 방지. **cap 없음**.
-- **이미지 multimodal**: `--no-ssot-image` ON이면 image content-type 응답 합류 안 함. URL fetch는 별도.
-- **출처 list**: link follow 1건 이상이면 `## SSOT 출처` 블록 출력 (§출력 포맷).
+R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off → 매칭 *.md 본문 안 URL·이미지를 fetch + connector fallback으로 corpus body에 합류. 절차·visited set·sanity check·출처 list 형식 모두 `references/ssot-rules.md` §R1.4·§R1.5. connector lookup은 `../planning-format/references/connector-routing.md` 공유 적재. `--no-ssot-image` ON이면 image content-type 합류 skip (URL fetch는 별도).
 
-자세한 절차는 `references/ssot-rules.md` §R1.4·§R1.5.
+#### R3 입력 제외 § 보조 신호 (0.2.2)
 
-#### R3 입력 제외 § 보조 신호 (0.2.2 신규)
-
-R3 활성 + Step 1에서 입력 제외 § 분리 성공 시 카테고리별 가중치 적용:
-
-- `fetch 실패` / `범위 외` / `구조 변환` / `디테일 축약` → R3 영향 후보 보조 신호 (default 분류 `권고`).
-- `원문 정의 부재` → R3 corpus 매칭에서 제외 (충돌 단정 불가).
-- `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` → 무시.
-
-자세한 절차·헤더 카운트 K 산출은 `references/deps-rules.md` §R3.2.1.
+R3 활성 + Step 1 분리 성공 시 카테고리별 가중치. 절차·신호 카테고리·헤더 카운트 K 산출 모두 `references/deps-rules.md` §R3.2.1.
 
 ### Step 3: 발견 합산 + 결과
 
@@ -140,20 +128,11 @@ R3 활성 + Step 1에서 입력 제외 § 분리 성공 시 카테고리별 가�
 
 규칙:
 
-- 활성 안 한 축의 sub-section은 통째 생략.
-- `SSOT 검색 키워드` 줄은 R1 활성 시에만.
-- `SSOT corpus` 줄 형식:
-  - link follow 1건 이상 시도: `매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`. K = 본문 합류 성공 자원, J = fetch 실패·인증·content-type skip 등.
-  - link 0건: `매칭 N개`.
-  - 매칭 0건: `매칭 0개 (검증 대상 없음)`.
-  - R1·R3 모두 비활성: 줄 통째 미출력.
-- `입력 제외 §` 줄 형식:
-  - 분리 성공: `분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)`. K = `fetch 실패 + 범위 외 + 구조 변환 + 디테일 축약` 합. `원문 정의 부재` + 5종(`다른 기능 후보`/`라벨 미매핑`/`중복`/`근거 부족 무시`/`포맷 노이즈`) = `R3 무관 N-K건`.
-  - 분리 성공 + 0건 (`없음` 본문): `분리 0건`.
-  - 분리 실패 또는 0.2.0 이전 산출물 (블록 부재): `없음 (또는 0.2.0 이전 산출물)`.
-  - R3 비활성이면 K건 표기는 하되 R3 점검에 적용 안 됨 (보조 신호 단계 skip).
-- `## SSOT 출처` 블록 위치: `## 리뷰 결과` 다음, 발견 sub-section 위. R1·R3 모두 비활성·매칭 0건·`--no-ssot-fetch`·link 0건이면 통째 생략.
-- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 `"[입력 제외 § fetch 실패 항목 cross-reference]"` 형태로 출처 표시.
+- 활성 안 한 축의 sub-section은 통째 생략. `SSOT 검색 키워드` 줄은 R1 활성 시에만.
+- `SSOT corpus` 줄: link follow ≥1 = `매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`. link 0건 = `매칭 N개`. 매칭 0건 = `매칭 0개 (검증 대상 없음)`. R1·R3 모두 비활성 = 줄 미출력.
+- `입력 제외 §` 줄: 분리 성공 = `분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)` (K 산출은 `deps-rules.md` §R3.2.1). 분리 성공 + 0건 = `분리 0건`. 분리 실패·0.2.0 이전 = `없음 (또는 0.2.0 이전 산출물)`.
+- `## SSOT 출처` 블록 위치 = `## 리뷰 결과` 다음, 발견 sub-section 위. R1·R3 모두 비활성·매칭 0건·`--no-ssot-fetch`·link 0건이면 통째 생략.
+- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 입력 제외 § cross-reference 표시.
 
 ## 참고 파일
 
