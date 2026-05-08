@@ -1,4 +1,4 @@
-# planning-kit (0.2.4)
+# planning-kit (0.2.5)
 
 기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format` 스킬과, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review` 스킬로 구성된 플러그인.
 
@@ -207,19 +207,20 @@ planning-kit/
 │       ├── prd-0.2.1.md                  # 입력 제외 10종 + 항상 출력 + F5 cross-ref
 │       ├── prd-0.2.2.md                  # R1 link follow + 입력 제외 § R3 보조 신호
 │       ├── prd-0.2.3.md                  # 표 셀 list 분해 판단 + 보조 표 sub-§
-│       └── prd-0.2.4.md                  # 본 release (sub-§ 정밀화·SKILL 분해·deep link·11 카테고리)
+│       ├── prd-0.2.4.md                  # sub-§ 정밀화·SKILL 분해·deep link·11 카테고리
+│       └── prd-0.2.5.md                  # 본 release (결정성 강화 7 항목)
 └── skills/
     ├── planning-format/
-    │   ├── SKILL.md                      # orchestration only (0.2.4)
+    │   ├── SKILL.md                      # orchestration only (0.2.4) + Step 3 fetch 시도 의무·BFS / Step 6·7 결정 트리·체크리스트 (0.2.5)
     │   ├── templates/
     │   │   ├── 기능설계서.md
     │   │   └── 정책서.md
     │   └── references/
-    │       ├── conversion-rules.md       # multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·backlink (0.2.4)
-    │       ├── exclusion-rules.md        # 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·marker 1종 (0.2.4)
+    │       ├── conversion-rules.md       # multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·backlink (0.2.4) + §4 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5)
+    │       ├── exclusion-rules.md        # 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·marker 1종 (0.2.4) + §2 결정 트리 + §3.1 모호성 트리거 + §3.2 16 어구 (0.2.5)
     │       ├── output-contract.md        # 출력 포맷·헤더 줄·--save·출처 list deep link (0.2.4)
-    │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식)
-    │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback·§11 connector별 anchor 추출 (0.2.4)
+    │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식) + F1~F6 26 항목 체크리스트 6패스 (0.2.5)
+    │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback·§11 connector별 anchor 추출 (0.2.4) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5)
     └── planning-review/
         ├── SKILL.md
         └── references/
@@ -234,7 +235,7 @@ planning-kit/
 
 `planning-kit`(0.2.4)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.4) |
+| 항목 | product-team-kit | planning-kit (0.2.5) |
 |---|---|---|
 | Skill 수 | 3 | 2 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
@@ -253,8 +254,9 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) |
-| 입력 제외 처리 | 없음 | 11 카테고리 (`충돌 후보` 0.2.4 신규) + 처리 줄 + 위치 markdown link (0.2.4) + R3 보조 신호 (0.2.2) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과 / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) — list 분해 max-depth cap=3 (0.2.5) |
+| 입력 제외 처리 | 없음 | 11 카테고리 (`충돌 후보` 0.2.4 신규) + 처리 줄 + 위치 markdown link (0.2.4) + R3 보조 신호 (0.2.2) — 결정 트리 + 모호성 강제 [TBD] (정규식 6 + 16 어구) (0.2.5) |
+| 결정성 (같은 입력 일치율) | — | 0.9% (0.2.4) → 25~39% (0.2.5, 28~43배). fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 [TBD]·max-depth cap·6패스 체크리스트·라벨 매핑 트리 (0.2.5 신규 7 항목) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
 | SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 + 직접 read + 매칭 file 본문 안 외부 링크 재귀 fetch (cap 없음, connector fallback) |
@@ -309,6 +311,16 @@ planning-kit/
   - **충돌 후보 카테고리 추가** — 입력 제외 § 11 카테고리(#11 끝 배치). 같은 사실 ≥2 다른 값 시 1순위 합류 + 나머지 추적. 본문 셀 1순위 미명확 = `[TBD]` + cross-ref. marker 1종(`[TBD]`) 정책 유지.
   - **신규 인자·옵션 0건**. 기존 인자·옵션·planning-review 동작·재귀 fetch·multimodal·sanity check 그대로 (sub-§ 인식 + connector anchor 추출 외).
   - 다운스트림 파서 영향: 보조 표 헤더 backlink 괄호 + 입력 제외 § 위치 필드 markdown link + 출처 list URL deep link fragment + `충돌 후보` 카테고리.
+- **0.2.4 → 0.2.5**: 결정성 강화. 인자·출력 markdown 형식·`planning-review` 동작 변경 없음. 같은 입력 N회 실행 시 산출물 일치율을 0.9% → 25~39%(28~43배) 개선.
+  - **fetch 시도 의무화** — queue dequeue된 visited 미포함 URL은 100% fetch 시도 강제. 사전 판단(인증 미연결·매핑 없음·미인증 추정)으로 시도 자체를 생략 금지. 시도 후 실패는 출처 list `상태` 컬럼 기록 + visited 등록. fetch 미시도 허용은 `--no-fetch` 단 1케이스. dequeue된 모든 URL은 출처 list 1행 차지 (행 누락 금지).
+  - **BFS 순서 강제** — depth N 모두 dequeue 완료 후 depth N+1 dequeue. 같은 depth 안에선 본문 발견 순서 (markdown link → HTML href → plain URL). LIFO·우선순위 휴리스틱 금지. 출처 list `#` 번호 = BFS dequeue 순서.
+  - **exclusion 11 카테고리 결정 트리** — `exclusion-rules.md` §2 우선순위를 11 분기 if-elif chain으로 룰화. 라벨 미매핑은 단일 폴백(분기 11)으로 이동, 그 외 카테고리 우선순위는 그대로. main 자유 판단을 syntactic feature 진입 조건으로 대체.
+  - **모호성 강제 [TBD] 룰** — 원문 syntactic 결함(괄호 미닫힘 `\([^)]*$` / 말줄임표 / 빈 list / 공란 row / 16 어구 / `[ ]`·`_____`·`—` 단독) 자동 [TBD] 단정. LLM 추론 단정 금지. 16 어구 카탈로그 = TBD/TODO/FIXME · 추후 정의/결정/협의 · 별도 정의/협의/확정 · 확정 시 재정의 · 미정/미확정/미결 · 기획 시 정의.
+  - **list 분해 max-depth cap = 3** — `conversion-rules.md` §5.4. 허용 depth = `§N.M`·`§N.M.K`·`§N.M.K.L`. depth 4 진입 시도 시 합류 유지 폴백 + 입력 제외 § `디테일 축약` 항목 추가. cap 없음 정책의 단일 예외.
+  - **self-review F1~F6 체크리스트화** — `self-review-rules.md`에 카테고리별 yes/no 체크리스트 (F1: 5 + F2: 4 + F3: 4 + F4: 4 + F5: 4 + F6: 5 = 26 항목). 6패스 진행 (카테고리당 1패스). 단일 LLM 패스 → 6패스로 검출 누락 차단.
+  - **라벨 매핑 룰 강화** — `conversion-rules.md` §4.1 결정 트리 (9 분기) + §4.2 양 매핑 분배 룰 (권한·연동·상태 측면별 위치 분배표 6 row). F2 cross-bleed 룰 그대로.
+  - **신규 인자·옵션 0건**. 기존 인자·옵션·planning-review 동작·재귀 fetch·multimodal·sanity check 그대로.
+  - 다운스트림 파서 영향: 출처 list 항목 수가 늘어날 수 있음 (이전 미시도 URL이 행으로 기록됨). 분해 깊이 4 이상 산출물은 cap 폴백.
 
 ---
 

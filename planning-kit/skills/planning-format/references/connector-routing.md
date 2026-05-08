@@ -75,20 +75,26 @@ Atlassian만 예외적으로 `getAccessibleAtlassianResources` 1회 호출해 cl
 
 ## 5. fallback 평가 케이스 표
 
-각 후보 호출 timeout 30초, 1회. 응답 비어 있거나 에러면 다음 후보. 모두 실패하면 다음 분기.
+**진입 조건 (0.2.5)**: 모든 케이스는 "**1차 WebFetch 시도 후**" 결과 분류. main이 §2 connector 카탈로그 사전 평가로 "미연결"·"미인증"·"매핑 없음" 판정해도 1차 WebFetch는 강제로 진행 (사전 skip 금지). 각 후보 호출 timeout 30초, 1회. 응답 비어 있거나 에러면 다음 후보. 모두 실패하면 status 기록 + visited 등록 후 다음 URL.
 
 매핑 lookup 호스트는 **원래 입력된 URL의 호스트** — redirect 최종 호스트 X.
 
-| 케이스 | 처리 |
+connector fallback 후보는 §2 카탈로그 인증 상태에 따라:
+- **인증됨**: 1회 호출 시도.
+- **미인증·미연결**: 호출 안 함 (시도해도 실패 자명). 1차 WebFetch 결과로만 분류.
+
+| 케이스 (1차 WebFetch 시도 후) | 처리 |
 |---|---|
 | connector 호출 1건 이상 성공 | 응답 텍스트로 본문 합류. status=`200 (via <connector> — <tool>)`. |
 | connector 모두 실패 + 1차 200 OK + 인증 게이트 아님 | 1차 본문 사용. status=`200 (via WebFetch)`. |
-| connector 모두 실패 + 1차 인증 게이트 | skip. status=`인증 필요 (<connector> 미인증)`. |
-| connector 모두 실패 + 1차 4xx/5xx/timeout | skip. status=1차 status·error 그대로. |
-| 매핑·추론 후보 0 + 1차 인증 게이트 | skip. status=`인증 필요 (connector 매핑 없음)`. |
-| connector 미연결 + 1차 인증 게이트 | skip. status=`인증 필요 (<connector> 미연결)`. |
+| connector 모두 실패 + 1차 인증 게이트 | 본문 합류 안 함. status=`인증 필요 (<connector> 미인증)`. |
+| connector 모두 실패 + 1차 4xx/5xx/timeout | 본문 합류 안 함. status=1차 status·error 그대로. |
+| 매핑·추론 후보 0 + 1차 인증 게이트 | 본문 합류 안 함. status=`인증 필요 (connector 매핑 없음)`. |
+| connector 미연결 + 1차 인증 게이트 | 본문 합류 안 함. status=`인증 필요 (<connector> 미연결)`. |
 | Google Drive 본문 추출 실패 + `get_file_metadata` 성공 | metadata만 합류. status=`metadata only (via Google Drive connector — get_file_metadata)`. |
-| `--no-fetch` ON | 1차·fallback 모두 봉쇄. visited만 기록, 본문 합류 0. |
+| `--no-fetch` ON | 1차·fallback 모두 봉쇄. visited만 기록, 본문 합류 0. **유일한 fetch 미시도 케이스 (0.2.5)**. |
+
+**0.2.5 변경**: 본문 합류 안 함 케이스도 출처 list에 1행 차지. dequeue 후 행 누락 금지. status는 위 표 사유 그대로 기록.
 
 connector 응답이 image content-type이면 image queue로 라우팅. status=`image/<subtype> <bytesize> (via <connector>)`.
 

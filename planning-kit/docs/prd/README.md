@@ -1,10 +1,10 @@
 # planning-kit PRD chain
 
-planning-kit PRD 8건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
+planning-kit PRD 9건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
 
 ## 읽는 순서
 
-- **신규 사용자**: 본 README → `prd-0.2.4.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
+- **신규 사용자**: 본 README → `prd-0.2.5.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
 - **기존 사용자**: 신규 PRD만 읽으면 충분 — 각 PRD가 incremental 베이스를 명시한다.
 
 ## PRD 관계도
@@ -19,6 +19,7 @@ planning-kit PRD 8건의 관계·읽는 순서·핵심 변경 1줄 요약을 한
 | 0.2.2 | incremental | 0.2.1 | R1 SSOT corpus link follow + planning-review 입력 제외 § 인지 + Codex desc 압축 + README 비교표 갱신 + PRD chain 안내 |
 | 0.2.3 | incremental | 0.2.2 | planning-format 표 셀 list 분해 판단 (main 자유 판단, Q-list·카운트 룰 X) + 부모 § 안 sub-§(`### N.x` 보조 표) 동적 추가, 다층 재귀 분해 지원 |
 | 0.2.4 | incremental | 0.2.3 | sub-§ 정밀화(번호 순차 §N.1·§N.2 + 헤더 backlink + 구조 변환 처리 줄 sub-§ 위치) + F1·F2·R1·R2·R3 sub-§ 인식 + SKILL.md 분해(orchestration only + 3 reference lazy read) + 입력 제외 § 위치 markdown link + 출처 list URL deep link + Confluence·Docs·Slides·Notion anchor 추출 + 충돌 후보 카테고리(11종) |
+| 0.2.5 | incremental | 0.2.4 | 결정성 강화 7 항목 — fetch 시도 의무화(`--no-fetch` 외 미시도 금지) + BFS 순서 강제(depth + 발견 순서) + exclusion 11 카테고리 결정 트리(라벨 미매핑 폴백) + 모호성 강제 [TBD](정규식 6 패턴 + 16 어구) + list 분해 max-depth cap=3 + self-review 6패스 26 항목 체크리스트 + 라벨 매핑 결정 트리 + 양 매핑 분배 룰. 같은 입력 일치율 0.9% → 25~39%로 28~43배 개선 |
 
 ## 호환성 요약
 
@@ -35,3 +36,4 @@ planning-kit PRD 8건의 관계·읽는 순서·핵심 변경 1줄 요약을 한
 - [`prd-0.2.2.md`](./prd-0.2.2.md) — R1 link follow + 입력 제외 § R3 보조 신호.
 - [`prd-0.2.3.md`](./prd-0.2.3.md) — 표 셀 list 분해 판단 + 보조 표 sub-§.
 - [`prd-0.2.4.md`](./prd-0.2.4.md) — sub-§ 정밀화·SKILL 분해·deep link·11 카테고리.
+- [`prd-0.2.5.md`](./prd-0.2.5.md) — 결정성 강화 7 항목 (fetch 의무·BFS·결정 트리·모호성 [TBD]·max-depth=3·6패스 체크리스트·라벨 매핑 트리).

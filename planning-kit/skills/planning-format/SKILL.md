@@ -48,7 +48,13 @@ URL 분기 sanity check는 `references/connector-routing.md` §8.
 
 ### Step 3: 재귀 fetch + connector fallback
 
-URL 한 개씩 dequeue → normalize → visited 검사 → fetch → 본문 합류 + 자식 URL/이미지 추출 → queue push. depth·pages·body 크기 cap 없음. visited set으로만 cycle 방지. `--no-fetch`면 §3 전체 skip.
+URL 한 개씩 dequeue → normalize → visited 검사 → fetch 시도 → 본문 합류 + 자식 URL/이미지 추출 → queue push. depth·pages·body 크기 cap 없음. visited set으로만 cycle 방지. `--no-fetch`면 §3 전체 skip.
+
+**fetch 시도 의무 (0.2.5)**: queue dequeue된 visited 미포함 URL은 **100% fetch 시도 강제**. 인증 미연결·매핑 없음·미인증 추정 등 사전 판단으로 시도 자체를 생략 금지. 시도 후 실패(인증 게이트·timeout·4xx/5xx·빈 본문·미지원 content-type)는 출처 list `상태` 컬럼에 사유 기록 + visited 등록. fetch 미시도 허용은 `--no-fetch` 단 1케이스. dequeue된 모든 URL은 출처 list 1행 차지 (행 누락 금지).
+
+**queue 순서 BFS 강제 (0.2.5)**: depth N 모두 dequeue 완료 후 depth N+1 dequeue. 같은 depth 안에선 본문 발견 순서 유지 (markdown link → HTML href → plain URL). LIFO·우선순위 휴리스틱 금지. normalize는 queue push 시점에 1회. 출처 list `#` 번호 = BFS dequeue 순서.
+
+self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:`/scheme 없는 URL은 시드 단계에서 이미 제외 (Step 1).
 
 fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFetch 1차 + connector fallback·인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·status 표기·sanity check 메시지·**§11 connector별 anchor 추출 (deep link)** 모두 거기에.
 
@@ -65,18 +71,18 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 `references/conversion-rules.md` 1회 Read 적재. 적재 후:
 
 - §3 기능명 추출 (1순위 1개).
-- §4 두 템플릿 변환 (라벨 매핑, 본문 미합류 조각은 입력 제외 §).
-- §5 list 분해 판단 — 보조 표 번호 순차(`§N.M`)·헤더 backlink(`(§N row K)`)·다층 재귀.
+- §4 두 템플릿 변환 — **라벨 매핑 결정 트리 (0.2.5)** + 양 매핑 분배 룰 + §10.2 측면별 분배표.
+- §5 list 분해 판단 — 보조 표 번호 순차(`§N.M`)·헤더 backlink(`(§N row K)`)·**다층 재귀 max-depth cap = 3 (0.2.5)**. depth 4 진입 시 합류 유지 폴백.
 
-본문 미합류 조각 라벨링은 `references/exclusion-rules.md` 1회 Read 적재 (§1 11 카테고리·§2 우선순위·§4 5필드·§5 처리 줄·§6 헤더 분포·§7 marker 1종).
+본문 미합류 조각 라벨링은 `references/exclusion-rules.md` 1회 Read 적재 (§1 11 카테고리·**§2 결정 트리 (0.2.5)**·**§3.1 모호성 트리거 + §3.2 16 어구 카탈로그 (0.2.5)**·§4 5필드·§5 처리 줄·§6 헤더 분포·§7 marker 1종).
 
 > 큰 입력(통합 본문 ≥30 page 등) 시 indexing(claim 추출·도메인 grouping·충돌 grouping) → synthesis(두 본문) → exclusion → self-review 순 진행 권고. 강제 X — 작은 입력은 자유.
 
 ### Step 7: 자체 품질 검증
 
-`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) 단일 패스 점검. F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·예시·발견 형식 모두 reference 그대로.
+`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) **6패스 체크리스트 점검 (0.2.5)** — 카테고리당 1패스, 총 26 항목 yes/no 검사. F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·체크리스트·예시·발견 형식 모두 reference 그대로.
 
-6 카테고리 모두 0건이면 `통과`, ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
+체크리스트 □ 중 unchecked 1개 = 발견 1건. 6 카테고리 모두 0건이면 `통과`, ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
 
 ### Step 8: `--save` 처리
 
@@ -90,10 +96,10 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 
 - `templates/기능설계서.md` — 8 섹션 표 골격.
 - `templates/정책서.md` — 10 섹션 표 골격.
-- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·backlink (Step 4·5·6).
-- `references/exclusion-rules.md` — 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (Step 6).
+- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·backlink (Step 4·5·6) + §4.1 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5).
+- `references/exclusion-rules.md` — 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (Step 6) + §2 결정 트리 + §3.1 모호성 트리거 + §3.2 16 어구 (0.2.5).
 - `references/output-contract.md` — 출력 포맷·헤더 줄·`--save` 처리·`## 출처` list deep link·분기별 헤더 (Step 8·9).
-- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7).
-- `references/connector-routing.md` — 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기·§8 sanity check·§11 connector별 anchor 추출 (Step 3).
+- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7) + 26 항목 체크리스트 6패스 (0.2.5).
+- `references/connector-routing.md` — 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기·§8 sanity check·§11 connector별 anchor 추출 (Step 3) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5).
 
 외부 검증(SSOT 충돌·acceptance criteria·의존 영향)은 `planning-review` 스킬 별도 호출. 자세한 사용법은 `skills/planning-review/SKILL.md`.
