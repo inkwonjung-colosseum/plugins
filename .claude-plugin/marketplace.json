@@ -43,8 +43,8 @@
     {
       "name": "planning-kit",
       "source": "./planning-kit",
-      "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증하는 planning-format과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하는 planning-review 두 스킬 구조. 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback. 0.2.4부터 보조 표 §N.1·§N.2 순차 + 헤더 backlink + F1·F2·R1·R2·R3 sub-§ 인식 + Confluence·Docs·Slides·Notion anchor 추출 + 충돌 후보 카테고리 + 위치 markdown link 1-hop 점프. 0.2.5부터 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리)으로 같은 입력 일치율 0.9% → 25~39% (28~43배). default 화면 output, --save로 ./.planning-kit/<기능명>/ 저장.",
-      "version": "0.2.5",
+      "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증하는 planning-format과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하는 planning-review 두 스킬 구조. 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback. 0.2.6부터 planning-review도 다중 URL 입력을 root input으로 받아 planning-format과 같은 input fetch·connector fallback·이미지 multimodal·통합 본문 합류를 수행하고, 입력 fetch와 SSOT corpus link follow를 별도 visited set·출처 블록으로 분리한다. 신규 옵션 --no-input-fetch / --no-input-image와 조건부 ## 입력 출처 블록을 제공한다. 0.2.5 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리) 포함. default 화면 output, --save로 ./.planning-kit/<기능명>/ 저장.",
+      "version": "0.2.6",
       "license": "MIT",
       "tags": ["planning", "product", "documentation", "review"]
     }

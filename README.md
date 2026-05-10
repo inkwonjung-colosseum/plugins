@@ -1,12 +1,12 @@
 # COLO plugins
 
-Claude Code와 Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs를 관리합니다. 현재 이 저장소는 Claude Code와 Codex용 manifest만 제공하며, Cowork용 plugin manifest나 marketplace catalog는 포함하지 않습니다.
+Claude Code, Claude Desktop/Cowork, Codex에서 사용할 플러그인을 한 저장소에서 관리하는 workspace입니다. 저장소 루트는 설치 가능한 단일 플러그인이 아니라 marketplace catalog이고, 실제 플러그인은 각 하위 디렉터리에서 자체 manifest, skills, docs를 관리합니다.
 
 ## 빠른 시작
 
 ### Claude Code
 
-GitHub repository marketplace를 추가한 뒤 필요한 플러그인을 설치합니다. 이 저장소의 공개 marketplace 기준 설치 경로는 [https://github.com/inkwonjung-colosseum/plugins](https://github.com/inkwonjung-colosseum/plugins)입니다.
+GitHub repository marketplace를 추가한 뒤 필요한 플러그인을 설치합니다. 플러그인 링크는 [https://github.com/inkwonjung-colosseum/plugins](https://github.com/inkwonjung-colosseum/plugins)입니다.
 
 ```bash
 claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins
@@ -21,24 +21,23 @@ claude plugin install ai-utility-kit@inkwonjung-colosseum
 
 ### Codex
 
-Codex는 repository marketplace를 추가한 뒤 Codex 앱에서 `/plugins`를 열어 필요한 플러그인을 설치/활성화합니다.
-
-```bash
-codex marketplace add https://github.com/inkwonjung-colosseum/plugins
-```
+Codex App을 사용하는 경우 Microsoft Store에서 Windows 앱을 설치한 뒤, 앱에서 `/plugins` 또는 plugin/skill 설정 화면을 열어 필요한 플러그인을 설치/활성화합니다. 플러그인 링크는 [https://github.com/inkwonjung-colosseum/plugins](https://github.com/inkwonjung-colosseum/plugins)입니다.
 
 스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$planning-format`, `$planning-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
-현재 이 저장소에는 Cowork용 plugin 추가 방법이 없습니다. Cowork를 지원하려면 Cowork가 요구하는 manifest/catalog 형식을 먼저 확인한 뒤, Claude Code의 `.claude-plugin/` 및 Codex의 `.codex-plugin/`과 별도 지원 파일을 추가해야 합니다.
+Cowork는 Claude Desktop 앱에서 plugin을 설치합니다. 현재는 `Cowork` > `Customize`에서 public GitHub repo 링크를 입력해 플러그인을 추가하는 방식으로 운영합니다. 이 경로에서는 사용자 PC에 Git 설치가 필요하지 않습니다. 조직 catalog 방식은 추후 도입 예정입니다.
+
+- Claude Desktop 다운로드: [https://claude.com/download](https://claude.com/download)
+- Cowork plugin 사용 문서: [https://support.claude.com/en/articles/13837440-use-plugins-in-claude-cowork](https://support.claude.com/en/articles/13837440-use-plugins-in-claude-cowork)
 
 ## 플러그인
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `product-team-kit` | `0.7.5` | 기획 입력을 기능설계서와 정책서 초안으로 단일 패스 작성·자체 검증하며, `.product-team-kit/config.json`과 `CLAUDE.md`/`AGENTS.md` 안내 블록 설정, 단계별 lazy read, Product Docs SSOT 근거 기반 2축 점검(SSOT 충돌·용어 일관성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `planning-kit` | `0.2.5` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 점검하는 `planning-format`과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 검증하는 `planning-review` 두 스킬 구조. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킵니다. Google Workspace는 자원별 tool 시퀀스(`read_file_content` → `download_file_content` → `get_file_metadata`)와 Sheets gid·range fragment 처리를 지원합니다. 입력 제외 § 11 카테고리(`충돌 후보` 0.2.4 신규) + 위치 markdown link로 외부 source 1-hop 점프, Confluence·Docs·Slides·Notion 4종 connector anchor 추출(0.2.4), 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink(0.2.4), F1·F2·R1·R2·R3 sub-§ 인식(0.2.4). 0.2.5부터 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리)으로 같은 입력 일치율 0.9% → 25~39%(28~43배) 개선. default 화면 output, `--save`로 `./.planning-kit/<기능명>/`에 두 본문 저장. | `planning-format`, `planning-review` | [README](./planning-kit/README.md) |
+| `planning-kit` | `0.2.6` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 점검하는 `planning-format`과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 검증하는 `planning-review` 두 스킬 구조. `planning-format`은 URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킵니다. 0.2.6부터 `planning-review`도 다중 URL 입력을 root input으로 받아 같은 input fetch·connector fallback·이미지 multimodal 처리를 수행하며, 입력 fetch와 SSOT corpus link follow를 별도 visited set·출처 블록으로 분리합니다. 0.2.5 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리)도 포함합니다. default 화면 output, `--save`로 `./.planning-kit/<기능명>/`에 두 본문 저장. | `planning-format`, `planning-review` | [README](./planning-kit/README.md) |
 | `diagram-design` | `1.0.3` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
@@ -96,6 +95,8 @@ $term-clarifier
 
 여러 플러그인이 같은 스킬 이름을 제공하는 경우에는 Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
 
+Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `diagram-design` 같은 스킬을 선택합니다.
+
 ## 저장소 구조
 
 ```text
@@ -145,13 +146,16 @@ Claude Code catalog는 `.claude-plugin/marketplace.json`입니다. 각 entry는 
 
 Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `source.path`, `policy.installation`, `policy.authentication`, `category`를 가집니다.
 
+Cowork 조직 catalog 배포는 추후 도입 예정입니다.
+
 새 플러그인을 추가할 때는 다음을 함께 맞춥니다.
 
 1. Claude Code 지원: `<plugin>/.claude-plugin/plugin.json`
 2. Codex 지원: `<plugin>/.codex-plugin/plugin.json`
 3. Claude Code catalog: `.claude-plugin/marketplace.json`
 4. Codex catalog: `.agents/plugins/marketplace.json`
-5. 플러그인 README와 루트 README의 목록/설치 안내
+5. Cowork public GitHub repo 링크 기반 설치 안내
+6. 플러그인 README와 루트 README의 목록/설치 안내
 
 ## 검증
 

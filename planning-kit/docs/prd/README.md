@@ -1,10 +1,10 @@
 # planning-kit PRD chain
 
-planning-kit PRD 9건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
+planning-kit PRD 11건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
 
 ## 읽는 순서
 
-- **신규 사용자**: 본 README → `prd-0.2.5.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
+- **신규 사용자**: 본 README → `prd-0.2.7.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
 - **기존 사용자**: 신규 PRD만 읽으면 충분 — 각 PRD가 incremental 베이스를 명시한다.
 
 ## PRD 관계도
@@ -20,6 +20,8 @@ planning-kit PRD 9건의 관계·읽는 순서·핵심 변경 1줄 요약을 한
 | 0.2.3 | incremental | 0.2.2 | planning-format 표 셀 list 분해 판단 (main 자유 판단, Q-list·카운트 룰 X) + 부모 § 안 sub-§(`### N.x` 보조 표) 동적 추가, 다층 재귀 분해 지원 |
 | 0.2.4 | incremental | 0.2.3 | sub-§ 정밀화(번호 순차 §N.1·§N.2 + 헤더 backlink + 구조 변환 처리 줄 sub-§ 위치) + F1·F2·R1·R2·R3 sub-§ 인식 + SKILL.md 분해(orchestration only + 3 reference lazy read) + 입력 제외 § 위치 markdown link + 출처 list URL deep link + Confluence·Docs·Slides·Notion anchor 추출 + 충돌 후보 카테고리(11종) |
 | 0.2.5 | incremental | 0.2.4 | 결정성 강화 7 항목 — fetch 시도 의무화(`--no-fetch` 외 미시도 금지) + BFS 순서 강제(depth + 발견 순서) + exclusion 11 카테고리 결정 트리(라벨 미매핑 폴백) + 모호성 강제 [TBD](정규식 6 패턴 + 16 어구) + list 분해 max-depth cap=3 + self-review 6패스 26 항목 체크리스트 + 라벨 매핑 결정 트리 + 양 매핑 분배 룰. 같은 입력 일치율 0.9% → 25~39%로 28~43배 개선 |
+| 0.2.6 | incremental | 0.2.5 | planning-review 입력 처리 parity — 다중 URL 입력 허용 + planning-format과 같은 input dispatch·재귀 fetch·connector fallback·image multimodal·통합 본문 합류 + `--no-input-fetch` / `--no-input-image` + `## 입력 출처` 블록. 입력 fetch와 SSOT corpus link follow는 별도 visited set·출처 블록으로 분리 |
+| 0.2.7 | incremental | 0.2.6 | 신규 `ssot-audit` 스킬 — 프로젝트 전체 `*.md` + 외부 링크 follow corpus를 구조 품질·내용 품질 2축으로 감사하고, 발견/권고와 개선 backlog를 화면 output only로 제공 |
 
 ## 호환성 요약
 
@@ -37,3 +39,5 @@ planning-kit PRD 9건의 관계·읽는 순서·핵심 변경 1줄 요약을 한
 - [`prd-0.2.3.md`](./prd-0.2.3.md) — 표 셀 list 분해 판단 + 보조 표 sub-§.
 - [`prd-0.2.4.md`](./prd-0.2.4.md) — sub-§ 정밀화·SKILL 분해·deep link·11 카테고리.
 - [`prd-0.2.5.md`](./prd-0.2.5.md) — 결정성 강화 7 항목 (fetch 의무·BFS·결정 트리·모호성 [TBD]·max-depth=3·6패스 체크리스트·라벨 매핑 트리).
+- [`prd-0.2.6.md`](./prd-0.2.6.md) — planning-review 다중 URL 입력 + input fetch parity + 입력/SSOT fetch 분리.
+- [`prd-0.2.7.md`](./prd-0.2.7.md) — ssot-audit 신규 스킬 + 구조/내용 품질 감사 + 개선 backlog 화면 출력.

@@ -5,6 +5,9 @@
 ## 용어
 
 - **SSOT corpus**: 현재 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 자동 제외, `--ssot-include <glob>`로 좁힘) **+ 0.2.2부터 매칭 *.md 본문 안 외부 URL fetch 본문·이미지 해석 결과** (link follow 활성 시). 외부 fetch 본문은 `--no-ssot-fetch`로, 이미지 multimodal은 `--no-ssot-image`로 봉쇄 가능.
+- **input collection**: 0.2.6부터 `planning-review`가 review 대상 본문을 만들기 위해 URL·파일·디렉터리·텍스트·이미지를 수집하는 단계. 입력 URL source 자체는 SSOT corpus가 아니다.
+- **input fetch**: input collection 안 URL fetch. `--no-input-fetch`로 봉쇄하며, R1/R3 SSOT corpus link follow와 별도 visited set을 가진다.
+- **SSOT fetch**: R1/R3 SSOT corpus link follow. `--no-ssot-fetch`로 봉쇄하며, input fetch와 별도 visited set·출처 블록을 가진다.
 - **확정 문장**: 변환 본문 중 `[TBD]`가 아닌 단정 표현.
 - **R1 link follow**: 매칭 *.md 본문 안 URL을 추출해 fetch + connector fallback으로 corpus body에 합류시키는 0.2.2 신규 절차 (§R1.4).
 
@@ -14,7 +17,7 @@
 2. 프로젝트 폴더 `find . -name '*.md'` (`.git`/`node_modules` 제외, `--ssot-include`로 좁힘).
 3. 키워드 `grep -l` 또는 `rg -l`로 본문 매칭 → 매칭 file 목록 확정.
 4. 매칭 file을 `Read` 툴로 직접 읽음 (인덱스 스캔 단계 없음).
-5. **(0.2.2 신규)** 매칭 file 본문에서 URL·이미지 참조 추출 — markdown link / autolink / HTML href·src·img / plain URL / markdown image / data URI. self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:` 제외.
+5. **(0.2.2 신규)** 매칭 file 본문에서 URL·이미지 참조 추출 — markdown link / autolink / HTML href·src·img / plain URL / markdown image / data URI. self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:` 제외. 이 추출은 SSOT corpus 확장용이며 0.2.6 input collection 추출과 독립이다.
 6. **(0.2.2 신규)** 추출 URL을 fetch queue에 시드, 이미지를 image queue에 시드. `--no-ssot-fetch` ON이면 단계 5~8 skip.
 7. **(0.2.2 신규)** 재귀 fetch + connector fallback — `../planning-format/references/connector-routing.md`를 1회 Read 적재해 그대로 사용. 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기 모두 거기에 있다.
 8. **(0.2.2 신규)** 이미지 multimodal 해석 — 지원 확장자·해석 프롬프트는 `planning-format` §4 그대로. `--no-ssot-image` ON이면 image content-type 응답 합류 안 함.
@@ -68,7 +71,8 @@ origin·line 필드는 출처 list 표기에만 사용 (§R1.5). fetch 동작 �
 ### visited set·cycle 방지
 
 - visited set: SSOT corpus의 URL normalize key 집합. URL normalize는 `connector-routing.md` §6 그대로 — fragment 제거·trailing `/`·트래킹 query 제거·호스트 lowercase·query 키 정렬.
-- visited set은 한 호출 내에서만 유효. `planning-format` 호출의 visited set과 별도 (호출 간 캐시 미공유). 호출 간 캐시는 후속 PRD.
+- visited set은 한 호출 내에서만 유효. `planning-format` 호출의 visited set, `planning-review` input fetch visited set과 별도 (호출 간 캐시 미공유). 호출 간 캐시는 후속 PRD.
+- input visited set과 SSOT visited set은 의도적으로 cross-set dedup하지 않는다. 같은 URL이 입력 root와 SSOT corpus link에 동시에 등장하면 `## 입력 출처`와 `## SSOT 출처`에 각각 나타날 수 있다.
 - 같은 URL이 여러 매칭 *.md에서 발견되면 1번만 fetch + 본문 합류. 출처 list에는 origin file 1번만 표시 (첫 발견).
 - 매칭 *.md 자체 본문은 cycle 방지 대상 아님 (이미 corpus). follow URL이 매칭 *.md 자기 자신을 가리키면 skip.
 - R1이 fetch한 본문에서 발견된 자식 link도 visited set으로만 제어 (cap 없음).
