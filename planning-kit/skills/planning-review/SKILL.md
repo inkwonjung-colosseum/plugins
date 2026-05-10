@@ -1,6 +1,6 @@
 ---
 name: planning-review
-description: "planning-format 산출물(정책서·기능설계서 두 본문)을 외부 SSOT corpus 충돌·acceptance criteria 검증가능성·의존 영향 분석 3축으로 점검할 때 사용한다. 직전 turn의 planning-format 출력, 디렉터리·파일 경로, raw markdown 텍스트, 1개 이상의 URL 입력을 모두 받는다."
+description: "planning-format 산출물(정책서·기능설계서 두 본문)을 외부 SSOT corpus 충돌·acceptance criteria 검증가능성·의존 영향 분석 3축으로 점검할 때 사용한다. 직전 turn의 planning-format 출력, 디렉터리·파일 경로, raw markdown 텍스트, 1개 이상의 URL 입력을 모두 받는다. 1개 파일 입력은 same-folder companion read로 같은 폴더 sibling 파일을 non-recursive 수집해 정책서·기능설계서 쌍을 식별한다."
 argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | raw markdown>] [--ssot-include <glob>] [--axes <list>] [--no-input-fetch] [--no-input-image] [--no-ssot-fetch] [--no-ssot-image]"
 ---
 
@@ -13,7 +13,7 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 - **0개** = conversation 참조 모드. 직전 turn의 `planning-format` 출력에서 두 본문 추출.
 - **1개 이상이고 모든 비어 있지 않은 토큰이 `^https?://`** = URL 분기. 모든 URL을 depth 0 root input source로 fetch한다. 다중 URL 허용.
 - **1개 (디렉터리)** = `정책서*.md` + `기능설계서*.md` 자동 검색. 디렉터리 안 지원 이미지 파일도 input image queue 시드.
-- **1개 (파일)** = 본문 안 두 섹션 자동 분리. 이미지 확장자면 input image queue 단독 시드.
+- **1개 (파일)** = same-folder companion read. 입력 파일의 parent directory에서 sibling 파일을 non-recursive로 함께 읽고, 정책서·기능설계서 쌍을 식별한다. 이미지 확장자면 input image queue 단독 시드.
 - **2개 non-URL path** = `<정책서> <기능설계서>` 또는 역순 (헤더/파일명으로 자동 식별).
 - **그 외** = raw markdown 텍스트 분기. URL 토큰과 비-URL 토큰이 섞이면 `planning-format`처럼 텍스트 분기로 본다. 텍스트 안 plain URL은 공통 URL 추출 단계에서 input fetch queue에 시드된다.
 
@@ -48,10 +48,28 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 1. 0개                                      → conversation 참조 모드
 2. URL 패턴 (1개 이상 토큰, 모두 https?://) → URL 분기
 3. 1개 디렉터리 경로                       → 디렉터리 분기
-4. 1개 파일 경로                           → 파일 분기 (이미지 확장자면 image queue 단독 시드)
+4. 1개 파일 경로                           → 파일 분기 (same-folder companion read, 이미지 확장자면 image queue 단독 시드)
 5. 2개 non-URL path                         → 두 파일 분기
 6. 그 외                                    → 텍스트 분기
 ```
+
+#### Step 1.1.1 same-folder companion read (0.2.7)
+
+1개 파일 입력은 해당 파일만 읽는 분기가 아니다. 사용자가 정책서 또는 기능설계서 파일 하나만 지정해도, 같은 폴더 안의 sibling 파일을 함께 읽어 정책서·기능설계서 쌍을 구성한다.
+
+동작 규칙:
+
+1. 입력 파일의 parent directory를 companion scan 범위로 잡는다.
+2. scan 범위는 **non-recursive**다. 하위 폴더는 읽지 않는다.
+3. 같은 폴더의 모든 읽을 수 있는 UTF-8 텍스트 파일과 planning-kit 지원 이미지 파일을 input collection에 추가한다.
+4. 숨김 파일, binary, dependency/build/cache 성격 파일은 읽지 않는다. 판단 기준은 `../planning-format/references/exclusion-rules.md`와 디렉터리 입력의 기본 제외 관례를 따른다.
+5. source title/path/H1/본문 헤더로 `정책서`와 `기능설계서` 후보를 식별한다.
+6. 입력 파일과 같은 기능명/stem/domain으로 보이는 후보를 우선한다.
+7. 후보가 1쌍으로 확정되면 두 본문을 함께 리뷰한다.
+8. 같은 폴더에 여러 기능의 정책서·기능설계서가 섞여 있고 1쌍으로 좁힐 수 없으면 임의 병합하지 않고 sanity check로 종료한다.
+9. 같은 폴더를 모두 읽었는데도 한쪽 본문만 있으면 기존처럼 한쪽 본문 비어 있음 또는 본문 식별 실패 메시지로 종료한다.
+
+이 변경은 단일 파일 입력의 편의 확장이다. `planning-review`가 새 정책서·기능설계서를 생성하거나, 같은 폴더 밖의 파일을 자동 탐색하거나, SSOT corpus를 review 대상 본문으로 승격하지 않는다.
 
 #### Step 1.2 input collection (0.2.6)
 
@@ -67,6 +85,7 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 - input image queue는 5경로(이미지 파일 인자, 디렉터리 이미지, markdown image/HTML img, fetch `image/*`, inline data URI)를 따른다. `--no-input-image` ON이면 image multimodal 0건이며 image content-type 응답은 본문 합류하지 않는다.
 - fetch·image 처리가 1건 이상이면 `## 입력 출처` 블록에 root URL, 자식 URL, 입력 이미지 행을 모두 기록한다. 실패 행도 포함한다.
 - fetch·image 처리가 끝나면 source 단위 헤더로 concat한다.
+- 1개 파일 입력의 companion read에서 추가된 sibling 텍스트/이미지도 source 단위 헤더로 concat한다. 입력 파일은 source 우선순위 1순위이며, 같은 기능명/stem/domain sibling만 정책서·기능설계서 후보로 우선한다.
 
 ```markdown
 === [입력 출처 1] URL: https://wiki.example/policy/order-cancel ===
@@ -87,9 +106,11 @@ Google Sheets gid/range, connector deep link anchor, metadata only 상태 등은
 3. `## 입력 제외 항목` 헤더 → 입력 제외 § 본문 (옵션 — 부재해도 sanity check 아님, 0.2.0 산출물 호환). 여러 개면 발견 순서대로 concat하고 dedup하지 않는다.
 4. markdown 코드 펜스 안 헤더 → 펜스 안 본문에서 1~3 반복.
 5. source title/path/URL label이 `정책서`, `policy`, `정책`, `기능설계서`, `feature`, `design`, `spec` 중 하나를 명확히 가리키면 source 단위 fallback 배정.
-6. 위 절차 후 정책서·기능설계서 둘 다 확보하지 못하면 sanity check.
+6. 1개 파일 입력의 companion read source는 title/path/H1/본문 헤더와 입력 파일의 기능명/stem/domain 유사도로 후보를 좁힌다.
+7. 위 절차 후 정책서·기능설계서 둘 다 확보하지 못하면 sanity check.
 
 source 단위 fallback은 명확한 1:1 신호일 때만 사용한다. 두 source가 모두 같은 종류로 추정되거나 둘 다 불명확하면 fallback하지 않는다.
+companion read에서 여러 기능의 정책서·기능설계서 후보가 섞여 있고 입력 파일 기준으로 1쌍을 확정할 수 없으면 fallback하지 않고 sanity check로 종료한다.
 
 분리 결과는 메모리에만. `--axes` 활성 무관 분리 단계는 항상 시도.
 
@@ -99,6 +120,7 @@ source 단위 fallback은 명확한 1:1 신호일 때만 사용한다. 두 sourc
 | URL 입력 + `--no-input-fetch` | `입력 URL fetch가 --no-input-fetch로 봉쇄되어 정책서·기능설계서 본문을 식별할 수 없습니다. 파일/markdown 입력을 주거나 --no-input-fetch를 제거하세요.` |
 | URL root 모두 본문 합류 실패 | `모든 review 입력 URL fetch 실패. 첫 번째 사유: <status 또는 error>` |
 | URL root 모두 인증 게이트 + fallback 실패 | `모든 review 입력 URL이 로그인 필요로 보입니다. connector/MCP fallback도 인증되지 않았습니다.` + `필요한 connector: <Atlassian / Figma / Google Drive / Slack / Notion / ...>` |
+| 단일 파일 companion read 후보 모호 | `같은 폴더에서 정책서·기능설계서 1쌍을 확정할 수 없습니다. 리뷰할 두 파일을 명시하거나 기능별 폴더로 분리하세요.` |
 | 본문 식별 실패 | `정책서·기능설계서 두 본문을 식별할 수 없습니다. URL 본문에 # 정책서 / # 기능설계서 헤더를 두거나, 정책서·기능설계서가 구분되는 별도 링크/파일로 주세요.` |
 | 한쪽 본문 비어 있음 | `<정책서 또는 기능설계서>가 비어 있습니다. 입력 URL/파일이 planning-format 산출물인지 확인하세요.` |
 | `--axes` 빈 값 | `--axes에 점검 축을 1개 이상 지정하세요. (ssot, ac, deps)` |

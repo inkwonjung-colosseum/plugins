@@ -23,7 +23,7 @@ claude plugin install ai-utility-kit@inkwonjung-colosseum
 
 Codex App을 사용하는 경우 Microsoft Store에서 Windows 앱을 설치한 뒤, 앱에서 `/plugins` 또는 plugin/skill 설정 화면을 열어 필요한 플러그인을 설치/활성화합니다. 플러그인 링크는 [https://github.com/inkwonjung-colosseum/plugins](https://github.com/inkwonjung-colosseum/plugins)입니다.
 
-스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$planning-format`, `$planning-review`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
+스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$planning-format`, `$planning-review`, `$ssot-audit`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
@@ -37,7 +37,7 @@ Cowork는 Claude Desktop 앱에서 plugin을 설치합니다. 현재는 `Cowork`
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `product-team-kit` | `0.7.5` | 기획 입력을 기능설계서와 정책서 초안으로 단일 패스 작성·자체 검증하며, `.product-team-kit/config.json`과 `CLAUDE.md`/`AGENTS.md` 안내 블록 설정, 단계별 lazy read, Product Docs SSOT 근거 기반 2축 점검(SSOT 충돌·용어 일관성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `planning-kit` | `0.2.6` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 점검하는 `planning-format`과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 검증하는 `planning-review` 두 스킬 구조. `planning-format`은 URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킵니다. 0.2.6부터 `planning-review`도 다중 URL 입력을 root input으로 받아 같은 input fetch·connector fallback·이미지 multimodal 처리를 수행하며, 입력 fetch와 SSOT corpus link follow를 별도 visited set·출처 블록으로 분리합니다. 0.2.5 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리)도 포함합니다. default 화면 output, `--save`로 `./.planning-kit/<기능명>/`에 두 본문 저장. | `planning-format`, `planning-review` | [README](./planning-kit/README.md) |
+| `planning-kit` | `0.2.7` | 기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 점검하는 `planning-format`, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 검증하는 `planning-review`, 프로젝트 Markdown SSOT corpus 자체를 구조·내용 2축으로 감사하는 `ssot-audit` 세 스킬 구조. 0.2.7부터 `planning-review` 단일 파일 입력은 같은 폴더 sibling 파일을 non-recursive로 함께 읽고, `ssot-audit`는 v0.8 미만 문서 제외·외부 링크 cap 없음 follow·개선 backlog 화면 output을 제공합니다. | `planning-format`, `planning-review`, `ssot-audit` | [README](./planning-kit/README.md) |
 | `diagram-design` | `1.0.3` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
 | `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
 | `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
@@ -63,6 +63,7 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 /product-team-kit:set-config
 /planning-kit:planning-format
 /planning-kit:planning-review
+/planning-kit:ssot-audit
 /diagram-design:diagram-design
 /logistics-expert-kit:logistics-scope
 /logistics-expert-kit:logistics-diagnose
@@ -82,6 +83,7 @@ $plan-review
 $set-config
 $planning-format
 $planning-review
+$ssot-audit
 $diagram-design
 $logistics-scope
 $logistics-diagnose
@@ -95,7 +97,7 @@ $term-clarifier
 
 여러 플러그인이 같은 스킬 이름을 제공하는 경우에는 Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
 
-Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `diagram-design` 같은 스킬을 선택합니다.
+Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `ssot-audit`, `diagram-design` 같은 스킬을 선택합니다.
 
 ## 저장소 구조
 
@@ -118,7 +120,8 @@ colo-plugins/
 │   ├── .codex-plugin/plugin.json
 │   ├── skills/
 │   │   ├── planning-format/
-│   │   └── planning-review/
+│   │   ├── planning-review/
+│   │   └── ssot-audit/
 │   └── docs/
 ├── diagram-design/
 │   ├── .claude-plugin/plugin.json
@@ -144,7 +147,7 @@ colo-plugins/
 
 Claude Code catalog는 `.claude-plugin/marketplace.json`입니다. 각 entry는 plugin name, source directory, description, version, license, tags를 가집니다.
 
-Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `source.path`, `policy.installation`, `policy.authentication`, `category`를 가집니다.
+Codex catalog는 `.agents/plugins/marketplace.json`입니다. 각 entry는 `source.path`, `policy.installation`, `policy.authentication`, `category`를 가지며, version marker가 필요한 entry는 `version`을 함께 둡니다.
 
 Cowork 조직 catalog 배포는 추후 도입 예정입니다.
 

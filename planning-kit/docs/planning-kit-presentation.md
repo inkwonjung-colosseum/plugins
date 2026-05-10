@@ -2,8 +2,9 @@
 
 > Confluence 게시용 운영 문서
 > 작성일: 2026-05-10
+> 최종 수정일: 2026-05-11
 > 대상: 기획팀, 개발팀, 디자인/QA/운영 협업자
-> 문서 상태: 초안 v0.11
+> 문서 상태: 초안 v0.12
 
 ---
 
@@ -16,6 +17,7 @@
 핵심 원칙은 다음과 같습니다.
 
 - 초안 작성은 기존 방식대로 자유롭게 진행하고, AI는 `planning-format`과 `planning-review` 단계에서 formatting과 review에 활용한다.
+- SSOT corpus 자체의 중복, 낮은 버전 참조, 내용 충돌은 새 기획 리뷰와 분리해 필요 시 `ssot-audit`로 점검한다.
 - Confluence `[Origin]`은 개인 자유 작성 결과물이 올라오는 공간으로 둔다.
 - Confluence `[AI]`는 `planning-kit`을 활용해 formatting/review한 결과물이 올라오는 공간으로 둔다.
 - 최종 기획 v1.0은 `planning-format`/`planning-review` 산출물이 아니라 기획/개발/디자인/QA/운영 등 관련 팀 리뷰와 합의 이후 Confluence `[AI]`에서 공식 기획 완료 문서로 확정한다.
@@ -59,6 +61,7 @@ Confluence 게시 시 아래 문구를 문서 상단 또는 안내 블록에 포
 
 ```text
 Confluence [Origin] / SSOT 자료 확인
+-> 필요 시 ssot-audit로 기존 SSOT backlog 확인
 -> 기존 방식으로 개인 기획 작성(~v0.7)
 -> Confluence [Origin] upload
 -> planning-format으로 기획서 formatting 및 기존 문서 기반 발견사항 보정
@@ -74,6 +77,7 @@ Confluence [Origin] / SSOT 자료 확인
 | 구간 | 역할 | 산출물/상태 |
 |---|---|---|
 | Confluence [Origin] / SSOT | 개인 자유 작성 결과물, 기존 기획, 제품 기준 확인 | 참조 자료, 기존 기준 |
+| ssot-audit | 기존 SSOT corpus 자체의 구조·내용 품질을 점검 | SSOT 인벤토리, 제외 문서, 개선 backlog |
 | 개인 기획 작성 | 기존 방식으로 자유롭게 초안 작성 | 개인 기획 초안 |
 | Confluence [Origin] upload | 개인 기획 초안을 Confluence `[Origin]`에 업로드 | `[Origin]` 개인 기획 초안 v0.7 |
 | planning-format | `[Origin]` upload본을 정책서와 기능설계서로 구조화하고 기존 문서 기반 발견사항을 보정 | 정책서, 기능설계서, 출처, 입력 제외, 자체 검증 |
@@ -93,11 +97,11 @@ Confluence [Origin] / SSOT 자료 확인
 - simple update와 mass update는 기획팀 리뷰 또는 실무 리뷰 중 이슈가 발견됐을 때 선택하는 보정 옵션이다.
 - 의미가 바뀌는 변경은 기획팀/실무 리뷰 단계에서 확인한다.
 
-발표 중 `planning-format`/`planning-review`의 내부 흐름을 더 자세히 설명해야 할 때는 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 함께 사용한다.
+발표 중 `planning-format`/`planning-review`/`ssot-audit`의 내부 흐름을 더 자세히 설명해야 할 때는 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 함께 사용한다.
 
 ## 5. planning-kit이 하는 일
 
-`planning-kit`은 두 단계로 동작합니다.
+`planning-kit`은 기본 기획 변환/리뷰 두 단계와, 필요 시 실행하는 SSOT corpus 감사 단계로 동작합니다.
 
 ### 5.1 planning-format
 
@@ -139,6 +143,7 @@ $planning-review https://wiki.example/policy/order-cancel https://docs.example/f
 ```
 
 0.2.6부터 정책서와 기능설계서가 서로 다른 URL에 있어도 직접 review 입력으로 줄 수 있습니다. 이 경우 `planning-review`가 URL root fetch, 본문 URL 재귀 fetch, connector fallback, 이미지 multimodal 처리를 수행한 뒤 `## 입력 출처`와 `## SSOT 출처`를 분리해 보여줍니다.
+0.2.7부터 정책서 또는 기능설계서 파일 하나만 입력해도 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 한 쌍을 찾습니다.
 
 점검 축:
 
@@ -152,6 +157,25 @@ $planning-review https://wiki.example/policy/order-cancel https://docs.example/f
 - 해결하지 못한 발견 항목은 회의 안건 또는 후속 보완 작업으로 전환합니다.
 
 상세 workflow와 발표용 다이어그램은 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 참고합니다.
+
+### 5.3 ssot-audit
+
+`ssot-audit`는 새 기획 산출물을 리뷰하는 단계가 아니라, 기존 SSOT corpus 자체를 점검하는 유지보수 도구입니다.
+
+```text
+$ssot-audit
+$ssot-audit --ssot-include "docs/**/*.md" --axes structure,content
+```
+
+주요 출력:
+
+- SSOT 인벤토리
+- 낮은 버전(`< v0.8`) 제외 문서
+- 구조 품질 발견/권고
+- 내용 품질 발견/권고
+- 개선 backlog
+
+결과는 화면 output only이며, 문서를 자동 수정하지 않습니다.
 
 ---
 
@@ -204,7 +228,7 @@ Confluence에 게시할 때는 문서 상단에 아래 정보를 표로 고정�
 | 버전 | v0.8 / v0.9 / v1.0 |
 | 담당 팀 | 기획팀 |
 | 원본 작성자 | 개인 기획 초안 작성자 |
-| planning-kit 실행 담당 | planning-format / planning-review 실행자 |
+| planning-kit 실행 담당 | planning-format / planning-review 실행자, 필요 시 ssot-audit 실행자 |
 | 리뷰어 | 기획팀, 개발팀, 디자인팀, QA, 운영/CS |
 | 기준일 | YYYY-MM-DD |
 | 출처 | 원본 초안, Figma, Slack, 기존 문서 링크 |
@@ -220,6 +244,7 @@ Confluence에 게시할 때는 문서 상단에 아래 정보를 표로 고정�
 - 담당 팀과 리뷰어가 지정되어 있는가
 - `[TBD]`와 입력 제외 항목을 숨기지 않았는가
 - `planning-review` 발견 항목을 본문 또는 리뷰 안건으로 연결했는가
+- SSOT corpus 자체의 중복/낮은 버전 참조/내용 충돌이 의심되면 `ssot-audit` 결과를 별도 backlog로 분리했는가
 - 출처 링크 접근 권한을 리뷰어가 확인할 수 있는가
 - `[Origin]`과 `[AI]` 중 문서 목적에 맞는 위치를 선택했는가
 
@@ -276,7 +301,7 @@ v1.0으로 올리기 전에는 아래 조건을 확인합니다.
 | 역할 | 책임 |
 |---|---|
 | 원본 작성자 | 기존 방식으로 개인 기획 초안을 작성하고 Confluence `[Origin]`에 업로드 |
-| planning-kit 실행 담당 | `planning-format`과 `planning-review` 실행, 발견사항 수정 반영, Confluence `[AI]` 업데이트 |
+| planning-kit 실행 담당 | `planning-format`과 `planning-review` 실행, 발견사항 수정 반영, Confluence `[AI]` 업데이트, 필요 시 `ssot-audit`로 SSOT backlog 분리 |
 | 기획팀 | 정책 판단, 범위와 우선순위 결정, TBD 해소, 공식 기획 완료 확인 |
 | 개발팀 | 상태 전이, 권한, 예외, 외부 연동, 구현 영향 확인 |
 | QA | Acceptance Criteria 검증가능성 확인, 테스트 관점 누락 제기 |

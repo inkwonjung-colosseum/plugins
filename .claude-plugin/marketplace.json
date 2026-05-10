@@ -43,8 +43,8 @@
     {
       "name": "planning-kit",
       "source": "./planning-kit",
-      "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증하는 planning-format과, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하는 planning-review 두 스킬 구조. 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback. 0.2.6부터 planning-review도 다중 URL 입력을 root input으로 받아 planning-format과 같은 input fetch·connector fallback·이미지 multimodal·통합 본문 합류를 수행하고, 입력 fetch와 SSOT corpus link follow를 별도 visited set·출처 블록으로 분리한다. 신규 옵션 --no-input-fetch / --no-input-image와 조건부 ## 입력 출처 블록을 제공한다. 0.2.5 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리) 포함. default 화면 output, --save로 ./.planning-kit/<기능명>/ 저장.",
-      "version": "0.2.6",
+      "description": "기획 초안 변환, 산출물 리뷰, SSOT corpus 감사를 지원하는 planning-kit. planning-format은 텍스트·파일·디렉터리·URL·이미지를 정책서·기능설계서로 변환하고 자체 품질을 검증한다. planning-review는 SSOT 충돌·acceptance criteria·의존 영향 3축 리뷰를 수행하며, 다중 URL input collection과 단일 파일 same-folder companion read를 지원한다. ssot-audit는 프로젝트 Markdown 전체를 대상으로 v0.8 미만 문서 제외, 외부 링크 cap 없음 follow, 구조/내용 품질 발견·권고와 개선 backlog를 화면 markdown only로 출력한다.",
+      "version": "0.2.7",
       "license": "MIT",
       "tags": ["planning", "product", "documentation", "review"]
     }

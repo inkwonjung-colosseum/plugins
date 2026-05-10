@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.6",
-  "description": "기획 초안(텍스트·파일·디렉터리·URL·이미지)을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format 스킬과, 외부 SSOT 충돌·acceptance criteria·의존 영향을 점검하는 planning-review 스킬로 구성된다. URL 다중 인자·본문 URL/이미지 추출·재귀 fetch·multimodal 이미지 해석을 지원하고, 인증 게이트는 MCP/connector(Atlassian·Figma·Google Workspace·Slack·Notion) fallback으로 합류시킨다. 입력 제외 §은 11 카테고리(0.2.4 신규 충돌 후보 포함)로 변환 본문 미합류 조각을 항상 추적하고 위치 필드는 markdown link 형식으로 외부 source 특정 위치까지 1-hop 점프한다. 자체 검증 F5는 cross-reference 3종을 함께 점검한다. 0.2.2부터 planning-review가 SSOT *.md 본문 안 외부 링크도 재귀 fetch해 corpus에 합류시킨다. 0.2.3부터 planning-format이 표 셀 list ≥2 합류 작성 시 항목 이질성을 판단해 부모 § 안 sub-§(보조 표)로 분해, 동질 enum은 합류 유지한다. 0.2.4부터 보조 표 번호 순차 부여(§N.1·§N.2)·헤더 backlink·F1·F2·R1·R2·R3 검증의 sub-§ 인식·Confluence·Docs·Slides·Notion 4종 connector anchor 추출이 추가됐다. 0.2.5부터 결정성 강화 7 항목(fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 강제 [TBD]·list 분해 max-depth cap=3·self-review 6패스 26 항목 체크리스트·라벨 매핑 결정 트리)으로 같은 입력 일치율을 0.9% → 25~39%로 28~43배 끌어올린다. 0.2.6부터 planning-review도 다중 URL을 root input으로 받아 planning-format과 같은 input fetch·connector fallback·이미지 multimodal·통합 본문 합류를 수행하며, --no-input-fetch / --no-input-image와 ## 입력 출처 블록을 제공한다. 입력 fetch와 SSOT fetch는 분리된다.",
+  "version": "0.2.7",
+  "description": "planning-format은 기획 초안을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증한다. planning-review는 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하며, 0.2.6 다중 URL input collection과 0.2.7 단일 파일 same-folder companion read를 지원한다. ssot-audit는 현재 프로젝트 Markdown SSOT corpus 자체를 구조 품질·내용 품질 2축으로 감사하고, v0.8 미만 문서 제외 집계·외부 링크 cap 없음 follow·개선 backlog를 화면 markdown only로 출력한다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "planning-kit",
-    "shortDescription": "기획 초안 → planning-format(변환 + 자체 품질) + planning-review(외부 SSOT·AC·의존 영향)",
-    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 정책서/기능설계서로 변환하고 자체 검증한다. planning-review는 SSOT·AC·의존 영향 3축 리뷰를 수행한다. 0.2.6부터 review도 다중 URL input fetch, connector fallback, 이미지 multimodal, ## 입력 출처를 지원하고 input fetch와 SSOT fetch를 분리한다.",
+    "shortDescription": "기획 초안 변환, 산출물 리뷰, SSOT corpus 감사",
+    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 정책서/기능설계서로 변환하고 자체 검증한다. planning-review는 SSOT·AC·의존 영향 3축 리뷰를 수행하며, 다중 URL input collection과 단일 파일 same-folder companion read를 지원한다. ssot-audit는 프로젝트 Markdown SSOT corpus를 구조/내용 2축으로 감사하고 v0.8 미만 문서 제외, 외부 링크 follow, 개선 backlog를 화면에 출력한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -33,6 +33,8 @@
       "이 기획 디렉터리를 planning-format으로 두 본문으로 변환해줘",
       "https://wiki.example.com/spec/order-cancel 페이지를 정책서·기능설계서로 정리해줘",
       "https://wiki.example.com/policy/order-cancel https://docs.example.com/feature/order-cancel 두 링크를 planning-review로 점검해줘",
+      "docs/주문취소/정책서.md 파일 하나로 planning-review를 실행해서 같은 폴더 기능설계서까지 같이 점검해줘",
+      "현재 프로젝트 문서 전체를 ssot-audit로 감사해서 SSOT 구조와 내용 backlog를 뽑아줘",
       "방금 변환한 두 본문을 planning-review로 SSOT 충돌과 의존 영향까지 점검해줘",
       "https://docs.google.com/spreadsheets/d/.../edit?gid=... 시트 기반으로 기획서 만들어줘"
     ],

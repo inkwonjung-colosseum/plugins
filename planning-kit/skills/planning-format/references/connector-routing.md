@@ -1,6 +1,6 @@
 # connector-routing
 
-`planning-format`의 fetch 단계 lookup data — 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지. **0.2.2부터 `planning-review` R1/R3 SSOT corpus link follow도 같이 사용**하고, **0.2.6부터 `planning-review` input collection도 같이 사용**한다. review 입력 URL fetch와 SSOT corpus link follow는 본 reference를 공유 적재하지만 visited set·출처 블록은 서로 분리한다 (별도 복제 없음).
+`planning-format`의 fetch 단계 lookup data — 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range 처리·fallback 케이스 표·status 표기·sanity check 메시지. **0.2.2부터 `planning-review` R1/R3 SSOT corpus link follow도 같이 사용**하고, **0.2.6부터 `planning-review` input collection도 같이 사용**하며, **0.2.7부터 `ssot-audit` 외부 링크 follow도 같이 사용**한다. review 입력 URL fetch, SSOT corpus link follow, ssot-audit 외부 follow는 본 reference를 공유 적재하지만 visited set·출처 블록은 서로 분리한다 (별도 복제 없음).
 
 ## 1. 인증 게이트 휴리스틱
 
@@ -92,7 +92,7 @@ connector fallback 후보는 §2 카탈로그 인증 상태에 따라:
 | 매핑·추론 후보 0 + 1차 인증 게이트 | 본문 합류 안 함. status=`인증 필요 (connector 매핑 없음)`. |
 | connector 미연결 + 1차 인증 게이트 | 본문 합류 안 함. status=`인증 필요 (<connector> 미연결)`. |
 | Google Drive 본문 추출 실패 + `get_file_metadata` 성공 | metadata만 합류. status=`metadata only (via Google Drive connector — get_file_metadata)`. |
-| fetch 봉쇄 옵션 ON | 1차·fallback 모두 봉쇄. visited만 기록, 본문 합류 0. `planning-format --no-fetch`, `planning-review --no-input-fetch`, `planning-review --no-ssot-fetch`가 각자 적용 범위에서 유일한 fetch 미시도 케이스다. |
+| fetch 봉쇄 옵션 ON | 1차·fallback 모두 봉쇄. visited만 기록, 본문 합류 0. `planning-format --no-fetch`, `planning-review --no-input-fetch`, `planning-review --no-ssot-fetch`, `ssot-audit --no-follow-links`가 각자 적용 범위에서 유일한 fetch 미시도 케이스다. |
 
 **0.2.5 변경**: 본문 합류 안 함 케이스도 출처 list에 1행 차지. dequeue 후 행 누락 금지. status는 위 표 사유 그대로 기록.
 

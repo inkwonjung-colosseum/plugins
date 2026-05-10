@@ -1,8 +1,8 @@
-# planning-kit (0.2.6)
+# planning-kit (0.2.7)
 
-기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format` 스킬과, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review` 스킬로 구성된 플러그인. 0.2.6부터 `planning-review`도 다중 URL 입력을 root input으로 받아 `planning-format`과 같은 input fetch·connector fallback·이미지 multimodal 처리를 거친 뒤 리뷰한다.
+기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format`, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review`, 현재 프로젝트의 Markdown **SSOT corpus 자체를 구조·내용 2축으로 감사**하는 `ssot-audit` 세 스킬로 구성된 플러그인. 0.2.7부터 `ssot-audit`가 추가되고, `planning-review <단일 파일>`은 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 식별한다.
 
-산출물은 default로 화면 output(응답 markdown)으로만 반환한다. `planning-format --save`를 사용하면 `./.planning-kit/<기능명>/`에 두 본문 markdown 파일이 추가로 떨어진다 (자체 검증 보고서·출처 list는 화면 only).
+산출물은 default로 화면 output(응답 markdown)으로만 반환한다. `planning-format --save`를 사용하면 `./.planning-kit/<기능명>/`에 두 본문 markdown 파일이 추가로 떨어진다 (자체 검증 보고서·출처 list는 화면 only). `ssot-audit`는 저장 옵션 없이 항상 화면 output only다.
 
 Claude Code · Codex 양쪽에서 동작한다.
 
@@ -18,6 +18,9 @@ Claude Code · Codex 양쪽에서 동작한다.
 
 # 위 출력에 대해 외부 SSOT 충돌·AC·의존 영향 3축 점검 (직전 turn 자동 참조)
 /planning-kit:planning-review
+
+# 프로젝트 문서 corpus 자체의 구조·내용 품질 감사
+/planning-kit:ssot-audit
 ```
 
 ### Codex
@@ -25,6 +28,7 @@ Claude Code · Codex 양쪽에서 동작한다.
 ```
 $planning-format 주문 취소 정책 정리해줘. 사용자가 결제 후 24시간 내 1회 취소 가능.
 $planning-review
+$ssot-audit
 ```
 
 ### 입력 분기 (planning-format)
@@ -61,6 +65,9 @@ $planning-review
 # --save로 떨어진 디렉터리
 /planning-kit:planning-review ./.planning-kit/주문취소/
 
+# 단일 파일 입력 (같은 폴더 sibling 파일을 함께 읽음)
+/planning-kit:planning-review ./.planning-kit/주문취소/정책서.md
+
 # 두 파일 명시
 /planning-kit:planning-review ./docs/주문-정책.md ./docs/주문-기능.md
 
@@ -76,7 +83,25 @@ $planning-review
 /planning-kit:planning-review --axes ssot,ac
 ```
 
-URL 입력은 `planning-format`과 같은 규칙으로 root URL fetch, 본문 URL 재귀 fetch, connector fallback, 이미지 multimodal 처리를 수행한다. 입력 URL fetch는 review 대상 본문 생성용이며, R1/R3의 SSOT corpus link follow와 visited set·출처 블록이 분리된다.
+URL 입력은 `planning-format`과 같은 규칙으로 root URL fetch, 본문 URL 재귀 fetch, connector fallback, 이미지 multimodal 처리를 수행한다. 입력 URL fetch는 review 대상 본문 생성용이며, R1/R3의 SSOT corpus link follow와 visited set·출처 블록이 분리된다. 단일 파일 입력은 해당 파일만 보지 않고 같은 폴더의 읽을 수 있는 sibling 텍스트/지원 이미지 파일을 non-recursive로 함께 읽어 한 쌍을 찾는다.
+
+### 입력 분기 (ssot-audit)
+
+```
+# 프로젝트 전체 Markdown SSOT 감사
+/planning-kit:ssot-audit
+
+# docs 하위만 감사
+/planning-kit:ssot-audit --ssot-include "docs/**/*.md"
+
+# archive 제외 + 구조 품질만 감사
+/planning-kit:ssot-audit --exclude "docs/archive/**" --axes structure
+
+# 외부 링크와 이미지 해석 없이 로컬 Markdown만 감사
+/planning-kit:ssot-audit --no-follow-links --no-image
+```
+
+기본 corpus는 프로젝트 폴더 안 모든 `*.md`이며 `.git/`, `node_modules/`는 제외한다. 제목/파일명/H1/마지막 path segment의 버전 신호가 `v0.8` 이상이거나 버전이 없으면 SSOT 후보로 남기고, `v0.8` 미만 문서는 `SSOT 제외 문서`로 집계한다.
 
 ---
 
@@ -105,6 +130,16 @@ URL 입력은 `planning-format`과 같은 규칙으로 root URL fetch, 본문 UR
    - **검증가능성** (R2): 정량성 / 상태 / 행위자 / 결과 관찰가능성
    - **영향 분석** (R3): 정책 변경 / 상태 전이 / 권한·역할 / 외부 의존 — 발견·권고 분류. 입력 제외 § 보조 신호로 만들어진 항목은 `근거`에 cross-ref (0.2.2)
 
+### ssot-audit 출력
+
+1. **헤더** — SSOT 범위, 제외 glob, 분석 축, 외부 링크 처리, 이미지 처리, 로컬 Markdown 수, `SSOT 제외(낮은 버전)` 수, 외부 fetch 성공/실패
+2. **감사 결과** — 구조 품질·내용 품질별 발견/권고 카운트
+3. **SSOT 인벤토리** — `v0.8` 미만 제외 후 role별 문서 수와 대표 문서
+4. **SSOT 제외 문서** — 낮은 버전(`< v0.8`) 문서가 있을 때만 출력
+5. **외부 출처** — 외부 follow 또는 image 처리 1건 이상이면 origin·상태·본문 사용 표
+6. **구조 품질 / 내용 품질** — 발견/권고 항목. 0건이면 `없음`
+7. **개선 backlog** — 문제 단위로 묶은 P0/P1/P2 권장 작업과 검증 조건
+
 ---
 
 ## 옵션
@@ -129,6 +164,16 @@ URL 입력은 `planning-format`과 같은 규칙으로 root URL fetch, 본문 UR
 | `--no-ssot-fetch` | SSOT corpus *.md 본문 안 외부 URL fetch + connector fallback 봉쇄. 매칭 file 본문만 corpus. (0.2.2) |
 | `--no-ssot-image` | SSOT corpus 본문 안 이미지 참조·fetch image content-type 응답 multimodal 호출 0건. URL fetch는 별도 (`--no-ssot-fetch`로 봉쇄). (0.2.2) |
 
+### ssot-audit
+
+| 옵션 | 동작 |
+|---|---|
+| `--ssot-include <glob>` | SSOT corpus 후보 glob. default = 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 제외). |
+| `--exclude <glob>` | corpus 후보 제외 glob. 반복 지정 또는 comma 구분 허용. |
+| `--axes <list>` | 감사 축. `structure,content` 콤마 구분. default = 둘 다 활성. |
+| `--no-follow-links` | Markdown 안 외부 URL fetch + connector fallback 봉쇄. 로컬 Markdown만 분석. |
+| `--no-image` | 로컬/외부 이미지 multimodal 해석 0건. URL fetch는 유지하되 image content-type 응답은 본문 합류하지 않음. |
+
 cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두지 않는다 — **cap 없음 정책** (품질·검증 > 토큰 절약). cycle은 visited set으로만 차단.
 
 ---
@@ -137,6 +182,7 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 - `planning-format`과 `planning-review` 모두 인자가 1개 이상의 `^https?://` 토큰이면 URL 분기로 진입한다. 모든 URL을 fetch → 본문 추출 → 통합한다.
 - `planning-review` URL 분기의 모든 URL은 review 대상 본문을 만드는 depth 0 root input source다. 이 input fetch는 SSOT corpus link follow가 아니다.
+- `ssot-audit`는 로컬 Markdown 안에서 발견한 외부 URL을 root URL로 삼아 기본 follow한다.
 - 텍스트/파일/디렉터리 분기에서도 입력 본문 안 URL을 자동 추출해 fetch한다. `planning-review`도 0.2.6부터 같은 input collection을 수행한다.
 - 추출 본문 안에 또 외부 링크가 있으면 **재귀로 따라간다** (depth·pages·body 크기 cap 없음). 호스트 제한 없음.
 - visited set으로 cycle·중복 방지 (URL normalize: fragment 제거, trailing `/`, 트래킹 query 제거, 호스트 lowercase, query 키 정렬).
@@ -149,9 +195,9 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
   - Drive 폴더 (`/folders/<folderId>`) → `search_files(parents=folderId)` → 자식 file은 별도 자식 URL 후보로 push
   - Sheets URL의 `#gid=<sheetGid>&range=<cellRange>` fragment는 시트 분리·범위 부연으로 처리
 - 출처 list `상태` 컬럼에 `200 (via WebFetch)` / `200 (via Atlassian MCP)` / `200 (via Figma MCP)` / `200 (via Google Drive connector — read_file_content)` / `인증 필요 (Slack MCP 미인증)` / `인증 필요 (Google Drive connector 미연결)` 형태로 fetch 경로가 표기된다.
-- 인증 게이트·지원 안 하는 content-type·timeout·4xx/5xx는 fallback까지 거친 뒤 본문 합류에서 제외하되 호출은 종료하지 않고 출처 list에 사유 기록. **루트 URL이 모두 실패한 경우만** 한 줄 sanity check로 종료. `planning-format`은 `## 출처`, `planning-review` input collection은 `## 입력 출처`, SSOT link follow는 `## SSOT 출처`에 기록한다.
+- 인증 게이트·지원 안 하는 content-type·timeout·4xx/5xx는 fallback까지 거친 뒤 본문 합류에서 제외하되 호출은 종료하지 않고 출처 list에 사유 기록. `planning-format`과 `planning-review`는 **입력 루트 URL이 모두 실패한 경우만** 한 줄 sanity check로 종료한다. `ssot-audit`는 외부 URL이 모두 실패해도 로컬 Markdown 기준으로 감사를 계속하고 실패 행을 `## 외부 출처`에 남긴다. `planning-format`은 `## 출처`, `planning-review` input collection은 `## 입력 출처`, SSOT link follow는 `## SSOT 출처`, `ssot-audit`는 `## 외부 출처`에 기록한다.
 
-상세 명세: `skills/planning-format/SKILL.md` §3, lookup data: `skills/planning-format/references/connector-routing.md`, 다이어그램: `docs/planning-format-workflow.md`.
+상세 명세: `skills/planning-format/SKILL.md` §3, `skills/planning-review/SKILL.md` Step 1.2, `skills/ssot-audit/SKILL.md` Step 4. lookup data는 `skills/planning-format/references/connector-routing.md`를 공유한다.
 
 ---
 
@@ -171,7 +217,7 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 ---
 
-## 검증 2단
+## 검증 3단
 
 ### 1. 자체 품질 검증 — `planning-format` 안에서 (6 카테고리)
 
@@ -196,6 +242,13 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 
 상세 기준은 `skills/planning-review/references/ssot-rules.md`·`ac-rules.md`·`deps-rules.md`.
 
+### 3. SSOT corpus 감사 — `ssot-audit` 호출 시 (2축)
+
+- **구조 품질**: canonical 중복/부재, archive·낮은 버전 활성 참조, 도메인 문서 흩어짐, 문서 역할 불명확, 외부 canonical 의존을 점검한다.
+- **내용 품질**: 정책/상태/권한/임계값 충돌, 용어 불일치, 미결/모호 표현, 검증 가능한 조건 부재, 설명 없는 중복을 점검한다.
+
+`ssot-audit`는 새 산출물 리뷰가 아니라 프로젝트 문서 corpus 자체의 유지보수 backlog를 만들기 위한 감사다. 상세 기준은 `skills/ssot-audit/references/structure-rules.md`·`content-rules.md`·`output-contract.md`.
+
 ---
 
 ## 구성
@@ -211,6 +264,9 @@ planning-kit/
 │   ├── planning-kit-workflow-guide.md    # 발표용 workflow 해설
 │   ├── planning-format-workflow.md       # planning-format 흐름 mermaid
 │   ├── planning-review-workflow.md       # planning-review 흐름 mermaid
+│   ├── diagram/
+│   │   ├── README.md                     # planning-kit docs Mermaid 변환 산출물 index
+│   │   └── *.html                        # standalone HTML/SVG 다이어그램
 │   └── prd/
 │       ├── README.md                     # PRD chain 안내 (0.2.2 신규)
 │       ├── prd-0.1.0.md
@@ -222,7 +278,8 @@ planning-kit/
 │       ├── prd-0.2.3.md                  # 표 셀 list 분해 판단 + 보조 표 sub-§
 │       ├── prd-0.2.4.md                  # sub-§ 정밀화·SKILL 분해·deep link·11 카테고리
 │       ├── prd-0.2.5.md                  # 결정성 강화 7 항목
-│       └── prd-0.2.6.md                  # 본 release (planning-review input fetch parity)
+│       ├── prd-0.2.6.md                  # planning-review input fetch parity
+│       └── prd-0.2.7.md                  # 본 release (ssot-audit + companion read)
 └── skills/
     ├── planning-format/
     │   ├── SKILL.md                      # orchestration only (0.2.4) + Step 3 fetch 시도 의무·BFS / Step 6·7 결정 트리·체크리스트 (0.2.5)
@@ -235,30 +292,36 @@ planning-kit/
     │       ├── output-contract.md        # 출력 포맷·헤더 줄·--save·출처 list deep link (0.2.4)
     │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식) + F1~F6 26 항목 체크리스트 6패스 (0.2.5)
     │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback·§11 connector별 anchor 추출 (0.2.4) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5)
-    └── planning-review/
-        ├── SKILL.md                      # input collection 0.2.6 + 외부 검증 orchestration
+    ├── planning-review/
+    │   ├── SKILL.md                      # input collection 0.2.6 + companion read 0.2.7 + 외부 검증 orchestration
+    │   └── references/
+    │       ├── ssot-rules.md             # R1 SSOT 충돌
+    │       ├── ac-rules.md               # R2 검증가능성 4 sub-category
+    │       └── deps-rules.md             # R3 의존·영향 4 sub-category
+    └── ssot-audit/
+        ├── SKILL.md                      # SSOT corpus 구조·내용 감사 orchestration
         └── references/
-            ├── ssot-rules.md             # R1 SSOT 충돌
-            ├── ac-rules.md               # R2 검증가능성 4 sub-category
-            └── deps-rules.md             # R3 의존·영향 4 sub-category
+            ├── structure-rules.md        # 구조 품질 감사 기준
+            ├── content-rules.md          # 내용 품질 감사 기준
+            └── output-contract.md        # 화면 output + backlog 계약
 ```
 
 ---
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.6)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` 두 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.7)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` + `ssot-audit` 세 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.6) |
+| 항목 | product-team-kit | planning-kit (0.2.7) |
 |---|---|---|
-| Skill 수 | 3 | 2 |
-| 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) |
-| 입력 분기 | 텍스트·파일·디렉터리 | `planning-format`: 텍스트·파일·디렉터리·URL(다중)·이미지. `planning-review`: conversation·파일·디렉터리·raw markdown·URL(다중)·이미지 input collection (0.2.6) |
+| Skill 수 | 3 | 3 |
+| 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) + 필요 시 `ssot-audit` |
+| 입력 분기 | 텍스트·파일·디렉터리 | `planning-format`: 텍스트·파일·디렉터리·URL(다중)·이미지. `planning-review`: conversation·파일·디렉터리·단일 파일 companion read·raw markdown·URL(다중)·이미지 input collection. `ssot-audit`: 프로젝트 Markdown corpus glob |
 | URL fetch / 이미지 multimodal | 없음 | 모든 분기 공통 (본문 추출 + 재귀, cap 없음). 인증 게이트는 MCP/connector fallback (Atlassian·Figma·Google Workspace·Slack·Notion). Google Workspace는 자원별 tool 시퀀스 + Sheets gid·range fragment 처리. |
 | Agent worker | 1 (terminology) | 0 |
-| Reference 수 | 5 | 8 (planning-format: conversion-rules + exclusion-rules + output-contract + self-review-rules + connector-routing / planning-review: ssot-rules + ac-rules + deps-rules) |
+| Reference 수 | 5 | 11 (planning-format 5 / planning-review 3 / ssot-audit 3) |
 | Template 수 | 2 (정책서 + 기능설계서) | 2 (정책서 + 기능설계서) |
-| 산출물 | 정책서 + 기능설계서 2 file (`<outputRoot>/.../*.md`) | 화면 output (default) + `--save` 시 `./.planning-kit/<기능명>/` 2 file |
+| 산출물 | 정책서 + 기능설계서 2 file (`<outputRoot>/.../*.md`) | 화면 output (default) + `planning-format --save` 시 `./.planning-kit/<기능명>/` 2 file. `ssot-audit`는 화면 output only |
 | 파일 IO | mkdir + Write 호출 (항상) | `--save`일 때만 |
 | Config 파일 | `.product-team-kit/config.json` 필수 | 없음 (default + CLI 인자) |
 | `CLAUDE.md`/`AGENTS.md` upsert | 항상 | 안 함 |
@@ -268,12 +331,12 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 5종 (변환+자체검증 / planning-review 결과+입력 출처(0.2.6) / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) — list 분해 max-depth cap=3 (0.2.5) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 6종 (변환+자체검증 / planning-review 결과+입력 출처(0.2.6) / ssot-audit 감사 결과+backlog / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) — list 분해 max-depth cap=3 (0.2.5) |
 | 입력 제외 처리 | 없음 | 11 카테고리 (`충돌 후보` 0.2.4 신규) + 처리 줄 + 위치 markdown link (0.2.4) + R3 보조 신호 (0.2.2) — 결정 트리 + 모호성 강제 [TBD] (정규식 6 + 16 어구) (0.2.5) |
 | 결정성 (같은 입력 일치율) | — | 0.9% (0.2.4) → 25~39% (0.2.5, 28~43배). fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 [TBD]·max-depth cap·6패스 체크리스트·라벨 매핑 트리 (0.2.5 신규 7 항목) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
 | 리뷰 worker | B축 worker 분리 | 없음 (각 스킬 main 단일 패스) |
-| SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | grep 매칭 + 직접 read + 매칭 file 본문 안 외부 링크 재귀 fetch (cap 없음, connector fallback) |
+| SSOT corpus 처리 | 인덱스 스캔 + version + archive 분류 | `planning-review`: grep 매칭 + 직접 read + 매칭 file 본문 안 외부 링크 재귀 fetch. `ssot-audit`: 프로젝트 Markdown corpus 전체 수집 + `v0.8` 미만 제외 + 외부 링크 follow + 구조/내용 감사 |
 | 검토 결과 | 3종 (통과/조건부/수정 필요) | 2종 (통과/발견 N건) |
 | 출력 구조 | 2층 (상단 합의 + 하단 agent 원본) | 1층 (각 스킬 단일 응답) |
 | GFM cell escape | 단일 진실 소스 알고리즘 | 없음 (numbered list) |
@@ -342,6 +405,12 @@ planning-kit/
   - **신규 옵션** — `--no-input-fetch` / `--no-input-image`. 기존 `--no-ssot-fetch` / `--no-ssot-image`는 SSOT corpus에만 적용.
   - **출력 추가** — 헤더 `입력 처리:` 줄과 조건부 `## 입력 출처` 블록 추가. `## 입력 출처`는 `## 리뷰 결과` 다음, `## SSOT 출처` 앞에 위치.
   - **본문 식별 fallback** — fetch된 root source의 title/path/URL label이 정책서·기능설계서를 명확히 가리키면 source 단위 fallback 배정 가능.
+- **0.2.6 → 0.2.7**: `ssot-audit` 신규 스킬 + `planning-review` 단일 파일 입력 확장. 기존 `planning-format` 동작은 동일.
+  - **ssot-audit 추가** — 프로젝트 폴더 안 모든 `*.md`를 기본 corpus로 수집하고 `.git/`, `node_modules/`는 제외. `--ssot-include`, `--exclude`, `--axes`, `--no-follow-links`, `--no-image` 지원.
+  - **버전 기준선 필터** — title/filename/H1/path segment의 버전 신호가 `v0.8` 이상이거나 버전 없음이면 SSOT 후보. `v0.8` 미만은 내용 비교에서 제외하고 `SSOT 제외 문서`로 집계.
+  - **구조·내용 2축 감사** — canonical 중복/부재, archive·낮은 버전 활성 참조, 외부 canonical 의존, 정책/상태/권한/임계값 충돌, 용어 불일치, 검증 조건 부재를 발견/권고로 출력.
+  - **개선 backlog** — 발견/권고를 문제 단위 P0/P1/P2로 묶고 영향 문서, 권장 작업, 검증 조건을 출력.
+  - **planning-review companion read** — 단일 파일 입력 시 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 식별. 여러 기능이 섞여 1쌍으로 좁힐 수 없으면 sanity check.
 
 ---
 

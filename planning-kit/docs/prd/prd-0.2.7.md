@@ -1,17 +1,19 @@
 # planning-kit PRD 0.2.7
 
-> 0.2.6 기반 incremental PRD. `planning-kit`에 신규 스킬 `ssot-audit`를 추가해 현재 프로젝트의 Markdown 문서 전체를 SSOT corpus로 분석하고, SSOT 자체의 구조 품질·내용 품질 발견/권고와 개선 backlog를 화면에 출력한다. 본 PRD 외 기존 `planning-format` / `planning-review` 명세는 [`prd-0.2.6.md`](./prd-0.2.6.md) 이하 chain 그대로.
+> 0.2.6 기반 incremental PRD. `planning-kit`에 신규 스킬 `ssot-audit`를 추가해 현재 프로젝트의 Markdown 문서 전체를 SSOT corpus로 분석하고, SSOT 자체의 구조 품질·내용 품질 발견/권고와 개선 backlog를 화면에 출력한다. 추가로 `planning-review` 단일 파일 입력 시 같은 폴더의 관련 파일을 함께 읽도록 보강한다. 본 PRD 외 기존 `planning-format` / `planning-review` 명세는 [`prd-0.2.6.md`](./prd-0.2.6.md) 이하 chain 그대로.
 >
-> 핵심 변경: `ssot-audit` 신규 스킬. 기본 범위는 프로젝트 폴더 안 모든 `*.md`이며, 기본으로 외부 링크를 cap 없이 재귀 follow하고 connector fallback을 사용한다. 산출물은 저장 없이 실행 화면 markdown으로만 출력한다.
+> 핵심 변경: `ssot-audit` 신규 스킬. 기본 범위는 프로젝트 폴더 안 모든 `*.md`이며, 기본으로 외부 링크를 cap 없이 재귀 follow하고 connector fallback을 사용한다. 산출물은 저장 없이 실행 화면 markdown으로만 출력한다. `planning-review <단일 파일>`은 해당 파일의 같은 폴더 안 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 찾는다.
 
 ## 1. 변경 요약
 
 1. **신규 스킬 `ssot-audit` 추가** — `planning-format` / `planning-review`와 별개로 SSOT corpus 자체를 감사한다.
 2. **기본 corpus 범위** — 프로젝트 폴더 안 모든 `*.md`를 대상으로 삼고 `.git/`, `node_modules/`는 제외한다. `--ssot-include <glob>` / `--exclude <glob>`로 범위를 조정한다.
-3. **외부 링크 기본 follow** — 대상 Markdown 안 URL·이미지를 추출해 cap 없이 BFS 재귀 fetch한다. 1차 WebFetch + connector fallback은 `planning-format`의 `connector-routing.md`를 공유한다.
-4. **감사 축 2개** — MVP 기본 축은 `structure,content`다. 운영 품질 축은 이번 PRD 비목표다.
-5. **화면 output only** — 감사 결과, 출처, 발견/권고, 개선 backlog는 응답 markdown에만 출력한다. 파일 저장 옵션은 도입하지 않는다.
-6. **개선 backlog 제공** — 발견/권고를 문제 단위로 묶고 영향 문서·권장 작업·검증 조건을 함께 출력한다.
+3. **버전 기준선 필터** — 문서 제목/파일명/H1에서 `v0.8` 이상(`0.8`, `0.9`, `1.0` 등) 또는 버전 없음이면 SSOT 후보로 남긴다. `v0.8` 미만(`0.7` 등)은 SSOT corpus로 취급하지 않는다.
+4. **외부 링크 기본 follow** — 대상 Markdown 안 URL·이미지를 추출해 cap 없이 BFS 재귀 fetch한다. 1차 WebFetch + connector fallback은 `planning-format`의 `connector-routing.md`를 공유한다.
+5. **감사 축 2개** — MVP 기본 축은 `structure,content`다. 운영 품질 축은 이번 PRD 비목표다.
+6. **화면 output only** — 감사 결과, 출처, 발견/권고, 개선 backlog는 응답 markdown에만 출력한다. 파일 저장 옵션은 도입하지 않는다.
+7. **개선 backlog 제공** — 발견/권고를 문제 단위로 묶고 영향 문서·권장 작업·검증 조건을 함께 출력한다.
+8. **planning-review 단일 파일 입력 보강** — `planning-review <파일>`은 해당 파일만 보지 않고 같은 폴더의 모든 sibling 파일을 함께 읽어 정책서·기능설계서 본문을 식별한다.
 
 ## 2. 동기
 
@@ -47,6 +49,24 @@
 | `ssot-audit` | 현재 프로젝트의 SSOT corpus 자체를 구조·내용 2축으로 감사하고 개선 backlog 제안 |
 
 `ssot-audit`는 review 대상 산출물을 입력으로 받지 않는다. 기본 실행은 현재 working directory의 Markdown corpus 전체를 대상으로 한다.
+
+### 4.1 planning-review 단일 파일 입력 확장
+
+0.2.7부터 `planning-review`의 **1개 파일 입력**은 해당 파일만 읽는 분기가 아니다. 사용자가 정책서 또는 기능설계서 파일 하나만 지정해도, 같은 폴더 안의 sibling 파일을 함께 읽어 정책서·기능설계서 쌍을 구성한다.
+
+동작 규칙:
+
+1. 입력 파일의 parent directory를 companion scan 범위로 잡는다.
+2. scan 범위는 **non-recursive**다. 하위 폴더는 읽지 않는다.
+3. 같은 폴더의 모든 읽을 수 있는 UTF-8 텍스트 파일과 planning-kit 지원 이미지 파일을 input collection에 추가한다.
+4. 숨김 파일, binary, dependency/build/cache 성격 파일은 읽지 않는다. 판단 기준은 `planning-format` 디렉터리 입력의 기본 제외 규칙을 따른다.
+5. source title/path/H1/본문 헤더로 `정책서`와 `기능설계서` 후보를 식별한다.
+6. 입력 파일과 같은 기능명/stem/domain으로 보이는 후보를 우선한다.
+7. 후보가 1쌍으로 확정되면 두 본문을 함께 리뷰한다.
+8. 같은 폴더에 여러 기능의 정책서·기능설계서가 섞여 있고 1쌍으로 좁힐 수 없으면 임의 병합하지 않고 sanity check로 종료한다.
+9. 같은 폴더를 모두 읽었는데도 한쪽 본문만 있으면 기존처럼 한쪽 본문 비어 있음 또는 본문 식별 실패 메시지로 종료한다.
+
+이 변경은 단일 파일 입력의 편의 확장이다. `planning-review`가 새 정책서·기능설계서를 생성하거나, 같은 폴더 밖의 파일을 자동 탐색하거나, SSOT corpus를 review 대상 본문으로 승격하는 것은 아니다.
 
 ## 5. 인자와 옵션
 
@@ -93,8 +113,12 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 3. `--ssot-include`가 있으면 include glob에 맞는 파일만 후보로 둔다.
 4. `--exclude`가 있으면 후보에서 제거한다.
 5. 각 파일의 path, filename, frontmatter, 첫 heading, heading tree, markdown link를 읽는다.
+6. 제목 수준 버전 신호를 판정한다. 대상은 frontmatter `title`, 첫 H1, filename stem, 마지막 path segment다. 본문 중간의 버전 언급은 corpus 포함/제외 기준으로 쓰지 않는다.
+7. 버전 신호가 없으면 현재 기준 후보로 보고 SSOT corpus에 남긴다.
+8. 버전 신호가 `v0.8` 이상이면 SSOT corpus에 남긴다. 예: `v0.8`, `0.8`, `v0.9`, `1.0`.
+9. 버전 신호가 `v0.8` 미만이면 SSOT corpus에서 제외한다. 예: `v0.7`, `0.6`. 제외 문서는 감사 입력 row에는 남기되 SSOT map 생성, 구조 품질 canonical 후보, 내용 품질 충돌 비교에는 사용하지 않는다.
 
-빈 파일은 corpus row로 남기되 본문 분석에는 사용하지 않는다.
+빈 파일은 corpus row로 남기되 본문 분석에는 사용하지 않는다. 버전 비교는 숫자 비교로 수행한다 (`1.0` > `0.9` > `0.8` > `0.7`).
 
 ### 6.2 문서 역할 분류
 
@@ -111,6 +135,8 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 | unknown | 위 신호로 분류 불가 |
 
 역할은 감사 보조 신호다. 역할 분류 자체가 틀릴 수 있으므로, 발견은 `권고`로 시작하고 명확한 충돌 근거가 있을 때만 `발견`으로 승격한다.
+
+`v0.8` 미만으로 제외된 문서는 SSOT 인벤토리 역할 집계에 포함하지 않고, 출력의 `SSOT 제외 문서`에 별도 집계한다. 단, 활성 문서가 낮은 버전 문서를 기준처럼 링크하면 구조 품질 발견으로 다룬다.
 
 ### 6.3 외부 링크 follow
 
@@ -205,16 +231,18 @@ canonical 신호:
 - canonical 정책서 또는 기능설계서 생성.
 - 기존 조각 문서에서 canonical 문서로 링크 정리.
 
-### 8.3 draft/old/archive 활성 참조
+### 8.3 draft/old/archive/낮은 버전 활성 참조
 
-`draft`, `old`, `archive`, `deprecated`, `legacy`, `wip` 신호가 있는 문서가 활성 문서에서 기준처럼 참조되면 발견한다.
+`draft`, `old`, `archive`, `deprecated`, `legacy`, `wip` 신호가 있는 문서나 `v0.8` 미만 낮은 버전 문서가 활성 문서에서 기준처럼 참조되면 발견한다.
 
 활성 참조 신호:
 
 - README, 정책서, 기능설계서, 최신 PRD에서 archive/draft 문서를 링크.
+- README, 정책서, 기능설계서, 최신 PRD에서 `v0.7` 등 낮은 버전 문서를 링크.
 - "기준", "정책", "참고", "따름" 같은 표현과 함께 링크.
 
 archive 내부 문서끼리 참조하는 경우는 발견하지 않는다.
+낮은 버전 문서끼리의 내부 참조도 발견하지 않는다. 문제는 현재 SSOT 후보가 낮은 버전 문서를 기준처럼 참조하는 경우다.
 
 ### 8.4 도메인 문서 흩어짐
 
@@ -283,6 +311,8 @@ archive 내부 문서끼리 참조하는 경우는 발견하지 않는다.
 - 권한 충돌: 가능한 역할 또는 승인 주체가 다름.
 - 임계값 충돌: 시간, 횟수, 금액, 비율, 개수 기준이 다름.
 
+`v0.8` 미만으로 제외된 낮은 버전 문서는 내용 충돌 비교 source로 사용하지 않는다. 낮은 버전 문서가 최신 기준처럼 참조되는 문제는 8.3 구조 품질 발견으로만 기록한다.
+
 ### 9.2 용어 불일치
 
 같은 개념이 여러 이름으로 쓰이면 권고한다. 용어 불일치가 정책값 충돌로 이어지면 발견으로 승격한다.
@@ -344,7 +374,7 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 
 | 분류 | 기준 |
 |---|---|
-| 발견 | 문서 간 값 충돌, archive 활성 참조, 핵심 정책값 `[TBD]`, 같은 대상의 권한/상태 결정 충돌처럼 근거가 명확한 문제 |
+| 발견 | 문서 간 값 충돌, archive/낮은 버전 활성 참조, 핵심 정책값 `[TBD]`, 같은 대상의 권한/상태 결정 충돌처럼 근거가 명확한 문제 |
 | 권고 | canonical 후보 불명확, 문서 역할 불명확, 용어 정리 필요, AC 보강 필요처럼 사람이 최종 판단해야 하는 개선 후보 |
 
 같은 문제가 구조와 내용 양쪽에 걸치면 한 번만 기록한다. 우선순위는 `내용 충돌 발견 > 구조 발견 > 내용 권고 > 구조 권고`다.
@@ -362,6 +392,7 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 - 외부 링크 처리: [활성, cap 없음 | --no-follow-links]
 - 이미지 처리: [활성 | --no-image]
 - 로컬 Markdown: N개
+- SSOT 제외(낮은 버전): L개
 - 외부 출처: fetch 성공 K개 / 실패 J개
 
 ---
@@ -373,6 +404,8 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 
 ## SSOT 인벤토리
 
+(`v0.8` 미만 제외 후 SSOT corpus 기준)
+
 | 역할 | 문서 수 | 대표 문서 |
 |---|---:|---|
 | README | N | ... |
@@ -382,6 +415,14 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 | 회의록/메모 | N | ... |
 | archive/draft | N | ... |
 | unknown | N | ... |
+
+## SSOT 제외 문서
+
+(`v0.8` 미만 문서가 1개 이상일 때만)
+
+| 사유 | 문서 수 | 대표 문서 |
+|---|---:|---|
+| 낮은 버전(`< v0.8`) | L | docs/order-v0.7.md |
 
 ## 외부 출처
 
@@ -397,7 +438,7 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 
 1. [발견 또는 권고 제목]
    - 분류: [발견 | 권고]
-   - 카테고리: [canonical 중복 | canonical 부재 | archive 활성 참조 | 도메인 문서 흩어짐 | 역할 불명확 | 외부 canonical 의존]
+   - 카테고리: [canonical 중복 | canonical 부재 | archive 활성 참조 | 낮은 버전 활성 참조 | 도메인 문서 흩어짐 | 역할 불명확 | 외부 canonical 의존]
    - 위치: [문서 path list]
    - 근거: "[짧은 근거]"
    - 영향: [한 줄]
@@ -433,7 +474,7 @@ SSOT 본문에 테스트 불가능한 표현이 남아 있으면 권고한다. �
 
 | 우선순위 | 기준 |
 |---|---|
-| P0 | 같은 정책/상태/권한/임계값의 직접 충돌, archive 문서가 최신 기준처럼 참조되는 문제 |
+| P0 | 같은 정책/상태/권한/임계값의 직접 충돌, archive 또는 낮은 버전 문서가 최신 기준처럼 참조되는 문제 |
 | P1 | canonical 부재/중복, 외부 canonical 의존, 핵심 문서 역할 불명확 |
 | P2 | 용어 통일, AC 보강, 설명 없는 중복 정리 |
 
@@ -444,6 +485,7 @@ P0/P1/P2는 화면 출력 정렬용이다. 점수화하지 않는다.
 | 케이스 | 메시지 |
 |---|---|
 | corpus Markdown 0개 | `SSOT 감사 대상 Markdown을 찾을 수 없습니다. --ssot-include 범위 또는 현재 작업 디렉터리를 확인하세요.` |
+| 버전 필터 적용 후 SSOT 후보 0개 | `v0.8 이상 또는 버전 없는 SSOT 후보 Markdown을 찾을 수 없습니다. 낮은 버전 문서를 기준으로 쓰려면 먼저 문서 버전을 올리거나 최신 기준 문서를 분리하세요.` |
 | `--axes` 빈 값 | `--axes에 감사 축을 1개 이상 지정하세요. (structure, content)` |
 | 알 수 없는 축 | `지원하지 않는 감사 축입니다: <axis>. 사용 가능: structure, content` |
 | 외부 URL 모두 실패 | 감사는 계속 진행. `## 외부 출처`에 실패 행을 기록하고 로컬 Markdown 기준으로 결과 출력 |
@@ -456,7 +498,7 @@ P0/P1/P2는 화면 출력 정렬용이다. 점수화하지 않는다.
 | 영역 | 0.2.6 → 0.2.7 |
 |---|---|
 | `planning-format` | 변경 없음 |
-| `planning-review` | 변경 없음 |
+| `planning-review` | 단일 파일 입력 시 같은 폴더 sibling 파일을 함께 읽어 정책서·기능설계서 쌍을 식별 |
 | 신규 skill | `ssot-audit` 추가 |
 | manifest | skill list에 `ssot-audit` 추가, version 0.2.7 |
 | README | 세 스킬 구조와 `ssot-audit` 예시 추가 필요 |
@@ -482,17 +524,29 @@ P0/P1/P2는 화면 출력 정렬용이다. 점수화하지 않는다.
    ```
    archive 문서를 corpus에서 빼고 현재 활성 문서 중심으로 감사. 단 archive 활성 참조 문제를 찾으려면 archive를 제외하지 않는 호출이 더 적합하다.
 
-4. **구조 품질만 감사**:
+4. **버전 기준선 적용**:
+   ```bash
+   /planning-kit:ssot-audit
+   ```
+   `사용자 관리 v0.9.md`, `권한 관리 v1.0.md`, `버전 없는 정책서.md`는 SSOT 후보로 남긴다. `로케이션 관리 v0.7.md`처럼 `v0.8` 미만인 문서는 SSOT corpus에서 제외하고 `SSOT 제외 문서`에 집계한다.
+
+5. **구조 품질만 감사**:
    ```bash
    /planning-kit:ssot-audit --axes structure
    ```
    canonical, archive 참조, 문서 역할, 외부 canonical 의존만 점검.
 
-5. **오프라인/빠른 감사**:
+6. **오프라인/빠른 감사**:
    ```bash
    /planning-kit:ssot-audit --no-follow-links --no-image
    ```
    로컬 Markdown만 분석. 외부 canonical 의존 판단은 제한된다.
+
+7. **planning-review 단일 파일 입력 + 같은 폴더 companion read**:
+   ```bash
+   /planning-kit:planning-review ./.planning-kit/주문취소/정책서.md
+   ```
+   `정책서.md`만 보지 않고 같은 폴더의 `기능설계서.md`, 보조 설명 파일, 지원 이미지 파일을 함께 읽어 review 대상 본문을 구성한다. 같은 폴더에 여러 기능 파일이 섞여 1쌍으로 좁힐 수 없으면 임의 병합하지 않고 sanity check로 종료한다.
 
 ## 16. 대안 검토
 
@@ -526,10 +580,11 @@ P0/P1/P2는 화면 출력 정렬용이다. 점수화하지 않는다.
 - `skills/ssot-audit/references/structure-rules.md` — 구조 품질 감사 기준.
 - `skills/ssot-audit/references/content-rules.md` — 내용 품질 감사 기준.
 - `skills/ssot-audit/references/output-contract.md` — 화면 output 포맷과 backlog 규칙.
+- `skills/planning-review/SKILL.md` — 단일 파일 입력 시 same-folder companion read 규칙 반영.
 - `skills/planning-format/references/connector-routing.md` — 외부 follow에서 공유 적재. 변경은 최소화하거나 설명 보강만.
 - `skills/planning-format/references/conversion-rules.md` — 이미지 multimodal·통합 본문 합류 룰 참조 가능.
 - `skills/planning-review/references/ac-rules.md` — 검증 가능한 조건 부재 판단에 참고 가능.
-- `planning-kit/README.md` — 세 스킬 구조, quick start, 옵션, 결과 형태 갱신.
+- `planning-kit/README.md` — 세 스킬 구조, quick start, 옵션, 결과 형태, `planning-review` 단일 파일 companion read 예시 갱신.
 - `planning-kit/.claude-plugin/plugin.json` / `.codex-plugin/plugin.json` — version 0.2.7, skill 설명 추가.
 - `.claude-plugin/marketplace.json` / `.agents/plugins/marketplace.json` — planning-kit version 갱신.
 - `docs/prd/README.md` — 0.2.7 row 추가.
@@ -537,8 +592,11 @@ P0/P1/P2는 화면 출력 정렬용이다. 점수화하지 않는다.
 ## 19. 용어
 
 - **SSOT audit**: 현재 프로젝트 문서 corpus 자체의 구조·내용 품질을 점검하는 작업.
+- **companion read**: `planning-review` 단일 파일 입력 시 같은 폴더의 sibling 파일을 함께 읽어 정책서·기능설계서 쌍을 찾는 입력 보강 절차.
 - **canonical 문서**: 특정 도메인/정책/기능의 기준으로 읽어야 하는 문서.
 - **외부 canonical 의존**: 로컬 Markdown보다 외부 링크 본문이 사실상 기준 역할을 하는 상태.
+- **버전 기준선**: SSOT 후보로 인정하는 최소 제목 버전. 0.2.7 기준 `v0.8` 이상 또는 버전 없음만 SSOT 후보이며, `v0.7` 등 낮은 버전 문서는 제외한다.
+- **낮은 버전 문서**: 제목/파일명/H1의 버전 신호가 `v0.8` 미만인 Markdown 문서. SSOT corpus로 쓰지 않고 별도 제외 집계한다.
 - **구조 품질**: 문서 역할, canonical 위치, 링크/계층 구조, archive/draft 참조 상태.
 - **내용 품질**: 정책값, 상태, 권한, 임계값, 용어, 검증 가능 조건의 일관성.
 - **개선 backlog**: 감사 결과를 실행 가능한 유지보수 작업으로 묶은 화면 출력 표.

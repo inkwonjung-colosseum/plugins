@@ -2,17 +2,19 @@
 
 > workflow 상세 설명 문서
 > 작성일: 2026-05-10
+> 최종 수정일: 2026-05-11
 > 대상: planning-kit 실행 담당, 기획/개발/디자인/QA/운영 리뷰어
-> 문서 상태: 초안 v0.1
+> 문서 상태: 초안 v0.2
 
 ---
 
 ## 1. 전체 workflow
 
-`planning-kit`은 두 단계로 동작합니다.
+`planning-kit`은 기본적으로 변환과 리뷰 두 단계로 동작하고, 필요할 때 SSOT corpus 자체를 별도로 감사합니다.
 
 1. `planning-format`: 자유로운 기획 초안을 정책서와 기능설계서로 구조화한다.
 2. `planning-review`: 구조화된 산출물이 외부 기준과 맞는지 점검한다.
+3. `ssot-audit`: 현재 프로젝트 Markdown SSOT corpus의 구조·내용 품질을 점검한다.
 
 ```mermaid
 flowchart LR
@@ -29,12 +31,18 @@ flowchart LR
   G --> H["R1 SSOT 충돌"]
   G --> I["R2 AC 검증가능성"]
   G --> J["R3 의존 영향"]
+
+  K["프로젝트 Markdown corpus"] --> L["ssot-audit"]
+  L --> M["구조 품질"]
+  L --> N["내용 품질"]
+  L --> O["개선 backlog"]
 ```
 
 핵심 메시지:
 
 - `planning-format`은 문서를 만든다.
 - `planning-review`는 만든 문서가 외부 기준과 맞는지 검증한다.
+- `ssot-audit`는 기존 SSOT 체계 자체의 중복, 부재, 낮은 버전 참조, 내용 충돌을 점검한다.
 - AI가 최종 승인하지 않는다. AI는 구조화, 누락 탐지, 충돌 후보 표시를 돕는다.
 - 최종 v1.0 확정은 기획팀과 실무팀 리뷰 이후 Confluence `[AI]`에서 한다.
 
@@ -158,11 +166,13 @@ flowchart TD
 |---|---|
 | 인자 없음 | 직전 turn의 `planning-format` 결과를 바로 리뷰 |
 | 디렉터리 | `planning-format --save`로 저장한 결과를 리뷰 |
+| 단일 파일 | 같은 폴더의 sibling 파일까지 함께 읽어 정책서·기능설계서 쌍을 리뷰 |
 | 두 파일 | 정책서와 기능설계서를 명시적으로 리뷰 |
 | raw markdown | 두 본문이 들어 있는 markdown을 직접 리뷰 |
 | URL 1개 이상 | Confluence, Google Docs 등 외부 문서에서 두 본문을 읽어 리뷰 |
 
 0.2.6부터 `planning-review`도 URL root input을 직접 받을 수 있습니다. 정책서와 기능설계서가 서로 다른 URL에 있어도 review 입력으로 줄 수 있습니다.
+0.2.7부터 단일 파일 입력은 해당 파일만 보지 않고 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 한 쌍을 찾습니다. 여러 기능 파일이 섞여 1쌍으로 좁힐 수 없으면 임의 병합하지 않고 sanity check로 종료합니다.
 
 ### 3.2 검증 축
 
@@ -244,9 +254,35 @@ flowchart TD
 
 ---
 
-## 6. 출력물 읽는 법
+## 6. SSOT corpus 감사
 
-### 6.1 planning-format 출력
+`ssot-audit`는 새 기획 산출물을 리뷰하는 도구가 아니라, 기존 문서 corpus가 유지보수 가능한 상태인지 보는 도구입니다.
+
+```mermaid
+flowchart TD
+  A["프로젝트 *.md"] --> B["버전 기준선 필터<br/>v0.8 이상 또는 버전 없음"]
+  B --> C["외부 링크 follow<br/>connector fallback"]
+  C --> D["SSOT map 생성"]
+  D --> E["구조 품질"]
+  D --> F["내용 품질"]
+  E --> G["개선 backlog"]
+  F --> G
+```
+
+주요 확인 항목:
+
+- canonical 문서가 중복되거나 없는가
+- archive, draft, `v0.8` 미만 낮은 버전 문서를 최신 기준처럼 참조하는가
+- 같은 정책/상태/권한/임계값이 문서마다 다르게 쓰이는가
+- 용어, 미결 표현, 검증 조건, 설명 없는 중복이 정리되어 있는가
+
+`ssot-audit` 결과는 화면 output only이며, 문서를 자동 수정하지 않습니다.
+
+---
+
+## 7. 출력물 읽는 법
+
+### 7.1 planning-format 출력
 
 본문뿐 아니라 아래 신호를 함께 확인합니다.
 
@@ -258,7 +294,7 @@ flowchart TD
 | 입력 제외 항목 | 본문에 넣지 않은 이유와 후속 확인 대상 |
 | 자체 검증 결과 | 리뷰 전에 문서 자체에서 보완해야 할 항목 |
 
-### 6.2 planning-review 출력
+### 7.2 planning-review 출력
 
 | 출력 | 읽는 법 |
 |---|---|
@@ -270,17 +306,29 @@ flowchart TD
 | 검증가능성 | 테스트 가능한 요구사항으로 바꿔야 할 문장 |
 | 영향 분석 | 같이 수정하거나 확인해야 할 주변 문서·기능 |
 
+### 7.3 ssot-audit 출력
+
+| 출력 | 읽는 법 |
+|---|---|
+| SSOT 인벤토리 | 현재 기준 후보 문서의 역할 분포 |
+| SSOT 제외 문서 | `v0.8` 미만이라 corpus 비교에서 빠진 문서 |
+| 외부 출처 | 외부 링크 follow와 이미지 처리 결과 |
+| 구조 품질 | canonical, archive/낮은 버전 참조, 문서 역할 문제 |
+| 내용 품질 | 정책값, 상태, 권한, 임계값, 용어, 검증 조건 문제 |
+| 개선 backlog | 기존 SSOT 체계에서 정리해야 할 구조/내용 작업 |
+
 ---
 
-## 7. 예시 workflow
+## 8. 예시 workflow
 
 ```text
 1. 기획자가 Confluence [Origin]에 개인 초안을 올린다.
-2. planning-kit 실행 담당이 Origin 링크를 planning-format에 입력한다.
-3. planning-format이 정책서, 기능설계서, 입력 제외 항목, 자체 검증 결과를 만든다.
-4. 실행 담당과 기획팀이 [TBD]와 입력 제외 항목을 확인한다.
-5. formatting 결과를 Confluence [AI]에 올린다.
-6. planning-review로 SSOT 충돌, AC 검증가능성, 의존 영향을 점검한다.
-7. 발견 항목을 수정하거나 리뷰 안건으로 남긴다.
-8. 기획팀 리뷰와 실무 리뷰를 거쳐 v1.0을 확정한다.
+2. 기존 SSOT corpus가 불안정하거나 오래된 문서가 섞여 있으면 ssot-audit로 backlog를 먼저 확인한다.
+3. planning-kit 실행 담당이 Origin 링크를 planning-format에 입력한다.
+4. planning-format이 정책서, 기능설계서, 입력 제외 항목, 자체 검증 결과를 만든다.
+5. 실행 담당과 기획팀이 [TBD]와 입력 제외 항목을 확인한다.
+6. formatting 결과를 Confluence [AI]에 올린다.
+7. planning-review로 SSOT 충돌, AC 검증가능성, 의존 영향을 점검한다.
+8. 발견 항목을 수정하거나 리뷰 안건으로 남긴다.
+9. 기획팀 리뷰와 실무 리뷰를 거쳐 v1.0을 확정한다.
 ```

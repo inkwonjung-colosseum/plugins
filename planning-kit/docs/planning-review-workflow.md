@@ -12,7 +12,7 @@ flowchart TD
   B -->|0개| BC[conversation 참조 모드]
   B -->|"1개+ URL"| BU[URL root 입력<br/>다중 URL 허용]
   B -->|"1개 (디렉터리)"| B1[정책서*.md + 기능설계서*.md 자동 검색]
-  B -->|"1개 (파일)"| B2[파일 본문 또는 이미지 시드]
+  B -->|"1개 (파일)"| B2[파일 본문 + same-folder companion read<br/>또는 이미지 시드]
   B -->|"1개 (raw markdown)"| B3[헤더로 두 본문 + 입력 제외 § 자동 분리]
   B -->|"2개 (path)"| B4[정책서·기능설계서 식별]
   B -->|"그 외"| B5[raw markdown 텍스트 분기<br/>URL 혼합 입력 포함]
@@ -60,7 +60,7 @@ flowchart LR
   N -->|그 외| TXT2[raw markdown 텍스트<br/>URL 혼합 입력 포함]
 
   ONE -->|디렉터리| DIR[정책서*.md + 기능설계서*.md<br/>자동 검색]
-  ONE -->|파일| FILE[본문 안 두 섹션<br/>자동 분리<br/>이미지 파일이면 image queue]
+  ONE -->|파일| FILE[same-folder companion read<br/>sibling 파일 non-recursive 수집<br/>이미지 파일이면 image queue]
   ONE -->|텍스트| TXT[raw markdown<br/>두 본문 자동 분리]
 
   CV --> CHK[직전 turn에서<br/>planning-format 출력 추출]
@@ -84,6 +84,14 @@ flowchart LR
 - `--no-input-fetch`는 input collection URL fetch만 봉쇄한다. URL-only 입력이면 본문 식별 불가 sanity check로 종료한다.
 - input image queue는 이미지 파일 인자, 디렉터리 이미지, markdown image/HTML img, fetch `image/*`, data URI 5경로를 쓴다. `--no-input-image`는 이 multimodal 처리만 봉쇄한다.
 
+단일 파일 companion read(0.2.7):
+
+- 입력 파일의 parent directory를 scan 범위로 잡고, 하위 폴더는 읽지 않는다.
+- 같은 폴더의 읽을 수 있는 UTF-8 텍스트 파일과 지원 이미지 파일을 input collection에 추가한다.
+- 숨김 파일, binary, dependency/build/cache 성격 파일은 읽지 않는다.
+- source title/path/H1/본문 헤더와 입력 파일의 기능명/stem/domain 유사도로 정책서·기능설계서 후보를 좁힌다.
+- 후보가 1쌍이면 리뷰하고, 여러 기능이 섞여 1쌍으로 확정할 수 없으면 sanity check로 종료한다.
+
 ## 3. 본문 분리 패턴
 
 ```mermaid
@@ -94,11 +102,14 @@ flowchart TD
   P2 -->|예| Q2[펜스 안 헤더로 식별]
   P2 -->|아니오| P4{"source title/path/URL label<br/>정책서·policy·feature·design·spec 등<br/>명확한 1:1 신호?"}
   P4 -->|예| Q4[source 단위 fallback 배정]
-  P4 -->|아니오| FAIL[식별 실패<br/>sanity check]
+  P4 -->|아니오| P5{"companion read<br/>입력 파일 stem/domain 기준<br/>1쌍 확정?"}
+  P5 -->|예| Q5[sibling source fallback 배정]
+  P5 -->|아니오| FAIL[식별 실패<br/>sanity check]
 
   Q1 --> P3{"헤더 '# 기능설계서'<br/>또는 '## 기능설계서'?"}
   Q2 --> P3
   Q4 --> P3
+  Q5 --> P3
   P3 -->|예| OK[두 본문 확보 → 검증 진행]
   P3 -->|아니오| EMPTY[한쪽 본문 없음<br/>sanity check]
 ```
@@ -236,3 +247,4 @@ flowchart TD
 | `docs/prd/prd-0.2.0.md` | 본 스킬 분할 + Google 라우팅 fix PRD |
 | `docs/prd/prd-0.2.2.md` | R1 link follow + 입력 제외 § R3 보조 신호 PRD |
 | `docs/prd/prd-0.2.6.md` | planning-review 다중 URL input collection parity PRD |
+| `docs/prd/prd-0.2.7.md` | planning-review 단일 파일 companion read + ssot-audit PRD |

@@ -54,6 +54,7 @@
     },
     {
       "name": "planning-kit",
+      "version": "0.2.7",
       "source": {
         "source": "local",
         "path": "./planning-kit"
