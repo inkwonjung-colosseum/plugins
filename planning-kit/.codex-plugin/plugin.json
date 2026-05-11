@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.9",
-  "description": "planning-format은 기획 초안을 readable 정책서·기능설계서로 변환하고 자체 검증 피드백을 출력한다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 판정·신뢰도·최우선 수정 항목·작업 백로그 우선 report로 SSOT·AC·의존 영향을 점검한다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사하며 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
+  "version": "0.2.10",
+  "description": "planning-format은 기획 초안을 readable 정책서·기능설계서로 변환하고 사용자 확인·릴리즈 차단 항목이 있으면 결정 보드를 먼저 출력한다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 D*/A*/T* 결정 보드 중심 report로 SSOT·AC·의존 영향을 점검한다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사하며 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "planning-kit",
-    "shortDescription": "기획 초안 변환, 산출물 리뷰, SSOT corpus 감사",
-    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 readable 정책서/기능설계서로 변환하고 검증 피드백을 출력한다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 판정·신뢰도·최우선 수정·작업 백로그 우선 report를 만든다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사하고 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
+    "shortDescription": "기획 초안 변환, 결정 보드 리뷰, SSOT corpus 감사",
+    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 readable 정책서/기능설계서로 변환하고 사용자 확인·릴리즈 차단 항목은 결정 보드로 먼저 보여준다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 D*/A*/T* 결정 보드 중심 report를 만든다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사하고 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

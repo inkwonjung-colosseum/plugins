@@ -78,6 +78,8 @@ placeholder 판정 예:
 - R2/R3가 P2-only이고 활성 핵심 축의 비교 대상이 없는 상태라면 `검토 필요`보다 `비교 불가`가 우선한다.
 - placeholder-only 한계는 `SSOT 보강` 작업 백로그에 올릴 수 있지만 verdict용 P2 finding count에는 포함하지 않는다.
 - placeholder-only 백로그가 있고 verdict용 finding이 0건이면 상단 발견 count는 `P0 0건, P1 0건, P2 0건`으로 유지하고, `작업 백로그`에는 `A*` 항목을 표시한다. `검증 범위와 한계`에는 `SSOT 보강 작업은 있으나 verdict finding에는 포함하지 않음`을 남긴다.
+- 0.2.10: SSOT 기준 문서 묶음 0건 또는 all-placeholder가 유일한 낮은 신뢰도 원인이고 R2/R3 finding이 없으면 결정 보드에 D* 또는 A*를 만들지 않는다. `## 결정 보드`는 출력하되 관련 subsection은 `없음`으로 두고, SSOT 보강 A*는 top-level `## 작업 백로그` 호환용 요약에만 표시한다. 판정은 0.2.9 규칙대로 `비교 불가`를 유지한다.
+- `--axes ac`처럼 SSOT가 비활성인 호출에서는 SSOT 보강 작업을 결정 보드나 작업 백로그에 만들지 않는다.
 - 로컬 SSOT Markdown은 placeholder지만 그 안의 외부 link follow 결과가 실질 본문을 제공하면, R1은 외부 본문 기준으로 제한적 비교를 수행한다. 이때 신뢰도는 `제한적`이고, `검증 범위와 한계`에 "로컬 SSOT는 placeholder, 외부 본문으로 비교"를 명시한다.
 - placeholder 파일의 외부 link follow 후보는 본문 키워드 매칭뿐 아니라 파일명, H1, link text, URL label도 매칭 신호로 삼는다. 이 신호로도 매칭되지 않은 SSOT 폴더 전체를 무조건 follow하지는 않는다.
 
