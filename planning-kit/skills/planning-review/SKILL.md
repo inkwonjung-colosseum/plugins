@@ -21,7 +21,7 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 
 | 인자 | 기본값 | 설명 |
 |---|---|---|
-| `--ssot-include <glob>` | (없음) | SSOT corpus glob. default = 프로젝트 폴더 안 모든 `*.md` (`.git/`, `node_modules/` 자동 제외). R1·R3 corpus 공유. |
+| `--ssot-include <glob>` | (없음) | SSOT token 폴더 후보 안에서 corpus를 좁히는 glob. 기본 후보는 폴더명에 독립 `SSOT` token이 있는 하위 폴더 안의 Markdown만이다. `planning/**`과 `.planning-kit/**`은 항상 제외한다. glob이 SSOT 폴더 경계 밖만 가리키면 결과는 0건이며 상세 추적에 제외 사유를 남긴다. R1·R3 corpus 공유. |
 | `--axes <list>` | `ssot,ac,deps` | 점검 축 콤마 구분. 빈 값이면 sanity check. |
 | `--no-input-fetch` | off | review 대상 입력 수집 단계의 URL root fetch + 본문 URL fetch + connector fallback 봉쇄. 파일/텍스트/디렉터리 본문 자체는 읽는다. |
 | `--no-input-image` | off | review 대상 입력 이미지 multimodal 호출 0건. URL fetch는 진행하되 image content-type 응답은 본문 합류하지 않는다. |
@@ -71,6 +71,12 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 
 이 변경은 단일 파일 입력의 편의 확장이다. `planning-review`가 새 정책서·기능설계서를 생성하거나, 같은 폴더 밖의 파일을 자동 탐색하거나, SSOT corpus를 review 대상 본문으로 승격하지 않는다.
 
+#### Step 1.1.2 planning-format 저장 산출물 입력 (0.2.9)
+
+`planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 디렉터리를 입력으로 받으면 해당 폴더의 `*정책서*.md`와 `*기능설계서*.md` 파일명을 우선 후보로 인식한다. 파일명으로 확정할 수 없으면 H1/H2의 `정책서`/`기능설계서` heading을 fallback으로 사용한다.
+
+저장 파일 중 하나만 입력받아도 same-folder companion read로 같은 폴더의 짝 파일을 찾아야 한다. 0.2.8 이하 `.planning-kit/**` 저장 산출물은 review 입력으로 계속 읽을 수 있지만, `.planning-kit/**`과 `planning/**`은 모두 SSOT corpus 근거가 될 수 없다.
+
 #### Step 1.2 input collection (0.2.6)
 
 `planning-format` Step 1~5와 같은 URL 판별, URL·이미지 추출, 재귀 fetch, connector fallback, image multimodal, 통합 본문 합류 룰을 사용한다.
@@ -101,13 +107,16 @@ Google Sheets gid/range, connector deep link anchor, metadata only 상태 등은
 
 통합 입력 본문에서 정책서·기능설계서·입력 제외 §을 분리한다.
 
-1. `# 정책서` / `## 정책서` 헤더 → 정책서 본문.
-2. `# 기능설계서` / `## 기능설계서` 헤더 → 기능설계서 본문.
-3. `## 입력 제외 항목` 헤더 → 입력 제외 § 본문 (옵션 — 부재해도 sanity check 아님, 0.2.0 산출물 호환). 여러 개면 발견 순서대로 concat하고 dedup하지 않는다.
-4. markdown 코드 펜스 안 헤더 → 펜스 안 본문에서 1~3 반복.
-5. source title/path/URL label이 `정책서`, `policy`, `정책`, `기능설계서`, `feature`, `design`, `spec` 중 하나를 명확히 가리키면 source 단위 fallback 배정.
-6. 1개 파일 입력의 companion read source는 title/path/H1/본문 헤더와 입력 파일의 기능명/stem/domain 유사도로 후보를 좁힌다.
-7. 위 절차 후 정책서·기능설계서 둘 다 확보하지 못하면 sanity check.
+1. 저장 경로가 있으면 화면 projection보다 `--save` 파일을 우선한다.
+2. 0.2.9 unsaved 화면 출력은 readable projection으로 취급한다. 정책서 본문은 첫 `## 정책서` wrapper heading 다음 줄에서 시작해 다음 `## 기능설계서` wrapper heading 직전에서 끝난다.
+3. 기능설계서 본문은 첫 `## 기능설계서` wrapper heading 다음 줄에서 시작해 `## 검증 피드백`, `## 출처 요약`, `## 입력 제외 요약`, `## 상세 추적` 중 가장 먼저 나오는 wrapper heading 직전에서 끝난다.
+4. wrapper heading은 줄 시작에 있는 정확한 heading만 인정한다. 들여쓰기된 heading, blockquote 안 heading, fenced code block 안 heading은 경계로 보지 않는다.
+5. 경계가 둘 이상으로 해석되거나 한쪽 본문을 확정할 수 없으면 임의 병합하지 않고 `검증 범위와 한계` 또는 sanity check에 `readable projection 경계 불명확`을 남긴다.
+6. `# 정책서` / `## 정책서` 헤더 → 정책서 본문, `# 기능설계서` / `## 기능설계서` 헤더 → 기능설계서 본문. 0.2.8 이하 코드 펜스 안 헤더도 읽기 호환으로 반복 처리한다.
+7. `## 입력 제외 항목` 또는 0.2.9 `## 입력 제외 요약`/`## 상세 추적` 안의 입력 제외 항목을 입력 제외 § 본문으로 분리한다. 부재해도 sanity check 아님.
+8. source title/path/URL label이 `정책서`, `policy`, `정책`, `기능설계서`, `feature`, `design`, `spec` 중 하나를 명확히 가리키면 source 단위 fallback 배정.
+9. 1개 파일 입력의 companion read source는 title/path/H1/본문 헤더와 입력 파일의 기능명/stem/domain 유사도로 후보를 좁힌다.
+10. 위 절차 후 정책서·기능설계서 둘 다 확보하지 못하면 sanity check.
 
 source 단위 fallback은 명확한 1:1 신호일 때만 사용한다. 두 source가 모두 같은 종류로 추정되거나 둘 다 불명확하면 fallback하지 않는다.
 companion read에서 여러 기능의 정책서·기능설계서 후보가 섞여 있고 입력 파일 기준으로 1쌍을 확정할 수 없으면 fallback하지 않고 sanity check로 종료한다.
@@ -149,35 +158,136 @@ R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off → 매칭 *.md 본
 
 R3 활성 + Step 1 분리 성공 시 카테고리별 가중치. 절차·신호 카테고리·헤더 카운트 K 산출 모두 `references/deps-rules.md` §R3.2.1.
 
-### Step 3: 발견 합산 + 결과
+### Step 3: 발견 합산 + 우선순위/작업화
 
-같은 발견이 두 축에 걸치면 한 번만 기록. 우선순위: **R1 > R3 > R2**.
+같은 발견이 두 축에 걸치면 한 번만 기록. 축 중복 제거 우선순위: **R1 > R3 > R2**.
 
-- 모든 활성 축 발견 0건 → `통과`
-- ≥1건 → `발견 N건` (R3 `권고`도 카운트 포함)
+발견은 기본 출력 전에 P0/P1/P2로 재정렬한다.
+
+| 우선순위 | 의미 | 기본 매핑 |
+|---|---|---|
+| P0 | 구현/운영 판정을 결정할 수 없어 기능 동작이 비결정적 | R1 또는 R2의 핵심 결정 불가, R3 외부 영향 중 운영 차단 |
+| P1 | 정책/기능 문서 간 범위 충돌 또는 외부 시스템 영향이 큼 | R1 충돌, R2 검증 불가, R3 발견 |
+| P2 | 후속 SSOT 보강, cross-link, 변경 워크플로 권고 | R3 권고, SSOT 보강 작업 |
+
+작업 백로그는 발견을 그대로 나열하기 전에 수정 작업 단위로 묶는다. 항목 ID는 `A1`, `A2` 형식이다.
+
+| 유형 | 설명 |
+|---|---|
+| `문서 수정` | 정책서·기능설계서 본문을 직접 고쳐야 함 |
+| `정책 결정` | 담당자/도메인 owner가 값을 결정해야 함 |
+| `SSOT 보강` | 본문 없는 자리표시자(placeholder) 또는 부재한 기준 문서를 작성/보강해야 함 |
+| `외부 인터페이스` | WCS/API/시트 등 외부 의존 계약을 명시해야 함 |
+| `동기화 워크플로` | 시트·정책서·기능설계서 동시 갱신 절차가 필요함 |
+
+모든 기본 발견 ID는 `R1-1`, `R2-1`, `R3-1` 형식이다. 같은 출력 안에서만 stable하면 된다.
+
+### Step 4: 판정과 검증 신뢰도
+
+검증 신뢰도:
+
+| 신뢰도 | 조건 |
+|---|---|
+| `충분` | review 대상 본문이 충분하고, 활성 축에 필요한 비교 대상/증거가 실질 본문을 포함하며, 활성 축을 정상 평가했다. |
+| `제한적` | review 대상 본문은 충분하고 활성 축을 평가했지만 일부 SSOT 파일이 placeholder이거나 특정 외부 link follow가 실패해 증거 범위가 일부 제한된다. |
+| `낮음` | 활성 핵심 축을 평가할 비교 대상 대부분이 비어 있거나, 입력 fetch 실패로 review 대상 본문 일부만 확보했다. `ssot` 축 활성 + SSOT 기준 문서 묶음 0건 또는 모두 placeholder이면 `낮음`. |
+
+판정 우선순위:
+
+1. `수정 필요`: P0 또는 P1 발견이 1건 이상 있다.
+2. `비교 불가`: 요청한 핵심 축이 증거 부족으로 판단 불가다. 예: `--axes ssot`인데 SSOT 기준 문서 묶음이 모두 placeholder.
+3. `검토 필요`: P0/P1은 없고, 핵심 축이 판단 가능하며, P2 권고가 있거나 외부 결정이 필요한 항목이 있다.
+4. `조건부 통과`: P0/P1/P2 발견이 없고, 활성 축은 평가됐지만 검증 신뢰도가 `제한적`이다.
+5. `통과`: P0/P1/P2 발견이 없고, 검증 신뢰도가 `충분`이다.
+
+신뢰도는 활성 축 기준으로 판단한다. 예를 들어 `--axes ac`만 활성인 경우 SSOT corpus 부재는 신뢰도 산정에 영향을 주지 않는다. `낮음`이고 P0/P1/P2 발견이 0건이면 최종 판정은 `비교 불가`다. `낮음`이더라도 P0/P1 발견이 있으면 `수정 필요`다.
 
 ## 출력 포맷
 
 ````markdown
 # planning-review: [기능명]
 
-- 입력: [경로 list / URL list / "직전 planning-format 출력 (conversation)" / "직접 입력 markdown"]
-- 입력 처리: [conversation 본문 사용 | local/raw 본문 사용 | URL root R개 + 입력 fetch 성공 K개 / 실패 J개 + 입력 이미지 M개 (cap 없음)]
-- 입력 제외 §: 분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)
+- 판정: [통과 / 조건부 통과 / 수정 필요 / 검토 필요 / 비교 불가]
+- 검증 신뢰도: [충분 / 제한적 / 낮음] — [이유]
+- 입력: [사람이 읽는 요약]
 - 점검 축: [ssot, ac, deps]
-- SSOT corpus: 매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)
-- SSOT 검색 키워드: [keyword1, keyword2, ...]
+- 발견: P0 N건, P1 N건, P2 N건
 
 ---
 
-## 리뷰 결과: [통과 | 발견 N건]
+## 결론
 
-- SSOT 충돌: N건 (활성 시)
-- 검증가능성: N건 (활성 시)
-- 영향 분석: N건 (활성 시, 발견+권고 합계)
+[1~3문장 bottom line]
 
-## 입력 출처
-(input fetch 또는 input image 처리 1건 이상일 때만)
+## 최우선 수정 항목
+
+[P0/P1만 기본 노출. 없으면 `없음`]
+
+## 작업 백로그
+
+[작업 단위 backlog. 없으면 `없음`]
+
+## 발견 요약
+
+[축별 count + high-signal finding only]
+
+## 검증 범위와 한계
+
+[입력/SSOT 기준 문서 묶음/본문 없는 자리표시자/본문 가져오기 실패/비활성 축 요약]
+
+## 출처 요약
+
+[기본 압축 출처]
+
+## 상세 추적
+
+[조건 충족 시 full 입력 출처표 / full SSOT 출처표 / 축별 원시 발견 목록]
+````
+
+규칙:
+
+- 최종 출력은 반드시 `# planning-review: [기능명]`으로 시작한다.
+- 최종 출력 앞에 fetch 진행 문장, project scan 진행 문장, "분석 결과를 정리합니다" 같은 로그를 쓰지 않는다.
+- 전체 리포트를 ` ```markdown ` 또는 ` ```text ` 코드 펜스로 감싸지 않는다.
+- `결론`은 발견 상세보다 먼저 온다.
+- `최우선 수정 항목`은 P0/P1만 기본 노출한다. P0/P1이 없으면 빈 표가 아니라 `없음`을 쓴다.
+- 작업 단위가 없으면 `## 작업 백로그`에는 빈 표가 아니라 `없음`을 쓴다.
+- P2만 있는 경우 `## 최우선 수정 항목`은 `없음`, `## 작업 백로그`와 `## 발견 요약`에는 P2 관련 작업/요약을 압축 표시한다.
+- full 입력 출처표, full SSOT 출처표, 축별 원시 발견 목록은 조건 충족 시 하단 `## 상세 추적` 섹션으로 이동한다.
+- `## 상세 추적`은 조건 충족 시 `## 출처 요약` 뒤에 둔다.
+- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 입력 제외 § cross-reference 표시.
+
+### 상세 추적 조건
+
+| 조건 | 처리 |
+|---|---|
+| P0/P1 발견이 1건 이상 | 축별 원시 발견 목록 포함 |
+| SSOT 기준 문서 묶음이 0건이거나 모두 placeholder | SSOT 후보/제외/placeholder 경로 요약 포함, 기본 상단 `검증 범위와 한계`에도 원인 표시 |
+| `--ssot-include`가 SSOT 폴더 경계 밖만 가리켜 후보가 0건 | include glob, 제외 사유, 경계 밖 매칭 수 포함 |
+| input fetch 실패, 인증 실패, 본문 미사용 출처가 1건 이상 | full 입력 출처표 포함 |
+| SSOT link follow 실패, 인증 실패, 본문 미사용 출처가 1건 이상 | full SSOT 출처표 포함 |
+
+### 출처 요약
+
+```markdown
+## 출처 요약
+
+| 구분 | 건수 | 성공 | 실패 | 본문 사용 | 비고 |
+|---|---:|---:|---:|---:|---|
+| 입력 URL | 2 | 2 | 0 | 2 | 정책서, 기능설계서 |
+| 입력 이미지 | 0 | 0 | 0 | 0 | 없음 |
+| SSOT Markdown | 6 | 6 | 0 | 0 | 모두 placeholder |
+| SSOT 외부 링크 | 0 | 0 | 0 | 0 | 링크 없음 |
+```
+
+connector 세부(`via Atlassian connector`)는 기본 출력에서 숨긴다. 실패나 인증 문제만 `비고`에 짧게 남긴다.
+
+### 상세 입력 출처
+
+input fetch 또는 input image 처리 1건 이상이고 상세 추적 조건을 충족할 때만 `## 상세 추적` 안에 둔다.
+
+```markdown
+### 입력 출처
 
 root 입력: R개
 재귀 fetch: 성공 K개 / 실패 J개 (cap 없음)
@@ -188,13 +298,16 @@ root 입력: R개
 | 1 | 입력 root URL | https://wiki.example/policy/order-cancel | — | 200 (via WebFetch) | O |
 | 2 | 입력 root URL | https://docs.example/feature/order-cancel | — | 200 (via Google Drive connector — read_file_content) | O |
 | 3 | 입력 자식 URL | https://figma.com/design/... | 입력 출처 2 | 인증 필요 (Figma MCP 미인증) | X |
-| 4 | 입력 이미지 | ./diagram.png | 입력 출처 1 | image/png 0.4MB | O (multimodal) |
+```
 
-## SSOT 출처
-(link follow 1건 이상일 때만, §R1.5 표 형식)
+### 상세 SSOT 출처
 
+link follow 1건 이상이거나 SSOT 0건/all-placeholder/경계 밖 include 조건을 충족할 때 `## 상세 추적` 안에 둔다. 표 형식은 `references/ssot-rules.md` §R1.5를 따른다.
+
+### 축별 원시 발견 목록
+
+```markdown
 ### SSOT 충돌
-(≥1건일 때만)
 1. [제목]
    - 위치: [정책서/기능설계서 §섹션] vs [SSOT 파일 §섹션]
    - 근거: "[변환 본문 인용]" vs "[SSOT 인용]"
@@ -202,41 +315,31 @@ root 입력: R개
    - 제안: [최소 수정 또는 확인 조건]
 
 ### 검증가능성
-(≥1건일 때만)
 1. [제목]
    - 카테고리: [정량성 / 상태 / 행위자 / 결과 관찰]
+   - 우선순위: [P0 / P1]
    - 위치: [정책서/기능설계서 §섹션]
    - 근거: "[변환 본문 인용]"
    - 영향: [한 줄]
    - 제안: [최소 수정]
 
 ### 영향 분석
-(≥1건일 때만)
 1. [제목]
    - 분류: [발견 / 권고]
+   - 우선순위: [P1 / P2]
    - 카테고리: [정책 변경 / 상태 전이 / 권한·역할 / 외부 의존]
    - 위치: [정책서/기능설계서 §섹션]
    - 영향 후보: [SSOT 파일 path list]
    - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용 또는 입력 제외 § cross-reference]"
    - 영향: [한 줄]
    - 제안: [후속 검토 조건]
-````
-
-규칙:
-
-- 활성 안 한 축의 sub-section은 통째 생략. `SSOT 검색 키워드` 줄은 R1 활성 시에만.
-- `입력 처리` 줄: conversation 모드에서 직전 `planning-format` 출력을 그대로 쓰고 input fetch가 0건이면 `conversation 본문 사용`. 파일/디렉터리/raw markdown 본문만 사용하고 fetch/image가 0건이면 `local/raw 본문 사용`. input fetch 또는 input image가 1건 이상이면 성공/실패 카운트를 표기.
-- `SSOT corpus` 줄: link follow ≥1 = `매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`. link 0건 = `매칭 N개`. 매칭 0건 = `매칭 0개 (검증 대상 없음)`. R1·R3 모두 비활성 = 줄 미출력.
-- `입력 제외 §` 줄: 분리 성공 = `분리 N건 (R3 신호 K건: fetch 실패 a, 범위 외 b, 구조 변환 c, 디테일 축약 d / R3 무관 N-K건)` (K 산출은 `deps-rules.md` §R3.2.1). 분리 성공 + 0건 = `분리 0건`. 분리 실패·0.2.0 이전 = `없음 (또는 0.2.0 이전 산출물)`.
-- `## 입력 출처` 블록 위치 = `## 리뷰 결과` 다음, `## SSOT 출처` 앞. input fetch·input image 처리가 0건이면 생략.
-- `## SSOT 출처` 블록 위치 = `## 입력 출처` 다음, 발견 sub-section 위. R1·R3 모두 비활성·매칭 0건·`--no-ssot-fetch`·link 0건이면 통째 생략.
-- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 입력 제외 § cross-reference 표시.
+```
 
 ## 참고 파일
 
-- `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·매칭·발견 형식·link follow·출처 list.
-- `references/ac-rules.md` — R2 4 sub-category 기준.
-- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견·권고 분류 + 입력 제외 § 보조 신호.
+- `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·SSOT token 폴더 corpus 경계·placeholder 판정·link follow·출처 list.
+- `references/ac-rules.md` — R2 4 sub-category 기준 + P0/P1 우선순위 기본값.
+- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견/권고 P1/P2 기본값 + 입력 제외 § 보조 신호 + backlog grouping 신호.
 - `../planning-format/references/connector-routing.md` — input fetch와 SSOT link follow에서 공유 적재. 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기.
 - `../planning-format/references/conversion-rules.md` — input image multimodal·통합 본문 합류 룰을 공유 참조.
 

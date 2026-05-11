@@ -14,7 +14,7 @@ orchestration only. 세부 룰은 reference로 lazy read.
 
 | 인자 | 기본값 | 설명 |
 |---|---|---|
-| `--save` | off | `./.planning-kit/<기능명>/정책서.md`, `./.planning-kit/<기능명>/기능설계서.md` 두 파일에 본문 저장. 자체 검증 보고서·출처 list·입력 제외 §은 디스크 저장 안 함 (화면 only). 충돌·안전화는 `references/output-contract.md` §6. |
+| `--save` | off | `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 아래 정책서 1개 + 기능설계서 1개를 저장한다. 저장 파일은 canonical Markdown 구조를 우선 보존하고, 화면 전용 카드/필드 목록 변환은 저장 파일에 강제하지 않는다. 저장 산출물은 review 대상 입력이 될 수 있지만 SSOT corpus 근거가 될 수 없다. 충돌·안전화는 `references/output-contract.md` §6. |
 | `--no-fetch` | off | URL fetch + connector fallback 봉쇄. |
 | `--no-image` | off | 이미지 multimodal 호출 0건. |
 | `--no-self-review` | off | 자체 품질 검증 블록 출력 생략. **입력 제외 §은 끄지 않음** — 변환 결과 핵심 정보. |
@@ -80,26 +80,38 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 
 ### Step 7: 자체 품질 검증
 
-`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) **6패스 체크리스트 점검** — 카테고리당 1패스, 총 27 항목 yes/no 검사(0.2.8 F6 legacy backlink 헤더 금지 포함). F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·체크리스트·예시·발견 형식 모두 reference 그대로.
+`--no-self-review`면 F1~F6 self-review만 skip한다. 이때도 readable 화면 렌더링, 저장 경로, 출처/입력 제외 요약, 상세 추적 배치 규칙은 유지하고 `## 검증 피드백`은 출력하지 않는다.
 
-체크리스트 □ 중 unchecked 1개 = 발견 1건. 6 카테고리 모두 0건이면 `통과`, ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
+그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) **6패스 체크리스트 점검** — 카테고리당 1패스, 항목별 yes/no 검사(0.2.8 F6 legacy backlink 헤더 금지와 0.2.9 readable boundary 점검 포함). F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·체크리스트·예시·발견 형식 모두 reference 그대로.
+
+체크리스트 □ 중 unchecked 1개 = 발견 1건. 발견은 `기계적 안정화`, `화면 전용 표시 변환`, `수정 제안 가능`, `사용자/외부 결정 필요` 중 하나로 분류한다.
+
+- `기계적 안정화`는 의미를 바꾸지 않는 범위에서 canonical 본문과 저장 파일에 반영할 수 있다.
+- `화면 전용 표시 변환`은 의미를 바꾸지 않는 범위에서 화면 렌더링에만 반영할 수 있다.
+- `수정 제안 가능`과 `사용자/외부 결정 필요`는 사용자 승인 전 정책서·기능설계서 canonical 본문에 자동 반영하지 않는다.
+- F2/F3/F4/F6 의미 변경 항목은 `## 검증 피드백`에 ID(`F2-1` 등), 위치, 문제, 영향, 제안, 사용자 확인 필요 여부를 남긴다.
+- 6 카테고리 모두 0건이면 `## 검증 피드백`은 `없음`으로 출력한다.
+
+외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
 
 ### Step 8: `--save` 처리
 
-`references/output-contract.md` §6 그대로 — 저장 경로·기능명 안전화·collision suffix·저장 실패 헤더 표기.
+`references/output-contract.md` §6 그대로 — `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 경로·기능명 안전화·collision suffix·저장 실패 헤더 표기.
 
 ### Step 9: 통합 출력
 
-`references/output-contract.md` Read (Step 8과 함께) — §1 블록 순서·§2 정상 출력·§3 헤더 줄·§4 입력 제외 분포·§5 출처 list deep link 그대로 따른다.
+`references/output-contract.md` Read (Step 8과 함께) — §1 블록 순서·§2 정상 출력·§3 헤더 줄·§4 입력 제외/출처 요약·§5 상세 추적·§6 저장 계약 그대로 따른다.
+
+최종 응답은 반드시 `# [기능명]`으로 시작한다. 그 앞에 fetch 진행 문장, connector fallback 진행 설명, "변환을 시작합니다" 같은 실행 로그를 쓰지 않는다. 기본 순서는 헤더 요약 → `## 정책서` → `## 기능설계서` → `## 검증 피드백`(self-review 실행 시) → `## 출처 요약` → `## 입력 제외 요약` → `## 상세 추적`(조건 충족 시)이다.
 
 ## 참고 파일
 
 - `templates/기능설계서.md` — 8 섹션 표 골격.
 - `templates/정책서.md` — 10 섹션 표 골격.
-- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (Step 4·5·6) + §4.1 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5).
+- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (Step 4·5·6) + §4.1 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §4.6 용어 표기 레이어 + §5.4 max-depth cap=3 (0.2.5) + §7 readable 화면 렌더링.
 - `references/exclusion-rules.md` — 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (Step 6) + §2 결정 트리 + §3.1 모호성 트리거 + §3.2 16 어구 (0.2.5).
-- `references/output-contract.md` — 출력 포맷·헤더 줄·`--save` 처리·`## 출처` list deep link·분기별 헤더 (Step 8·9).
-- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7) + 27 항목 체크리스트 6패스 (0.2.8 F6 legacy backlink 헤더 금지 포함).
+- `references/output-contract.md` — readable 산출물 우선 출력·헤더 줄·`--save` 처리·출처/입력 제외 요약·하단 상세 추적·`## 출처` list deep link·분기별 헤더 (Step 8·9).
+- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7) + 항목별 체크리스트 6패스 (0.2.8 F6 legacy backlink 헤더 금지 포함) + 0.2.9 feedback-first 분류/출력 규칙.
 - `references/connector-routing.md` — 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기·§8 sanity check·§11 connector별 anchor 추출 (Step 3) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5).
 
 외부 검증(SSOT 충돌·acceptance criteria·의존 영향)은 `planning-review` 스킬 별도 호출. 자세한 사용법은 `skills/planning-review/SKILL.md`.

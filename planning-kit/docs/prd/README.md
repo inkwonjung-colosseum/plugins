@@ -1,10 +1,10 @@
 # planning-kit PRD chain
 
-planning-kit PRD 12건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
+planning-kit PRD 13건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
 
 ## 읽는 순서
 
-- **신규 사용자**: 본 README → `prd-0.2.8.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
+- **신규 사용자**: 본 README → `prd-0.2.9.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
 - **기존 사용자**: 신규 PRD만 읽으면 충분 — 각 PRD가 incremental 베이스를 명시한다.
 
 ## PRD 관계도
@@ -23,6 +23,7 @@ planning-kit PRD 12건의 관계·읽는 순서·핵심 변경 1줄 요약을 �
 | 0.2.6 | incremental | 0.2.5 | planning-review 입력 처리 parity — 다중 URL 입력 허용 + planning-format과 같은 input dispatch·재귀 fetch·connector fallback·image multimodal·통합 본문 합류 + `--no-input-fetch` / `--no-input-image` + `## 입력 출처` 블록. 입력 fetch와 SSOT corpus link follow는 별도 visited set·출처 블록으로 분리 |
 | 0.2.7 | incremental | 0.2.6 | 신규 `ssot-audit` 스킬 — 프로젝트 전체 `*.md` + 외부 링크 follow corpus를 구조·내용 2축으로 감사하고 backlog를 화면 output only로 제공. `planning-review` 단일 파일 입력은 같은 폴더 sibling companion read로 정책서·기능설계서 쌍을 식별 |
 | 0.2.8 | incremental | 0.2.7 | planning-format 보조 표 헤더 backlink 제거 — `### N.M [용도] 보조 표` clean header만 신규 출력하고, 부모 §/row 추적은 `## 입력 제외 항목`의 `구조 변환` 처리 줄로 이동. legacy backlink 헤더는 읽기 호환 유지 |
+| 0.2.9 | incremental | 0.2.8 | planning-format + planning-review 출력 품질 개선 — 진행 로그 제거, readable 결정 문서 우선 출력, 자체 검증 피드백 우선, review 판정/신뢰도/액션 backlog 우선 출력, `--save` 경로 `planning/` 고정, `planning/**` SSOT 제외 |
 
 ## 호환성 요약
 
@@ -43,3 +44,4 @@ planning-kit PRD 12건의 관계·읽는 순서·핵심 변경 1줄 요약을 �
 - [`prd-0.2.6.md`](./prd-0.2.6.md) — planning-review 다중 URL 입력 + input fetch parity + 입력/SSOT fetch 분리.
 - [`prd-0.2.7.md`](./prd-0.2.7.md) — ssot-audit 신규 스킬 + 구조/내용 품질 감사 + 개선 backlog 화면 출력 + planning-review 단일 파일 companion read.
 - [`prd-0.2.8.md`](./prd-0.2.8.md) — 보조 표 헤더 backlink 제거 + 구조 변환 추적 정보 입력 제외 항목 이동 + legacy header 읽기 호환.
+- [`prd-0.2.9.md`](./prd-0.2.9.md) — planning-format + planning-review 출력 개선: 진행 로그 제거, readable 결정 문서/report 우선 출력, 자체 검증 피드백 우선, 새 옵션 없이 추적 정보 하단 분리, `--save` 경로 `planning/` 고정, SSOT 폴더명 기반 corpus 제한.

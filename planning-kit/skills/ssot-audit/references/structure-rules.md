@@ -38,27 +38,24 @@ Backlog:
 - canonical 정책서 또는 기능설계서 생성.
 - 기존 조각 문서에서 canonical 문서로 링크 정리.
 
-## 3. draft/old/archive/낮은 버전 활성 참조
+## 3. draft/old/archive 활성 참조
 
-`draft`, `old`, `archive`, `deprecated`, `legacy`, `wip` 신호가 있는 문서나 `v0.8` 미만 낮은 버전 문서가 활성 문서에서 기준처럼 참조되면 발견한다.
+`draft`, `old`, `archive`, `deprecated`, `legacy`, `wip` 신호가 있는 문서가 활성 SSOT 문서에서 기준처럼 참조되면 발견한다.
 
 활성 참조 신호:
 
 - README, 정책서, 기능설계서, 최신 PRD에서 archive/draft 문서를 링크.
-- README, 정책서, 기능설계서, 최신 PRD에서 `v0.7` 등 낮은 버전 문서를 링크.
 - "기준", "정책", "참고", "따름" 같은 표현과 함께 링크.
 
 예외:
 
 - archive 내부 문서끼리 참조하는 경우는 발견하지 않는다.
-- 낮은 버전 문서끼리의 내부 참조도 발견하지 않는다.
 
-문제는 현재 SSOT 후보가 낮은 버전 문서를 기준처럼 참조하는 경우다.
+문제는 현재 SSOT 후보가 draft/archive 문서를 기준처럼 참조하는 경우다.
 
 Backlog:
 
 - 활성 문서에서 최신 canonical로 링크를 바꾼다.
-- 낮은 버전 문서가 여전히 기준이면 문서 버전을 올리거나 최신 기준 문서로 분리한다.
 
 ## 4. 도메인 문서 흩어짐
 
@@ -114,11 +111,21 @@ Backlog:
 ```markdown
 1. [발견 또는 권고 제목]
    - 분류: [발견 | 권고]
-   - 카테고리: [canonical 중복 | canonical 부재 | archive 활성 참조 | 낮은 버전 활성 참조 | 도메인 문서 흩어짐 | 역할 불명확 | 외부 canonical 의존]
+   - 카테고리: [canonical 중복 | canonical 부재 | archive 활성 참조 | 도메인 문서 흩어짐 | 역할 불명확 | 외부 canonical 의존 | SSOT token 밖 기준 문서]
    - 위치: [문서 path list]
    - 근거: "[짧은 근거]"
    - 영향: [한 줄]
    - 제안: [최소 개선 방향]
 ```
 
-명확한 기준값 충돌, archive 활성 참조, 낮은 버전 활성 참조는 `발견`이다. 사람이 최종 판단해야 하는 구조 개선 후보는 `권고`다.
+명확한 기준값 충돌, archive 활성 참조, SSOT token 밖 기준 문서를 최신 기준처럼 참조하는 문제는 `발견`이다. 사람이 최종 판단해야 하는 구조 개선 후보는 `권고`다.
+
+## 8. SSOT token 밖 기준 문서
+
+폴더명에 독립 `SSOT` token이 없는 문서가 기준 문서처럼 쓰이면 `문서 이동` 또는 `SSOT 보강` backlog를 제안한다. 단순 substring(`ProductSSOT`)이나 도구명(`ssot-audit`)은 SSOT token으로 보지 않는다.
+
+예:
+
+- `docs/policy/order.md`에 결정 문장이 풍부하지만 SSOT token 폴더 밖에 있음.
+- `ProductSSOT/order.md`는 `SSOT` 독립 token이 아니므로 corpus 밖이다.
+- `planning/[SSOT]/draft.md`는 `planning/**` 생성 초안 영역이라 corpus 밖이다.

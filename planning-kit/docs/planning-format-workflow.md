@@ -26,7 +26,7 @@ flowchart TD
   K --> L[Step 6: 변환 — 두 템플릿]
   L --> M[Step 7: 자체 품질 검증<br/>F1~F6]
   M --> N{--save?}
-  N -->|예| SV["Step 8: 디스크 저장<br/>./.planning-kit/&lt;기능명&gt;/"]
+  N -->|예| SV["Step 8: 디스크 저장<br/>planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
   N -->|아니오| OUT
   SV --> OUT[Step 9: 단일 응답 markdown 출력]
 ```
@@ -172,7 +172,7 @@ flowchart TD
   LD -->|동질 enum<br/>동일 동작·ref| KEEP[합류 유지]
   AUX --> NSR{--no-self-review?}
   KEEP --> NSR
-  NSR -->|예| OUT[변환 본문만 출력]
+  NSR -->|예| OUT["readable 본문 + 요약 출력<br/>검증 피드백 생략"]
   NSR -->|아니오| SR[references/self-review-rules.md Read]
 
   SR --> F1[F1. 섹션 충실도<br/>5 항목 체크리스트 0.2.5]
@@ -188,8 +188,8 @@ flowchart TD
   F4 --> RES
   F5 --> RES
   F6 --> RES
-  RES -->|모두 0건| PASS[자체 검증: 통과]
-  RES -->|≥1건| FOUND[자체 검증: 발견 N건<br/>카테고리별 list]
+  RES -->|모두 0건| PASS["검증 피드백: 없음"]
+  RES -->|≥1건| FOUND["검증 피드백<br/>F*-* ID / 위치 / 문제 / 제안"]
 
   PASS --> OUT
   FOUND --> OUT
@@ -218,7 +218,7 @@ list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main�
 
 검증 sub-§ 인식 (0.2.4): F1·F2 자체 검증, R1·R2·R3 외부 검증 모두 sub-§(`### N.M ... 보조 표`) 본문을 점검 대상으로 인식. 부모 § 룰 그대로 sub-§ 확장.
 
-자체 검증 6패스 체크리스트: F1~F6 27 항목 yes/no 검사 (F1: 5 + F2: 4 + F3: 4 + F4: 4 + F5: 4 + F6: 6). 카테고리당 1패스, 총 6패스. 단일 LLM 패스 → 6패스로 검출 누락 차단. 0.2.8부터 신규 출력에 legacy backlink 헤더가 남으면 F6 syntax 발견으로 기록한다.
+자체 검증 6패스 체크리스트: F1~F6 항목 yes/no 검사. 카테고리당 1패스, 총 6패스. 단일 LLM 패스 → 6패스로 검출 누락 차단. 0.2.9부터 의미 변경이 필요한 발견은 canonical 본문에 자동 반영하지 않고 `## 검증 피드백`에 먼저 노출한다.
 
 외부 SSOT corpus 충돌·acceptance criteria·의존 영향은 `planning-review` 스킬이 별도 처리.
 
@@ -226,12 +226,12 @@ list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main�
 
 ```mermaid
 flowchart TD
-  S[--save ON?] -->|아니오| SK[화면 only<br/>저장 줄: 화면 only]
-  S -->|예| N[기능명 안전화<br/>NFC + 분리자 제거 + 64자 cap]
-  N --> MK["mkdir ./.planning-kit/&lt;기능명&gt;/"]
+  S[--save ON?] -->|아니오| SK["저장 없음<br/>(--save 미사용)"]
+  S -->|예| N["기능명 안전화<br/>NFC + 금지문자 '-' 치환 + 80자 cap"]
+  N --> MK["mkdir planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
   MK --> WR{collision?}
-  WR -->|없음| W1[정책서.md / 기능설계서.md 작성<br/>저장 줄: 두 경로]
-  WR -->|있음| W2[suffix -2 / -3 ... 시도<br/>99까지<br/>저장 줄: 충돌 회피 표기]
+  WR -->|없음| W1["[안전기능명]_정책서.md<br/>[안전기능명]_기능설계서.md 작성"]
+  WR -->|있음| W2["폴더 suffix --2 / --3 ..."]
   WR -->|99까지 충돌| W3[저장 실패<br/>저장 줄: 실패 사유]
   W2 --> END
   W1 --> END
@@ -239,26 +239,27 @@ flowchart TD
   SK --> END[변환 본문은 화면에<br/>저장은 헤더 줄에만 표기]
 ```
 
-저장 실패는 호출 종료 사유 아님. 자체 검증 결과 변경 안 함.
+저장 실패는 호출 종료 사유 아님. 저장 산출물은 review 대상이 될 수 있지만 SSOT corpus 근거가 될 수 없다.
 
 ## 9. 단일 응답 출력 구조 (Step 9)
 
 ```mermaid
 flowchart LR
-  H["# 기능명<br/>입력 처리 / 출처 / 미결 /<br/>입력 제외 (카테고리 분포) / 저장"]
+  H["# 기능명<br/>입력 / 산출물 / 검증 / 저장"]
   H --> P[## 정책서<br/>10 섹션]
   P --> F[## 기능설계서<br/>8 섹션]
-  F --> SR{URL fetch +<br/>이미지 처리<br/>≥ 1건?}
-  SR -->|예| ST[## 출처 표]
-  SR -->|아니오| EXB
-  ST --> EXB["## 입력 제외 항목<br/>항상 출력<br/>(0건 = '없음', ≥1건 = 5필드 항목 list)"]
-  EXB --> RV{--no-self-review?}
-  RV -->|아니오| RVB[## 자체 검증<br/>6개 카테고리<br/>F5는 본문 누락 + cross-ref 3종]
-  RV -->|예| END[종료]
-  RVB --> END
+  F --> FB{--no-self-review?}
+  FB -->|아니오| FBB["## 검증 피드백<br/>없음 또는 F*-* list"]
+  FB -->|예| SRC
+  FBB --> SRC["## 출처 요약"]
+  SRC --> EXB["## 입력 제외 요약"]
+  EXB --> TR{상세 조건?}
+  TR -->|예| TRB["## 상세 추적<br/>full 출처/입력 제외"]
+  TR -->|아니오| END[종료]
+  TRB --> END
 ```
 
-블록 순서: **변환 본문 → 출처 → 입력 제외 → 자체 검증**. `## 입력 제외 항목`은 항상 등장 (0건도 명시 출력). `## 출처`·`## 자체 검증`은 조건부 생략.
+블록 순서: **헤더 요약 → 정책서 → 기능설계서 → 검증 피드백 → 출처 요약 → 입력 제외 요약 → 상세 추적**. `## 검증 피드백`은 `--no-self-review`에서 생략하고, `## 상세 추적`은 실패/본문 미사용/high-signal 제외 항목 등 조건 충족 시 출력한다.
 
 입력 제외 카테고리 11종 (`exclusion-rules.md` §1) — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` / `충돌 후보`(0.2.4 신규). 각 항목은 5필드(카테고리·위치·인용·처리·설명). 위치 필드는 `[출처 N](URL#anchor)` markdown link 형식 (0.2.4) — 외부 source 특정 위치 1-hop 점프.
 
@@ -266,9 +267,9 @@ flowchart LR
 
 **모호성 강제 [TBD] (0.2.5, `exclusion-rules.md` §3.1·§3.2)**: 원문 syntactic 결함 (괄호 미닫힘 `\([^)]*$` / 말줄임표 / 공란 row / 빈 list / 16 어구 / `[ ]`·`_____`·`—`) 자동 [TBD] 단정. LLM 추론 단정 금지. 16 어구 카탈로그 = TBD/TODO/FIXME·추후 정의/결정/협의·별도 정의/협의/확정·확정 시 재정의·미정/미확정/미결·기획 시 정의 등.
 
-자체 검증 F5(누락) sub-label 3종 — `cross-ref-fetch` (출처 list 실패) / `cross-ref-scope` (§2 명시 제외) / `cross-ref-tbd` (미결 §). 입력 제외 §과 어긋나면 발견.
+자체 검증 F5(누락) sub-label 3종 — `cross-ref-fetch` (출처 list 실패) / `cross-ref-scope` (§2 명시 제외) / `cross-ref-tbd` (미결 §). 입력 제외 추적과 어긋나면 발견.
 
-`## 출처` list URL = deep link 형식 (0.2.4) — anchor 지원 source(Confluence·Docs·Slides·Notion·Sheets·Figma·Slack)는 fragment 포함, 추출 실패 = page-level fallback.
+상세 추적의 full 출처 list URL = deep link 형식 (0.2.4) — anchor 지원 source(Confluence·Docs·Slides·Notion·Sheets·Figma·Slack)는 fragment 포함, 추출 실패 = page-level fallback.
 
 ## 10. 출처 list status 분류
 
@@ -309,8 +310,8 @@ flowchart TD
   OPT --> O3[--no-fetch]
   OPT --> O4[--no-image]
 
-  O1 --> E1["Step 8 디스크 저장 활성<br/>./.planning-kit/&lt;기능명&gt;/ 2개 파일"]
-  O2 --> E2[Step 7 자체 검증 skip<br/>자체 검증 블록 통째 생략]
+  O1 --> E1["Step 8 디스크 저장 활성<br/>planning/[안전기능명]--YYYY-MM-DD-HHMMSS/ 2개 파일"]
+  O2 --> E2["Step 7 self-review skip<br/>검증 피드백 생략"]
   O3 --> E3[Step 3 전체 봉쇄<br/>1차 WebFetch + connector fallback 모두 0건]
   O4 --> E4[Step 4 전체 skip<br/>multimodal 호출 0건]
 ```
@@ -321,8 +322,8 @@ flowchart TD
 |---|---|
 | `skills/planning-format/SKILL.md` | orchestration only (Step 1~9 high-level + lazy read 지시) (0.2.4) |
 | `skills/planning-format/references/conversion-rules.md` | multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (0.2.8) |
-| `skills/planning-format/references/exclusion-rules.md` | 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (0.2.4 신규) |
-| `skills/planning-format/references/output-contract.md` | 출력 포맷·헤더 줄·`--save`·`## 출처` list deep link·분기별 헤더 (0.2.4 신규, save 흡수) |
+| `skills/planning-format/references/exclusion-rules.md` | 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·입력 제외 요약·marker 1종 |
+| `skills/planning-format/references/output-contract.md` | readable 출력 포맷·헤더 줄·`--save`·출처/입력 제외 요약·상세 추적 |
 | `skills/planning-format/references/connector-routing.md` | 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace 자원별 tool 시퀀스·gid/range 처리·fallback 케이스 표·sanity check·status 표기·**§11 connector별 anchor 추출 (0.2.4)** |
 | `skills/planning-format/references/self-review-rules.md` | 자체 품질 6개 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (0.2.4) |
 | `skills/planning-format/templates/기능설계서.md` | 8 섹션 표 골격 |

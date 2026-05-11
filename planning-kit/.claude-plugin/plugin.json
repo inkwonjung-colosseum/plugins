@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.8",
-  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증까지 수행하는 planning-format, 산출물을 외부 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하는 planning-review, 현재 프로젝트 Markdown SSOT corpus 자체를 구조 품질·내용 품질 2축으로 감사하는 ssot-audit 세 스킬로 구성된다. planning-format은 텍스트·파일·디렉터리·URL·이미지 입력, 재귀 fetch, MCP/connector fallback, 이미지 multimodal, 입력 제외 11 카테고리, --save 저장을 지원한다. 0.2.8부터 planning-format 신규 출력의 보조 표 헤더는 내부 backlink 없는 clean header만 사용하고 부모 §/row 추적은 입력 제외 항목의 구조 변환 처리 줄에 기록한다. planning-review는 0.2.6 다중 URL input collection, 0.2.7 단일 파일 companion read, 0.2.8 clean/legacy 보조 표 heading 읽기 호환을 지원한다. ssot-audit는 v0.8 미만 문서 제외, 외부 링크 cap 없음 follow, 개선 backlog 화면 output only를 제공한다.",
+  "version": "0.2.9",
+  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 자체 품질 검증 피드백까지 수행하는 planning-format, 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 report-first 점검하는 planning-review, 선언된 SSOT token 폴더 Markdown을 구조·내용 2축으로 감사하는 ssot-audit 세 스킬로 구성된다. 0.2.9부터 planning-format은 진행 로그 없이 readable 정책서·기능설계서를 먼저 출력하고 --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 판정·검증 신뢰도·최우선 수정 항목·작업 백로그를 우선 출력하고, planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다. ssot-audit는 독립 SSOT token 폴더가 없으면 프로젝트 전체 Markdown으로 fallback하지 않는다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",

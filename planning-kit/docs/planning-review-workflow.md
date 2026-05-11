@@ -40,12 +40,10 @@ flowchart TD
   RR2 --> M
   RR3 --> M
 
-  M --> N{Step 4: 결과}
-  N -->|모두 0건| PASS[리뷰 결과: 통과]
-  N -->|≥1건| FOUND[리뷰 결과: 발견 N건]
+  M --> N["Step 4: 판정 + 신뢰도 + P0/P1/P2<br/>작업 백로그 생성"]
+  N --> PASS["판정: 통과 / 조건부 통과 / 수정 필요 / 검토 필요 / 비교 불가"]
 
-  PASS --> OUT[Step 5: 단일 응답 markdown 출력<br/>+ ## 입력 출처 0.2.6<br/>+ ## SSOT 출처 0.2.2]
-  FOUND --> OUT
+  PASS --> OUT["report-first markdown 출력<br/>결론 / 최우선 수정 / 작업 백로그 / 상세 추적"]
 ```
 
 ## 2. 입력 dispatch (Step 1)
@@ -99,14 +97,14 @@ flowchart TD
   IN[통합 입력 본문] --> P1{"헤더 '# 정책서'<br/>또는 '## 정책서'?"}
   P1 -->|예| Q1[정책서 섹션 추출]
   P1 -->|아니오| P2{"코드 펜스<br/>markdown 펜스 블록?"}
-  P2 -->|예| Q2[펜스 안 헤더로 식별]
+  P2 -->|예| Q2[0.2.8 이하 펜스 안 헤더로 식별]
   P2 -->|아니오| P4{"source title/path/URL label<br/>정책서·policy·feature·design·spec 등<br/>명확한 1:1 신호?"}
   P4 -->|예| Q4[source 단위 fallback 배정]
   P4 -->|아니오| P5{"companion read<br/>입력 파일 stem/domain 기준<br/>1쌍 확정?"}
   P5 -->|예| Q5[sibling source fallback 배정]
   P5 -->|아니오| FAIL[식별 실패<br/>sanity check]
 
-  Q1 --> P3{"헤더 '# 기능설계서'<br/>또는 '## 기능설계서'?"}
+  Q1 --> P3{"헤더 '# 기능설계서'<br/>또는 '## 기능설계서'?<br/>0.2.9 readable boundary 포함"}
   Q2 --> P3
   Q4 --> P3
   Q5 --> P3
@@ -123,7 +121,7 @@ flowchart LR
   T --> R3[R3. 의존·영향 분석]
 
   R1 --> R1A[키워드 추출<br/>기능명·도메인·역할·상태·권한]
-  R1A --> R1B[프로젝트 *.md grep<br/>--ssot-include 적용]
+  R1A --> R1B["SSOT token 폴더 Markdown만 grep<br/>planning/** 제외<br/>--ssot-include는 후보 안 narrowing"]
   R1B --> R1L{매칭 ≥1<br/>+ R1 또는 R3 활성<br/>+ --no-ssot-fetch off?}
   R1L -->|예 0.2.2| R1LF[link follow<br/>매칭 *.md 본문 안 URL 추출<br/>→ fetch + connector fallback<br/>→ corpus body 합류<br/>cap 없음]
   R1L -->|아니오| R1C
@@ -159,42 +157,38 @@ flowchart TD
   KEEP --> SUM[발견 합계 산출]
   KEEP1 --> SUM
   SUM --> RES{발견 ≥ 1?}
-  RES -->|아니오| PASS[통과]
-  RES -->|예| FND[발견 N건]
+  RES -->|아니오| PASS[통과 후보]
+  RES -->|예| FND[P0/P1/P2 재정렬]
+  PASS --> V["검증 신뢰도 산정<br/>충분/제한적/낮음"]
+  FND --> V
+  V --> J["판정 우선순위<br/>수정 필요 → 비교 불가 → 검토 필요 → 조건부 통과 → 통과"]
 ```
 
 ## 6. 단일 응답 출력 (Step 5)
 
 ```mermaid
 flowchart LR
-  H[# planning-review: 기능명<br/>입력 / 입력 처리 0.2.6 / 입력 제외 § 0.2.2 / 점검 축 / SSOT corpus / SSOT 검색 키워드]
-  H --> RR[## 리뷰 결과<br/>통과 또는 발견 N건<br/>축별 카운트]
-  RR --> IO{input fetch/image<br/>1건 이상?}
-  IO -->|예 0.2.6| IOO[## 입력 출처<br/>root URL + 입력 자식 URL/이미지 표]
-  IO -->|아니오| SO
-  IOO --> SO{SSOT link follow<br/>1건 이상?}
-  SO -->|예 0.2.2| SOO[## SSOT 출처<br/>매칭 *.md + 자식 URL/이미지 표]
-  SO -->|아니오| S1
-  SOO --> S1{R1 활성<br/>+ 발견 ≥1?}
-  S1 -->|예| SS1[### SSOT 충돌 list]
-  S1 -->|아니오| S2
-  SS1 --> S2{R2 활성<br/>+ 발견 ≥1?}
-  S2 -->|예| SS2[### 검증가능성 list]
-  S2 -->|아니오| S3
-  SS2 --> S3{R3 활성<br/>+ 발견 ≥1?}
-  S3 -->|예| SS3[### 영향 분석 list<br/>입력 제외 § cross-ref 가능]
-  S3 -->|아니오| FIN[출력 종료]
-  SS3 --> FIN
+  H["# planning-review: 기능명<br/>판정 / 검증 신뢰도 / 입력 / 점검 축 / 발견"]
+  H --> C[## 결론]
+  C --> T[## 최우선 수정 항목<br/>P0/P1 또는 없음]
+  T --> B[## 작업 백로그<br/>A* 또는 없음]
+  B --> S[## 발견 요약]
+  S --> L[## 검증 범위와 한계]
+  L --> SRC[## 출처 요약]
+  SRC --> D{상세 조건?}
+  D -->|예| DT["## 상세 추적<br/>입력 출처 / SSOT 출처 / 원시 발견"]
+  D -->|아니오| FIN[출력 종료]
+  DT --> FIN
 ```
 
 규칙:
 - 활성 안 한 축의 sub-section은 통째 생략.
 - `입력 처리` 줄은 conversation 본문 사용, local/raw 본문 사용, 또는 URL root/fetch/image 카운트 중 하나로 표기.
-- `SSOT 검색 키워드` 줄은 R1 활성 시에만.
-- `SSOT corpus` 카운트 줄은 R1 또는 R3 활성 시에만 (corpus 공유). link follow 1건 이상이면 `매칭 N개 + 외부 fetch 성공 K개 / 실패 J개 (총 시도 K+J건, cap 없음)`.
-- `입력 제외 §` 줄은 분리 성공 시 항상 (R3 활성 무관). R3 신호 K건 표기.
-- `## 입력 출처` 블록은 input fetch 또는 input image 1건 이상일 때만, `## 리뷰 결과` 다음에 출력.
-- `## SSOT 출처` 블록은 link follow 1건 이상 시도 시에만 (R1 또는 R3 트리거).
+- 전체 리포트를 코드 펜스로 감싸지 않는다.
+- full 입력 출처, full SSOT 출처, 축별 원시 발견은 조건 충족 시 하단 `## 상세 추적`으로 이동한다.
+- P0/P1이 없으면 `## 최우선 수정 항목`은 빈 표가 아니라 `없음`이다.
+- 작업 단위가 없으면 `## 작업 백로그`도 `없음`이다.
+- SSOT 0건/all-placeholder/include 경계 밖은 `검증 범위와 한계`와 `## 상세 추적`에 원인을 남긴다.
 
 ## 7. R1 vs R3 차이
 

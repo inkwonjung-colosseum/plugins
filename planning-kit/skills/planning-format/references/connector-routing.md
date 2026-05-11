@@ -130,11 +130,11 @@ connector 경유 본문도 자식 URL을 추출해 visited queue로 push (`is_fo
 | 모든 root 지원 안 하는 content-type | `모든 URL이 지원 안 하는 content-type: <type list>` |
 | 통합 본문 추출 0byte | `통합 본문이 비어 있습니다. URL 본문 확인 후 다시 시도하세요.` |
 
-`## 자체 검증` 블록 없이 단독 한 줄 + 입력 URL list로 출력.
+산출물 본문이나 `## 검증 피드백` 없이 단독 한 줄 + 입력 URL list로 출력.
 
 ## 11. connector별 anchor 추출 (deep link, 0.2.4)
 
-`output-contract.md` §5의 `## 출처` list URL deep link 형식과 `exclusion-rules.md` §4.1 입력 제외 § 위치 markdown link를 위해, anchor 지원 source는 deep link 형식으로 저장한다. 추출 실패·미지원 source = page-level URL fallback (link는 작동, 점프는 page 단위).
+`output-contract.md`의 상세 추적 full 출처 list URL deep link 형식과 `exclusion-rules.md` §4.1 입력 제외 § 위치 markdown link를 위해, anchor 지원 source는 deep link 형식으로 저장한다. 추출 실패·미지원 source = page-level URL fallback (link는 작동, 점프는 page 단위).
 
 | Source | Anchor 형식 | 추출 방법 | 도입 |
 |---|---|---|---|
