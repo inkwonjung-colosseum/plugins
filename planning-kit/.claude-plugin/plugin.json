@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.10",
-  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 사용자 확인·릴리즈 차단 항목을 결정 보드로 먼저 보여주는 planning-format, 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 D*/A*/T* 결정 보드 중심 점검하는 planning-review, 선언된 SSOT token 폴더 Markdown을 구조·내용 2축으로 감사하는 ssot-audit 세 스킬로 구성된다. planning-format --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 판정·검증 신뢰도와 함께 오늘 결정·릴리즈 차단·바로 수정할 작업을 먼저 출력하고, planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다. ssot-audit는 독립 SSOT token 폴더가 없으면 프로젝트 전체 Markdown으로 fallback하지 않는다.",
+  "version": "0.2.11",
+  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 사용자 확인·릴리즈 차단 항목을 결정 보드로 먼저 보여주는 planning-format, 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 D*/A*/T* 결정 보드 중심 점검하는 planning-review, 선언된 SSOT token 폴더 Markdown을 구조·내용 2축으로 감사하는 ssot-audit 세 스킬로 구성된다. planning-format --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-format과 planning-review의 사용자-facing 위치 표기는 정책서 5.1, 기능설계서 7, 입력 제외 섹션처럼 clean display를 사용하며 legacy 섹션 기호 입력은 읽기 호환으로 유지한다. planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",

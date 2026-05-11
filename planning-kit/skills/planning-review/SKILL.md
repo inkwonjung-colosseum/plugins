@@ -87,7 +87,7 @@ argument-hint: "[<URL... | 정책서·기능설계서 경로 | 디렉터리 | ra
 - depth·pages·body·fanout cap은 두지 않는다. cycle·중복은 input visited set으로만 막는다.
 - fetch 진입 직전 `../planning-format/references/connector-routing.md`를 1회 Read 적재한다. 1차 WebFetch + connector fallback·인증 휴리스틱·MCP 카탈로그·Google Workspace tool 시퀀스·gid/range·status 표기를 그대로 공유한다.
 - input visited set은 SSOT visited set과 별도다. 같은 URL이 input source와 SSOT corpus link에 동시에 등장해도 `## 입력 출처`와 `## SSOT 출처`에 각각 나타날 수 있다.
-- `--no-input-fetch` ON이면 input fetch queue 전체를 봉쇄한다. 입력이 URL뿐이면 review 대상 본문을 만들 수 없으므로 §sanity check 메시지를 출력한다.
+- `--no-input-fetch` ON이면 input fetch queue 전체를 봉쇄한다. 입력이 URL뿐이면 review 대상 본문을 만들 수 없으므로 sanity check 메시지를 출력한다.
 - input image queue는 5경로(이미지 파일 인자, 디렉터리 이미지, markdown image/HTML img, fetch `image/*`, inline data URI)를 따른다. `--no-input-image` ON이면 image multimodal 0건이며 image content-type 응답은 본문 합류하지 않는다.
 - fetch·image 처리가 1건 이상이면 `## 입력 출처` 블록에 root URL, 자식 URL, 입력 이미지 행을 모두 기록한다. 실패 행도 포함한다.
 - fetch·image 처리가 끝나면 source 단위 헤더로 concat한다.
@@ -105,7 +105,7 @@ Google Sheets gid/range, connector deep link anchor, metadata only 상태 등은
 
 #### Step 1.3 본문 분리
 
-통합 입력 본문에서 정책서·기능설계서·입력 제외 §을 분리한다.
+통합 입력 본문에서 정책서·기능설계서·입력 제외 섹션을 분리한다.
 
 1. 저장 경로가 있으면 화면 projection보다 `--save` 파일을 우선한다.
 2. 0.2.10 unsaved 화면 출력은 readable projection으로 취급한다. `## 결정 보드`는 report metadata이며 정책서·기능설계서 본문이 아니다.
@@ -118,10 +118,12 @@ Google Sheets gid/range, connector deep link anchor, metadata only 상태 등은
 9. 정책서·기능설계서 본문 종료 경계는 0.2.9와 동일하게 다음 wrapper heading 중 먼저 등장하는 항목이다: `## 기능설계서`, `## 검증 피드백`, `## 출처 요약`, `## 입력 제외 요약`, `## 상세 추적`, `## 결론`, `## 최우선 수정 항목`, `## 작업 백로그`, EOF. `## 결정 보드`는 정상 본문 경계로 사용하지 않고, misplaced/duplicate sentinel일 때만 제외 range를 만든다.
 10. 경계가 둘 이상으로 해석되거나 한쪽 본문을 확정할 수 없으면 임의 병합하지 않고 `검증 범위와 한계` 또는 sanity check에 `readable projection boundary ambiguous`를 남긴다.
 11. `# 정책서` / `## 정책서` 헤더 → 정책서 본문, `# 기능설계서` / `## 기능설계서` 헤더 → 기능설계서 본문. 0.2.8 이하 코드 펜스 안 헤더도 읽기 호환으로 반복 처리한다.
-12. `## 입력 제외 항목` 또는 0.2.9 `## 입력 제외 요약`/`## 상세 추적` 안의 입력 제외 항목을 입력 제외 § 본문으로 분리한다. 부재해도 sanity check 아님.
+12. `## 입력 제외 항목` 또는 0.2.9 `## 입력 제외 요약`/`## 상세 추적` 안의 입력 제외 항목을 입력 제외 섹션 본문으로 분리한다. 부재해도 sanity check 아님.
 13. source title/path/URL label이 `정책서`, `policy`, `정책`, `기능설계서`, `feature`, `design`, `spec` 중 하나를 명확히 가리키면 source 단위 fallback 배정.
 14. 1개 파일 입력의 companion read source는 title/path/H1/본문 헤더와 입력 파일의 기능명/stem/domain 유사도로 후보를 좁힌다.
 15. 위 절차 후 정책서·기능설계서 둘 다 확보하지 못하면 sanity check.
+
+위치 parser는 legacy 입력 `정책서 §5.1`, `기능설계서 §7`, `§5.1 보조 표`, `sub-§`, `입력 제외 §`를 각각 clean display 위치와 같은 section id로 normalize한다. 내부 matching에는 숫자 chain을 써도 되지만, 사용자에게 다시 출력할 때는 `정책서 5.1`, `기능설계서 7`, `5.1 보조 표`, `보조 표`, `입력 제외 섹션`으로 렌더링한다.
 
 source 단위 fallback은 명확한 1:1 신호일 때만 사용한다. 두 source가 모두 같은 종류로 추정되거나 둘 다 불명확하면 fallback하지 않는다.
 companion read에서 여러 기능의 정책서·기능설계서 후보가 섞여 있고 입력 파일 기준으로 1쌍을 확정할 수 없으면 fallback하지 않고 sanity check로 종료한다.
@@ -143,7 +145,7 @@ companion read에서 여러 기능의 정책서·기능설계서 후보가 섞�
 
 `--axes` 활성 축만 main 단일 패스. 각 축은 reference 적재 후 그대로 따른다.
 
-**sub-§ 인식 (0.2.4)**: R1·R2·R3 모두 산출물 부모 § + sub-§(`### N.M ... 보조 표`) 본문을 함께 점검 대상으로 본다. 절차 detail은 각 reference 그대로 — 부모 § 룰을 sub-§ 본문에 자연 확장.
+**보조 표 인식 (0.2.4)**: R1·R2·R3 모두 산출물 상위 섹션 + 보조 표(`### N.M ... 보조 표`) 본문을 함께 점검 대상으로 본다. 절차 detail은 각 reference 그대로 — 상위 섹션 룰을 보조 표 본문에 자연 확장.
 
 | 축 | 키 | 적재 reference | 발견 sub-category |
 |---|---|---|---|
@@ -155,13 +157,13 @@ R1·R3 corpus 공유 (`--ssot-include`). R2는 input collection 이후 분리된
 
 #### R1 link follow (0.2.2)
 
-R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off → 매칭 *.md 본문 안 URL·이미지를 fetch + connector fallback으로 corpus body에 합류. 절차·visited set·sanity check·출처 list 형식 모두 `references/ssot-rules.md` §R1.4·§R1.5. connector lookup은 `../planning-format/references/connector-routing.md` 공유 적재. `--no-ssot-image` ON이면 image content-type 합류 skip (URL fetch는 별도).
+R1 활성 OR R3 활성 + 매칭 ≥1 + `--no-ssot-fetch` off → 매칭 *.md 본문 안 URL·이미지를 fetch + connector fallback으로 corpus body에 합류. 절차·visited set·sanity check·출처 list 형식 모두 `references/ssot-rules.md` R1.4·R1.5. connector lookup은 `../planning-format/references/connector-routing.md` 공유 적재. `--no-ssot-image` ON이면 image content-type 합류 skip (URL fetch는 별도).
 
 입력 URL source 자체는 SSOT corpus가 아니다. input fetch는 review 대상 본문 생성용이고, SSOT fetch는 비교 corpus 확장용이다.
 
-#### R3 입력 제외 § 보조 신호 (0.2.2)
+#### R3 입력 제외 섹션 보조 신호 (0.2.2)
 
-R3 활성 + Step 1 분리 성공 시 카테고리별 가중치. 절차·신호 카테고리·헤더 카운트 K 산출 모두 `references/deps-rules.md` §R3.2.1.
+R3 활성 + Step 1 분리 성공 시 카테고리별 가중치. 절차·신호 카테고리·헤더 카운트 K 산출 모두 `references/deps-rules.md` R3.2.1.
 
 ### Step 3: 발견 합산 + 우선순위/작업화
 
@@ -315,7 +317,7 @@ ID 의미:
 - P2만 있는 경우 `## 최우선 수정 항목`은 `없음`, `## 작업 백로그`와 `## 발견 요약`에는 P2 관련 작업/요약을 압축 표시한다.
 - full 입력 출처표, full SSOT 출처표, 축별 원시 발견 목록은 조건 충족 시 하단 `## 상세 추적` 섹션으로 이동한다.
 - `## 상세 추적`은 조건 충족 시 `## 출처 요약` 뒤에 둔다.
-- R3 발견·권고 항목이 입력 제외 § 보조 신호로 만들어진 경우 `근거` 줄에 입력 제외 § cross-reference 표시.
+- R3 발견·권고 항목이 입력 제외 섹션 보조 신호로 만들어진 경우 `근거` 줄에 입력 제외 섹션 cross-reference 표시.
 - 상단 결정 보드에는 connector 세부 status, full source URL table, full SSOT corpus table, 원시 finding 전문을 출력하지 않는다.
 - 상단 결정 보드에는 `SSOT corpus`, `fetch`, `deps`, `AC Blocker`를 단독 표기로 쓰지 않고, 각각 `SSOT 기준 문서 묶음`, `본문 가져오기`, `영향 분석`, `구현/QA 차단`으로 표시한다.
 - 결정 보드는 카드/필드 목록을 기본으로 한다. Markdown 표는 5열 이하이고 모든 표시 문자열 셀이 60자 이하일 때만 쓴다. 60자는 link URL, backtick, 강조 기호를 제거한 표시 문자열 기준이다.
@@ -324,6 +326,7 @@ ID 의미:
 - `지금 결정해야 할 항목`과 `바로 수정할 문서 작업` subsection은 제목 목록(ID / 제목 / 결정 필요자 또는 담당 / 의존성)을 먼저 보여주고, 긴 필드는 제목 목록 아래 상세 카드나 접힘 영역에 둔다.
 - 상단 D*/A* 상세 카드 하나는 기본 6개 필드 이하로 접고, 검증 방법처럼 긴 필드는 카드 하단 또는 상세 섹션에 둔다.
 - 카드/필드 목록으로 분해할 때 필드명과 값은 보존한다.
+- 0.2.11부터 최종 사용자 출력은 clean display를 사용한다. 섹션 기호를 출력하지 말고 `정책서 5.1`, `기능설계서 7`, `입력 제외 섹션`, `보조 표`처럼 사람이 읽는 위치 표기로 쓴다. 이 규칙은 결정 보드, legacy summary, 발견 요약, 검증 범위와 한계, 출처 요약, 상세 추적, 축별 원시 발견 목록 모두에 적용한다. 원문 직접 인용 안에 기호가 포함된 경우만 예외다.
 
 ### 상세 추적 조건
 
@@ -371,7 +374,7 @@ root 입력: R개
 
 ### 상세 SSOT 출처
 
-link follow 1건 이상이거나 SSOT 0건/all-placeholder/경계 밖 include 조건을 충족할 때 `## 상세 추적` 안에 둔다. 표 형식은 `references/ssot-rules.md` §R1.5를 따른다.
+link follow 1건 이상이거나 SSOT 0건/all-placeholder/경계 밖 include 조건을 충족할 때 `## 상세 추적` 안에 둔다. 표 형식은 `references/ssot-rules.md` R1.5를 따른다.
 
 ### 결정 보드 연결 맵
 
@@ -392,7 +395,7 @@ D*/A*/T*가 원시 R*를 접어 표시하면 `## 상세 추적` 안에 사람이
 ```markdown
 ### SSOT 충돌
 1. [제목]
-   - 위치: [정책서/기능설계서 §섹션] vs [SSOT 파일 §섹션]
+   - 위치: [정책서 5.1] vs [SSOT 파일 2]
    - 근거: "[변환 본문 인용]" vs "[SSOT 인용]"
    - 영향: [한 줄]
    - 제안: [최소 수정 또는 확인 조건]
@@ -401,7 +404,7 @@ D*/A*/T*가 원시 R*를 접어 표시하면 `## 상세 추적` 안에 사람이
 1. [제목]
    - 카테고리: [정량성 / 상태 / 행위자 / 결과 관찰]
    - 우선순위: [P0 / P1]
-   - 위치: [정책서/기능설계서 §섹션]
+   - 위치: [정책서 6 / 기능설계서 5]
    - 근거: "[변환 본문 인용]"
    - 영향: [한 줄]
    - 제안: [최소 수정]
@@ -411,9 +414,9 @@ D*/A*/T*가 원시 R*를 접어 표시하면 `## 상세 추적` 안에 사람이
    - 분류: [발견 / 권고]
    - 우선순위: [P1 / P2]
    - 카테고리: [정책 변경 / 상태 전이 / 권한·역할 / 외부 의존]
-   - 위치: [정책서/기능설계서 §섹션]
+   - 위치: [정책서 5.1]
    - 영향 후보: [SSOT 파일 path list]
-   - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용 또는 입력 제외 § cross-reference]"
+   - 근거: "[변환 본문 인용]" + (선택) "[SSOT 인용 또는 입력 제외 섹션 cross-reference]"
    - 영향: [한 줄]
    - 제안: [후속 검토 조건]
 ```
@@ -422,7 +425,7 @@ D*/A*/T*가 원시 R*를 접어 표시하면 `## 상세 추적` 안에 사람이
 
 - `references/ssot-rules.md` — R1 SSOT 충돌 점검 절차·SSOT token 폴더 corpus 경계·placeholder 판정·link follow·출처 list.
 - `references/ac-rules.md` — R2 4 sub-category 기준 + P0/P1 우선순위 기본값.
-- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견/권고 P1/P2 기본값 + 입력 제외 § 보조 신호 + backlog grouping 신호.
+- `references/deps-rules.md` — R3 4 sub-category 기준 + 발견/권고 P1/P2 기본값 + 입력 제외 섹션 보조 신호 + backlog grouping 신호.
 - `../planning-format/references/connector-routing.md` — input fetch와 SSOT link follow에서 공유 적재. 인증 게이트 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기.
 - `../planning-format/references/conversion-rules.md` — input image multimodal·통합 본문 합류 룰을 공유 참조.
 

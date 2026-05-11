@@ -42,7 +42,7 @@ Atlassian만 예외적으로 `getAccessibleAtlassianResources` 1회 호출해 cl
 | 1 | `*.atlassian.net` (path가 `/wiki/...`) | Atlassian MCP — `getConfluencePage` (page id 추출 가능 시) / `fetch` | Confluence page | URL에 `pages/<id>` 또는 `viewpage.action?pageId=<id>`가 있으면 page id 추출. 없으면 `fetch`. |
 | 2 | `*.atlassian.net` (path가 `/browse/<KEY-NUM>` 또는 `/jira/...`) | Atlassian MCP — `getJiraIssue` (key 추출) / `fetch` | Jira issue | issue key를 path에서 추출. summary + description + recent comments 합류. |
 | 3 | `figma.com/file/...`, `figma.com/design/...`, `figma.com/board/...`, `figma.com/slides/...`, `figma.com/make/...` | Figma MCP — `get_design_context`(design) / `get_figjam`(board) / `get_metadata`(slides·make) | Figma 파일/노드 | URL에서 `fileKey`(또는 `branchKey`)·`nodeId` 추출. node-id의 `-`를 `:`로 변환. |
-| 4 | Google Workspace 호스트 (§3.4 표) | Google Drive connector — 자원별 tool 시퀀스 (§3.4) | Docs / Sheets / Slides / Drive 파일·폴더 | fileId·folderId·gid·range 추출. fragment 처리 §3.5. |
+| 4 | Google Workspace 호스트 (3.4 표) | Google Drive connector — 자원별 tool 시퀀스 (3.4) | Docs / Sheets / Slides / Drive 파일·폴더 | fileId·folderId·gid·range 추출. fragment 처리 3.5. |
 | 5 | `*.slack.com/archives/<channel>/p<ts>`, `*.slack.com/archives/<channel>` | Slack MCP — `slack_read_thread`(thread ts) / `slack_read_channel`(채널) | Slack 메시지/스레드 | thread 영구링크면 ts 추출. 채널 단독이면 최근 메시지 N개(default 50). private 채널은 connector 권한 의존. |
 | 6 | `*.slack.com` 그 외 path | Slack MCP — `slack_read_canvas`(canvas URL) / `slack_search_public_and_private`(쿼리=path 토큰) / `fetch` | Slack search/canvas 등 | canvas는 `slack_read_canvas` 우선. 그 외 `fetch` 폴백. |
 | 7 | `notion.so`, `*.notion.site` | Notion connector — 페이지 조회 도구 | Notion page | path에서 page id(마지막 dash 뒤 32자) 추출. |
@@ -71,15 +71,15 @@ Atlassian만 예외적으로 `getAccessibleAtlassianResources` 1회 호출해 cl
 
 ## 4. 런타임 MCP 카탈로그 추론 (매핑 외 호스트)
 
-§2 카탈로그 tool 이름에서 외부 서비스 단서를 본다 — `Linear`/`Intercom`/`Canva`/`Box`/`HubSpot`/`monday`/`Microsoft_365`/`Asana`/`Pencil` 등. 대상 URL 호스트가 단서의 기성 도메인(`linear.app`, `intercom.com`, `canva.com`, `box.com`, `hubspot.com`, `monday.com`, `microsoftonline.com`, `asana.com`)과 일치하거나 subdomain이면 해당 MCP의 일반 `fetch` 도구를 후보로. 추론 결과는 호출 안 메모리 캐시. 추론 실패 = 후보 0.
+2 카탈로그 tool 이름에서 외부 서비스 단서를 본다 — `Linear`/`Intercom`/`Canva`/`Box`/`HubSpot`/`monday`/`Microsoft_365`/`Asana`/`Pencil` 등. 대상 URL 호스트가 단서의 기성 도메인(`linear.app`, `intercom.com`, `canva.com`, `box.com`, `hubspot.com`, `monday.com`, `microsoftonline.com`, `asana.com`)과 일치하거나 subdomain이면 해당 MCP의 일반 `fetch` 도구를 후보로. 추론 결과는 호출 안 메모리 캐시. 추론 실패 = 후보 0.
 
 ## 5. fallback 평가 케이스 표
 
-**진입 조건 (0.2.5)**: 모든 케이스는 "**1차 WebFetch 시도 후**" 결과 분류. main이 §2 connector 카탈로그 사전 평가로 "미연결"·"미인증"·"매핑 없음" 판정해도 1차 WebFetch는 강제로 진행 (사전 skip 금지). 각 후보 호출 timeout 30초, 1회. 응답 비어 있거나 에러면 다음 후보. 모두 실패하면 status 기록 + visited 등록 후 다음 URL.
+**진입 조건 (0.2.5)**: 모든 케이스는 "**1차 WebFetch 시도 후**" 결과 분류. main이 2 connector 카탈로그 사전 평가로 "미연결"·"미인증"·"매핑 없음" 판정해도 1차 WebFetch는 강제로 진행 (사전 skip 금지). 각 후보 호출 timeout 30초, 1회. 응답 비어 있거나 에러면 다음 후보. 모두 실패하면 status 기록 + visited 등록 후 다음 URL.
 
 매핑 lookup 호스트는 **원래 입력된 URL의 호스트** — redirect 최종 호스트 X.
 
-connector fallback 후보는 §2 카탈로그 인증 상태에 따라:
+connector fallback 후보는 2 카탈로그 인증 상태에 따라:
 - **인증됨**: 1회 호출 시도.
 - **미인증·미연결**: 호출 안 함 (시도해도 실패 자명). 1차 WebFetch 결과로만 분류.
 
@@ -134,14 +134,14 @@ connector 경유 본문도 자식 URL을 추출해 visited queue로 push (`is_fo
 
 ## 11. connector별 anchor 추출 (deep link, 0.2.4)
 
-`output-contract.md`의 상세 추적 full 출처 list URL deep link 형식과 `exclusion-rules.md` §4.1 입력 제외 § 위치 markdown link를 위해, anchor 지원 source는 deep link 형식으로 저장한다. 추출 실패·미지원 source = page-level URL fallback (link는 작동, 점프는 page 단위).
+`output-contract.md`의 상세 추적 full 출처 list URL deep link 형식과 `exclusion-rules.md` 4.1 입력 제외 섹션 위치 markdown link를 위해, anchor 지원 source는 deep link 형식으로 저장한다. 추출 실패·미지원 source = page-level URL fallback (link는 작동, 점프는 page 단위).
 
 | Source | Anchor 형식 | 추출 방법 | 도입 |
 |---|---|---|---|
-| Google Sheets | `URL#gid=<id>&range=<cell>` | URL fragment 그대로 (이미 §3.5) | 0.1.1 |
+| Google Sheets | `URL#gid=<id>&range=<cell>` | URL fragment 그대로 (이미 3.5) | 0.1.1 |
 | Figma | `URL?node-id=<id>` | URL query 그대로 | 0.1.2 |
 | Slack thread | thread 영구링크 | URL 자체 영구링크 | 0.1.2 |
-| **Confluence** | `URL#<heading-id>` | Atlassian MCP body XHTML `<h1 id="..."`/`<h2 id="...">` 등 추출. 본문 합류 § heading id 매핑. | **0.2.4 신규** |
+| **Confluence** | `URL#<heading-id>` | Atlassian MCP body XHTML `<h1 id="..."`/`<h2 id="...">` 등 추출. 본문 합류 heading id 매핑. | **0.2.4 신규** |
 | **Google Docs** | `URL#heading=h.<digest>` | `read_file_content` 응답에서 heading anchor 추출. heading text → digest 매핑. | **0.2.4 신규** |
 | **Google Slides** | `URL#slide=id.<id>` | slide ID를 응답에서 추출. | **0.2.4 신규** |
 | **Notion** | `URL#<block-id>` | Notion connector 응답에서 block id 추출 (best-effort). | **0.2.4 신규** |
@@ -152,7 +152,7 @@ connector 경유 본문도 자식 URL을 추출해 visited queue로 push (`is_fo
 
 - Atlassian MCP `getConfluencePage` body XHTML에 `<ac:structured-macro>` 무관 `<h1>`/`<h2>`/`<h3>`/... 태그의 `id` 속성 추출.
 - heading id가 없으면 heading text를 slug 변환 (공백 → `-`, 한글 그대로). 변환 결과가 페이지 내 unique이면 사용, 그 외 page-level.
-- 본문 합류 § heading id 매핑은 main 판단. 입력 제외 § 항목 인용이 특정 heading 본문에서 발췌된 경우 그 heading id 사용.
+- 본문 합류 heading id 매핑은 main 판단. 입력 제외 섹션 항목 인용이 특정 heading 본문에서 발췌된 경우 그 heading id 사용.
 
 ### 11.2 Google Docs heading anchor
 
@@ -172,11 +172,11 @@ connector 경유 본문도 자식 URL을 추출해 visited queue로 push (`is_fo
 - Notion page URL 마지막 `-<32자>` 형태가 page id, 안쪽 block은 응답 본문의 block id 매칭.
 - 추출 실패 = page-level (best-effort).
 
-### 11.5 anchor 매칭 — 입력 제외 § 항목 단위
+### 11.5 anchor 매칭 — 입력 제외 섹션 항목 단위
 
 같은 source가 여러 항목 위치로 분산 인용될 때 각 항목별로 가장 가까운 anchor 사용. 매칭 우선순위:
 
-1. 항목 인용 내용이 source 특정 § 본문에서 발췌된 명확한 경우 → 해당 § anchor.
+1. 항목 인용 내용이 source 특정 heading 본문에서 발췌된 명확한 경우 → 해당 heading anchor.
 2. 항목이 source 전체에 걸친 일반 정보 → page-level URL.
 3. 매칭 불확실 → page-level URL.
 
@@ -184,4 +184,4 @@ main 판단. 강제 매핑 룰 없음.
 
 ### 11.6 visited set 영향
 
-URL normalize는 fragment 제거 그대로 (§6). visited set은 fragment 무관 같은 자원 1번만 fetch. 출처 list 표 행 URL은 fragment 포함 deep link로 저장 — visited와 별도 컬럼.
+URL normalize는 fragment 제거 그대로 (6). visited set은 fragment 무관 같은 자원 1번만 fetch. 출처 list 표 행 URL은 fragment 포함 deep link로 저장 — visited와 별도 컬럼.

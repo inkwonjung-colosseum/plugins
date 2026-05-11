@@ -4,6 +4,8 @@
 
 0.2.10 우선 규칙: 최종 응답은 실행 로그가 아니라 산출물이다. `planning-format`은 0.2.9의 readable 정책서·기능설계서 우선 원칙을 유지하되, 사용자 확인 필요 항목이나 릴리즈 차단 항목이 있으면 헤더 요약 바로 아래에 `## 결정 보드`를 먼저 보여준다. 결정 보드는 사용자가 지금 결정·수정·검증해야 할 항목을 위한 projection이며 canonical 본문이 아니다.
 
+0.2.11 우선 규칙: 사용자-facing 출력과 저장 파일은 clean display를 사용한다. 섹션 기호를 출력하지 말고 `정책서 5.1`, `기능설계서 7`, `입력 제외 섹션`, `보조 표`처럼 사람이 읽는 위치 표기로 쓴다. 원문 직접 인용 안에 기호가 포함된 경우만 예외다.
+
 ## 1. 출력 블록 순서
 
 ```markdown
@@ -64,6 +66,7 @@
 - self-review를 실행했고 사용자 확인 필요와 릴리즈 차단 항목이 모두 없으면 상단 검증 줄에 `사용자 확인 필요 없음`을 명시한다.
 - `저장: 화면 only` 표현은 쓰지 않는다. `--save` off는 `- 저장: 없음 (--save 미사용)`으로 쓴다.
 - `## 상세 추적`은 조건 충족 시 `## 입력 제외 요약` 뒤에 둔다.
+- 반영 위치, 대상, 위치, 처리, 설명 필드에는 clean display를 사용한다. 예: `정책서 5.1 / 기능설계서 7`, `출처 1의 9.1`, `입력 제외 섹션`.
 
 ## 2. 출력 아티팩트 레이어
 
@@ -183,7 +186,7 @@ self-review 발견은 다음 형식으로 출력한다.
 
 | ID | 구분 | 위치 | 문제 | 영향 | 제안 | 사용자 확인 |
 |---|---|---|---|---|---|---|
-| F2-1 | cross-bleed | 정책서 §6 | `배너 유지`가 정책서 핵심 처리 기준에 있음 | 정책/화면 레이어 혼용 | 정책 표현으로 바꾸고 배너는 기능설계서에만 둠 | 필요 |
+| F2-1 | cross-bleed | 정책서 6 | `배너 유지`가 정책서 핵심 처리 기준에 있음 | 정책/화면 레이어 혼용 | 정책 표현으로 바꾸고 배너는 기능설계서에만 둠 | 필요 |
 ```
 
 규칙:
@@ -221,16 +224,16 @@ self-review 발견은 다음 형식으로 출력한다.
 | Source | URL 형식 | 비고 |
 |---|---|---|
 | WebFetch HTML | `URL#<heading-id>` (있으면) | `<h*> id="..."` parsing. 없으면 page-level. |
-| Confluence | `URL#<heading-id>` | `connector-routing.md` §11.1 |
-| Google Docs | `URL#heading=h.<digest>` | §11.2 |
-| Google Slides | `URL#slide=id.<id>` | §11.3 |
-| Notion | `URL#<block-id>` | §11.4 |
+| Confluence | `URL#<heading-id>` | `connector-routing.md` 11.1 |
+| Google Docs | `URL#heading=h.<digest>` | 11.2 |
+| Google Slides | `URL#slide=id.<id>` | 11.3 |
+| Notion | `URL#<block-id>` | 11.4 |
 | Google Sheets | `URL#gid=<id>&range=<cell>` | 기존 gid/range 처리 |
 | Figma | `URL?node-id=<id>` | URL query 그대로 |
 | Slack | thread 영구링크 | URL 자체 |
 | Jira | page-level (`#comment-<id>` 가능) | summary·description 단위는 anchor 없음 |
 
-추출 실패·미지원 source = page-level URL fallback. 표 행 URL = 입력 제외 § 위치 필드 markdown link URL과 동일.
+추출 실패·미지원 source = page-level URL fallback. 표 행 URL = 입력 제외 섹션 위치 필드 markdown link URL과 동일.
 
 ## 6. 입력 제외 요약
 
@@ -253,7 +256,7 @@ self-review 발견은 다음 형식으로 출력한다.
 | `원문 정의 부재` | 연결된 `[TBD]` 위치 표시 |
 | `라벨 미매핑` | 문서 본문 반영 누락 가능성이 있으므로 표시 |
 
-full 5필드 항목 list는 §7 조건 충족 시 하단 `## 상세 추적`에 둔다. 5필드 형식은 `exclusion-rules.md` §4를 유지한다.
+full 5필드 항목 list는 7 조건 충족 시 하단 `## 상세 추적`에 둔다. 5필드 형식은 `exclusion-rules.md` 4를 유지한다.
 
 ## 7. 상세 추적
 
@@ -283,7 +286,7 @@ full 5필드 항목 list는 §7 조건 충족 시 하단 `## 상세 추적`에 �
 |---|---:|---|---|---|---|
 | 0 | - | 원본 | 직접 입력 / 파일 / 디렉터리 / - | - | O (원본) |
 | 1 | 0 | 인자 URL | <Confluence URL>#취소-정책 | 200 (via Atlassian MCP) | O |
-| 2 | 1 | 자식 URL | <Sheets URL>#gid=0&range=C13 (출처: [#1] §line N) | 200 (via Google Drive connector - read_file_content) | O |
+| 2 | 1 | 자식 URL | <Sheets URL>#gid=0&range=C13 (출처: [#1] line N) | 200 (via Google Drive connector - read_file_content) | O |
 ```
 
 ### 7.2 Full 입력 제외 항목
@@ -295,7 +298,7 @@ full 5필드 항목 list는 §7 조건 충족 시 하단 `## 상세 추적`에 �
    - 카테고리: [11종 중 하나]
    - 위치: [출처 N](URL#anchor) [부연 plain text]
    - 인용: "[입력 원문 <=80자]"
-   - 처리: [exclusion-rules.md §5 처리 줄]
+   - 처리: [exclusion-rules.md 5 처리 줄]
    - 설명: [왜 본문에 안 넣었는지 한 줄]
 ```
 

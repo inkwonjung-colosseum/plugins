@@ -55,7 +55,7 @@
 - 점수, 등급, health score는 만들지 않는다.
 - SSOT token 폴더가 없으면 프로젝트 전체 Markdown으로 fallback하지 않는다. `## 결론`에는 `감사 불가 — 선언된 SSOT token 폴더 없음`을 쓰고, `## 개선 백로그`에 SSOT 폴더 생성/이동 작업을 제안한다.
 - `planning/**`, `.planning-kit/**`, `planning-kit/skills/**`, `planning-kit/docs/prd/**`는 감사 corpus가 아니라 제외 요약 대상이다.
-- full 후보표/제외표/외부 출처표는 §5 조건에 따라 하단 `## 상세 추적`에 둔다.
+- full 후보표/제외표/외부 출처표는 5 조건에 따라 하단 `## 상세 추적`에 둔다.
 
 ## 2. Section 출력 규칙
 

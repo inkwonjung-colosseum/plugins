@@ -43,8 +43,8 @@
     {
       "name": "planning-kit",
       "source": "./planning-kit",
-      "description": "기획 초안 변환, 결정 보드 중심 산출물 리뷰, SSOT corpus 감사를 지원하는 planning-kit. planning-format은 readable 정책서·기능설계서와 자체 검증 피드백을 산출하고 사용자 확인·릴리즈 차단 항목은 결정 보드로 먼저 보여준다. planning-review는 D*/A*/T* 결정 보드 우선 report로 SSOT·AC·의존 영향을 점검한다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사하며 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
-      "version": "0.2.10",
+      "description": "기획 초안 변환, 결정 보드 중심 산출물 리뷰, SSOT corpus 감사를 지원하는 planning-kit. planning-format은 readable 정책서·기능설계서와 자체 검증 피드백을 산출하고 사용자 확인·릴리즈 차단 항목은 결정 보드로 먼저 보여준다. planning-review는 D*/A*/T* 결정 보드 우선 report로 SSOT·AC·의존 영향을 점검한다. 사용자-facing 위치 표기는 clean display를 사용하고 legacy 섹션 기호 입력은 읽기 호환으로 유지한다. ssot-audit는 독립 SSOT token 폴더 Markdown만 감사한다.",
+      "version": "0.2.11",
       "license": "MIT",
       "tags": ["planning", "product", "documentation", "review"]
     }

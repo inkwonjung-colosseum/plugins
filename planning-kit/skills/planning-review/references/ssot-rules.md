@@ -10,7 +10,7 @@
 - **SSOT fetch**: R1/R3 SSOT corpus link follow. `--no-ssot-fetch`로 봉쇄하며, input fetch와 별도 visited set·출처 블록을 가진다.
 - **확정 문장**: 변환 본문 중 `[TBD]`가 아닌 단정 표현.
 - **본문 없는 자리표시자 (placeholder)**: 빈 파일, frontmatter-only, H1-only, "작성 예정" 한 줄, 빈 표/헤더만 있는 표처럼 정책 값·상태·권한·임계값 등 결정 문장이 없는 파일.
-- **보조 표 heading 호환**: 0.2.8 clean header(`### N.M ... 보조 표`)와 0.2.4~0.2.7 legacy backlink header(`### N.M ... 보조 표 (§N row M)`)를 모두 sub-§으로 인식한다. legacy header 자체는 R1 발견으로 강제하지 않는다.
+- **보조 표 heading 호환**: 0.2.8 clean header(`### N.M ... 보조 표`)와 0.2.4~0.2.7 legacy backlink header(`### N.M ... 보조 표 (§N row M)`)를 모두 보조 표로 인식한다. 일부 중간 산출물의 `(N row M)` backlink도 읽기 호환으로 보조 표 처리한다. legacy header 자체는 R1 발견으로 강제하지 않는다.
 
 ## R1.1 SSOT token 폴더 후보 추출
 
@@ -54,7 +54,7 @@ SSOT token 폴더가 없거나 SSOT token 폴더 안 Markdown이 비어 있으�
 5. 매칭 file 본문에서 URL·이미지 참조 추출 — markdown link / autolink / HTML href·src·img / plain URL / markdown image / data URI. self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:` 제외.
 6. `--no-ssot-fetch` off이면 추출 URL을 fetch queue에 시드하고 이미지를 image queue에 시드한다.
 7. 재귀 fetch + connector fallback — `../planning-format/references/connector-routing.md`를 1회 Read 적재해 그대로 사용한다.
-8. 이미지 multimodal 해석 — 지원 확장자·해석 프롬프트는 `planning-format` §4 그대로. `--no-ssot-image` ON이면 image content-type 응답 합류 안 함.
+8. 이미지 multimodal 해석 — 지원 확장자·해석 프롬프트는 `planning-format` 4 그대로. `--no-ssot-image` ON이면 image content-type 응답 합류 안 함.
 9. 외부 fetch 본문 + 이미지 해석 결과를 corpus body에 합류. visited set으로 cycle 방지. cap 없음.
 
 ## R1.3 placeholder corpus 규칙
@@ -96,7 +96,7 @@ placeholder 판정 예:
 - 변환 본문 확정 문장과 매칭 file 본문 + 외부 fetch 본문(link follow 활성 시)을 직접 비교한다.
 - 같은 대상(역할·상태·정책 규칙·임계)이 양쪽에 있고 표기·결정·임계값이 어긋나면 발견한다.
 - 같은 대상에 대해 SSOT가 침묵하면 R1 발견이 아니다. R3 권고가 될 수 있다.
-- sub-§ 인식: 산출물 부모 § + sub-§(`### N.M ... 보조 표`) 본문 모두 corpus 비교 대상이다. sub-§ 단독 발견 가능.
+- 보조 표 인식: 산출물 상위 섹션 + 보조 표(`### N.M ... 보조 표`) 본문 모두 corpus 비교 대상이다. 보조 표 단독 발견 가능.
 
 ## R1.6 발견 ID와 우선순위
 
@@ -107,10 +107,10 @@ placeholder 판정 예:
 발견 위치 표기:
 
 ```markdown
-- 위치: 정책서 §5.1 row 3 (보조 표 안) vs Product SSOT/zone.md §2
+- 위치: 정책서 5.1 row 3 (보조 표 안) vs Product SSOT/zone.md 2
 ```
 
-부모 § + sub-§ + row 모두 식별되면 셋 다 표시한다. 부모 § 단독도 가능하다.
+상위 섹션 + 보조 표 + row 모두 식별되면 셋 다 표시한다. 상위 섹션 단독도 가능하다.
 
 ## R1.7 link follow
 
@@ -122,7 +122,7 @@ placeholder 판정 예:
 
 ### visited set·cycle 방지
 
-- visited set: SSOT corpus의 URL normalize key 집합. URL normalize는 `connector-routing.md` §6 그대로.
+- visited set: SSOT corpus의 URL normalize key 집합. URL normalize는 `connector-routing.md` 6 그대로.
 - input visited set과 SSOT visited set은 의도적으로 cross-set dedup하지 않는다.
 - 같은 URL이 여러 매칭 Markdown에서 발견되면 1번만 fetch + 본문 합류. 출처 list에는 origin file 1번만 표시한다.
 - 매칭 Markdown 자체 본문은 cycle 방지 대상이 아니다.
@@ -132,7 +132,7 @@ placeholder 판정 예:
 
 - 매칭 file ≥1 + link 0건 → 정상. corpus는 매칭 file 본문만.
 - 매칭 file ≥1 + link N건 + fetch 모두 실패 → 정상. corpus는 매칭 file 본문만, 출처 list에 사유를 남기고 R1/R3 점검을 진행한다.
-- 외부 fetch 결과가 image content-type → `planning-format` §4와 동일하게 image queue로 라우팅한다.
+- 외부 fetch 결과가 image content-type → `planning-format` 4와 동일하게 image queue로 라우팅한다.
 - 루트 매칭 file이 모두 placeholder여도 호출 종료 안 함. 신뢰도/판정에서 처리한다.
 
 ## R1.8 출처 list
