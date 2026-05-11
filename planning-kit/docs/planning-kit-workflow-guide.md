@@ -44,7 +44,7 @@ flowchart LR
 - `planning-review`는 만든 문서가 외부 기준과 맞는지 검증한다.
 - `ssot-audit`는 기존 SSOT 체계 자체의 중복, 부재, 낮은 버전 참조, 내용 충돌을 점검한다.
 - AI가 최종 승인하지 않는다. AI는 구조화, 누락 탐지, 충돌 후보 표시를 돕는다.
-- 최종 v1.0 확정은 기획팀과 실무팀 리뷰 이후 Confluence `[AI]`에서 한다.
+- 최종 v1.0 확정은 기획팀과 실무팀 리뷰 이후 Confluence `[SSOT]`에서 한다.
 
 ---
 
@@ -53,7 +53,7 @@ flowchart LR
 `planning-format`은 초안을 받아 정책서와 기능설계서 두 본문으로 변환합니다. 섞여 있는 기획 초안을 리뷰 가능한 두 문서로 나누는 단계입니다.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A["입력 dispatch"] --> B["URL·이미지 추출"]
   B --> C["자료 수집<br/>링크 재확인 + 접근 재시도"]
   C --> D["이미지 내용 해석"]
@@ -132,7 +132,7 @@ URL 본문 안에서 다시 URL이 발견되면 그 링크도 이어서 확인�
 `planning-review`는 `planning-format` 산출물을 외부 기준으로 점검합니다. 문서가 만들어진 뒤, 기존 기준과 테스트 가능성, 주변 영향까지 보는 단계입니다.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A["review 입력"] --> B{"입력 형태"}
   B -->|"인자 없음"| C["직전 planning-format 출력"]
   B -->|"URL 1개 이상"| D["URL 본문 수집"]
@@ -259,7 +259,7 @@ flowchart TD
 `ssot-audit`는 새 기획 산출물을 리뷰하는 도구가 아니라, 기존 문서 corpus가 유지보수 가능한 상태인지 보는 도구입니다.
 
 ```mermaid
-flowchart TD
+flowchart LR
   A["프로젝트 *.md"] --> B["버전 기준선 필터<br/>v0.8 이상 또는 버전 없음"]
   B --> C["외부 링크 follow<br/>connector fallback"]
   C --> D["SSOT map 생성"]
@@ -327,7 +327,7 @@ flowchart TD
 3. planning-kit 실행 담당이 Origin 링크를 planning-format에 입력한다.
 4. planning-format이 정책서, 기능설계서, 입력 제외 항목, 자체 검증 결과를 만든다.
 5. 실행 담당과 기획팀이 [TBD]와 입력 제외 항목을 확인한다.
-6. formatting 결과를 Confluence [AI]에 올린다.
+6. formatting 결과를 Confluence [SSOT]에 올린다.
 7. planning-review로 SSOT 충돌, AC 검증가능성, 의존 영향을 점검한다.
 8. 발견 항목을 수정하거나 리뷰 안건으로 남긴다.
 9. 기획팀 리뷰와 실무 리뷰를 거쳐 v1.0을 확정한다.

@@ -168,7 +168,7 @@ flowchart TD
   NA --> RD[templates/기능설계서.md + 정책서.md 병렬 Read]
   RD --> WR[main이 같은 턴에서<br/>두 본문 직접 작성]
   WR --> LD{셀 list 합류 ≥2?<br/>0.2.3}
-  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.M [용도] 보조 표 (§N row K)<br/>순차 §N.1·§N.2 (0.2.4)<br/>다층 도트 chain §N.M.K"]
+  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.M [용도] 보조 표<br/>clean header (0.2.8)<br/>부모 row는 입력 제외 처리 줄"]
   LD -->|동질 enum<br/>동일 동작·ref| KEEP[합류 유지]
   AUX --> NSR{--no-self-review?}
   KEEP --> NSR
@@ -214,11 +214,11 @@ list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main�
 
 **list 분해 max-depth cap = 3 (0.2.5)**: 허용 depth = `§N.M`·`§N.M.K`·`§N.M.K.L`까지. depth 4 진입 시 합류 유지 폴백 + 입력 제외 § `디테일 축약` 항목 추가. 8/10 섹션 골격 변경 없음, sub-§만 동적 추가.
 
-보조 표 번호 정밀화 (0.2.4): 부모 § 안 보조 표 번호는 순차 부여(`§N.1`·`§N.2`·...), 다층 도트 chain(`§N.M.K`). 임의 letter(`§N.x`) 금지. 헤더 backlink(`### N.M [용도] 보조 표 (§N row K)`)로 분해 row 위치 추적 — row 식별 못 하면 부모 §만(`(§N)`).
+보조 표 번호 정밀화: 부모 § 안 보조 표 번호는 순차 부여(`§N.1`·`§N.2`·...), 다층 도트 chain(`§N.M.K`). 임의 letter(`§N.x`) 금지. 0.2.8부터 헤더는 `### N.M [용도] 보조 표` clean header만 쓰고, 분해 row 위치 추적은 입력 제외 §의 `구조 변환` 처리 줄에 `본문 위치`/`부모 위치`로 기록한다.
 
 검증 sub-§ 인식 (0.2.4): F1·F2 자체 검증, R1·R2·R3 외부 검증 모두 sub-§(`### N.M ... 보조 표`) 본문을 점검 대상으로 인식. 부모 § 룰 그대로 sub-§ 확장.
 
-자체 검증 6패스 체크리스트 (0.2.5): F1~F6 26 항목 yes/no 검사 (F1: 5 + F2: 4 + F3: 4 + F4: 4 + F5: 4 + F6: 5). 카테고리당 1패스, 총 6패스. 단일 LLM 패스 → 6패스로 검출 누락 차단.
+자체 검증 6패스 체크리스트: F1~F6 27 항목 yes/no 검사 (F1: 5 + F2: 4 + F3: 4 + F4: 4 + F5: 4 + F6: 6). 카테고리당 1패스, 총 6패스. 단일 LLM 패스 → 6패스로 검출 누락 차단. 0.2.8부터 신규 출력에 legacy backlink 헤더가 남으면 F6 syntax 발견으로 기록한다.
 
 외부 SSOT corpus 충돌·acceptance criteria·의존 영향은 `planning-review` 스킬이 별도 처리.
 
@@ -320,7 +320,7 @@ flowchart TD
 | 파일 | 역할 |
 |---|---|
 | `skills/planning-format/SKILL.md` | orchestration only (Step 1~9 high-level + lazy read 지시) (0.2.4) |
-| `skills/planning-format/references/conversion-rules.md` | multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·backlink (0.2.4 신규) |
+| `skills/planning-format/references/conversion-rules.md` | multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (0.2.8) |
 | `skills/planning-format/references/exclusion-rules.md` | 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (0.2.4 신규) |
 | `skills/planning-format/references/output-contract.md` | 출력 포맷·헤더 줄·`--save`·`## 출처` list deep link·분기별 헤더 (0.2.4 신규, save 흡수) |
 | `skills/planning-format/references/connector-routing.md` | 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace 자원별 tool 시퀀스·gid/range 처리·fallback 케이스 표·sanity check·status 표기·**§11 connector별 anchor 추출 (0.2.4)** |

@@ -1,6 +1,6 @@
-# planning-kit (0.2.7)
+# planning-kit (0.2.8)
 
-기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format`, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review`, 현재 프로젝트의 Markdown **SSOT corpus 자체를 구조·내용 2축으로 감사**하는 `ssot-audit` 세 스킬로 구성된 플러그인. 0.2.7부터 `ssot-audit`가 추가되고, `planning-review <단일 파일>`은 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 식별한다.
+기획 초안을 **정책서·기능설계서 두 본문**으로 변환하고 자체 품질을 점검하는 `planning-format`, 그 산출물을 **외부 SSOT 충돌·acceptance criteria·의존 영향** 3축으로 검증하는 `planning-review`, 현재 프로젝트의 Markdown **SSOT corpus 자체를 구조·내용 2축으로 감사**하는 `ssot-audit` 세 스킬로 구성된 플러그인. 0.2.7부터 `ssot-audit`가 추가되고, `planning-review <단일 파일>`은 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 식별한다. 0.2.8부터 `planning-format` 신규 출력의 보조 표 헤더는 내부 backlink 없는 clean header만 사용하고, 부모 §/row 추적 정보는 `## 입력 제외 항목`의 `구조 변환` 처리 줄에 기록한다.
 
 산출물은 default로 화면 output(응답 markdown)으로만 반환한다. `planning-format --save`를 사용하면 `./.planning-kit/<기능명>/`에 두 본문 markdown 파일이 추가로 떨어진다 (자체 검증 보고서·출처 list는 화면 only). `ssot-audit`는 저장 옵션 없이 항상 화면 output only다.
 
@@ -109,13 +109,13 @@ URL 입력은 `planning-format`과 같은 규칙으로 root URL fetch, 본문 UR
 
 ### planning-format 출력
 
-1. **정책서 본문** (10 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.x ... 보조 표`)에 분해 (0.2.3, main 판단)
-2. **기능설계서 본문** (8 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.x ... 보조 표`)에 분해 (0.2.3, main 판단)
+1. **정책서 본문** (10 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.M ... 보조 표`)에 분해 (0.2.3, main 판단). 0.2.8부터 보조 표 헤더에는 `(§N row M)` 같은 내부 backlink를 쓰지 않는다.
+2. **기능설계서 본문** (8 섹션 markdown, 코드 펜스로 감싼 형태). 표 셀 안 list가 이질이면 부모 § 안 sub-§(`### N.M ... 보조 표`)에 분해 (0.2.3, main 판단). 부모 §/row 추적은 입력 제외 항목의 `구조 변환` 처리 줄에 둔다.
 3. **출처 list** (URL fetch나 이미지 처리가 1건 이상일 때만)
-4. **입력 제외 항목** (항상 출력. 0건이면 `없음` 1줄. 변환 본문에 반영 안 한 입력 조각을 10 카테고리로 분류 + 항목별 `처리` 줄로 본문·출처·미결 § cross-reference)
+4. **입력 제외 항목** (항상 출력. 0건이면 `없음` 1줄. 변환 본문에 반영 안 한 입력 조각을 11 카테고리로 분류 + 항목별 `처리` 줄로 본문·출처·미결 § cross-reference)
 5. **자체 검증 결과** (`통과` 또는 `발견 N건`, 6개 카테고리 카운트 포함)
 
-자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5, sub: `cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`) / Markdown syntax lint(F6). F1·F2는 sub-§(보조 표) 본문도 점검 (0.2.4).
+자체 품질 6개 카테고리 — 섹션 충실도(F1) / 라벨 cross-bleed(F2) / 용어 일관성(F3) / 정책-기능 매핑(F4) / 누락(F5, sub: `cross-ref-fetch` / `cross-ref-scope` / `cross-ref-tbd`) / Markdown syntax lint(F6). F1·F2는 sub-§(보조 표) 본문도 점검 (0.2.4). 0.2.8부터 신규 출력에 legacy backlink header가 남으면 F6 syntax 발견으로 잡는다.
 
 입력 제외 11 카테고리 — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` / `충돌 후보`(0.2.4 신규). 헤더 `- 입력 제외:` 줄에 카테고리별 분포 표기. 위치 필드는 `[출처 N](URL#anchor)` markdown link 형식으로 외부 source 특정 위치까지 1-hop 점프 (0.2.4).
 
@@ -279,18 +279,19 @@ planning-kit/
 │       ├── prd-0.2.4.md                  # sub-§ 정밀화·SKILL 분해·deep link·11 카테고리
 │       ├── prd-0.2.5.md                  # 결정성 강화 7 항목
 │       ├── prd-0.2.6.md                  # planning-review input fetch parity
-│       └── prd-0.2.7.md                  # 본 release (ssot-audit + companion read)
+│       ├── prd-0.2.7.md                  # ssot-audit + companion read
+│       └── prd-0.2.8.md                  # 본 release (clean header + 구조 변환 trace 이동)
 └── skills/
     ├── planning-format/
-    │   ├── SKILL.md                      # orchestration only (0.2.4) + Step 3 fetch 시도 의무·BFS / Step 6·7 결정 트리·체크리스트 (0.2.5)
+    │   ├── SKILL.md                      # orchestration only (0.2.4) + Step 3 fetch 시도 의무·BFS / Step 6·7 결정 트리·체크리스트 (0.2.5) + clean header (0.2.8)
     │   ├── templates/
     │   │   ├── 기능설계서.md
     │   │   └── 정책서.md
     │   └── references/
-    │       ├── conversion-rules.md       # multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·backlink (0.2.4) + §4 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5)
-    │       ├── exclusion-rules.md        # 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·marker 1종 (0.2.4) + §2 결정 트리 + §3.1 모호성 트리거 + §3.2 16 어구 (0.2.5)
-    │       ├── output-contract.md        # 출력 포맷·헤더 줄·--save·출처 list deep link (0.2.4)
-    │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식) + F1~F6 26 항목 체크리스트 6패스 (0.2.5)
+    │       ├── conversion-rules.md       # multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호·clean header (0.2.8) + §4 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5)
+    │       ├── exclusion-rules.md        # 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·marker 1종 (0.2.4) + 구조 변환 본문/부모 위치 추적 (0.2.8)
+    │       ├── output-contract.md        # 출력 포맷·헤더 줄·--save·출처 list deep link + clean header 출력 계약 (0.2.8)
+    │       ├── self-review-rules.md      # 자체 품질 6 카테고리 (F1·F2 sub-§ 인식) + F1~F6 27 항목 체크리스트 6패스 (0.2.8)
     │       └── connector-routing.md      # 호스트 매핑·Google tool 시퀀스·fallback·§11 connector별 anchor 추출 (0.2.4) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5)
     ├── planning-review/
     │   ├── SKILL.md                      # input collection 0.2.6 + companion read 0.2.7 + 외부 검증 orchestration
@@ -310,9 +311,9 @@ planning-kit/
 
 ## product-team-kit과의 차이
 
-`planning-kit`(0.2.7)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` + `ssot-audit` 세 스킬**로 재구성한다. 차이 요점:
+`planning-kit`(0.2.8)은 `product-team-kit`(`set-config` + `plan-format` + `plan-review` 3 스킬)의 흐름을 **`planning-format` + `planning-review` + `ssot-audit` 세 스킬**로 재구성한다. 차이 요점:
 
-| 항목 | product-team-kit | planning-kit (0.2.7) |
+| 항목 | product-team-kit | planning-kit (0.2.8) |
 |---|---|---|
 | Skill 수 | 3 | 3 |
 | 변환·리뷰 호출 | 2번 (`plan-format` → `plan-review`) | 2번 (`planning-format` → `planning-review`) + 필요 시 `ssot-audit` |
@@ -331,7 +332,7 @@ planning-kit/
 | 본문 검사 | 빈 골격/구조 일치 retry/중복/cross-bleed | 자체 6 카테고리 (planning-format 단계에서) |
 | 저장 절차 | staging→write→verify→rename + collision `--01..99` | mkdir + write + collision `-2`/`-3` (planning-format `--save`) |
 | 안전기능명 정규화 | 폴더명 안전화 (NFC, 특수문자 제거 등) | NFC + 분리자 제거 + 64자 cap (planning-format `--save`) |
-| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 6종 (변환+자체검증 / planning-review 결과+입력 출처(0.2.6) / ssot-audit 감사 결과+backlog / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + 헤더 backlink (`(§N row M)`) (0.2.4) — list 분해 max-depth cap=3 (0.2.5) |
+| 출력 템플릿 | 4종 (설정없음/저장보류/저장완료/저장실패) | 6종 (변환+자체검증 / planning-review 결과+입력 출처(0.2.6) / ssot-audit 감사 결과+backlog / 빈 입력 / URL 분기 sanity / 저장 실패). 입력 제외 § 항상 출력 (0건 = `없음`). 표 셀 list 이질 시 부모 § 안 sub-§(보조 표) 동적 추가 (0.2.3) — 보조 표 번호 부모 § 안 순차(`§N.1`·`§N.2`) + clean header (0.2.8) — list 분해 max-depth cap=3 (0.2.5) |
 | 입력 제외 처리 | 없음 | 11 카테고리 (`충돌 후보` 0.2.4 신규) + 처리 줄 + 위치 markdown link (0.2.4) + R3 보조 신호 (0.2.2) — 결정 트리 + 모호성 강제 [TBD] (정규식 6 + 16 어구) (0.2.5) |
 | 결정성 (같은 입력 일치율) | — | 0.9% (0.2.4) → 25~39% (0.2.5, 28~43배). fetch 시도 의무화·BFS 순서·exclusion 결정 트리·모호성 [TBD]·max-depth cap·6패스 체크리스트·라벨 매핑 트리 (0.2.5 신규 7 항목) |
 | 리뷰 축 | 2축 (SSOT 충돌 + 용어 일관성) | 자체 6 카테고리 (F5 cross-ref 3종 포함) + 외부 3축 (R1 corpus link follow 포함). SSOT 검색 키워드 노출 |
@@ -411,6 +412,12 @@ planning-kit/
   - **구조·내용 2축 감사** — canonical 중복/부재, archive·낮은 버전 활성 참조, 외부 canonical 의존, 정책/상태/권한/임계값 충돌, 용어 불일치, 검증 조건 부재를 발견/권고로 출력.
   - **개선 backlog** — 발견/권고를 문제 단위 P0/P1/P2로 묶고 영향 문서, 권장 작업, 검증 조건을 출력.
   - **planning-review companion read** — 단일 파일 입력 시 같은 폴더 sibling 파일을 non-recursive로 함께 읽어 정책서·기능설계서 쌍을 식별. 여러 기능이 섞여 1쌍으로 좁힐 수 없으면 sanity check.
+- **0.2.7 → 0.2.8**: `planning-format` 보조 표 헤더 정리. `planning-review`와 `ssot-audit` 기본 책임은 동일.
+  - **clean header** — 신규 출력 보조 표 헤더는 `### N.M [용도] 보조 표`만 허용. `(§N row M)` 같은 내부 backlink 괄호를 본문 헤더에 남기지 않는다.
+  - **구조 변환 추적 이동** — 부모 §/row 정보는 `## 입력 제외 항목`의 `구조 변환` 처리 줄에 `본문 위치`와 `부모 위치`로 기록한다.
+  - **저장 결과 정리** — `planning-format --save`로 저장되는 정책서·기능설계서 본문에는 내부 backlink 메타데이터가 없다. 입력 제외/출처는 기존처럼 화면 only다.
+  - **legacy read 호환** — `planning-review`는 0.2.4~0.2.7 legacy backlink header와 0.2.8 clean header를 모두 보조 표로 인식한다.
+  - **self-review 보강** — 신규 `planning-format` 출력에서 legacy backlink header가 남으면 F6 syntax 발견으로 기록한다.
 
 ---
 

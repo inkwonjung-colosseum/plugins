@@ -11,13 +11,13 @@
     :root { color-scheme: light; --paper: #f5f5f5; --ink: #2d3142; --muted: #4f5d75; --rule: rgba(45,49,66,0.12); }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Geist', system-ui, sans-serif; }
-    .page { width: min(100%, 920px); margin: 0 auto; padding: 32px 24px 40px; }
+    .page { width: min(100%, 2400px); margin: 0 auto; padding: 32px 24px 40px; }
     header { margin-bottom: 18px; }
     .eyebrow { margin: 0 0 8px; font: 500 10px/1.4 'Geist Mono', monospace; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; }
     h1 { margin: 0; font: 400 32px/1.08 'Instrument Serif', Georgia, serif; letter-spacing: 0; }
     .source { margin: 8px 0 0; color: var(--muted); font: 400 12px/1.5 'Geist Mono', monospace; }
     .figure { overflow-x: auto; border-top: 1px solid var(--rule); padding-top: 16px; }
-    svg { display: block; width: 780px; max-width: none; height: auto; }
+    svg { display: block; width: 2400px; max-width: none; height: auto; }
   </style>
 </head>
 <body>
@@ -28,9 +28,9 @@
       <p class="source">planning-kit/docs/planning-kit-workflow-guide.md · Mermaid block #3</p>
     </header>
     <main class="figure">
-<svg viewBox="0 0 780 1492" width="780" height="1492" role="img" aria-labelledby="title desc">
-  <title id="title">diagram</title>
-  <desc id="desc">Flowchart converted from planning-kit Mermaid source.</desc>
+<svg viewBox="0 0 2400 620" width="2400" height="620" role="img" aria-labelledby="title desc">
+  <title id="title">planning-review 흐름</title>
+  <desc id="desc">Review input branches are collected, identified, validated across three axes, merged, and emitted as review output.</desc>
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
@@ -38,212 +38,155 @@
   </defs>
   <rect width="100%" height="100%" fill="#f5f5f5"/>
 
+  <g class="edge"><path d="M 176 304 C 204 304, 204 304, 232 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
   <g class="edge">
-    <path d="M 390 156 C 390 194, 390 194, 390 232" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
+    <path d="M 376 304 C 408 304, 408 158, 440 158" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="382" y="224" width="70" height="14" rx="2" fill="#f5f5f5"/>
+    <text x="417" y="234" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">인자 없음</text>
   </g>
   <g class="edge">
-    <path d="M 390 316 C 390 354, 128 354, 128 392" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="223.67000000000002" y="337" width="70.66" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="259" y="347" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="259" dy="0">인자 없음</tspan></text>
+    <path d="M 376 304 C 408 304, 408 254, 440 254" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="376" y="272" width="88" height="14" rx="2" fill="#f5f5f5"/>
+    <text x="420" y="282" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">URL 1개 이상</text>
   </g>
   <g class="edge">
-    <path d="M 390 316 C 390 359, 302 359, 302 402" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="302.17" y="342" width="87.66" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="346" y="352" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="346" dy="0">URL 1개 이상</tspan></text>
+    <path d="M 376 304 C 408 304, 408 350, 440 350" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="384" y="320" width="68" height="14" rx="2" fill="#f5f5f5"/>
+    <text x="418" y="330" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">디렉터리</text>
   </g>
   <g class="edge">
-    <path d="M 390 316 C 390 357, 482 357, 482 398" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="402.2" y="340" width="67.6" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="436" y="350" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="436" dy="0">디렉터리</tspan></text>
+    <path d="M 376 304 C 408 304, 408 448, 440 448" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="384" y="368" width="78" height="26" rx="2" fill="#f5f5f5"/>
+    <text x="423" y="378" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="423" dy="0">파일 / raw</tspan><tspan x="423" dy="11">markdown</tspan></text>
+  </g>
+  <g class="edge"><path d="M 608 158 C 642 158, 642 304, 676 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 588 254 C 632 254, 632 304, 676 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 620 350 C 648 350, 648 304, 676 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 588 448 C 632 448, 632 304, 676 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 856 304 C 884 304, 884 304, 912 304" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge">
+    <path d="M 1080 304 C 1112 304, 1112 224, 1144 224" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="1086" y="254" width="58" height="14" rx="2" fill="#f5f5f5"/>
+    <text x="1115" y="264" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">아니오</text>
   </g>
   <g class="edge">
-    <path d="M 390 316 C 390 359, 662 359, 662 402" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="488.12" y="330" width="75.76" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="526" y="340" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="526" dy="0">파일 / raw</tspan><tspan x="526" dy="11">markdown</tspan></text>
+    <path d="M 1080 304 C 1112 304, 1112 388, 1144 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
+    <rect x="1090" y="336" width="52" height="14" rx="2" fill="#f5f5f5"/>
+    <text x="1116" y="346" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em">예</text>
   </g>
-  <g class="edge">
-    <path d="M 128 472 C 128 510, 390 510, 390 548" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 302 462 C 302 505, 390 505, 390 548" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 482 466 C 482 507, 390 507, 390 548" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 662 462 C 662 505, 390 505, 390 548" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 390 608 C 390 646, 390 646, 390 684" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 390 772 C 390 810, 308 810, 308 848" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="321.15" y="793" width="55.699999999999996" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="349" y="803" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="349" dy="0">아니오</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 390 772 C 390 810, 492 810, 492 848" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="415" y="793" width="52" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="441" y="803" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="441" dy="0">예</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 492 908 C 492 946, 218 946, 218 984" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 492 908 C 492 946, 390 946, 390 984" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 492 908 C 492 946, 562 946, 562 984" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 218 1044 C 218 1082, 390 1082, 390 1120" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 390 1044 C 390 1082, 390 1082, 390 1120" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 562 1044 C 562 1082, 390 1082, 390 1120" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 390 1188 C 390 1226, 390 1226, 390 1264" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
+  <g class="edge"><path d="M 1288 388 C 1320 388, 1320 260, 1352 260" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1288 388 C 1320 388, 1320 388, 1352 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1288 388 C 1320 388, 1320 508, 1352 508" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1504 260 C 1540 260, 1540 388, 1576 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1528 388 C 1552 388, 1552 388, 1576 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1504 508 C 1540 508, 1540 388, 1576 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1760 388 C 1788 388, 1788 388, 1816 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
+  <g class="edge"><path d="M 1760 388 C 1788 388, 1788 388, 1816 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/></g>
 
   <g class="node" id="node-A">
-    <rect x="328" y="96" width="124" height="60" rx="18" fill="#f5f5f5"/>
-    <rect x="328" y="96" width="124" height="60" rx="18" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="338" y="104" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="353" y="114" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">IN</text>
-    <text x="390" y="130" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">review 입력</tspan></text>
+    <rect x="56" y="270" width="120" height="68" rx="18" fill="#f5f5f5"/>
+    <rect x="56" y="270" width="120" height="68" rx="18" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <rect x="66" y="278" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="81" y="288" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">IN</text>
+    <text x="116" y="308" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">review 입력</text>
   </g>
   <g class="node decision" id="node-B">
-    <polygon points="390,232 470,274 390,316 310,274" fill="#f5f5f5"/>
-    <polygon points="390,232 470,274 390,316 310,274" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="390" y="278" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">입력 형태</tspan></text>
+    <polygon points="304,252 376,304 304,356 232,304" fill="#f5f5f5"/>
+    <polygon points="304,252 376,304 304,356 232,304" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
+    <text x="304" y="308" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">입력 형태</text>
   </g>
   <g class="node" id="node-C">
-    <rect x="56" y="392" width="144" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="56" y="392" width="144" height="80" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="66" y="400" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="81" y="410" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
-    <text x="128" y="421" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="128" dy="0">직전</tspan><tspan x="128" dy="14">planning-format</tspan><tspan x="128" dy="14">출력</tspan></text>
+    <rect x="440" y="124" width="168" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="440" y="124" width="168" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="450" y="132" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="468" y="142" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="524" y="152" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="524" dy="0">직전 planning-format</tspan><tspan x="524" dy="14">출력</tspan></text>
   </g>
   <g class="node" id="node-D">
-    <rect x="240" y="402" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="240" y="402" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="250" y="410" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="268" y="420" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="302" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="302" dy="0">URL 본문 수집</tspan></text>
+    <rect x="440" y="220" width="148" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="440" y="220" width="148" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="450" y="228" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="468" y="238" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="514" y="258" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">URL 본문 수집</text>
   </g>
   <g class="node" id="node-E">
-    <rect x="404" y="398" width="156" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="404" y="398" width="156" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="414" y="406" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="432" y="416" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="482" y="428.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="482" dy="0">정책서·기능설계서</tspan><tspan x="482" dy="14">검색</tspan></text>
+    <rect x="440" y="310" width="180" height="80" rx="6" fill="#f5f5f5"/>
+    <rect x="440" y="310" width="180" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="450" y="318" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="468" y="328" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="530" y="344" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="530" dy="0">정책서·기능설계서</tspan><tspan x="530" dy="14">검색</tspan></text>
   </g>
   <g class="node" id="node-F">
-    <rect x="600" y="402" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="600" y="402" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="610" y="410" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="628" y="420" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="662" y="436" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="662" dy="0">본문 분리</tspan></text>
+    <rect x="440" y="414" width="148" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="440" y="414" width="148" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="450" y="422" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="468" y="432" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="514" y="452" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">본문 분리</text>
   </g>
   <g class="node" id="node-G">
-    <rect x="306" y="548" width="168" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="306" y="548" width="168" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="316" y="556" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="334" y="566" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="390" y="582" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">review 대상 본문 수집</tspan></text>
+    <rect x="676" y="270" width="180" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="676" y="270" width="180" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="686" y="278" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="704" y="288" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="766" y="308" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">review 대상 본문 수집</text>
   </g>
   <g class="node decision" id="node-H">
-    <polygon points="390,684 486,728 390,772 294,728" fill="#f5f5f5"/>
-    <polygon points="390,684 486,728 390,772 294,728" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="390" y="724.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">정책서 + 기능설계서</tspan><tspan x="390" dy="14">식별?</tspan></text>
+    <polygon points="996,244 1080,304 996,364 912,304" fill="#f5f5f5"/>
+    <polygon points="996,244 1080,304 996,364 912,304" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
+    <text x="996" y="300" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="996" dy="0">정책서 +</tspan><tspan x="996" dy="14">기능설계서 식별?</tspan></text>
   </g>
   <g class="node" id="node-X">
-    <rect x="226" y="848" width="164" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="226" y="848" width="164" height="60" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="236" y="856" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="251" y="866" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
-    <text x="308" y="882" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="308" dy="0">sanity check 후 종료</tspan></text>
+    <rect x="1144" y="190" width="168" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1144" y="190" width="168" height="68" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <rect x="1154" y="198" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1169" y="208" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
+    <text x="1228" y="228" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">sanity check 후 종료</text>
   </g>
   <g class="node" id="node-I">
-    <rect x="430" y="848" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="430" y="848" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="440" y="856" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="458" y="866" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="492" y="882" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="492" dy="0">검증 축 실행</tspan></text>
+    <rect x="1144" y="354" width="144" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1144" y="354" width="144" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="1154" y="362" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1172" y="372" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="1216" y="392" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">검증 축 실행</text>
   </g>
   <g class="node" id="node-J">
-    <rect x="156" y="984" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="156" y="984" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="166" y="992" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="184" y="1002" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="218" y="1018" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="218" dy="0">R1 SSOT 충돌</tspan></text>
+    <rect x="1352" y="226" width="152" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1352" y="226" width="152" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="1362" y="234" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1380" y="244" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="1428" y="264" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">R1 SSOT 충돌</text>
   </g>
   <g class="node" id="node-K">
-    <rect x="320" y="984" width="140" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="320" y="984" width="140" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="330" y="992" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="348" y="1002" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="390" y="1018" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">R2 AC 검증가능성</tspan></text>
+    <rect x="1352" y="354" width="176" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1352" y="354" width="176" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="1362" y="362" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1380" y="372" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="1440" y="392" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">R2 AC 검증가능성</text>
   </g>
   <g class="node" id="node-L">
-    <rect x="500" y="984" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="500" y="984" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="510" y="992" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="528" y="1002" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="562" y="1018" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="562" dy="0">R3 의존·영향</tspan></text>
+    <rect x="1352" y="474" width="152" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1352" y="474" width="152" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="1362" y="482" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1380" y="492" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="1428" y="512" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">R3 의존·영향</text>
   </g>
   <g class="node" id="node-M">
-    <rect x="328" y="1120" width="124" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="328" y="1120" width="124" height="68" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="338" y="1128" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="353" y="1138" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
-    <text x="390" y="1150.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">발견 합산</tspan><tspan x="390" dy="14">R1 &gt; R3 &gt; R2</tspan></text>
+    <rect x="1576" y="344" width="184" height="88" rx="6" fill="#f5f5f5"/>
+    <rect x="1576" y="344" width="184" height="88" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+    <rect x="1586" y="352" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1604" y="362" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
+    <text x="1668" y="382" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="1668" dy="0">발견 합산</tspan><tspan x="1668" dy="14">R1 &gt; R3 &gt; R2</tspan></text>
   </g>
   <g class="node" id="node-N">
-    <rect x="328" y="1264" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="328" y="1264" width="124" height="60" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="338" y="1272" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="353" y="1282" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
-    <text x="390" y="1298" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="390" dy="0">리뷰 결과 출력</tspan></text>
+    <rect x="1816" y="354" width="160" height="68" rx="6" fill="#f5f5f5"/>
+    <rect x="1816" y="354" width="160" height="68" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+    <rect x="1826" y="362" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
+    <text x="1841" y="372" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">OUT</text>
+    <text x="1896" y="392" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">리뷰 결과 출력</text>
   </g>
-  <line x1="40" y1="1438" x2="740" y2="1438" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
-  <text x="40" y="1458" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">FLOWCHART</text>
-  <text x="740" y="1458" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.08em">STEP · ASK · OUT</text>
+  <line x1="40" y1="566" x2="2360" y2="566" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+  <text x="40" y="586" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">FLOWCHART</text>
+  <text x="2360" y="586" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.08em">STEP · ASK · OUT</text>
 </svg>
     </main>
   </div>

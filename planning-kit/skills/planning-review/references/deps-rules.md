@@ -4,6 +4,7 @@
 
 - **SSOT corpus**: R1과 동일 set 공유 (`--ssot-include` 같이 적용).
 - **영향 후보**: 변환 본문 변경이 영향을 줄 가능성이 있는 SSOT 파일.
+- **보조 표 heading 호환**: 0.2.8 clean header(`### N.M ... 보조 표`)와 0.2.4~0.2.7 legacy backlink header(`### N.M ... 보조 표 (§N row M)`)를 모두 sub-§으로 인식한다. legacy header 자체는 R3 발견으로 강제하지 않는다.
 
 ## R3.1 4 sub-category
 

@@ -10,6 +10,7 @@
 - **SSOT fetch**: R1/R3 SSOT corpus link follow. `--no-ssot-fetch`로 봉쇄하며, input fetch와 별도 visited set·출처 블록을 가진다.
 - **확정 문장**: 변환 본문 중 `[TBD]`가 아닌 단정 표현.
 - **R1 link follow**: 매칭 *.md 본문 안 URL을 추출해 fetch + connector fallback으로 corpus body에 합류시키는 0.2.2 신규 절차 (§R1.4).
+- **보조 표 heading 호환**: 0.2.8 clean header(`### N.M ... 보조 표`)와 0.2.4~0.2.7 legacy backlink header(`### N.M ... 보조 표 (§N row M)`)를 모두 sub-§으로 인식한다. legacy header 자체는 R1 발견으로 강제하지 않는다.
 
 ## R1.1 corpus 추출 절차
 

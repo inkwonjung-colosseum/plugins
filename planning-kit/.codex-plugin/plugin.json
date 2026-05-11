@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.7",
-  "description": "planning-format은 기획 초안을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증한다. planning-review는 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 점검하며, 0.2.6 다중 URL input collection과 0.2.7 단일 파일 same-folder companion read를 지원한다. ssot-audit는 현재 프로젝트 Markdown SSOT corpus 자체를 구조 품질·내용 품질 2축으로 감사하고, v0.8 미만 문서 제외 집계·외부 링크 cap 없음 follow·개선 backlog를 화면 markdown only로 출력한다.",
+  "version": "0.2.8",
+  "description": "planning-format은 기획 초안을 정책서·기능설계서 두 본문으로 변환하고 자체 품질을 검증한다. 0.2.8부터 보조 표 헤더는 내부 backlink 없는 clean header만 출력하고 추적 정보는 입력 제외 항목의 구조 변환 처리 줄에 둔다. planning-review는 SSOT·AC·의존 영향 3축 리뷰, 다중 URL input collection, 단일 파일 companion read, clean/legacy 보조 표 heading 읽기 호환을 지원한다. ssot-audit는 프로젝트 Markdown SSOT corpus를 구조/내용 2축으로 감사한다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "planning-kit",
     "shortDescription": "기획 초안 변환, 산출물 리뷰, SSOT corpus 감사",
-    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 정책서/기능설계서로 변환하고 자체 검증한다. planning-review는 SSOT·AC·의존 영향 3축 리뷰를 수행하며, 다중 URL input collection과 단일 파일 same-folder companion read를 지원한다. ssot-audit는 프로젝트 Markdown SSOT corpus를 구조/내용 2축으로 감사하고 v0.8 미만 문서 제외, 외부 링크 follow, 개선 backlog를 화면에 출력한다.",
+    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 정책서/기능설계서로 변환하고 자체 검증한다. 0.2.8부터 보조 표는 clean header로 출력하고 부모 row 추적은 입력 제외 항목에 기록한다. planning-review는 SSOT·AC·의존 영향 3축 리뷰, 다중 URL input collection, 단일 파일 companion read, clean/legacy heading 호환을 지원한다. ssot-audit는 프로젝트 Markdown SSOT corpus를 구조/내용 2축으로 감사한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

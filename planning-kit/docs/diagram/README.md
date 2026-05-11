@@ -16,7 +16,7 @@ PRD 문서를 제외한 `planning-kit/docs` Markdown의 Mermaid 블록을 `diagr
 | `planning-kit/docs/planning-format-workflow.md` | 9. 단일 응답 출력 구조 (Step 9) | [planning-format-workflow-09.html](./planning-format-workflow-09.html) | 9 | 10 |
 | `planning-kit/docs/planning-format-workflow.md` | 10. 출처 list status 분류 | [planning-format-workflow-10.html](./planning-format-workflow-10.html) | 21 | 20 |
 | `planning-kit/docs/planning-format-workflow.md` | 11. 옵션 영향 | [planning-format-workflow-11.html](./planning-format-workflow-11.html) | 9 | 8 |
-| `planning-kit/docs/planning-kit-install-guide-windows.md` | 2. 전체 구성 | [planning-kit-install-guide-windows-01.html](./planning-kit-install-guide-windows-01.html) | 9 | 11 |
+| `planning-kit/docs/planning-kit-install-guide-windows.md` | 2. 전체 구성 | [planning-kit-install-guide-windows-01.html](./planning-kit-install-guide-windows-01.html) | 7 | 7 |
 | `planning-kit/docs/planning-kit-workflow-guide.md` | 1. 전체 workflow | [planning-kit-workflow-guide-01.html](./planning-kit-workflow-guide-01.html) | 15 | 15 |
 | `planning-kit/docs/planning-kit-workflow-guide.md` | 2. planning-format 흐름 | [planning-kit-workflow-guide-02.html](./planning-kit-workflow-guide-02.html) | 11 | 10 |
 | `planning-kit/docs/planning-kit-workflow-guide.md` | 3. planning-review 흐름 | [planning-kit-workflow-guide-03.html](./planning-kit-workflow-guide-03.html) | 15 | 19 |

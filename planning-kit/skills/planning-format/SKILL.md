@@ -72,7 +72,7 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 
 - §3 기능명 추출 (1순위 1개).
 - §4 두 템플릿 변환 — **라벨 매핑 결정 트리 (0.2.5)** + 양 매핑 분배 룰 + §10.2 측면별 분배표.
-- §5 list 분해 판단 — 보조 표 번호 순차(`§N.M`)·헤더 backlink(`(§N row K)`)·**다층 재귀 max-depth cap = 3 (0.2.5)**. depth 4 진입 시 합류 유지 폴백.
+- §5 list 분해 판단 — 보조 표 번호 순차(`§N.M`)·0.2.8 clean header(`### N.M [용도] 보조 표`)·**다층 재귀 max-depth cap = 3 (0.2.5)**. 부모 §/row 추적은 입력 제외 § `구조 변환` 처리 줄에 기록. depth 4 진입 시 합류 유지 폴백.
 
 본문 미합류 조각 라벨링은 `references/exclusion-rules.md` 1회 Read 적재 (§1 11 카테고리·**§2 결정 트리 (0.2.5)**·**§3.1 모호성 트리거 + §3.2 16 어구 카탈로그 (0.2.5)**·§4 5필드·§5 처리 줄·§6 헤더 분포·§7 marker 1종).
 
@@ -80,7 +80,7 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 
 ### Step 7: 자체 품질 검증
 
-`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) **6패스 체크리스트 점검 (0.2.5)** — 카테고리당 1패스, 총 26 항목 yes/no 검사. F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·체크리스트·예시·발견 형식 모두 reference 그대로.
+`--no-self-review`면 skip. 그 외엔 `references/self-review-rules.md` 적재 후 6 카테고리(F1 충실도·F2 cross-bleed·F3 용어·F4 정책-기능 매핑·F5 누락·F6 syntax) **6패스 체크리스트 점검** — 카테고리당 1패스, 총 27 항목 yes/no 검사(0.2.8 F6 legacy backlink 헤더 금지 포함). F1·F2는 sub-§(`### N.M ... 보조 표`) 본문도 점검. F5는 본문 누락 + cross-ref 3종(`cross-ref-fetch`·`cross-ref-scope`·`cross-ref-tbd`) 모두. 기준·체크리스트·예시·발견 형식 모두 reference 그대로.
 
 체크리스트 □ 중 unchecked 1개 = 발견 1건. 6 카테고리 모두 0건이면 `통과`, ≥1건이면 `발견 N건`. 외부 corpus·다른 *.md는 보지 않음 (planning-review가 처리).
 
@@ -96,10 +96,10 @@ fetch 진입 직전 1회 `references/connector-routing.md`를 Read 적재. WebFe
 
 - `templates/기능설계서.md` — 8 섹션 표 골격.
 - `templates/정책서.md` — 10 섹션 표 골격.
-- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·backlink (Step 4·5·6) + §4.1 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5).
+- `references/conversion-rules.md` — multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (Step 4·5·6) + §4.1 라벨 매핑 결정 트리 + §4.2 양 매핑 분배 + §5.4 max-depth cap=3 (0.2.5).
 - `references/exclusion-rules.md` — 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·헤더 분포·marker 1종 (Step 6) + §2 결정 트리 + §3.1 모호성 트리거 + §3.2 16 어구 (0.2.5).
 - `references/output-contract.md` — 출력 포맷·헤더 줄·`--save` 처리·`## 출처` list deep link·분기별 헤더 (Step 8·9).
-- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7) + 26 항목 체크리스트 6패스 (0.2.5).
+- `references/self-review-rules.md` — 자체 품질 6 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (Step 7) + 27 항목 체크리스트 6패스 (0.2.8 F6 legacy backlink 헤더 금지 포함).
 - `references/connector-routing.md` — 인증 휴리스틱·MCP 카탈로그·호스트 매핑·Google Workspace tool 시퀀스·gid/range·fallback·status 표기·§8 sanity check·§11 connector별 anchor 추출 (Step 3) + §5 진입 조건 1차 WebFetch 시도 후 통일 (0.2.5).
 
 외부 검증(SSOT 충돌·acceptance criteria·의존 영향)은 `planning-review` 스킬 별도 호출. 자세한 사용법은 `skills/planning-review/SKILL.md`.

@@ -1,6 +1,6 @@
 # Conversion Rules
 
-`planning-format` 변환 단계 (SKILL.md Step 4~6) 세부 룰. SKILL.md는 orchestration only이므로 multimodal 처리·통합 본문 합류·기능명 추출·라벨 매핑·list 분해 판단·보조 표 번호 부여·backlink는 모두 본 reference에 있다. SKILL.md Step 6 진입 시 1회 Read 적재.
+`planning-format` 변환 단계 (SKILL.md Step 4~6) 세부 룰. SKILL.md는 orchestration only이므로 multimodal 처리·통합 본문 합류·기능명 추출·라벨 매핑·list 분해 판단·보조 표 번호 부여·clean header 규칙은 모두 본 reference에 있다. SKILL.md Step 6 진입 시 1회 Read 적재.
 
 ## 1. 이미지 multimodal 처리 (Step 4)
 
@@ -105,7 +105,7 @@ X가 §4.1 분기 ≥2 매칭 시:
 
 ### 5.1 룰
 
-한 셀에 list 항목 ≥2 합류 작성 시, main이 항목별 속성(타입)·동작(클릭/overlay/non-MVP)·정책 ref(§ cross-link)·검증·[TBD]·non-MVP 등 이질성을 평가한다. 이질이면 부모 § 안 sub-§(`### N.x [용도] 보조 표`)로 분해(본 셀엔 `§N.x 참조` 1행만, 컬럼 set은 list 성격에 맞춰 main 결정, 권장 최소 = `순번`·`항목`·`비고`), 동질 enum·동일 동작·동일 ref면 합류 유지.
+한 셀에 list 항목 ≥2 합류 작성 시, main이 항목별 속성(타입)·동작(클릭/overlay/non-MVP)·정책 ref(§ cross-link)·검증·[TBD]·non-MVP 등 이질성을 평가한다. 이질이면 부모 § 안 sub-§(`### N.M [용도] 보조 표`)로 분해(본 셀엔 `§N.M 참조` 1행만, 컬럼 set은 list 성격에 맞춰 main 결정, 권장 최소 = `순번`·`항목`·`비고`), 동질 enum·동일 동작·동일 ref면 합류 유지.
 
 ### 5.2 보조 표 번호 순차 부여 (0.2.4)
 
@@ -114,17 +114,31 @@ X가 §4.1 분기 ≥2 매칭 시:
 - 같은 부모 § 안 두 보조 표는 항상 다른 번호. 같은 번호 재사용 금지.
 - 임의 letter (`§N.x`·`§N.x.y` placeholder) 사용 금지.
 
-### 5.3 보조 표 헤더 backlink (0.2.4)
+### 5.3 보조 표 clean header (0.2.8)
 
-보조 표 헤더 형식:
+0.2.8부터 `planning-format`이 새로 생성하는 보조 표 헤더는 내부 추적 괄호 없는 clean header만 허용한다.
 
 ```markdown
-### 4.1 [용도] 보조 표 (§4 row 3)
+### 4.1 [용도] 보조 표
 ```
 
-- 괄호 안 `§N row M` = 부모 § 번호 + 분해 발생 row 위치.
-- row 식별 못 하면 부모 §만 (`(§4)`).
-- 다층 보조 표는 부모 보조 표 row 가리킴 (예: `(§4.1 row 2)`).
+규칙:
+
+- heading level은 `###`.
+- 번호는 `N.M`, `N.M.K`, `N.M.K.L` 중 하나다.
+- 제목은 실제 용도명 + `보조 표`로 끝낸다.
+- 헤더 뒤에 `(§N row M)`, `(§N)`, `(§N.M row K)` 같은 backlink 괄호를 붙이지 않는다.
+- 표 첫 행, HTML comment, 숨김 row에도 부모 §/row 추적 정보를 옮기지 않는다.
+
+부모 §/row 추적이 필요하면 `exclusion-rules.md`의 `구조 변환` 처리 줄에 `본문 위치`와 `부모 위치`를 기록한다.
+
+금지:
+
+```markdown
+### 5.1 Zone Type별 정책 보조 표 (§5 row 7~11)
+### 5.1 Zone Type별 정책 보조 표 (§5)
+### 5.1.1 하위 Zone 정책 보조 표 (§5.1 row 2)
+```
 
 ### 5.4 다층 분해 + max-depth cap (0.2.5)
 
@@ -164,4 +178,4 @@ INBOUND / STORAGE / OUTBOUND / RETURN / DEFECT
 
 ## 6. 8/10 섹션 골격
 
-8/10 섹션 골격은 변경 없음. sub-§(`### N.M ... 보조 표`)만 동적 추가.
+8/10 섹션 골격은 변경 없음. sub-§(`### N.M ... 보조 표`)만 동적 추가한다. legacy 0.2.4~0.2.7 backlink header는 신규 출력 금지이며, 읽기 호환은 `planning-review`와 self-review parser 쪽에서만 다룬다.
