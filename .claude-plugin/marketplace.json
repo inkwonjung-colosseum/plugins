@@ -43,8 +43,8 @@
     {
       "name": "planning-kit",
       "source": "./planning-kit",
-      "description": "기획 초안 변환, 결정 보드 중심 산출물 리뷰, SSOT 감사, 현재 context memory의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 파일/URL/경로 인자를 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.2.13",
+      "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
+      "version": "0.2.14",
       "license": "MIT",
       "tags": ["planning", "product", "documentation", "review"]
     }

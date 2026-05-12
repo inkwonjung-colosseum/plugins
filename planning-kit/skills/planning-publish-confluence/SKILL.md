@@ -1,23 +1,28 @@
 ---
 name: planning-publish-confluence
-description: "현재 context memory 안에 정책서와 기능 설계서 두 본문이 모두 명확히 있을 때만 Confluence SSOT parent 아래 v0.7 후보 문서로 발행한다. 파일/URL/경로 입력은 받지 않고, parent 선택·중복 처리·최종 확인 후 Confluence page create/update와 readback을 수행한다."
-argument-hint: "(인자 없음. 현재 context memory의 정책서·기능 설계서 두 본문만 사용)"
+description: "현재 context memory 안에 정책서와 기능 설계서 두 본문이 모두 명확하거나, 명시적 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/ 저장 폴더 입력이 있을 때만 Confluence SSOT parent 아래 v0.7 후보 문서로 발행한다. URL/임의 .md/여러 폴더 입력은 받지 않고, parent 선택·중복 처리·최종 확인 후 Confluence page create/update와 readback을 수행한다."
+argument-hint: "(인자 없음 | [planning/[안전기능명]--YYYY-MM-DD-HHMMSS/])"
 ---
 
 # planning-publish-confluence
 
-현재 context memory에 이미 있는 정책서와 기능 설계서 본문을 Confluence SSOT 하위에 `v0.7` 후보 문서로 발행하는 스킬이다.
+현재 context memory에 이미 있는 정책서와 기능 설계서 본문, 또는 사용자가 명시한 0.2.14 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 폴더의 canonical 두 파일을 Confluence SSOT 하위에 `v0.7` 후보 문서로 발행하는 스킬이다.
 
 ## 호출
 
 - Claude Code: `/planning-kit:planning-publish-confluence`
 - Codex: `$planning-publish-confluence`
 
-위치 인자와 옵션은 받지 않는다. 파일 경로, URL, `planning/` 저장 산출물 경로는 0.2.13 publish 입력이 아니다.
+지원 입력:
+
+- 인자 없음: 현재 context memory에서 정책서·기능 설계서 두 본문을 찾는다.
+- 저장 폴더 경로 1개: `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` direct child 폴더에서 canonical 정책서·기능설계서 두 파일만 읽는다.
+
+URL, Confluence page URL, 임의 `.md`, 임의 경로, 여러 저장 폴더, `planning/` 밖 경로, `planning/foo/`, `planning/drafts/...`, 중첩 폴더는 받지 않는다.
 
 ## 책임과 경계
 
-- 현재 context memory에서 정책서 1개와 기능 설계서 1개를 식별한다.
+- 현재 context memory 또는 명시적 저장 폴더에서 정책서 1개와 기능 설계서 1개를 식별한다.
 - 기본 Confluence parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`이다.
 - AskUserQuestion 또는 동일한 일반 질문으로 기본 parent 사용, 다른 parent URL 입력, 취소를 받는다.
 - Confluence title과 metadata에는 항상 `v0.7` 발행 label을 붙인다.
@@ -27,11 +32,17 @@ argument-hint: "(인자 없음. 현재 context memory의 정책서·기능 설�
 
 ## 동작 시퀀스
 
-### Step 1: 금지 입력 확인
+### Step 1: 입력 dispatch와 금지 입력 확인
 
-호출 인자에 non-empty positional token 또는 `--` option이 있으면 즉시 취소한다.
+호출 인자에 따라 다음 중 하나로 분기한다.
 
-이 분기에서는 다음을 모두 금지한다.
+| 입력 | 처리 |
+|---|---|
+| 인자 없음 | Step 2 context memory gate로 진행 |
+| `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 폴더 1개 | Step 2A 저장 폴더 gate로 진행 |
+| 그 외 non-empty positional token 또는 `--` option | 즉시 취소 |
+
+금지 입력 분기에서는 다음을 모두 금지한다.
 
 - 로컬 파일 read
 - URL fetch
@@ -54,6 +65,20 @@ argument-hint: "(인자 없음. 현재 context memory의 정책서·기능 설�
 - `readable projection boundary ambiguous`에 해당하는 ambiguity 없음
 
 통과하지 못하면 Confluence 조회 없이 취소한다.
+
+### Step 2A: 저장 폴더 gate
+
+명시적 저장 폴더 입력이 있으면 `references/context-gate.md`의 `0.2.14 저장 폴더 입력` 규칙을 따른다.
+
+통과 조건:
+
+- repo root 기준 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` direct child 폴더 1개
+- 폴더 바로 아래 정책서 파일 1개와 기능설계서 파일 1개
+- 정책서 파일명 `*_정책서.md`, 기능설계서 파일명 `*_기능설계서.md`
+- 하위 폴더 재귀 탐색, sibling folder glob, 최근 폴더 자동 선택 없음
+- 두 파일의 H1 또는 파일명 기반 기능명이 서로 충돌하지 않음
+
+통과하면 canonical 정책서·기능설계서 두 파일만 발행 후보 본문으로 읽는다. `## 저장 파일`, `## 결론`, `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 검토 결과`, `## 검토 근거 요약`, `## 상세 추적`, `## 저장 실패 상세` 같은 report section은 child page body로 발행하지 않는다.
 
 ### Step 3: parent 선택
 

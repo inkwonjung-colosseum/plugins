@@ -20,6 +20,8 @@
 - Claude Desktop/Codex에서 Figma, Atlassian, Google Workspace 커넥터를 필수 연결한다.
 - 로컬 SSOT 폴더를 기준으로 `planning-format`, `planning-review`, `planning-publish-confluence`, 필요 시 `ssot-audit`를 실행한다.
 
+planning-kit 기준 버전은 **0.2.14**입니다. `planning-format`은 기본적으로 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 파일을 만들고 화면에는 `## 저장 파일`과 `## 체크해야 할 항목`을 보여줍니다. 정책서·기능설계서 전문을 화면에 펼쳐 확인해야 할 때만 `--no-save`를 사용합니다.
+
 권장 기본 경로는 **Confluence Export Desktop + Claude Desktop/Cowork + planning-kit**입니다. Codex는 선택 경로로 둡니다.
 
 ---
@@ -48,7 +50,7 @@ flowchart LR
 | Figma 커넥터 | Figma 링크가 입력될 때 디자인/화면 맥락을 읽기 위한 연결 | 필수 |
 | Atlassian 커넥터 | Confluence/Jira 링크가 입력될 때 정책, 요구사항, 이슈 맥락을 읽기 위한 연결 | 필수 |
 | Google Workspace 커넥터 | Google Docs/Sheets/Slides/Drive 링크가 입력될 때 문서 맥락을 읽기 위한 연결 | 필수 |
-| planning-kit | 기획 초안을 정책서/기능설계서로 변환·review하고, 현재 context memory의 두 본문을 `v0.7` Confluence 후보로 발행하며, 필요 시 SSOT corpus를 감사하는 플러그인 | 필수 |
+| planning-kit | 기획 초안을 정책서/기능설계서 저장 파일로 변환·review하고, 현재 context memory 또는 명시적 저장 폴더의 두 본문을 `v0.7` Confluence 후보로 발행하며, 필요 시 SSOT corpus를 감사하는 플러그인 | 필수 |
 
 ---
 
@@ -383,7 +385,7 @@ $ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 | SSOT 폴더가 비어 있음 | export 대상과 출력 폴더 | Confluence Export Desktop 작업 설정 확인 후 수동 실행 |
 | `planning-review`가 SSOT를 못 찾음 | SSOT 출력 폴더와 현재 연결된 작업 폴더 | Confluence Export Desktop에 지정한 SSOT 출력 폴더를 다시 확인 |
 | `planning-publish-confluence`가 바로 취소됨 | 파일 경로, URL, `--save` 같은 금지 입력을 함께 넣었는지 또는 현재 context memory에 두 본문이 모두 있는지 | 인자 없이 실행하고, 정책서와 기능 설계서 본문이 현재 대화에 남아 있는 상태에서 다시 실행 |
-| 발행 page가 `v0.7` 없이 만들어지려 함 | 스킬 또는 플러그인 버전이 0.2.13인지 | planning-kit 업데이트 후 다시 실행. 0.2.13 발행 title은 항상 `v0.7`을 포함해야 함 |
+| 발행 page가 `v0.7` 없이 만들어지려 함 | 스킬 또는 플러그인 버전이 0.2.14인지 | planning-kit 업데이트 후 다시 실행. 0.2.14 발행 title은 항상 `v0.7`을 포함해야 함 |
 | review 결과가 오래된 기준을 참조함 | 정기 동기화 성공 여부 | Confluence Export Desktop 로그 확인 후 재동기화 |
 | `ssot-audit` 결과에 낮은 버전 문서가 많이 나옴 | v0.8 미만 문서가 최신 기준처럼 남아 있는지 | 최신 canonical 문서를 만들거나 낮은 버전 문서 링크를 정리 |
 

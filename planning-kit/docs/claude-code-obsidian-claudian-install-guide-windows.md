@@ -21,6 +21,8 @@
 
 이 문서는 Claude Code provider 기준입니다.
 
+planning-kit을 이 환경에서 함께 사용할 경우 기준 버전은 **0.2.14**입니다. `planning-format`은 기본적으로 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 파일을 만들고 화면에는 `## 저장 파일`과 `## 체크해야 할 항목`을 보여줍니다. 정책서·기능설계서 전문을 Obsidian 화면에 바로 펼쳐 확인해야 할 때만 `--no-save`를 사용합니다.
+
 ---
 
 ## 2. 전체 구성

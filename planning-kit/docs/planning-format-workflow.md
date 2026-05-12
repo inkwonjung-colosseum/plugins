@@ -1,345 +1,87 @@
 # planning-format workflow
 
-`/planning-kit:planning-format` 한 호출의 전체 흐름을 다이어그램으로 정리한 문서. 동작 명세는 `skills/planning-format/SKILL.md`, lookup data는 `skills/planning-format/references/connector-routing.md`·`references/self-review-rules.md`에 있다.
+`/planning-kit:planning-format` 한 호출의 0.2.14 흐름을 정리한 문서입니다. 동작 명세는 `skills/planning-format/SKILL.md`, 출력 계약은 `skills/planning-format/references/output-contract.md`에 있습니다.
 
 ## 1. 전체 시퀀스
 
 ```mermaid
 flowchart TD
-  A[인자 입력] --> B{Step 1: 분기 판별}
-  B -->|모든 토큰 https?://| C[URL 분기]
-  B -->|디렉터리 경로| D[디렉터리 분기]
-  B -->|파일 경로| E[파일 분기]
-  B -->|그 외| F[텍스트 분기]
-
-  C --> G[본문 URL·이미지 추출<br/>모든 분기 공통]
+  A["인자 입력"] --> B{"Step 1<br/>분기 판별"}
+  B -->|"URL"| C["URL 분기"]
+  B -->|"디렉터리"| D["디렉터리 분기"]
+  B -->|"파일"| E["파일 분기"]
+  B -->|"그 외"| F["텍스트 분기"]
+  C --> G["URL·이미지 추출"]
   D --> G
   E --> G
   F --> G
-
-  G --> H{Step 2: 빈 입력?}
-  H -->|본문 0byte<br/>+ 이미지 0건<br/>+ URL 0건| H1["입력 비어 있음. ...<br/>한 줄 출력 후 종료"]
-  H -->|아님| I[Step 3: 재귀 fetch + connector fallback]
-
-  I --> J[Step 4: 이미지 multimodal]
-  J --> K[Step 5: 통합 본문 합류]
-  K --> L[Step 6: 변환 — 두 템플릿]
-  L --> M[Step 7: 자체 품질 검증<br/>F1~F6]
-  M --> RS[생성 결과 요약<br/>7개 필수 라벨]
-  RS --> DB{결정 보드 필요?<br/>사용자 확인 / 출시 전 해결}
-  DB --> N{--save?}
-  N -->|예| SV["Step 8: 디스크 저장<br/>planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
-  N -->|아니오| OUT
-  SV --> OUT[Step 9: 단일 응답 markdown 출력]
+  G --> H["재귀 본문 가져오기<br/>connector fallback"]
+  H --> I["이미지 multimodal"]
+  I --> J["통합 본문 합류"]
+  J --> K["정책서·기능설계서 변환"]
+  K --> L["자체 품질 검증"]
+  L --> M{"--no-save?"}
+  M -->|"아니오"| N["default-on 저장<br/>planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
+  M -->|"예"| O["화면 only 본문 출력"]
+  N --> P{"저장 성공?"}
+  P -->|"예"| Q["## 저장 파일<br/>## 체크해야 할 항목"]
+  P -->|"아니오"| R["## 정책서<br/>## 기능설계서<br/>## 체크해야 할 항목<br/>## 저장 실패 상세"]
+  O --> S["## 정책서<br/>## 기능설계서<br/>## 체크해야 할 항목"]
 ```
 
-## 2. 입력 dispatch (Step 1)
+## 2. 입력 수집
+
+입력은 텍스트, 파일, 디렉터리, URL, 이미지입니다. URL과 이미지 참조는 모든 분기에서 추출하며, `--no-fetch`와 `--no-image`는 각각 본문 가져오기와 이미지 해석만 봉쇄합니다.
+
+## 3. 변환과 검증
 
 ```mermaid
 flowchart LR
-  IN[인자 토큰] --> T{모든 토큰<br/>^https?://}
-  T -->|"예 (1개)"| URL1[단일 URL 분기]
-  T -->|"예 (2개+)"| URLM[다중 URL 분기]
-  T -->|아니오| P{경로?}
-  P -->|디렉터리| DIR[디렉터리 분기<br/>UTF-8 텍스트 + 이미지 시드]
-  P -->|"파일 (이미지 확장자)"| IMG[이미지 단독 시드]
-  P -->|"파일 (텍스트)"| FILE[파일 분기]
-  P -->|경로 아님| TXT[텍스트 분기]
-
-  URL1 --> EXT[본문 URL·이미지 추출<br/>fetch queue + image queue 시드]
-  URLM --> EXT
-  DIR --> EXT
-  IMG --> EXT
-  FILE --> EXT
-  TXT --> EXT
+  A["통합 본문"] --> B["기능명 추출"]
+  B --> C["정책서 작성"]
+  B --> D["기능설계서 작성"]
+  C --> E["F1~F6 자체 검증"]
+  D --> E
+  E --> F["확인 필요 / 문서 보강 / 출처 누락 분류"]
+  F --> G["체크해야 할 항목"]
 ```
 
-추출 패턴: markdown link / autolink / HTML href·src·img / plain URL / markdown image / data URI. 제외: self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:`. `--no-fetch`/`--no-image`면 해당 시드 skip.
+F2/F3/F4/F6처럼 의미 변경이 필요한 발견은 사용자 승인 전 본문에 조용히 반영하지 않습니다. 0.2.14에서는 이 발견을 상단 projection으로 반복하지 않고 `## 체크해야 할 항목` 또는 조건부 `## 상세 추적`으로 재배치합니다.
 
-## 3. fetch 시퀀스 (Step 3)
-
-URL 1개 처리 단위. WebFetch 1차 + connector fallback 2단 구조.
+## 4. 저장 처리
 
 ```mermaid
 flowchart TD
-  S[fetch 진입] --> CAT[references/connector-routing.md Read<br/>호출당 1회]
-  CAT --> WF[WebFetch GET<br/>timeout 30초, redirect ≤5]
-  WF --> CLS{응답 분류}
-
-  CLS -->|200 OK + html/md/plain/xhtml| OK1[본문 추출 합류<br/>via=WebFetch]
-  CLS -->|200 OK + image/*| OK2[image queue<br/>via=WebFetch]
-  CLS -->|지원 안 하는 ct<br/>or 401/403<br/>or 인증 게이트 휴리스틱<br/>or 4xx/5xx<br/>or timeout/network error| FB[fallback 평가]
-
-  FB --> M{매핑표 lookup<br/>원래 입력 호스트}
-  M -->|적중| C1[connector 후보 산출]
-  M -->|미적중| RT{런타임 추론}
-  RT -->|tool 단서 일치| C1
-  RT -->|매칭 없음| SK1[skip<br/>사유: 인증 필요<br/>connector 매핑 없음]
-
-  C1 --> TRY[후보 순서대로 호출<br/>timeout 30초, 1회씩]
-  TRY --> R{결과}
-  R -->|1건 이상 성공| OK3[응답 텍스트 합류<br/>via=connector — tool]
-  R -->|모두 실패<br/>+ 1차 200 OK 정상| OK4[1차 본문 사용<br/>via=WebFetch]
-  R -->|모두 실패<br/>+ 1차 인증 게이트| SK2[skip<br/>사유: 인증 필요<br/>connector 미인증/미연결]
-  R -->|모두 실패<br/>+ 1차 4xx/5xx/timeout| SK3[skip<br/>사유: 1차 status·error]
-
-  OK1 --> CHILD[자식 URL 추출<br/>visited queue push]
-  OK3 --> CHILD
-  OK4 --> CHILD
-  CHILD --> NEXT[다음 round]
+  A["저장 처리"] --> B{"--no-save?"}
+  B -->|"예"| C["저장 없음<br/>화면 본문 출력"]
+  B -->|"아니오"| D["기능명 안전화"]
+  D --> E["mkdir planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
+  E --> F{"collision?"}
+  F -->|"없음"| G["정책서.md + 기능설계서.md 작성"]
+  F -->|"있음"| H["suffix --2 / --3"]
+  G --> I{"최종 파일 존재 확인"}
+  I -->|"성공"| J["저장 파일 handoff 출력"]
+  I -->|"실패"| K["저장 실패 fallback"]
 ```
 
-**핵심 포인트:**
-- `references/connector-routing.md`는 fetch 진입 직전 1회 적재.
-- 매핑 lookup 호스트는 **원래 입력된 URL의 호스트** (redirect 최종 호스트 X).
-- connector 응답 본문도 자식 URL 추출 → "Confluence root → Figma 자식 → 본문 합류" 자동 동작.
-- `--no-fetch`면 1차·fallback 모두 봉쇄. **유일한 fetch 미시도 케이스 (0.2.5)**.
+`--save`는 0.2.x 호환용 no-op alias이며 기본 저장과 같습니다. 저장하지 않으려면 `--no-save`를 사용합니다.
 
-**0.2.5 결정성 강화**:
+## 5. 출력 구조
 
-- **fetch 시도 의무**: queue dequeue된 visited 미포함 URL은 100% fetch 시도 강제. 사전 판단(인증 미연결·매핑 없음·미인증 추정)으로 시도 자체를 생략 금지. dequeue된 모든 URL은 출처 list 1행 차지 (행 누락 금지).
-- **BFS 순서**: depth N 모두 dequeue 완료 후 depth N+1 dequeue. 같은 depth 안에선 본문 발견 순서 유지 (markdown link → HTML href → plain URL). LIFO·우선순위 휴리스틱 금지. normalize는 queue push 시점 1회. 출처 list `#` 번호 = BFS dequeue 순서.
-- **1차 WebFetch 의무**: connector 카탈로그 사전 평가로 "미연결" 판정해도 1차 WebFetch는 강제 진행. 결과로 분류.
+기본 저장 성공:
 
-## 4. 호스트 매핑표 (요약)
+```markdown
+# [기능명]
+- 입력: ...
+- 산출물: 정책서, 기능설계서
+- 검증: 확인 필요 N건, 문서 보강 M건 / 확인 필요 없음
+- 저장: planning/[안전기능명]--YYYY-MM-DD-HHMMSS/
 
-```mermaid
-flowchart LR
-  H[대상 URL 호스트] --> M{매핑 lookup}
-  M -->|*.atlassian.net /wiki| A1[Atlassian MCP<br/>getConfluencePage]
-  M -->|*.atlassian.net /browse| A2[Atlassian MCP<br/>getJiraIssue]
-  M -->|figma.com| F1[Figma MCP<br/>get_design_context / get_figjam]
-  M -->|docs.google.com /document| G1[Google Drive connector<br/>read_file_content → get_file_metadata]
-  M -->|docs.google.com /spreadsheets| G2[Google Drive connector<br/>read_file_content → download_file_content text/csv → get_file_metadata]
-  M -->|docs.google.com /presentation| G3[Google Drive connector<br/>read_file_content → get_file_metadata]
-  M -->|drive.google.com /file| G4[Google Drive connector<br/>read_file_content → download_file_content → get_file_metadata]
-  M -->|drive.google.com /folders| G5[Google Drive connector<br/>search_files parents=folderId]
-  M -->|*.slack.com /archives| S1[Slack MCP<br/>slack_read_thread / slack_read_channel]
-  M -->|*.slack.com 그 외| S2[Slack MCP<br/>slack_read_canvas / slack_search ...]
-  M -->|notion.so / *.notion.site| N1[Notion connector]
-  M -->|매핑 외| RT[런타임 추론<br/>Linear / Intercom / Canva / Box / ...]
+## 저장 파일
+...
+
+## 체크해야 할 항목
+...
 ```
 
-전체 매핑·tool 시퀀스 detail은 `skills/planning-format/references/connector-routing.md` §3 + §3.4 + §3.5.
-
-## 5. URL 분기 sanity check (Step 3.4)
-
-루트 URL이 **모두** 본문 합류 실패하면 호출 종료. 일부만 실패면 출처 list에 사유 기록 후 진행.
-
-```mermaid
-flowchart TD
-  R[루트 URL 결과 종합] --> AS{모든 root 실패?}
-  AS -->|일부만 실패| C[진행<br/>출처 list에 사유 기록]
-  AS -->|모두 실패| W{사유 분류}
-
-  W -->|http/https 외 scheme| W1["http(s) URL만 지원합니다."]
-  W -->|모두 fetch 실패 4xx/5xx/timeout| W2[모든 URL fetch 실패. 첫 사유: ...]
-  W -->|모두 인증 게이트<br/>+ connector 미인증/실패| W3[모든 URL이 로그인 필요.<br/>connector/MCP fallback도 미인증.<br/>필요한 connector: ...]
-  W -->|모두 지원 안 하는 ct| W4[모든 URL이 지원 안 하는 content-type: ...]
-  W -->|통합 본문 0byte| W5[통합 본문이 비어 있습니다.]
-
-  W1 --> END[자체 검증 블록 없이<br/>한 줄 + URL list 출력 후 종료]
-  W2 --> END
-  W3 --> END
-  W4 --> END
-  W5 --> END
-```
-
-## 6. 이미지 multimodal (Step 4)
-
-```mermaid
-flowchart TD
-  Q[image queue] --> S[5경로 시드<br/>인자 / 디렉터리 / 본문 추출 / fetch image / data URI]
-  S --> X{지원 확장자<br/>.png .jpg .gif .webp .bmp .heic .svg}
-  X -->|예| MM[main이 자기 자신에 multimodal 해석 요청]
-  X -->|아니오| F1[skip<br/>사유: 미지원 이미지 포맷]
-
-  MM --> R{해석 결과}
-  R -->|텍스트| MERGE["=== [출처 N] 이미지: ... === 헤더로 본문 합류"]
-  R -->|빈 응답| F2[skip<br/>사유: 빈 해석 결과]
-  R -->|read 실패| F3[skip<br/>사유: image read 실패]
-```
-
-`--no-image`면 §4 전체 skip. 이미지 실패는 호출 종료 사유 아님.
-
-## 7. 변환 + 자체 품질 검증 (Step 6 + Step 7)
-
-```mermaid
-flowchart TD
-  CB[통합 본문] --> NA[기능명 추출<br/>1순위 1개만]
-  NA --> RD[templates/기능설계서.md + 정책서.md 병렬 Read]
-  RD --> WR[main이 같은 턴에서<br/>두 본문 직접 작성]
-  WR --> LD{셀 list 합류 ≥2?<br/>0.2.3}
-  LD -->|이질<br/>속성·동작·ref| AUX["부모 § 안 sub-§ 추가<br/>### N.M [용도] 보조 표<br/>clean header (0.2.8)<br/>부모 row는 입력 제외 처리 줄"]
-  LD -->|동질 enum<br/>동일 동작·ref| KEEP[합류 유지]
-  AUX --> NSR{--no-self-review?}
-  KEEP --> NSR
-  NSR -->|예| OUT["생성 결과 요약 + readable 본문<br/>차단 입력이면 결정 보드 가능<br/>검증 피드백 생략"]
-  NSR -->|아니오| SR[references/self-review-rules.md Read]
-
-  SR --> F1[F1. 섹션 충실도<br/>5 항목 체크리스트 0.2.5]
-  SR --> F2[F2. 라벨 cross-bleed<br/>4 항목 체크리스트 0.2.5]
-  SR --> F3[F3. 용어 일관성<br/>4 항목 체크리스트 0.2.5]
-  SR --> F4[F4. 정책-기능 매핑<br/>4 항목 체크리스트 0.2.5]
-  SR --> F5[F5. 누락<br/>4 항목 체크리스트 0.2.5]
-  SR --> F6[F6. Markdown syntax lint<br/>5 항목 체크리스트 0.2.5]
-
-  F1 --> RES{발견}
-  F2 --> RES
-  F3 --> RES
-  F4 --> RES
-  F5 --> RES
-  F6 --> RES
-  RES -->|모두 0건| PASS["검증 피드백: 없음"]
-  RES -->|≥1건| FOUND["검증 피드백<br/>F*-* ID / 위치 / 문제 / 제안"]
-
-  PASS --> OUT
-  FOUND --> OUT
-```
-
-라벨 매핑 결정 트리 (0.2.5, `conversion-rules.md` §4.1):
-1. 화면·UI·필드·버튼·입력 폼·메시지 → 기능설계서
-2. 사용자 흐름·트리거·액션·동작 시퀀스 → 기능설계서
-3. 권한·접근 통제·데이터 가시성 → 양쪽 (§4.2 분배 룰)
-4. 규칙·금지·허용·임계·조건 판단 기준 → 정책서
-5. 상태 전이·전환 트리거·상태 처리 기준 → 정책서
-6. 예외·승인·결정 권한·운영 대응 기준 → 정책서
-7. 외부 시스템 연동 정책·실패 대응 → 정책서
-8. 용어 정의·범위·원칙 → 정책서
-9. ELSE → 입력 제외 § `라벨 미매핑` 폴백
-
-양 매핑 분배 (권한·연동·상태): 측면별로 정책서·기능설계서 위치 분배. F2 cross-bleed 룰 그대로.
-
-라벨 매핑 안 되는 조각·중복·근거 부족 조각은 입력 제외 추적으로. 근거 부족 셀은 inline `[TBD]`. marker `[TBD]` 1종만.
-
-list 분해 판단 (0.2.3): 한 셀에 list 항목 ≥2 합류 작성 시 main이 항목별 속성·동작·정책 ref 이질성을 매 케이스 판단. 이질이면 부모 § 안 sub-§(`### N.M [용도] 보조 표`)로 분해, 동질 enum·동일 동작·동일 ref면 합류 유지. 보조 표 안 셀이 다시 list 합류면 같은 룰 재귀(`§N.M.K`).
-
-**list 분해 max-depth cap = 3 (0.2.5)**: 허용 depth = `§N.M`·`§N.M.K`·`§N.M.K.L`까지. depth 4 진입 시 합류 유지 폴백 + 입력 제외 § `디테일 축약` 항목 추가. 8/10 섹션 골격 변경 없음, sub-§만 동적 추가.
-
-보조 표 번호 정밀화: 부모 § 안 보조 표 번호는 순차 부여(`§N.1`·`§N.2`·...), 다층 도트 chain(`§N.M.K`). 임의 letter(`§N.x`) 금지. 0.2.8부터 헤더는 `### N.M [용도] 보조 표` clean header만 쓰고, 분해 row 위치 추적은 입력 제외 §의 `구조 변환` 처리 줄에 `본문 위치`/`부모 위치`로 기록한다.
-
-검증 sub-§ 인식 (0.2.4): F1·F2 자체 검증, R1·R2·R3 외부 검증 모두 sub-§(`### N.M ... 보조 표`) 본문을 점검 대상으로 인식. 부모 § 룰 그대로 sub-§ 확장.
-
-자체 검증 6패스 체크리스트: F1~F6 항목 yes/no 검사. 카테고리당 1패스, 총 6패스. 단일 LLM 패스 → 6패스로 검출 누락 차단. 0.2.9부터 의미 변경이 필요한 발견은 canonical 본문에 자동 반영하지 않고 `## 검증 피드백`에 먼저 노출한다.
-
-외부 기준 문서 묶음 충돌·acceptance criteria·의존 영향은 `planning-review` 스킬이 별도 처리.
-
-## 8. `--save` 처리 (Step 8)
-
-```mermaid
-flowchart TD
-  S[--save ON?] -->|아니오| SK["저장 없음<br/>(--save 미사용)"]
-  S -->|예| N["기능명 안전화<br/>NFC + 금지문자 '-' 치환 + 80자 cap"]
-  N --> MK["mkdir planning/[안전기능명]--YYYY-MM-DD-HHMMSS/"]
-  MK --> WR{collision?}
-  WR -->|없음| W1["[안전기능명]_정책서.md<br/>[안전기능명]_기능설계서.md 작성"]
-  WR -->|있음| W2["폴더 suffix --2 / --3 ..."]
-  WR -->|99까지 충돌| W3[저장 실패<br/>저장 줄: 실패 사유]
-  W2 --> END
-  W1 --> END
-  W3 --> END
-  SK --> END[변환 본문은 화면에<br/>저장은 헤더 줄에만 표기]
-```
-
-저장 실패는 호출 종료 사유 아님. 저장 산출물은 review 대상이 될 수 있지만 기준 문서 묶음 근거가 될 수 없다.
-
-## 9. 단일 응답 출력 구조 (Step 9)
-
-```mermaid
-flowchart LR
-  H["# 기능명<br/>입력 / 산출물 / 검증 / 저장"]
-  H --> RS["## 생성 결과 요약<br/>문서 결과 / 저장 / 검증 / 확인 필요"]
-  RS --> DB{결정 보드 필요?}
-  DB -->|예| BOARD["## 결정 보드<br/>첫 화면 요약 / 결정 / 작업 / 차단"]
-  DB -->|아니오| P[## 정책서<br/>10 섹션]
-  BOARD --> P
-  P --> F[## 기능설계서<br/>8 섹션]
-  F --> FB{--no-self-review?}
-  FB -->|아니오| FBB["## 검증 피드백<br/>없음 또는 F*-* list"]
-  FB -->|예| SRC
-  FBB --> SRC["## 출처 요약"]
-  SRC --> EXB["## 입력 제외 요약"]
-  EXB --> TR{상세 조건?}
-  TR -->|예| TRB["## 상세 추적<br/>full 출처/입력 제외"]
-  TR -->|아니오| END[종료]
-  TRB --> END
-```
-
-블록 순서: 기본은 **헤더 요약 → 생성 결과 요약 → 정책서 → 기능설계서 → 검증 피드백 → 출처 요약 → 입력 제외 요약 → 상세 추적**이다. 사용자 확인 필요 항목 또는 출시 전 해결 필요 항목이 있으면 **헤더 요약 → 생성 결과 요약 → 결정 보드 → 정책서 → 기능설계서 → 검증 피드백 → 출처 요약 → 입력 제외 요약 → 상세 추적**이다. `## 검증 피드백`은 `--no-self-review`에서 생략하고, `## 상세 추적`은 실패/본문 미사용/high-signal 제외 항목, 결정 보드 연결 맵 등 조건 충족 시 출력한다.
-
-`생성 결과 요약`은 화면 전용 metadata다. 필수 라벨은 `문서 결과`, `저장`, `검증 상태`, `확인 필요`, `출처 상태`, `입력 제외 상태`, `읽는 순서`이며 각 1회, 7줄 이하로 출력한다.
-
-결정 보드는 canonical 본문이 아니라 사용자가 지금 결정·수정·검증할 항목을 앞세우는 projection이다. 상단에는 `범례`, `읽는 순서`, `첫 화면 요약`, `지금 결정해야 할 항목`, `출시 전 해결 필요 항목`, `바로 수정할 문서 작업`이 들어가며, 원시 피드백 ID와 connector 세부 상태는 하단 `## 검증 피드백` 또는 `## 상세 추적`으로 내린다.
-
-입력 제외 카테고리 11종 (`exclusion-rules.md` §1) — `다른 기능 후보` / `라벨 미매핑` / `중복` / `근거 부족 무시` / `포맷 노이즈` / `디테일 축약` / `범위 외` / `구조 변환` / `fetch 실패` / `원문 정의 부재` / `충돌 후보`(0.2.4 신규). 각 항목은 5필드(카테고리·위치·인용·처리·설명). 위치 필드는 `[출처 N](URL#anchor)` markdown link 형식 (0.2.4) — 외부 source 특정 위치 1-hop 점프.
-
-**카테고리 결정 트리 (0.2.5, `exclusion-rules.md` §2)**: 11 분기 if-elif chain (범위 외 → fetch 실패 → 구조 변환 → 디테일 축약 → 원문 정의 부재 → 다른 기능 후보 → 중복 → 근거 부족 무시 → 포맷 노이즈 → 충돌 후보 → 라벨 미매핑 폴백). 각 분기는 syntactic feature 진입 조건. main 자유 판단 영역을 룰화.
-
-**모호성 강제 [TBD] (0.2.5, `exclusion-rules.md` §3.1·§3.2)**: 원문 syntactic 결함 (괄호 미닫힘 `\([^)]*$` / 말줄임표 / 공란 row / 빈 list / 16 어구 / `[ ]`·`_____`·`—`) 자동 [TBD] 단정. LLM 추론 단정 금지. 16 어구 카탈로그 = TBD/TODO/FIXME·추후 정의/결정/협의·별도 정의/협의/확정·확정 시 재정의·미정/미확정/미결·기획 시 정의 등.
-
-자체 검증 F5(누락) sub-label 3종 — `cross-ref-fetch` (출처 list 실패) / `cross-ref-scope` (§2 명시 제외) / `cross-ref-tbd` (미결 §). 입력 제외 추적과 어긋나면 발견.
-
-상세 추적의 full 출처 list URL = deep link 형식 (0.2.4) — anchor 지원 source(Confluence·Docs·Slides·Notion·Sheets·Figma·Slack)는 fragment 포함, 추출 실패 = page-level fallback.
-
-## 10. 출처 list status 분류
-
-```mermaid
-flowchart TD
-  ST[상태 컬럼] --> S{종류}
-  S -->|성공| OK
-  S -->|실패| FAIL
-
-  OK --> OK1[200 via WebFetch]
-  OK --> OK2[200 via Atlassian MCP]
-  OK --> OK3[200 via Figma MCP]
-  OK --> OK4[200 via Google Drive connector — read_file_content]
-  OK --> OK5[200 via Google Drive connector — download_file_content]
-  OK --> OK6[200 via Google Drive connector — search_files]
-  OK --> OK7[metadata only via Google Drive connector — get_file_metadata]
-  OK --> OK8[200 via Slack MCP]
-  OK --> OK9[200 via Notion connector]
-  OK --> OK10[image/png 1.2MB via Figma MCP]
-
-  FAIL --> F1[인증 필요<br/>Atlassian/Figma/Google Drive/Slack/Notion 미인증]
-  FAIL --> F2[인증 필요<br/>Google Drive connector 미연결]
-  FAIL --> F3[인증 필요<br/>connector 매핑 없음]
-  FAIL --> F4[content-type video/mp4]
-  FAIL --> F5[빈 본문 / 빈 해석 결과]
-  FAIL --> F6[미지원 이미지 포맷 / image read 실패]
-  FAIL --> F7[timeout / network error]
-```
-
-표 detail은 `references/connector-routing.md` §7.
-
-## 11. 옵션 영향
-
-```mermaid
-flowchart TD
-  OPT[옵션] --> O1[--save]
-  OPT --> O2[--no-self-review]
-  OPT --> O3[--no-fetch]
-  OPT --> O4[--no-image]
-
-  O1 --> E1["Step 8 디스크 저장 활성<br/>planning/[안전기능명]--YYYY-MM-DD-HHMMSS/ 2개 파일"]
-  O2 --> E2["Step 7 self-review skip<br/>검증 피드백 생략"]
-  O3 --> E3[Step 3 전체 봉쇄<br/>1차 WebFetch + connector fallback 모두 0건]
-  O4 --> E4[Step 4 전체 skip<br/>multimodal 호출 0건]
-```
-
-## 12. 참고 파일
-
-0.2.13 이후 Confluence 발행은 `planning-format`의 책임이 아니다. 발행이 필요하면 현재 context memory에 정책서와 기능설계서 두 본문이 명확히 남아 있는 상태에서 `planning-publish-confluence`를 별도로 실행한다. 이 발행 스킬은 파일 경로, URL, `--save` 산출물 경로를 인자로 받지 않고, Confluence에는 `v0.7` 후보 title과 metadata를 붙인다.
-
-| 파일 | 역할 |
-|---|---|
-| `skills/planning-format/SKILL.md` | orchestration only (Step 1~9 high-level + lazy read 지시) (0.2.4) |
-| `skills/planning-format/references/conversion-rules.md` | multimodal·통합 본문·기능명·라벨 매핑·list 분해 판단·보조 표 번호 순차·clean header (0.2.8) |
-| `skills/planning-format/references/exclusion-rules.md` | 11 카테고리·5필드(위치 markdown link)·처리 줄·우선순위·입력 제외 요약·marker 1종 |
-| `skills/planning-format/references/output-contract.md` | readable 출력 포맷·헤더 줄·`--save`·출처/입력 제외 요약·상세 추적 |
-| `skills/planning-format/references/connector-routing.md` | 인증 휴리스틱·MCP 카탈로그·호스트 매핑표·Google Workspace 자원별 tool 시퀀스·gid/range 처리·fallback 케이스 표·sanity check·status 표기·**§11 connector별 anchor 추출 (0.2.4)** |
-| `skills/planning-format/references/self-review-rules.md` | 자체 품질 6개 카테고리 (F1~F6) 점검 기준. F1·F2 sub-§ 인식 (0.2.4) |
-| `skills/planning-format/templates/기능설계서.md` | 8 섹션 표 골격 |
-| `skills/planning-format/templates/정책서.md` | 10 섹션 표 골격 |
-| `docs/planning-review-workflow.md` | planning-review 스킬 별도 워크플로 |
-| `skills/planning-publish-confluence/SKILL.md` | 현재 context memory 기반 Confluence `v0.7` 후보 발행 워크플로 |
-| `docs/prd/prd-0.2.4.md` | sub-§ 정밀화·SKILL 분해·deep link·11 카테고리 PRD |
+`--no-save`와 저장 실패 fallback은 `## 정책서`, `## 기능설계서`, `## 체크해야 할 항목` 순서로 본문을 화면에 출력합니다. 저장 실패 fallback은 추가로 `## 저장 실패 상세`를 출력합니다.

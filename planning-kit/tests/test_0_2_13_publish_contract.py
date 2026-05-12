@@ -23,9 +23,9 @@ class PublishContractTest(unittest.TestCase):
         self.assertIn("name: planning-publish-confluence", skill)
         self.assertIn("argument-hint: \"(인자 없음", skill)
         self.assertIn("현재 context memory", skill)
-        self.assertIn("위치 인자와 옵션", skill)
+        self.assertIn("지원 입력", skill)
         self.assertIn("Confluence page create/update", skill)
-        self.assertIn("Step 1: 금지 입력 확인", skill)
+        self.assertIn("Step 1: 입력 dispatch와 금지 입력 확인", skill)
         self.assertIn("Step 7: write 실행과 readback", skill)
 
         context_gate = read(skill_dir / "references" / "context-gate.md")
@@ -39,7 +39,7 @@ class PublishContractTest(unittest.TestCase):
         self.assertIn("[기능명] v0.7", page_contract)
         self.assertIn("[기능명] 정책서 v0.7", page_contract)
         self.assertIn("[기능명] 기능 설계서 v0.7", page_contract)
-        self.assertIn("page move는 0.2.13 범위 밖", page_contract)
+        self.assertIn("page move는 0.2.14 범위 밖", page_contract)
         self.assertIn("version conflict", page_contract)
         self.assertIn("readback", page_contract)
         self.assertIn("발행 label: `v0.7`", page_contract)
@@ -78,8 +78,8 @@ class PublishContractTest(unittest.TestCase):
         claude_market = load_json(ROOT / ".claude-plugin" / "marketplace.json")
         codex_market = load_json(ROOT / ".agents" / "plugins" / "marketplace.json")
 
-        self.assertEqual(claude["version"], "0.2.13")
-        self.assertEqual(codex["version"], "0.2.13")
+        self.assertEqual(claude["version"], "0.2.14")
+        self.assertEqual(codex["version"], "0.2.14")
         self.assertIn("planning-publish-confluence", claude["description"])
         self.assertIn("planning-publish-confluence", codex["description"])
         self.assertIn("Write", codex["interface"]["capabilities"])
@@ -87,8 +87,8 @@ class PublishContractTest(unittest.TestCase):
 
         planning_claude_entry = next(item for item in claude_market["plugins"] if item["name"] == "planning-kit")
         planning_codex_entry = next(item for item in codex_market["plugins"] if item["name"] == "planning-kit")
-        self.assertEqual(planning_claude_entry["version"], "0.2.13")
-        self.assertEqual(planning_codex_entry["version"], "0.2.13")
+        self.assertEqual(planning_claude_entry["version"], "0.2.14")
+        self.assertEqual(planning_codex_entry["version"], "0.2.14")
         self.assertIn("planning-publish-confluence", planning_claude_entry["description"])
         self.assertIn("planning-publish-confluence", planning_codex_entry["description"])
 

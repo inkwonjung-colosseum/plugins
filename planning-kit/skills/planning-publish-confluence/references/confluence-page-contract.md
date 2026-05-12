@@ -30,7 +30,7 @@ space key가 `PROD`가 아니면 최종 확인에 space key와 title을 명시�
 
 ## 2. v0.7 Title Hierarchy
 
-0.2.13 발행은 확정 SSOT가 아니므로 Confluence title과 metadata에 항상 `v0.7` 발행 label을 붙인다.
+0.2.14 발행은 확정 SSOT가 아니므로 Confluence title과 metadata에 항상 `v0.7` 발행 label을 붙인다.
 
 ```text
 [선택된 parent]
@@ -67,6 +67,7 @@ container page는 긴 문서 본문을 복제하지 않는다.
 - 정책서 content fingerprint
 - 기능 설계서 content fingerprint
 - target page id와 version (readback 후 갱신)
+- source 상태: `context memory` 또는 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`
 
 ## 4. Child Body
 
@@ -83,7 +84,7 @@ child page에는 compact publish metadata block과 해당 문서 본문만 넣�
 - 발행 기준: `현재 context memory`
 - content fingerprint
 - operation id
-- source 상태: `context memory`
+- source 상태: `context memory` 또는 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`
 - 검토 상태: context에 `planning-review` 통과/수정 필요 신호가 명확하면 반영, 없으면 `확인 불가`
 
 ## 5. Duplicate Lookup
@@ -110,7 +111,7 @@ child page에는 compact publish metadata block과 해당 문서 본문만 넣�
 
 `v0.7` 없는 unversioned page는 update target이 아니다.
 
-page move는 0.2.13 범위 밖이다.
+page move는 0.2.14 범위 밖이다.
 
 ## 7. Update Preflight
 

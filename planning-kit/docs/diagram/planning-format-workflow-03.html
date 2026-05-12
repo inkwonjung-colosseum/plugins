@@ -1,295 +1,32 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3. fetch 시퀀스 (Step 3) — planning-format-workflow</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root { color-scheme: light; --paper: #f5f5f5; --ink: #2d3142; --muted: #4f5d75; --rule: rgba(45,49,66,0.12); }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Geist', system-ui, sans-serif; }
-    .page { width: min(100%, 920px); margin: 0 auto; padding: 32px 24px 40px; }
-    header { margin-bottom: 18px; }
-    .eyebrow { margin: 0 0 8px; font: 500 10px/1.4 'Geist Mono', monospace; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; }
-    h1 { margin: 0; font: 400 32px/1.08 'Instrument Serif', Georgia, serif; letter-spacing: 0; }
-    .source { margin: 8px 0 0; color: var(--muted); font: 400 12px/1.5 'Geist Mono', monospace; }
-    .figure { overflow-x: auto; border-top: 1px solid var(--rule); padding-top: 16px; }
-    svg { display: block; width: 764px; max-width: none; height: auto; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>4. 저장 처리 — planning-format-workflow</title>
+<style>
+:root { color-scheme: light; --paper: #f7f7f5; --ink: #263238; --muted: #60717b; --rule: rgba(38,50,56,.14); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { width: min(100%, 1800px); margin: 0 auto; padding: 32px 24px 40px; }
+header { margin-bottom: 18px; }
+.eyebrow { margin: 0 0 8px; font: 600 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: 0; font-size: 28px; line-height: 1.16; letter-spacing: 0; font-weight: 650; }
+.source { margin: 8px 0 0; color: var(--muted); font: 400 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.figure { overflow-x: auto; border-top: 1px solid var(--rule); padding-top: 16px; }
+.figure svg { display: block; width: max-content; min-width: 960px; max-width: none; height: auto; background: white; }
+</style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <p class="eyebrow">planning-format-workflow · diagram 03</p>
-      <h1>3. fetch 시퀀스 (Step 3)</h1>
-      <p class="source">planning-kit/docs/planning-format-workflow.md · Mermaid block #3</p>
-    </header>
-    <main class="figure">
-<svg viewBox="0 0 764 2176" width="764" height="2176" role="img" aria-labelledby="title desc">
-  <title id="title">diagram</title>
-  <desc id="desc">Flowchart converted from planning-kit Mermaid source.</desc>
-  <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
-    </marker>
-  </defs>
-  <rect width="100%" height="100%" fill="#f5f5f5"/>
-
-  <g class="edge">
-    <path d="M 382 156 C 382 194, 382 194, 382 232" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 312 C 382 350, 382 350, 382 388" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 468 C 382 506, 382 506, 382 544" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 628 C 382 666, 218 666, 218 704" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="228.63000000000002" y="637" width="142.73999999999995" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="300" y="647" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="300" dy="0">200 OK +</tspan><tspan x="300" dy="11">html/md/plain/xhtml</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 628 C 382 666, 382 666, 382 704" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="325.42" y="649" width="113.15999999999997" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="382" y="659" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="382" dy="0">200 OK + image/*</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 628 C 382 668, 546 668, 546 708" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="405.21000000000004" y="639" width="117.57999999999997" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="464" y="649" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="464" dy="0">지원 안 하는 ct or</tspan><tspan x="464" dy="11">401/403 or 인증</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 546 768 C 546 808, 382 808, 382 848" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 936 C 382 1059, 282 1059, 282 1182" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="306" y="1042" width="52" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="332" y="1052" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="332" dy="0">적중</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 936 C 382 974, 382 974, 382 1012" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="354.15" y="957" width="55.699999999999996" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="382" y="967" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="382" dy="0">미적중</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 1096 C 382 1139, 282 1139, 282 1182" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="282.22" y="1122" width="99.55999999999999" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="332" y="1132" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="332" dy="0">tool 단서 일치</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 1096 C 382 1134, 482 1134, 482 1172" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="396.67" y="1117" width="70.66" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="432" y="1127" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="432" dy="0">매칭 없음</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 282 1242 C 282 1285, 382 1285, 382 1328" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 1396 C 382 1434, 382 1434, 382 1472" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 1556 C 382 1598, 130 1598, 130 1640" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="209.95999999999998" y="1581" width="92.08000000000001" height="14" rx="2" fill="#f5f5f5"/>
-    <text x="256" y="1591" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="256" dy="0">1건 이상 성공</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 1556 C 382 1601, 306 1601, 306 1646" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="281.98" y="1572" width="124.03999999999996" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="344" y="1582" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="344" dy="0">모두 실패 + 1차 200</tspan><tspan x="344" dy="11">OK 정상</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 1556 C 382 1594, 474 1594, 474 1632" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="363.77" y="1565" width="128.45999999999998" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="428" y="1575" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="428" dy="0">모두 실패 + 1차 인증</tspan><tspan x="428" dy="11">게이트</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 382 1556 C 382 1598, 644 1598, 644 1640" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-    <rect x="454.55" y="1569" width="116.89999999999998" height="26" rx="2" fill="#f5f5f5"/>
-    <text x="513" y="1579" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.04em"><tspan x="513" dy="0">모두 실패 + 1차</tspan><tspan x="513" dy="11">4xx/5xx/timeout</tspan></text>
-  </g>
-  <g class="edge">
-    <path d="M 218 772 C 218 1288, 382 1288, 382 1804" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 130 1720 C 130 1762, 382 1762, 382 1804" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 306 1714 C 306 1759, 382 1759, 382 1804" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-  <g class="edge">
-    <path d="M 382 1872 C 382 1910, 382 1910, 382 1948" fill="none" stroke="#4f5d75" stroke-width="1.05" marker-end="url(#arrow)"/>
-
-  </g>
-
-  <g class="node" id="node-S">
-    <rect x="320" y="96" width="124" height="60" rx="18" fill="#f5f5f5"/>
-    <rect x="320" y="96" width="124" height="60" rx="18" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
-
-    <rect x="330" y="104" width="30" height="14" rx="2" fill="#f5f5f5" stroke="#eb6c36" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="345" y="114" fill="#eb6c36" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">IN</text>
-    <text x="382" y="130" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">fetch 진입</tspan></text>
-  </g>
-  <g class="node" id="node-CAT">
-    <rect x="268" y="232" width="228" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="268" y="232" width="228" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="278" y="240" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="296" y="250" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="261" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">references/connector-routing.md</tspan><tspan x="382" dy="14">Read</tspan><tspan x="382" dy="14">호출당 1회</tspan></text>
-  </g>
-  <g class="node" id="node-WF">
-    <rect x="320" y="388" width="124" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="320" y="388" width="124" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="330" y="396" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="348" y="406" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="417" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">WebFetch GET</tspan><tspan x="382" dy="14">timeout 30초,</tspan><tspan x="382" dy="14">redirect ≤5</tspan></text>
-  </g>
-  <g class="node decision" id="node-CLS">
-    <polygon points="382,544 462,586 382,628 302,586" fill="#f5f5f5"/>
-    <polygon points="382,544 462,586 382,628 302,586" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="382" y="590" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">응답 분류</tspan></text>
-  </g>
-  <g class="node" id="node-OK1">
-    <rect x="156" y="704" width="124" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="156" y="704" width="124" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="166" y="712" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="184" y="722" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="218" y="734.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="218" dy="0">본문 추출 합류</tspan><tspan x="218" dy="14">via=WebFetch</tspan></text>
-  </g>
-  <g class="node" id="node-OK2">
-    <rect x="320" y="704" width="124" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="320" y="704" width="124" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="330" y="712" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="348" y="722" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="734.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">image queue</tspan><tspan x="382" dy="14">via=WebFetch</tspan></text>
-  </g>
-  <g class="node" id="node-FB">
-    <rect x="484" y="708" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="484" y="708" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="494" y="716" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="512" y="726" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="546" y="742" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="546" dy="0">fallback 평가</tspan></text>
-  </g>
-  <g class="node decision" id="node-M">
-    <polygon points="382,848 468,892 382,936 296,892" fill="#f5f5f5"/>
-    <polygon points="382,848 468,892 382,936 296,892" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="382" y="888.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">매핑표 lookup</tspan><tspan x="382" dy="14">원래 입력 호스트</tspan></text>
-  </g>
-  <g class="node" id="node-C1">
-    <rect x="202" y="1182" width="160" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="202" y="1182" width="160" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="212" y="1190" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="230" y="1200" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="282" y="1216" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="282" dy="0">connector 후보 산출</tspan></text>
-  </g>
-  <g class="node decision" id="node-RT">
-    <polygon points="382,1012 462,1054 382,1096 302,1054" fill="#f5f5f5"/>
-    <polygon points="382,1012 462,1054 382,1096 302,1054" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="382" y="1058" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">런타임 추론</tspan></text>
-  </g>
-  <g class="node" id="node-SK1">
-    <rect x="402" y="1172" width="160" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="402" y="1172" width="160" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="412" y="1180" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="430" y="1190" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="482" y="1201" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="482" dy="0">skip</tspan><tspan x="482" dy="14">사유: 인증 필요</tspan><tspan x="482" dy="14">connector 매핑 없음</tspan></text>
-  </g>
-  <g class="node" id="node-TRY">
-    <rect x="302" y="1328" width="160" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="302" y="1328" width="160" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="312" y="1336" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="330" y="1346" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="1358.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">후보 순서대로 호출</tspan><tspan x="382" dy="14">timeout 30초, 1회씩</tspan></text>
-  </g>
-  <g class="node decision" id="node-R">
-    <polygon points="382,1472 462,1514 382,1556 302,1514" fill="#f5f5f5"/>
-    <polygon points="382,1472 462,1514 382,1556 302,1514" fill="#ffffff" stroke="#2d3142" stroke-width="1.1"/>
-    <text x="382" y="1518" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">결과</tspan></text>
-  </g>
-  <g class="node" id="node-OK3">
-    <rect x="56" y="1640" width="148" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="56" y="1640" width="148" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="66" y="1648" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="84" y="1658" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="130" y="1669" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="130" dy="0">응답 텍스트 합류</tspan><tspan x="130" dy="14">via=connector —</tspan><tspan x="130" dy="14">tool</tspan></text>
-  </g>
-  <g class="node" id="node-OK4">
-    <rect x="244" y="1646" width="124" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="244" y="1646" width="124" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="254" y="1654" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="272" y="1664" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="306" y="1676.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="306" dy="0">1차 본문 사용</tspan><tspan x="306" dy="14">via=WebFetch</tspan></text>
-  </g>
-  <g class="node" id="node-SK2">
-    <rect x="408" y="1632" width="132" height="96" rx="6" fill="#f5f5f5"/>
-    <rect x="408" y="1632" width="132" height="96" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="418" y="1640" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="436" y="1650" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="474" y="1661.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="474" dy="0">skip</tspan><tspan x="474" dy="14">사유: 인증 필요</tspan><tspan x="474" dy="14">connector</tspan><tspan x="474" dy="14">미인증/미연결</tspan></text>
-  </g>
-  <g class="node" id="node-SK3">
-    <rect x="580" y="1640" width="128" height="80" rx="6" fill="#f5f5f5"/>
-    <rect x="580" y="1640" width="128" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="590" y="1648" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="608" y="1658" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="644" y="1669" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="644" dy="0">skip</tspan><tspan x="644" dy="14">사유: 1차</tspan><tspan x="644" dy="14">status·error</tspan></text>
-  </g>
-  <g class="node" id="node-CHILD">
-    <rect x="304" y="1804" width="156" height="68" rx="6" fill="#f5f5f5"/>
-    <rect x="304" y="1804" width="156" height="68" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="314" y="1812" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="332" y="1822" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="1834.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">자식 URL 추출</tspan><tspan x="382" dy="14">visited queue push</tspan></text>
-  </g>
-  <g class="node" id="node-NEXT">
-    <rect x="320" y="1948" width="124" height="60" rx="6" fill="#f5f5f5"/>
-    <rect x="320" y="1948" width="124" height="60" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-
-    <rect x="330" y="1956" width="36" height="14" rx="2" fill="#f5f5f5" stroke="#4f5d75" stroke-opacity="0.45" stroke-width="0.8"/>
-    <text x="348" y="1966" fill="#4f5d75" fill-opacity="0.86" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">STEP</text>
-    <text x="382" y="1982" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle"><tspan x="382" dy="0">다음 round</tspan></text>
-  </g>
-  <line x1="40" y1="2122" x2="724" y2="2122" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
-  <text x="40" y="2142" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">FLOWCHART</text>
-  <text x="724" y="2142" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.08em">STEP · ASK · OUT</text>
-</svg>
-    </main>
-  </div>
+<div class="page">
+<header>
+<p class="eyebrow">planning-format-workflow · diagram 03</p>
+<h1>4. 저장 처리</h1>
+<p class="source">planning-kit/docs/planning-format-workflow.md</p>
+</header>
+<main class="figure">
+<svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 588.836px; background-color: transparent;" viewBox="0 0 588.8359375 1204.21875" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .cluster-label text{fill:#333;}#my-svg .cluster-label span{color:#333;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#333;color:#333;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#my-svg .arrowheadPath{fill:#333333;}#my-svg .edgePath .path{stroke:#333333;stroke-width:1px;}#my-svg .flowchart-link{stroke:#333333;fill:none;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#my-svg .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#my-svg .cluster text{fill:#333;}#my-svg .cluster span{color:#333;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M268.621,62L268.621,66.167C268.621,70.333,268.621,78.667,268.621,86.333C268.621,94,268.621,101,268.621,104.5L268.621,108" id="my-svg-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MjY4LjYyMTA5Mzc1LCJ5Ijo2Mn0seyJ4IjoyNjguNjIxMDkzNzUsInkiOjg3fSx7IngiOjI2OC42MjEwOTM3NSwieSI6MTEyfV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M237.051,206.711L225.622,218.139C214.194,229.568,191.337,252.424,179.909,269.353C168.48,286.281,168.48,297.281,168.48,302.781L168.48,308.281" id="my-svg-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6MjM3LjA1MDc4MTI1LCJ5IjoyMDYuNzEwOTM3NX0seyJ4IjoxNjguNDgwNDY4NzUsInkiOjI3NS4yODEyNX0seyJ4IjoxNjguNDgwNDY4NzUsInkiOjMxMi4yODEyNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M300.191,206.711L311.62,218.139C323.048,229.568,345.905,252.424,357.333,271.353C368.762,290.281,368.762,305.281,368.762,312.781L368.762,320.281" id="my-svg-L_B_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_D_0" data-points="W3sieCI6MzAwLjE5MTQwNjI1LCJ5IjoyMDYuNzEwOTM3NX0seyJ4IjozNjguNzYxNzE4NzUsInkiOjI3NS4yODEyNX0seyJ4IjozNjguNzYxNzE4NzUsInkiOjMyNC4yODEyNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M368.762,378.281L368.762,384.448C368.762,390.615,368.762,402.948,368.762,412.615C368.762,422.281,368.762,429.281,368.762,432.781L368.762,436.281" id="my-svg-L_D_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_E_0" data-points="W3sieCI6MzY4Ljc2MTcxODc1LCJ5IjozNzguMjgxMjV9LHsieCI6MzY4Ljc2MTcxODc1LCJ5Ijo0MTUuMjgxMjV9LHsieCI6MzY4Ljc2MTcxODc1LCJ5Ijo0NDAuMjgxMjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M368.762,518.281L368.762,522.448C368.762,526.615,368.762,534.948,368.762,542.615C368.762,550.281,368.762,557.281,368.762,560.781L368.762,564.281" id="my-svg-L_E_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_F_0" data-points="W3sieCI6MzY4Ljc2MTcxODc1LCJ5Ijo1MTguMjgxMjV9LHsieCI6MzY4Ljc2MTcxODc1LCJ5Ijo1NDMuMjgxMjV9LHsieCI6MzY4Ljc2MTcxODc1LCJ5Ijo1NjguMjgxMjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M334.588,652.857L318.501,664.719C302.415,676.582,270.243,700.307,254.157,717.669C238.07,735.031,238.07,746.031,238.07,751.531L238.07,757.031" id="my-svg-L_F_G_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_F_G_0" data-points="W3sieCI6MzM0LjU4NzU2NTE0MzM2NjUsInkiOjY1Mi44NTcwOTYzOTMzNjY1fSx7IngiOjIzOC4wNzAzMTI1LCJ5Ijo3MjQuMDMxMjV9LHsieCI6MjM4LjA3MDMxMjUsInkiOjc2MS4wMzEyNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M402.936,652.857L419.022,664.719C435.108,676.582,467.281,700.307,483.367,719.669C499.453,739.031,499.453,754.031,499.453,761.531L499.453,769.031" id="my-svg-L_F_H_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_F_H_0" data-points="W3sieCI6NDAyLjkzNTg3MjM1NjYzMzUsInkiOjY1Mi44NTcwOTYzOTMzNjY1fSx7IngiOjQ5OS40NTMxMjUsInkiOjcyNC4wMzEyNX0seyJ4Ijo0OTkuNDUzMTI1LCJ5Ijo3NzMuMDMxMjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M238.07,839.031L238.07,843.198C238.07,847.365,238.07,855.698,238.07,863.365C238.07,871.031,238.07,878.031,238.07,881.531L238.07,885.031" id="my-svg-L_G_I_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_G_I_0" data-points="W3sieCI6MjM4LjA3MDMxMjUsInkiOjgzOS4wMzEyNX0seyJ4IjoyMzguMDcwMzEyNSwieSI6ODY0LjAzMTI1fSx7IngiOjIzOC4wNzAzMTI1LCJ5Ijo4ODkuMDMxMjV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M193.791,1023.939L180.554,1037.486C167.316,1051.032,140.842,1078.126,127.604,1097.172C114.367,1116.219,114.367,1127.219,114.367,1132.719L114.367,1138.219" id="my-svg-L_I_J_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_I_J_0" data-points="W3sieCI6MTkzLjc5MDc4NzAxNDYzODg4LCJ5IjoxMDIzLjkzOTIyNDUxNDYzODl9LHsieCI6MTE0LjM2NzE4NzUsInkiOjExMDUuMjE4NzV9LHsieCI6MTE0LjM2NzE4NzUsInkiOjExNDIuMjE4NzV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M282.35,1023.939L295.587,1037.486C308.824,1051.032,335.299,1078.126,348.536,1097.172C361.773,1116.219,361.773,1127.219,361.773,1132.719L361.773,1138.219" id="my-svg-L_I_K_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_I_K_0" data-points="W3sieCI6MjgyLjM0OTgzNzk4NTM2MTE1LCJ5IjoxMDIzLjkzOTIyNDUxNDYzODl9LHsieCI6MzYxLjc3MzQzNzUsInkiOjExMDUuMjE4NzV9LHsieCI6MzYxLjc3MzQzNzUsInkiOjExNDIuMjE4NzV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(168.48046875, 275.28125)"><g class="label" data-id="L_B_C_0" transform="translate(-6.921875, -12)"><foreignObject width="13.84375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>예</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(368.76171875, 275.28125)"><g class="label" data-id="L_B_D_0" transform="translate(-20.765625, -12)"><foreignObject width="41.53125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>아니오</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(238.0703125, 724.03125)"><g class="label" data-id="L_F_G_0" transform="translate(-13.84375, -12)"><foreignObject width="27.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>없음</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(499.453125, 724.03125)"><g class="label" data-id="L_F_H_0" transform="translate(-13.84375, -12)"><foreignObject width="27.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>있음</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_G_I_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(114.3671875, 1105.21875)"><g class="label" data-id="L_I_J_0" transform="translate(-13.84375, -12)"><foreignObject width="27.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>성공</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(361.7734375, 1105.21875)"><g class="label" data-id="L_I_K_0" transform="translate(-13.84375, -12)"><foreignObject width="27.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>실패</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-A-0" data-look="classic" transform="translate(268.62109375, 35)"><rect class="basic label-container" style="" x="-60.09375" y="-27" width="120.1875" height="54"/><g class="label" style="" transform="translate(-30.09375, -12)"><rect/><foreignObject width="60.1875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>저장 처리</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-B-1" data-look="classic" transform="translate(268.62109375, 175.140625)"><polygon points="63.140625,0 126.28125,-63.140625 63.140625,-126.28125 0,-63.140625" class="label-container" transform="translate(-62.640625, 63.140625)"/><g class="label" style="" transform="translate(-36.140625, -12)"><rect/><foreignObject width="72.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>--no-save?</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-3" data-look="classic" transform="translate(168.48046875, 351.28125)"><rect class="basic label-container" style="" x="-76.34375" y="-39" width="152.6875" height="78"/><g class="label" style="" transform="translate(-46.34375, -24)"><rect/><foreignObject width="92.6875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>저장 없음<br />화면 본문 출력</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-5" data-look="classic" transform="translate(368.76171875, 351.28125)"><rect class="basic label-container" style="" x="-73.9375" y="-27" width="147.875" height="54"/><g class="label" style="" transform="translate(-43.9375, -12)"><rect/><foreignObject width="87.875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>기능명 안전화</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-7" data-look="classic" transform="translate(368.76171875, 479.28125)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"/><g class="label" style="" transform="translate(-100, -24)"><rect/><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>mkdir planning/[안전기능명]--YYYY-MM-DD-HHMMSS/</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-F-9" data-look="classic" transform="translate(368.76171875, 627.65625)"><polygon points="59.375,0 118.75,-59.375 59.375,-118.75 0,-59.375" class="label-container" transform="translate(-58.875, 59.375)"/><g class="label" style="" transform="translate(-32.375, -12)"><rect/><foreignObject width="64.75" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>collision?</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-G-11" data-look="classic" transform="translate(238.0703125, 800.03125)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"/><g class="label" style="" transform="translate(-100, -24)"><rect/><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>정책서.md + 기능설계서.md 작성</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-H-13" data-look="classic" transform="translate(499.453125, 800.03125)"><rect class="basic label-container" style="" x="-81.3828125" y="-27" width="162.765625" height="54"/><g class="label" style="" transform="translate(-51.3828125, -12)"><rect/><foreignObject width="102.765625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>suffix --2 / --3</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-I-15" data-look="classic" transform="translate(238.0703125, 978.625)"><polygon points="89.59375,0 179.1875,-89.59375 89.59375,-179.1875 0,-89.59375" class="label-container" transform="translate(-89.09375, 89.59375)"/><g class="label" style="" transform="translate(-62.59375, -12)"><rect/><foreignObject width="125.1875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>최종 파일 존재 확인</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-J-17" data-look="classic" transform="translate(114.3671875, 1169.21875)"><rect class="basic label-container" style="" x="-106.3671875" y="-27" width="212.734375" height="54"/><g class="label" style="" transform="translate(-76.3671875, -12)"><rect/><foreignObject width="152.734375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>저장 파일 handoff 출력</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-K-19" data-look="classic" transform="translate(361.7734375, 1169.21875)"><rect class="basic label-container" style="" x="-91.0390625" y="-27" width="182.078125" height="54"/><g class="label" style="" transform="translate(-61.0390625, -12)"><rect/><foreignObject width="122.078125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>저장 실패 fallback</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg>
+</main>
+</div>
 </body>
 </html>

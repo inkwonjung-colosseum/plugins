@@ -1,0 +1,161 @@
+schema_version: 1
+prd: "planning-kit PRD 0.2.14"
+purpose: "Golden expectations for result-first planning-format, saved-file handoff planning-review, explicit storage-folder publish input, parser boundaries, and save-failure fallback."
+status: "spec fixture data plus automated contract checks in planning-kit/tests/test_0_2_14_contract.py"
+
+defaults:
+  format: &format_fixture
+    skill: "planning-format"
+    args: []
+    expected_present: []
+    expected_absent: []
+    expected_section_order: []
+  review: &review_fixture
+    skill: "planning-review"
+    args: []
+    inline_context: ""
+    expected_present: []
+    expected_absent: []
+    expected_section_order: []
+  publish: &publish_fixture
+    skill: "planning-publish-confluence"
+    args: []
+    expected_present: []
+    expected_absent: []
+    expected_no_tool_calls: []
+    expected_tool_calls: []
+
+fixtures:
+  - id: planning_format_default_save_success
+    <<: *format_fixture
+    args: ["planning-format", "Zone 관리 초안"]
+    expected_section_order:
+      - "# Zone 관리"
+      - "## 저장 파일"
+      - "## 체크해야 할 항목"
+    expected_present:
+      - "- 저장: planning/Zone-관리--YYYY-MM-DD-HHMMSS/"
+      - "- 정책서: planning/Zone-관리--YYYY-MM-DD-HHMMSS/Zone-관리_정책서.md"
+      - "- 기능설계서: planning/Zone-관리--YYYY-MM-DD-HHMMSS/Zone-관리_기능설계서.md"
+    expected_absent:
+      - "## 정책서"
+      - "## 기능설계서"
+      - "## 저장 실패 상세"
+
+  - id: planning_format_save_failure_fallback
+    <<: *format_fixture
+    args: ["planning-format", "Zone 관리 초안"]
+    simulated_failure: "write_denied"
+    expected_section_order:
+      - "# Zone 관리"
+      - "## 정책서"
+      - "## 기능설계서"
+      - "## 체크해야 할 항목"
+      - "## 저장 실패 상세"
+    expected_present:
+      - "- 저장: 실패 -"
+      - "- 실패 단계:"
+      - "- 대상 경로: planning/Zone-관리--YYYY-MM-DD-HHMMSS/"
+    expected_absent:
+      - "## 저장 파일"
+
+  - id: planning_format_no_save_screen_only
+    <<: *format_fixture
+    args: ["planning-format", "Zone 관리 초안", "--no-save"]
+    expected_section_order:
+      - "# Zone 관리"
+      - "## 정책서"
+      - "## 기능설계서"
+      - "## 체크해야 할 항목"
+    expected_present:
+      - "- 저장: 없음 (--no-save)"
+    expected_absent:
+      - "## 저장 파일"
+      - "## 저장 실패 상세"
+
+  - id: planning_review_saved_files_handoff
+    <<: *review_fixture
+    inline_context: |
+      # Zone 관리
+
+      - 입력: URL 1개
+      - 산출물: 정책서, 기능설계서
+      - 검증: 확인 필요 없음
+      - 저장: planning/Zone-관리--2026-05-12-120000/
+
+      ## 저장 파일
+
+      - 정책서: planning/Zone-관리--2026-05-12-120000/Zone-관리_정책서.md
+      - 기능설계서: planning/Zone-관리--2026-05-12-120000/Zone-관리_기능설계서.md
+
+      ## 체크해야 할 항목
+      없음
+    expected_tool_calls:
+      - "local_file_read:planning/Zone-관리--2026-05-12-120000/Zone-관리_정책서.md"
+      - "local_file_read:planning/Zone-관리--2026-05-12-120000/Zone-관리_기능설계서.md"
+    expected_section_order:
+      - "# Zone 관리 검토 결과"
+      - "## 결론"
+      - "## 검토 결과"
+      - "## 체크해야 할 항목"
+    expected_present:
+      - "저장 파일 handoff"
+      - "planning/** 저장 파일은 review 대상 입력"
+    expected_absent:
+      - "최근 폴더 자동 선택"
+
+  - id: planning_review_save_failure_context_body
+    <<: *review_fixture
+    inline_context: |
+      # Zone 관리
+      - 저장: 실패 - write denied
+
+      ## 정책서
+      ### 목적
+      Zone 이동 정책을 정의한다.
+
+      ## 기능설계서
+      ### 사용자 흐름
+      운영자가 Zone 이동을 요청한다.
+
+      ## 체크해야 할 항목
+      ### 결정 필요
+      없음
+
+      ## 저장 실패 상세
+      - 실패 단계: write
+    expected_present:
+      - "## 결론"
+      - "## 검토 결과"
+    expected_absent:
+      - "저장 실패 상세 본문 합류"
+
+  - id: planning_publish_storage_folder_input
+    <<: *publish_fixture
+    args: ["planning-publish-confluence", "planning/Zone-관리--2026-05-12-120000/"]
+    expected_tool_calls:
+      - "local_file_read:planning/Zone-관리--2026-05-12-120000/Zone-관리_정책서.md"
+      - "local_file_read:planning/Zone-관리--2026-05-12-120000/Zone-관리_기능설계서.md"
+    expected_no_tool_calls:
+      - "url_fetch"
+      - "confluence_get_page_before_storage_gate"
+    expected_present:
+      - "canonical 정책서·기능설계서 두 파일"
+      - "[기능명] v0.7"
+    expected_absent:
+      - "## 체크해야 할 항목"
+      - "## 저장 실패 상세"
+
+  - id: parser_boundaries_0_2_14
+    <<: *review_fixture
+    inline_context: "0.2.14 output with policy and feature bodies plus report sections"
+    expected_present:
+      - "## 저장 파일"
+      - "## 결론"
+      - "## 체크해야 할 항목"
+      - "## 검토 결과"
+      - "## 검토 근거 요약"
+      - "## 저장 실패 상세"
+    expected_absent:
+      - "report section merged into policy body"
+      - "report section merged into feature body"
