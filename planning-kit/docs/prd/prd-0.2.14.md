@@ -2,7 +2,7 @@
 
 > 0.2.13 기반 incremental PRD. 0.2.12는 `planning-format`에 `생성 결과 요약`과 조건부 `결정 보드`를, `planning-review`에 항상 출력되는 `결정 보드`를 도입해 첫 화면 인지성을 개선했다. 그러나 실제 기획자가 혼자 문서를 정리하고 판단·보강까지 진행하는 흐름에서는 결정/작업 projection이 문서 본문과 검토 결과보다 앞서 보여, 두 스킬 모두 회의용 우선순위판처럼 보이는 문제가 남았다.
 >
-> 핵심 변경: `planning-format`과 `planning-review`의 public 화면 출력은 **결과/검토 결과 우선 + 하단 체크리스트** 구조로 바꾼다. `planning-format`은 기본적으로 로컬 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`에 정책서·기능설계서를 저장하고, 화면에는 저장 파일 링크와 `체크해야 할 항목`만 보여준다. 정책서·기능설계서 전문을 화면에 펼치는 것은 파일 저장하지 않는 `--no-save` 실행에서만 한다. `planning-review`는 헤더 요약 뒤 바로 `결론`, `검토 결과`를 보여준다. 미확정·누락·보강점은 마지막 `체크해야 할 항목`에 모은다. `planning-publish-confluence`는 기본 저장 결과를 발행할 수 있도록 명시적 저장 폴더 입력을 지원하되, canonical 정책서·기능설계서 두 파일만 읽고 최종 쓰기 확인은 유지한다. `## 결정 보드` heading은 신규 public 출력에서 쓰지 않고, legacy 0.2.10~0.2.13 화면 출력 읽기 호환으로만 유지한다.
+> 핵심 변경: `planning-format`과 `planning-review`의 public 화면 출력은 **결과/검토 결과 우선 + 하단 체크리스트** 구조로 바꾼다. `planning-format`은 기본적으로 로컬 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`에 정책서·기능설계서를 저장하고, 화면에는 저장 파일 링크와 `체크해야 할 항목`만 보여준다. 정책서·기능설계서 전문을 화면에 펼치는 것은 파일 저장하지 않는 `--no-save` 실행에서만 한다. `planning-review`는 헤더 요약 뒤 바로 `결론`, `검토 결과`를 보여준다. 미확정·누락·보강점은 마지막 `체크해야 할 항목`에 모은다. `planning-publish-confluence`는 기본 저장 결과를 발행할 수 있도록 명시적 저장 폴더 입력을 지원하되, canonical 정책서·기능설계서 두 파일만 읽고 최종 쓰기 확인은 유지한다. `## 결정 보드` heading은 0.2.14 신규 public 출력과 parser 목표에서 제외한다.
 
 ## 1. 상태
 
@@ -22,9 +22,8 @@
 4. **상단 결정 보드 제거** — 두 스킬의 신규 public 출력에서는 `## 결정 보드`를 출력하지 않는다. 결정/작업/차단 항목은 하단 `## 체크해야 할 항목`에 통합한다.
 5. **상단 요약 축소** — `planning-format`의 `## 생성 결과 요약`과 `planning-review`의 `## 결정 보드`는 신규 출력에서 별도 H2로 쓰지 않는다. 입력·산출물·검증·저장 상태는 `# [기능명]` 또는 `# [기능명] 검토 결과` 바로 아래 헤더 bullet에 압축한다.
 6. **체크리스트 후행** — 사용자가 정책서와 기능설계서 정리본 또는 review 결론과 결과를 읽은 뒤, 마지막에 결정 필요·문서 보강 필요·출처/누락 참고를 확인하게 한다.
-7. **기존 정보 보존** — 기존 `결정 보드`, `검증 피드백`, `출처 요약`, `입력 제외 요약`의 핵심 정보는 사라지지 않는다. `체크해야 할 항목`, `출처/누락 요약`, 조건부 `상세 추적`으로 재배치한다.
+7. **기존 정보 보존** — 검증 피드백, 출처 요약, 입력 제외 요약의 핵심 정보는 사라지지 않는다. `체크해야 할 항목`, `출처/누락 요약`, 조건부 `상세 추적`으로 재배치한다.
 8. **trace는 선택 확인 영역** — full source table, connector status, 입력 제외 전체 목록, 원시 F* 피드백은 하단 `상세 추적`에만 둔다. 일반 검토자가 매번 필수로 읽는 영역이 아니어야 한다.
-9. **legacy 결정 보드는 읽기 호환 전용** — 0.2.10~0.2.13 출력의 `## 결정 보드`는 parser가 계속 읽되, 0.2.14 신규 public 출력의 작성 목표가 아니다.
 
 ## 3. 문제와 범위
 
@@ -41,7 +40,6 @@
 
 ### 비목표
 
-- legacy `planning-format` 화면 출력의 `## 생성 결과 요약`, `## 결정 보드`를 parser에서 읽지 못하게 만들지 않는다.
 - D*/A*/T*/F* ID 모델을 폐기하지 않는다. 신규 public 출력에서는 노출을 줄이되, `상세 추적`과 parser용 structured mapping에서는 보존할 수 있다.
 - `planning-format` 저장 파일의 내용 계약을 바꾸지 않는다. 저장 파일은 계속 정책서 1개 + 기능설계서 1개 canonical Markdown이다. 단, 저장 실행 방식은 opt-in `--save`에서 default-on + opt-out `--no-save`로 바꾼다.
 - R1/R2/R3 review 축이나 SSOT/AC/의존 영향 분석 규칙을 변경하지 않는다.
@@ -308,7 +306,7 @@
 
 ## 상세 추적
 
-[조건 충족 시에만 R1/R2/R3 raw finding, legacy ID mapping, source trace]
+[조건 충족 시에만 R1/R2/R3 raw finding, ID mapping, source trace]
 ```
 
 규칙:
@@ -317,7 +315,7 @@
 - `## 결론`이 첫 H2가 된다.
 - `## 검토 결과`는 사용자가 바로 고칠 수 있는 발견 목록이다. 축 이름(R1/R2/R3)은 사용자-facing 제목이 아니라 하단 상세 추적의 근거로만 둔다.
 - `## 체크해야 할 항목`은 review 결과를 읽은 뒤 실제 후속 행동을 정리하는 checklist다. `지금 반영할 것`, `기획자가 확인할 것`, `출처/근거 한계` 3개 subsection을 기본으로 한다.
-- legacy `## 최우선 수정 항목`, `## 작업 백로그`는 0.2.x consumer 호환용으로 읽을 수 있지만, 신규 출력에서는 반복하지 않는다.
+- `## 최우선 수정 항목`, `## 작업 백로그`는 신규 출력에서 반복하지 않는다.
 - R1/R2/R3 raw finding, D*/A*/T* mapping, source id, parser warning은 필요 시 `## 상세 추적`에 둔다.
 
 ## 9. 출처/누락 요약과 상세 추적
@@ -349,13 +347,13 @@
 - 원문 정의 부재가 checklist 항목으로 승격됨
 - 입력 제외 high-signal 항목 1건 이상
 - parser boundary warning
-- D*/A*/F* legacy ID mapping 보존 필요
+- D*/A*/F* ID mapping 보존 필요
 
 `상세 추적`에는 다음을 둘 수 있다.
 
 - full 출처표
 - full 입력 제외 5필드 목록
-- legacy `D*/A*/T*/F*` 연결 맵
+- D*/A*/T*/F* 연결 맵
 - fetch/connector 상태
 - parser boundary warning
 
@@ -415,23 +413,16 @@
 - `## 검토 결과`
 - `## 검토 근거 요약`
 - `## 상세 추적`
-- legacy `## 생성 결과 요약`
-- legacy `## 결정 보드`
-- legacy `## 검증 피드백`
-- legacy `## 출처 요약`
-- legacy `## 입력 제외 요약`
 
-## 11. Parser와 호환성
+## 11. Parser boundary
 
 - 0.2.14 신규 `planning-format` 기본 저장 출력에서는 첫 H2가 `## 저장 파일`이다.
 - 0.2.14 신규 `planning-format --no-save` 출력에서는 첫 H2가 `## 정책서`다.
 - 0.2.14 신규 `planning-review` 출력에서는 첫 H2가 `## 결론`이다.
 - parser는 `## 저장 파일`, `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 검토 결과`, `## 검토 근거 요약`, `## 상세 추적`을 정책서·기능설계서 본문 종료 boundary 또는 review report boundary로 인식해야 한다.
 - `## 저장 파일`은 report metadata다. 정책서·기능설계서 본문으로 병합하지 않는다.
-- legacy 0.2.10~0.2.13 `planning-format` 출력의 `## 생성 결과 요약`과 `## 결정 보드`는 계속 metadata로 읽기 호환한다.
-- legacy 0.2.10~0.2.13 `planning-review` 출력의 `## 결정 보드`, `## 최우선 수정 항목`, `## 작업 백로그`는 계속 report metadata로 읽기 호환한다.
 - 0.2.14 신규 public 출력에서 `## 결정 보드` 부재를 실패로 보지 않는다.
-- 0.2.14 신규 `planning-format` 호출은 저장 기본값을 따른다. legacy caller가 `--save`를 붙여도 같은 저장 동작으로 처리하고, 저장하지 않으려면 `--no-save`를 사용한다.
+- 0.2.14 신규 `planning-format` 호출은 저장 기본값을 따른다. 기존 caller가 `--save`를 붙여도 같은 저장 동작으로 처리하고, 저장하지 않으려면 `--no-save`를 사용한다.
 - `planning-publish-confluence`는 `## 저장 파일`, `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 검토 결과`, `## 검토 근거 요약`, `## 상세 추적`을 발행 본문에서 제외해야 한다.
 - downstream parser는 `결정 필요자`, `담당/결정 필요자`, `첫 화면 요약` 필드 부재를 실패로 보지 않아야 한다.
 - 저장 파일에는 기존처럼 `체크해야 할 항목`, `출처/누락 요약`, `상세 추적`을 쓰지 않는다.
@@ -464,14 +455,13 @@
 
 5. **Parser boundary fixture**
    - 기대: `## 체크해야 할 항목` 이후 내용은 기능설계서 body에 합류하지 않는다.
-   - 기대: legacy `planning-format`/`planning-review`의 `## 결정 보드` output도 여전히 metadata로 읽힌다.
    - 기대: 신규 `planning-review`의 `## 검토 근거 요약`과 `## 상세 추적`은 발견 본문에 합류하지 않는다.
 
 6. **Default save canonical fixture**
    - 옵션 없는 기본 실행 결과 파일에는 정책서/기능설계서 본문만 있다.
    - 옵션 없는 기본 실행 화면 출력에는 정책서/기능설계서 전문이 없다.
    - `체크해야 할 항목`, `출처/누락 요약`, `상세 추적`은 저장 파일에 없다.
-   - legacy `--save` 입력도 옵션 없는 기본 실행과 같은 결과를 만든다.
+   - 기존 `--save` 입력도 옵션 없는 기본 실행과 같은 결과를 만든다.
 
 7. **No-save fixture**
    - `--no-save` 실행은 로컬 파일을 만들지 않는다.
@@ -496,13 +486,12 @@
 
 1. `planning-format` output contract에서 기본 저장 public order를 `저장 파일 -> 체크해야 할 항목`으로 변경한다. 저장 성공 화면에는 정책서/기능설계서 전문을 출력하지 않는다.
 2. `planning-format --no-save` output contract는 `정책서 -> 기능설계서 -> 체크해야 할 항목`으로 유지한다.
-3. `planning-format` 저장 계약을 default-on으로 변경한다. 옵션 없는 호출은 저장하고, `--no-save`만 화면 only로 처리하며, legacy `--save`는 no-op alias로 허용한다.
+3. `planning-format` 저장 계약을 default-on으로 변경한다. 옵션 없는 호출은 저장하고, `--no-save`만 화면 only로 처리하며, 기존 `--save`는 no-op alias로 허용한다.
 4. `planning-review` output contract에서 public order를 `결론 -> 검토 결과 -> 체크해야 할 항목`으로 변경하고, 신규 출력에서 `## 결정 보드`, `## 최우선 수정 항목`, `## 작업 백로그` 반복 출력을 제거한다.
 5. `planning-publish-confluence` context gate를 확장해 명시적 저장 폴더 입력을 지원하고, canonical 정책서·기능설계서 두 파일 검증을 추가한다.
 6. `planning-review`와 `planning-publish-confluence` parser boundary에 `## 저장 파일`, `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 검토 결과`, `## 검토 근거 요약`을 추가한다.
 7. README, workflow guide, fixtures를 0.2.14 구조로 갱신한다.
-8. legacy 0.2.10~0.2.13 readable projection parser 호환을 유지한다.
-9. manifest/marketplace/cache 버전 동기화는 실제 구현 완료 후 별도 release step에서 처리한다.
+8. manifest/marketplace/cache 버전 동기화는 실제 구현 완료 후 별도 release step에서 처리한다.
 
 ## 14. 롤백 기준
 
