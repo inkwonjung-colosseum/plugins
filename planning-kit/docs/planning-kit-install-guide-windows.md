@@ -2,7 +2,7 @@
 
 > 기획팀 사용자용 설치 문서
 > 작성일: 2026-05-10
-> 최종 수정일: 2026-05-11
+> 최종 수정일: 2026-05-12
 > 대상: Windows 10/11 사용자, Claude Desktop/Codex 미설치 상태의 기획팀 구성원
 > 문서 상태: 초안 v0.2
 
@@ -18,7 +18,7 @@
 - Claude Desktop을 설치해 Cowork를 사용할 수 있게 한다.
 - Codex를 선택 설치 경로로 제공한다.
 - Claude Desktop/Codex에서 Figma, Atlassian, Google Workspace 커넥터를 필수 연결한다.
-- 로컬 SSOT 폴더를 기준으로 `planning-format`, `planning-review`, 필요 시 `ssot-audit`를 실행한다.
+- 로컬 SSOT 폴더를 기준으로 `planning-format`, `planning-review`, `planning-publish-confluence`, 필요 시 `ssot-audit`를 실행한다.
 
 권장 기본 경로는 **Confluence Export Desktop + Claude Desktop/Cowork + planning-kit**입니다. Codex는 선택 경로로 둡니다.
 
@@ -35,8 +35,8 @@ flowchart LR
   K["필수 커넥터<br/>Figma / Atlassian / Google Workspace"] --> E
   C --> E
 
-  E --> F["planning-format / planning-review / ssot-audit"]
-  F --> G["정책서 / 기능설계서<br/>SSOT 충돌 / AC / 의존 영향<br/>SSOT corpus backlog"]
+  E --> F["planning-format / planning-review / planning-publish-confluence / ssot-audit"]
+  F --> G["정책서 / 기능설계서<br/>SSOT 충돌 / AC / 의존 영향<br/>v0.7 Confluence 후보<br/>SSOT corpus backlog"]
 ```
 
 | 구성 요소 | 역할 | 필수 여부 |
@@ -48,7 +48,7 @@ flowchart LR
 | Figma 커넥터 | Figma 링크가 입력될 때 디자인/화면 맥락을 읽기 위한 연결 | 필수 |
 | Atlassian 커넥터 | Confluence/Jira 링크가 입력될 때 정책, 요구사항, 이슈 맥락을 읽기 위한 연결 | 필수 |
 | Google Workspace 커넥터 | Google Docs/Sheets/Slides/Drive 링크가 입력될 때 문서 맥락을 읽기 위한 연결 | 필수 |
-| planning-kit | 기획 초안을 정책서/기능설계서로 변환·review하고, 필요 시 SSOT corpus를 감사하는 플러그인 | 필수 |
+| planning-kit | 기획 초안을 정책서/기능설계서로 변환·review하고, 현재 context memory의 두 본문을 `v0.7` Confluence 후보로 발행하며, 필요 시 SSOT corpus를 감사하는 플러그인 | 필수 |
 
 ---
 
@@ -223,7 +223,7 @@ Cowork에서는 Claude Desktop UI에서 plugin을 설치합니다.
 4. plugin 추가 화면에서 아래 GitHub repo 링크를 입력한다.
 5. `planning-kit`을 설치 또는 활성화한다.
 
-Cowork에서 사용할 때는 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `ssot-audit` 스킬을 선택합니다.
+Cowork에서 사용할 때는 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` 스킬을 선택합니다.
 
 ### 9.2 Codex App에서 planning-kit 설치
 
@@ -241,6 +241,7 @@ Codex에서 사용할 때는 스킬을 다음처럼 호출합니다.
 ```text
 $planning-format
 $planning-review
+$planning-publish-confluence
 $ssot-audit
 ```
 
@@ -261,7 +262,8 @@ Cowork를 사용하는 경우 Claude Desktop에서 아래 흐름으로 실행합
 5. 입력창에서 `/` 또는 `+` 버튼으로 `planning-format` 스킬을 선택한다.
 6. `planning-format`에는 Confluence `[Origin]` 링크 1개를 입력한다.
 7. 이어서 `planning-review` 스킬을 선택하고 정책서 링크와 기능설계서 링크 2개를 입력한다.
-8. SSOT 폴더 자체의 중복, 낮은 버전 참조, 내용 충돌이 의심되면 `ssot-audit`를 별도로 실행한다.
+8. 검토가 끝난 두 본문이 현재 대화 context에 명확히 남아 있을 때 `planning-publish-confluence`를 실행해 Confluence [SSOT] 하위에 `v0.7` 후보 문서로 발행한다.
+9. SSOT 폴더 자체의 중복, 낮은 버전 참조, 내용 충돌이 의심되면 `ssot-audit`를 별도로 실행한다.
 
 기본적으로 파일, 텍스트, 디렉터리 등 다른 입력 형태도 지원하지만 기획팀 권장 형태는 아래입니다.
 
@@ -276,6 +278,10 @@ planning-review <정책서 링크> <기능설계서 링크>
 ```
 
 ```text
+planning-publish-confluence
+```
+
+```text
 ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 ```
 
@@ -285,6 +291,14 @@ ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 - 기능설계서
 - 입력 제외 항목
 - 자체 검증 결과
+
+`planning-publish-confluence` 출력:
+
+- Confluence 발행 판정
+- `v0.7` 발행 label
+- 생성/업데이트 page URL
+- readback 검증 결과
+- 실패 또는 부분 완료 사유
 
 ### 10.2 planning-review 실행
 
@@ -307,6 +321,7 @@ Codex를 사용하는 경우 같은 작업을 아래처럼 명령으로 입력�
 ```text
 $planning-format <Confluence Origin 링크>
 $planning-review <정책서 링크> <기능설계서 링크>
+$planning-publish-confluence
 ```
 
 ### 10.3 ssot-audit 실행
@@ -345,9 +360,10 @@ $ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 5. Claude Desktop Cowork 또는 Codex에서 planning-format으로 정책서와 기능설계서를 생성한다.
 6. [TBD], 입력 제외 항목, 자체 검증 결과를 확인한다.
 7. planning-review로 로컬 SSOT 기준 충돌과 의존 영향을 점검한다.
-8. SSOT corpus 자체가 불안정하면 ssot-audit로 구조·내용 backlog를 분리한다.
-9. 발견 항목을 수정하거나 기획팀/실무 리뷰 안건으로 남긴다.
-10. 정리된 결과를 Confluence [SSOT]에 업데이트한다.
+8. 현재 context memory에 정책서와 기능 설계서 두 본문이 명확히 남아 있으면 planning-publish-confluence로 Confluence [SSOT] 하위에 v0.7 후보 문서를 발행한다.
+9. SSOT corpus 자체가 불안정하면 ssot-audit로 구조·내용 backlog를 분리한다.
+10. 발견 항목을 수정하거나 기획팀/실무 리뷰 안건으로 남긴다.
+11. 기획팀/실무 리뷰 이후 v1.0 확정 SSOT로 승격한다.
 ```
 
 ---
@@ -366,6 +382,8 @@ $ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 | Confluence export가 실패함 | API token, Confluence 권한, 네트워크 | 토큰 재발급, `[SSOT]` 영역 읽기 권한 확인 |
 | SSOT 폴더가 비어 있음 | export 대상과 출력 폴더 | Confluence Export Desktop 작업 설정 확인 후 수동 실행 |
 | `planning-review`가 SSOT를 못 찾음 | SSOT 출력 폴더와 현재 연결된 작업 폴더 | Confluence Export Desktop에 지정한 SSOT 출력 폴더를 다시 확인 |
+| `planning-publish-confluence`가 바로 취소됨 | 파일 경로, URL, `--save` 같은 금지 입력을 함께 넣었는지 또는 현재 context memory에 두 본문이 모두 있는지 | 인자 없이 실행하고, 정책서와 기능 설계서 본문이 현재 대화에 남아 있는 상태에서 다시 실행 |
+| 발행 page가 `v0.7` 없이 만들어지려 함 | 스킬 또는 플러그인 버전이 0.2.13인지 | planning-kit 업데이트 후 다시 실행. 0.2.13 발행 title은 항상 `v0.7`을 포함해야 함 |
 | review 결과가 오래된 기준을 참조함 | 정기 동기화 성공 여부 | Confluence Export Desktop 로그 확인 후 재동기화 |
 | `ssot-audit` 결과에 낮은 버전 문서가 많이 나옴 | v0.8 미만 문서가 최신 기준처럼 남아 있는지 | 최신 canonical 문서를 만들거나 낮은 버전 문서 링크를 정리 |
 
@@ -383,4 +401,5 @@ $ssot-audit --ssot-include "<SSOT 출력 폴더>/**/*.md"
 - SSOT 출력 폴더에 Confluence `[SSOT]` Markdown 문서가 내려와 있다.
 - `planning-format`으로 정책서/기능설계서가 생성된다.
 - `planning-review`가 로컬 SSOT 기준으로 실행된다.
+- `planning-publish-confluence`가 현재 context memory의 두 본문을 기준으로 `v0.7` Confluence 후보 발행 전 최종 확인을 보여준다.
 - 필요 시 `ssot-audit`가 로컬 SSOT 폴더를 기준으로 실행된다.

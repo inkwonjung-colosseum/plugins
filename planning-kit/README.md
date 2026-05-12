@@ -1,8 +1,12 @@
-# planning-kit (0.2.12)
+# planning-kit (0.2.13)
 
-`planning-kit`은 기획 초안을 정책서·기능설계서로 정리하고, 그 산출물을 외부 기준과 비교하며, 선언된 SSOT 문서 묶음의 구조·내용 품질을 감사하는 플러그인입니다.
+`planning-kit`은 기획 초안을 정책서·기능설계서로 정리하고, 그 산출물을 외부 기준과 비교하며, 현재 context memory의 두 본문을 Confluence `v0.7` 후보 문서로 발행하고, 선언된 SSOT 문서 묶음의 구조·내용 품질을 감사하는 플러그인입니다.
 
-0.2.12의 핵심 변경은 첫 화면의 결과 인지성입니다. `planning-format`은 정책서·기능설계서 본문 전에 항상 `생성 결과 요약`을 출력해 문서 결과, 저장 상태, 검증 상태, 확인 필요, 출처 영향을 먼저 보여줍니다. `planning-review`는 `결정 보드`를 실제 실행 기준으로 단일화하고, 기존 `최우선 수정 항목`과 `작업 백로그` heading은 호환용 최소 표시로만 유지합니다.
+0.2.13의 핵심 변경은 `planning-publish-confluence` 추가입니다. 이 스킬은 현재 context memory 안에 정책서와 기능 설계서 두 본문이 모두 명확히 있을 때만 Product Team Space SSOT 하위에 `[기능명] v0.7` container와 `[기능명] 정책서 v0.7`, `[기능명] 기능 설계서 v0.7` child page를 발행합니다. 파일 경로, URL, `planning-format --save` 산출물 경로는 입력으로 받지 않습니다.
+
+기본 Confluence parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`입니다. 실행 중 기본 parent 사용, 직접 parent URL 입력, 취소를 선택하고, Confluence write 전에는 target hierarchy, 신규/수정 page, `v0.7` label, content fingerprint를 최종 확인합니다. write 후에는 readback으로 page id, parent, version, fingerprint, 문서 종류 marker를 검증합니다.
+
+0.2.12의 결과 인지성 계약도 유지됩니다. `planning-format`은 정책서·기능설계서 본문 전에 항상 `생성 결과 요약`을 출력해 문서 결과, 저장 상태, 검증 상태, 확인 필요, 출처 영향을 먼저 보여줍니다. `planning-review`는 `결정 보드`를 실제 실행 기준으로 단일화하고, 기존 `최우선 수정 항목`과 `작업 백로그` heading은 호환용 최소 표시로만 유지합니다.
 
 `결정 보드`는 오늘 결정할 항목, 출시 전 해결 필요 항목, 바로 수정할 작업, 다음 액션을 자연어 라벨로 먼저 보여줍니다. 내부 추적 ID는 `결정 1 (D1)`, `작업 1 (A1)`, `출시 전 해결 1 (T1)`처럼 괄호 안에 보존하고, 원시 발견 추적은 하단 상세로 내립니다.
 
@@ -21,6 +25,7 @@ Claude Code · Codex 양쪽에서 같은 `skills/`를 공유합니다.
 ```text
 /planning-kit:planning-format 주문 취소 정책 정리해줘. 사용자가 결제 후 24시간 내 1회 취소 가능.
 /planning-kit:planning-review
+/planning-kit:planning-publish-confluence
 /planning-kit:ssot-audit
 ```
 
@@ -29,6 +34,7 @@ Claude Code · Codex 양쪽에서 같은 `skills/`를 공유합니다.
 ```text
 $planning-format 주문 취소 정책 정리해줘. 사용자가 결제 후 24시간 내 1회 취소 가능.
 $planning-review
+$planning-publish-confluence
 $ssot-audit
 ```
 
@@ -38,6 +44,7 @@ $ssot-audit
 |---|---|
 | `planning-format` | 텍스트·파일·디렉터리·URL·이미지를 정책서와 기능설계서로 변환하고, 생성 결과 요약을 본문 전에 먼저 출력 |
 | `planning-review` | planning-format 산출물을 SSOT 충돌, acceptance criteria 검증가능성, 의존 영향 3축으로 review하고 결정 보드를 실행 기준으로 출력 |
+| `planning-publish-confluence` | 현재 context memory의 정책서·기능 설계서 두 본문을 `v0.7` Confluence 후보 문서로 발행하고 readback 검증 |
 | `ssot-audit` | 선언된 `SSOT` 표시 폴더 Markdown의 구조·내용 품질과 개선 백로그 감사 |
 
 ## planning-format
@@ -220,6 +227,63 @@ planning/Zone-관리--2026-05-11-143000/
 4. `조건부 통과`: 발견은 없지만 검증 신뢰도 제한적
 5. `통과`: 발견 없고 검증 신뢰도 충분
 
+## planning-publish-confluence
+
+입력 예:
+
+```text
+/planning-kit:planning-publish-confluence
+```
+
+```text
+$planning-publish-confluence
+```
+
+위치 인자와 옵션은 받지 않습니다. 현재 context memory 안에 이미 있는 정책서 본문 1개와 기능 설계서 본문 1개만 발행 대상으로 사용합니다.
+
+금지 입력 예:
+
+```text
+/planning-kit:planning-publish-confluence ./planning/기능--2026-05-12-120000/
+/planning-kit:planning-publish-confluence ./정책서.md ./기능설계서.md
+/planning-kit:planning-publish-confluence https://colosseum.atlassian.net/wiki/...
+/planning-kit:planning-publish-confluence --save
+```
+
+0.2.13 규칙:
+
+- 호출 인자에 파일 경로, URL, 저장 산출물 경로, 옵션이 있으면 로컬 파일 read, URL fetch, Confluence 조회 없이 즉시 취소합니다.
+- 현재 context memory에서 정책서·기능 설계서 두 본문, 기능명 1개, 명확한 본문 경계를 식별하지 못하면 Confluence 조회 없이 취소합니다.
+- 기본 parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`이며, 실행 중 기본값 사용, 다른 parent URL 직접 입력, 취소를 선택합니다.
+- Confluence 구조는 `[기능명] v0.7` container 아래 `[기능명] 정책서 v0.7`, `[기능명] 기능 설계서 v0.7` child page입니다.
+- page title과 metadata에는 `발행 label: v0.7`, `문서 상태: SSOT 후보`를 표시합니다.
+- 같은 target 위치의 같은 문서 종류와 같은 `v0.7` label page만 update target입니다. `v0.7` 없는 page는 자동 업데이트하지 않습니다.
+- page move, 자동 merge, blind overwrite, append update, batch publish, 예약 publish는 하지 않습니다.
+- Confluence page create/update 전에는 parent, target hierarchy, 신규/수정 page 수, update target version, content fingerprint, operation id, write order를 최종 확인합니다.
+- 각 write 후 readback으로 page id, title, parent id, version, operation id, content fingerprint, 문서 종류 marker, `v0.7` label을 검증합니다.
+- Confluence write는 transaction이 아니므로 자동 rollback/delete하지 않습니다. 중간 실패는 `부분 완료`로 출력하고 남은 write를 중단합니다.
+
+기본 출력 순서:
+
+```markdown
+# planning-publish-confluence
+
+- 판정: 성공 / 부분 완료 / 변경 없음 / 발행 취소
+- Confluence 변경: 생성 N건, 업데이트 M건, 변경 없음 K건
+
+## 페이지
+...
+
+## 실패/스킵
+...
+
+## readback 검증
+...
+
+## 발행 정보
+...
+```
+
 ## 기준 문서 묶음 (SSOT)
 
 `planning-review`와 `ssot-audit`는 같은 SSOT 경계 규칙을 사용합니다.
@@ -322,6 +386,10 @@ ProductSSOT/**/*.md
 | `--no-ssot-fetch` | 기준 문서 묶음 외부 link follow 봉쇄 |
 | `--no-ssot-image` | 기준 문서 묶음 이미지 multimodal 봉쇄 |
 
+### planning-publish-confluence
+
+옵션 없음. 위치 인자, 파일 경로, URL, `planning-format --save` 산출물 경로, `--` 옵션이 있으면 Confluence 조회 없이 취소합니다.
+
 ### ssot-audit
 
 | 옵션 | 동작 |
@@ -333,6 +401,15 @@ ProductSSOT/**/*.md
 | `--no-image` | 이미지 multimodal 처리 봉쇄 |
 
 ## 마이그레이션
+
+0.2.12 이하에서 0.2.13으로 넘어갈 때 확인할 내용:
+
+- 신규 `planning-publish-confluence`는 현재 context memory 안에 정책서와 기능 설계서 본문이 모두 명확할 때만 실행됩니다. 파일/URL/경로를 인자로 주면 발행하지 않습니다.
+- 기본 Confluence parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`이고, 사용자는 실행 중 다른 parent URL을 직접 입력할 수 있습니다.
+- 발행 page title은 `[기능명] v0.7`, `[기능명] 정책서 v0.7`, `[기능명] 기능 설계서 v0.7` 형식입니다. 0.2.13 발행물은 확정 SSOT가 아니라 `v0.7` 후보입니다.
+- `v0.7` 없는 기존 page는 update target이 아닙니다. 같은 target 위치, 같은 문서 종류, 같은 `v0.7` label page만 업데이트할 수 있습니다.
+- Confluence write 전 최종 확인과 write 후 readback 검증이 필수입니다.
+- 0.2.13 검증 기대값은 [docs/prd/fixtures/prd-0.2.13-fixtures.yml](./docs/prd/fixtures/prd-0.2.13-fixtures.yml)에 보관합니다.
 
 0.2.11 이하에서 0.2.12로 넘어갈 때 확인할 내용:
 
@@ -359,8 +436,10 @@ planning-kit/
 │       ├── README.md
 │       ├── fixtures/
 │       │   ├── prd-0.2.10-fixtures.yml
-│       │   └── prd-0.2.12-fixtures.yml
-│       └── prd-0.2.12.md
+│       │   ├── prd-0.2.12-fixtures.yml
+│       │   └── prd-0.2.13-fixtures.yml
+│       ├── prd-0.2.12.md
+│       └── prd-0.2.13.md
 └── skills/
     ├── planning-format/
     │   ├── SKILL.md
@@ -377,6 +456,12 @@ planning-kit/
     │       ├── ssot-rules.md
     │       ├── ac-rules.md
     │       └── deps-rules.md
+    ├── planning-publish-confluence/
+    │   ├── SKILL.md
+    │   └── references/
+    │       ├── context-gate.md
+    │       ├── confluence-page-contract.md
+    │       └── output-contract.md
     └── ssot-audit/
         ├── SKILL.md
         └── references/

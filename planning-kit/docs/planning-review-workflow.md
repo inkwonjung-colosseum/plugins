@@ -237,6 +237,8 @@ flowchart TD
 
 ## 9. 참고 파일
 
+0.2.13 이후 Confluence 발행은 `planning-review`의 책임이 아니다. 리뷰 결과를 반영한 정책서와 기능설계서 두 본문이 현재 context memory에 명확히 남아 있을 때 `planning-publish-confluence`를 별도 실행해 `v0.7` 후보로 올린다. 이 스킬은 최종 확인 전 Confluence create/update를 하지 않고, write 후 readback을 확인한다.
+
 | 파일 | 역할 |
 |---|---|
 | `skills/planning-review/SKILL.md` | 동작 시퀀스 골격 (Step 1~5) |
@@ -245,6 +247,7 @@ flowchart TD
 | `skills/planning-review/references/deps-rules.md` | R3 의존·영향 4 sub-category 기준 + 발견·권고 분류 + 입력 제외 § 보조 신호 (0.2.2) |
 | `skills/planning-format/references/connector-routing.md` | input fetch와 기준 문서 link follow 공유 적재 — 인증 휴리스틱·MCP 카탈로그·Google Workspace tool 시퀀스·fallback 케이스 |
 | `skills/planning-format/references/conversion-rules.md` | input image multimodal·통합 본문 합류 룰 공유 참조 |
+| `skills/planning-publish-confluence/SKILL.md` | 현재 context memory 기반 Confluence `v0.7` 후보 발행 워크플로 |
 | `docs/planning-format-workflow.md` | planning-format 변환·자체 검증 워크플로 |
 | `docs/prd/prd-0.2.0.md` | 본 스킬 분할 + Google 라우팅 fix PRD |
 | `docs/prd/prd-0.2.2.md` | R1 link follow + 입력 제외 § R3 보조 신호 PRD |

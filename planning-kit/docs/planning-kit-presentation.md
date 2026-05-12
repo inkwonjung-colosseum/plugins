@@ -2,7 +2,7 @@
 
 > Confluence 게시용 운영 문서
 > 작성일: 2026-05-10
-> 최종 수정일: 2026-05-11
+> 최종 수정일: 2026-05-12
 > 대상: 기획팀, 개발팀, 디자인/QA/운영 협업자
 > 문서 상태: 초안 v0.12
 
@@ -16,10 +16,10 @@
 
 핵심 원칙은 다음과 같습니다.
 
-- 초안 작성은 기존 방식대로 자유롭게 진행하고, AI는 `planning-format`과 `planning-review` 단계에서 formatting과 review에 활용한다.
+- 초안 작성은 기존 방식대로 자유롭게 진행하고, AI는 `planning-format`, `planning-review`, `planning-publish-confluence` 단계에서 formatting, review, 후보 발행에 활용한다.
 - SSOT corpus 자체의 중복, 낮은 버전 참조, 내용 충돌은 새 기획 리뷰와 분리해 필요 시 `ssot-audit`로 점검한다.
 - Confluence `[Origin]`은 개인 자유 작성 결과물이 올라오는 공간으로 둔다.
-- Confluence `[SSOT]`는 `planning-kit`을 활용해 formatting/review한 결과물이 올라오는 공간으로 둔다.
+- Confluence `[SSOT]`는 `planning-kit`을 활용해 formatting/review한 결과물과 `v0.7` 후보 발행본이 올라오는 공간으로 둔다.
 - 최종 기획 v1.0은 `planning-format`/`planning-review` 산출물이 아니라 기획/개발/디자인/QA/운영 등 관련 팀 리뷰와 합의 이후 Confluence `[SSOT]`에서 공식 기획 완료 문서로 확정한다.
 
 ---
@@ -65,9 +65,8 @@ Confluence [Origin] / SSOT 자료 확인
 -> 기존 방식으로 개인 기획 작성(~v0.7)
 -> Confluence [Origin] upload
 -> planning-format으로 기획서 formatting 및 기존 문서 기반 발견사항 보정
--> Confluence [SSOT]에 planning-format 결과물 upload
 -> planning-review로 리뷰/사전 점검 및 발견사항 수정
--> Confluence [SSOT]에 planning-review 반영본 update
+-> planning-publish-confluence로 Confluence [SSOT]에 v0.7 후보 발행
 -> 기획팀 리뷰 진행(v0.8)
 -> 실무 리뷰 진행(v0.9)
 -> 이슈 발견 시 simple update 또는 mass update
@@ -81,9 +80,8 @@ Confluence [Origin] / SSOT 자료 확인
 | 개인 기획 작성 | 기존 방식으로 자유롭게 초안 작성 | 개인 기획 초안 |
 | Confluence [Origin] upload | 개인 기획 초안을 Confluence `[Origin]`에 업로드 | `[Origin]` 개인 기획 초안 v0.7 |
 | planning-format | `[Origin]` upload본을 정책서와 기능설계서로 구조화하고 기존 문서 기반 발견사항을 보정 | 정책서, 기능설계서, 출처, 입력 제외, 자체 검증 |
-| Confluence [SSOT] formatting upload | `planning-format` 결과물을 Confluence `[SSOT]`에 업로드 | formatting 초안 |
 | planning-review | SSOT 충돌, AC 검증가능성, 의존 영향을 확인하고 발견사항을 수정 | 리뷰 결과, 수정 반영본, 잔여 발견/권고 목록 |
-| Confluence [SSOT] review update | `planning-review` 반영본을 Confluence `[SSOT]`에 업데이트 | 기획팀 리뷰 진입 전 초안 |
+| planning-publish-confluence | 현재 context memory의 정책서·기능 설계서 두 본문을 Confluence `[SSOT]` 하위에 발행 | `[기능명] v0.7` 후보 container와 정책서/기능 설계서 child page |
 | 기획팀 리뷰 | 정책, 범위, 우선순위, 미결 사항 확인 | 기획팀 리뷰 v0.8 |
 | 실무 리뷰 | 개발, 디자인, QA, 운영 영향 확인 | 실무 리뷰 v0.9 |
 | 공식 기획 완료 | Confluence `[SSOT]`에서 개발 착수 가능한 공식 기준 문서로 확정 | `[SSOT]` 공식 기획 완료 문서 v1.0 |
@@ -97,11 +95,11 @@ Confluence [Origin] / SSOT 자료 확인
 - simple update와 mass update는 기획팀 리뷰 또는 실무 리뷰 중 이슈가 발견됐을 때 선택하는 보정 옵션이다.
 - 의미가 바뀌는 변경은 기획팀/실무 리뷰 단계에서 확인한다.
 
-발표 중 `planning-format`/`planning-review`/`ssot-audit`의 내부 흐름을 더 자세히 설명해야 할 때는 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 함께 사용한다.
+발표 중 `planning-format`/`planning-review`/`planning-publish-confluence`/`ssot-audit`의 내부 흐름을 더 자세히 설명해야 할 때는 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 함께 사용한다.
 
 ## 5. planning-kit이 하는 일
 
-`planning-kit`은 기본 기획 변환/리뷰 두 단계와, 필요 시 실행하는 SSOT corpus 감사 단계로 동작합니다.
+`planning-kit`은 기본 기획 변환/리뷰/후보 발행 세 단계와, 필요 시 실행하는 SSOT corpus 감사 단계로 동작합니다.
 
 ### 5.1 planning-format
 
@@ -158,7 +156,30 @@ $planning-review https://wiki.example/policy/order-cancel https://docs.example/f
 
 상세 workflow와 발표용 다이어그램은 [planning-kit workflow 발표 가이드](./planning-kit-workflow-guide.md)를 참고합니다.
 
-### 5.3 ssot-audit
+### 5.3 planning-publish-confluence
+
+`planning-publish-confluence`는 현재 context memory에 정책서와 기능 설계서 두 본문이 명확히 있을 때만 Confluence `[SSOT]` 하위에 `v0.7` 후보 문서로 발행합니다. 파일 경로, URL, 저장 산출물 경로는 인자로 받지 않습니다.
+
+```text
+$planning-publish-confluence
+```
+
+주요 출력:
+
+- Confluence 발행 판정
+- `v0.7` 발행 label
+- 생성/업데이트 page URL
+- readback 검증 결과
+- 실패 또는 부분 완료 사유
+
+주의:
+
+- 기본 parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`이지만 실행 중 다른 parent URL을 직접 입력할 수 있습니다.
+- 발행 title은 `[기능명] v0.7`, `[기능명] 정책서 v0.7`, `[기능명] 기능 설계서 v0.7` 형식입니다.
+- Confluence write 전 최종 확인이 필요하며, write 후 readback으로 검증합니다.
+- `v0.7` 후보는 공식 v1.0 SSOT가 아닙니다.
+
+### 5.4 ssot-audit
 
 `ssot-audit`는 새 기획 산출물을 리뷰하는 단계가 아니라, 기존 SSOT corpus 자체를 점검하는 유지보수 도구입니다.
 
@@ -191,6 +212,7 @@ $ssot-audit --ssot-include "docs/**/*.md" --axes structure,content
 | 입력 제외 항목 | 본문에 반영하지 않은 이유 | 기획팀 |
 | 자체 검증 | 문서 품질 점검 결과 | planning-kit 실행 담당 |
 | review 결과 | SSOT/AC/의존 영향 발견 사항 | 기획팀/실무팀 |
+| publish 결과 | `v0.7` Confluence 후보 page와 readback 검증 결과 | planning-kit 실행 담당/기획팀 |
 
 해석 기준:
 
@@ -202,7 +224,7 @@ $ssot-audit --ssot-include "docs/**/*.md" --axes structure,content
 
 ## 7. Confluence 게시 규칙
 
-Confluence `[Origin]`에는 개인 자유 작성 결과물을 올립니다. Confluence `[SSOT]`에는 `planning-format` 결과물을 먼저 올리고, 이후 `planning-review` 발견사항을 반영한 결과물로 업데이트합니다. 게시 전에 planning-kit 실행 담당 또는 기획팀이 산출물을 확인하고, 상태와 담당 팀, 리뷰 단계를 명확히 둡니다.
+Confluence `[Origin]`에는 개인 자유 작성 결과물을 올립니다. Confluence `[SSOT]`에는 `planning-review`까지 확인한 결과를 `planning-publish-confluence`로 `v0.7` 후보 문서로 올립니다. 게시 전에 planning-kit 실행 담당 또는 기획팀이 산출물을 확인하고, 상태와 담당 팀, 리뷰 단계를 명확히 둡니다.
 
 ### 7.1 문서 상태
 
@@ -210,8 +232,9 @@ Confluence `[Origin]`에는 개인 자유 작성 결과물을 올립니다. Conf
 |---|---|---|
 | 개인 초안 | 기획자가 기존 방식으로 작성한 최초 입력 | 작성자 관리 / v0.7 이하 |
 | Origin upload | 개인 기획 초안을 Confluence `[Origin]`에 업로드 | `[Origin]` / v0.7 |
-| formatting 초안 | `planning-format`으로 구조화, 보정한 결과물을 Confluence `[SSOT]`에 게시 | `[SSOT]` / formatting 초안 |
-| review 반영본 | `planning-review` 발견사항을 수정 반영 | `[SSOT]` / 기획팀 리뷰 전 |
+| formatting 초안 | `planning-format`으로 구조화, 보정한 결과물 | 대화 context 또는 작업 초안 / v0.7 후보 전 |
+| review 반영본 | `planning-review` 발견사항을 수정 반영 | 대화 context 또는 작업 초안 / v0.7 후보 전 |
+| v0.7 후보 발행본 | `planning-publish-confluence`로 Confluence `[SSOT]` 하위에 발행 | `[SSOT]` / v0.7 후보 |
 | 기획팀 리뷰 | 정책, 범위, TBD 확인 | `[SSOT]` / v0.8 |
 | 기획팀 내부 검토 | 우선순위, 메시지, 정책 정합성 확인 | `[SSOT]` / v0.8.x |
 | 실무 리뷰 | 개발, 디자인, QA, 운영 영향 검토 | `[SSOT]` / v0.9 |
@@ -225,10 +248,10 @@ Confluence에 게시할 때는 문서 상단에 아래 정보를 표로 고정�
 | 항목 | 값 |
 |---|---|
 | 문서 상태 | 기획팀 리뷰 / 실무 리뷰 / 공식 기획 완료 |
-| 버전 | v0.8 / v0.9 / v1.0 |
+| 버전 | v0.7 후보 / v0.8 / v0.9 / v1.0 |
 | 담당 팀 | 기획팀 |
 | 원본 작성자 | 개인 기획 초안 작성자 |
-| planning-kit 실행 담당 | planning-format / planning-review 실행자, 필요 시 ssot-audit 실행자 |
+| planning-kit 실행 담당 | planning-format / planning-review / planning-publish-confluence 실행자, 필요 시 ssot-audit 실행자 |
 | 리뷰어 | 기획팀, 개발팀, 디자인팀, QA, 운영/CS |
 | 기준일 | YYYY-MM-DD |
 | 출처 | 원본 초안, Figma, Slack, 기존 문서 링크 |
@@ -240,10 +263,11 @@ Confluence에 게시할 때는 문서 상단에 아래 정보를 표로 고정�
 ### 7.3 게시 전 체크리스트
 
 - 문서 상태와 버전이 맞는가
-- 개인 자유 작성 결과물은 `[Origin]`, `planning-kit` 처리 결과물은 `[SSOT]`에 게시했는가
+- 개인 자유 작성 결과물은 `[Origin]`, `planning-kit` 처리 결과물은 `planning-publish-confluence`로 `[SSOT]`에 `v0.7` 후보로 게시했는가
 - 담당 팀과 리뷰어가 지정되어 있는가
 - `[TBD]`와 입력 제외 항목을 숨기지 않았는가
 - `planning-review` 발견 항목을 본문 또는 리뷰 안건으로 연결했는가
+- Confluence 발행 title과 metadata에 `v0.7`이 포함됐는가
 - SSOT corpus 자체의 중복/낮은 버전 참조/내용 충돌이 의심되면 `ssot-audit` 결과를 별도 backlog로 분리했는가
 - 출처 링크 접근 권한을 리뷰어가 확인할 수 있는가
 - `[Origin]`과 `[SSOT]` 중 문서 목적에 맞는 위치를 선택했는가
@@ -301,7 +325,7 @@ v1.0으로 올리기 전에는 아래 조건을 확인합니다.
 | 역할 | 책임 |
 |---|---|
 | 원본 작성자 | 기존 방식으로 개인 기획 초안을 작성하고 Confluence `[Origin]`에 업로드 |
-| planning-kit 실행 담당 | `planning-format`과 `planning-review` 실행, 발견사항 수정 반영, Confluence `[SSOT]` 업데이트, 필요 시 `ssot-audit`로 SSOT backlog 분리 |
+| planning-kit 실행 담당 | `planning-format`, `planning-review`, `planning-publish-confluence` 실행, 발견사항 수정 반영, Confluence `[SSOT]` `v0.7` 후보 발행, 필요 시 `ssot-audit`로 SSOT backlog 분리 |
 | 기획팀 | 정책 판단, 범위와 우선순위 결정, TBD 해소, 공식 기획 완료 확인 |
 | 개발팀 | 상태 전이, 권한, 예외, 외부 연동, 구현 영향 확인 |
 | QA | Acceptance Criteria 검증가능성 확인, 테스트 관점 누락 제기 |

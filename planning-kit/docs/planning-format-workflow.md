@@ -328,6 +328,8 @@ flowchart TD
 
 ## 12. 참고 파일
 
+0.2.13 이후 Confluence 발행은 `planning-format`의 책임이 아니다. 발행이 필요하면 현재 context memory에 정책서와 기능설계서 두 본문이 명확히 남아 있는 상태에서 `planning-publish-confluence`를 별도로 실행한다. 이 발행 스킬은 파일 경로, URL, `--save` 산출물 경로를 인자로 받지 않고, Confluence에는 `v0.7` 후보 title과 metadata를 붙인다.
+
 | 파일 | 역할 |
 |---|---|
 | `skills/planning-format/SKILL.md` | orchestration only (Step 1~9 high-level + lazy read 지시) (0.2.4) |
@@ -339,4 +341,5 @@ flowchart TD
 | `skills/planning-format/templates/기능설계서.md` | 8 섹션 표 골격 |
 | `skills/planning-format/templates/정책서.md` | 10 섹션 표 골격 |
 | `docs/planning-review-workflow.md` | planning-review 스킬 별도 워크플로 |
+| `skills/planning-publish-confluence/SKILL.md` | 현재 context memory 기반 Confluence `v0.7` 후보 발행 워크플로 |
 | `docs/prd/prd-0.2.4.md` | sub-§ 정밀화·SKILL 분해·deep link·11 카테고리 PRD |

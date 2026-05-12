@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.12",
-  "description": "planning-format은 기획 초안을 readable 정책서·기능설계서로 변환하고 본문 전에 생성 결과 요약을 먼저 출력한다. 사용자 확인·출시 전 해결 필요 항목이 있으면 결정 보드를 이어서 보여준다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 결정 보드를 실행 기준으로 삼아 SSOT·AC·의존 영향을 점검하고 legacy 최우선 수정 항목·작업 백로그는 호환용 최소 표시로 유지한다. 사용자-facing 위치 표기는 정책서 5.1, 기능설계서 7, 입력 제외 섹션처럼 clean display를 사용하고 legacy 섹션 기호 입력은 읽기 호환으로 유지한다. ssot-audit는 독립 SSOT 표시 폴더 Markdown만 감사한다.",
+  "version": "0.2.13",
+  "description": "planning-format은 기획 초안을 readable 정책서·기능설계서로 변환하고, planning-review는 결정 보드를 실행 기준으로 SSOT·AC·의존 영향을 점검하며, ssot-audit는 독립 SSOT 표시 폴더 Markdown만 감사한다. planning-publish-confluence는 현재 context memory 안의 정책서·기능 설계서 두 본문만 사용해 기본 SSOT parent 또는 사용자가 직접 입력한 Confluence parent 아래 v0.7 label이 붙은 기능 container와 정책서/기능 설계서 child page를 최종 확인 후 create/update하고 readback으로 검증한다. 파일/URL/경로 인자는 받지 않는다.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -19,13 +19,14 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "planning-kit",
-    "shortDescription": "기획 초안 변환, 생성 결과 요약, 결정 보드 리뷰",
-    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 readable 정책서/기능설계서로 변환하고 본문 전에 생성 결과 요약을 먼저 보여준다. 사용자 확인·출시 전 해결 필요 항목은 결정 보드로 이어서 표시한다. --save는 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/에 저장한다. planning-review는 결정 보드를 실행 기준으로 삼고 legacy 최우선 수정 항목·작업 백로그는 호환용 최소 표시로 유지한다. 사용자-facing 위치 표기는 정책서 5.1, 기능설계서 7, 입력 제외 섹션처럼 clean display를 사용하고 legacy 섹션 기호 입력은 읽기 호환으로 유지한다. ssot-audit는 독립 SSOT 표시 폴더 Markdown만 감사하고 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
+    "shortDescription": "기획 초안 변환, 결정 보드 리뷰, v0.7 Confluence 발행",
+    "longDescription": "planning-format은 텍스트·파일·디렉터리·URL·이미지를 readable 정책서/기능설계서로 변환하고 본문 전에 생성 결과 요약을 먼저 보여준다. planning-review는 결정 보드를 실행 기준으로 삼아 SSOT·AC·의존 영향을 점검한다. ssot-audit는 독립 SSOT 표시 폴더 Markdown만 감사하고 planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다. planning-publish-confluence는 현재 context memory 안의 정책서와 기능 설계서 본문이 명확할 때만 기본 SSOT parent 또는 사용자 직접 입력 parent 아래 [기능명] v0.7 container와 [기능명] 정책서 v0.7, [기능명] 기능 설계서 v0.7 child page를 최종 확인 후 Confluence에 create/update하고 readback으로 검증한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
       "Read",
-      "Interactive"
+      "Interactive",
+      "Write"
     ],
     "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-kit",
     "defaultPrompt": [
@@ -35,6 +36,7 @@
       "https://wiki.example.com/policy/order-cancel https://docs.example.com/feature/order-cancel 두 링크를 planning-review로 점검해줘",
       "docs/주문취소/정책서.md 파일 하나로 planning-review를 실행해서 같은 폴더 기능설계서까지 같이 점검해줘",
       "현재 프로젝트 문서 전체를 ssot-audit로 감사해서 SSOT 구조와 내용 backlog를 뽑아줘",
+      "현재 context memory의 정책서와 기능 설계서를 planning-publish-confluence로 v0.7 Confluence 후보 문서로 발행해줘",
       "방금 변환한 두 본문을 planning-review로 SSOT 충돌과 의존 영향까지 점검해줘",
       "https://docs.google.com/spreadsheets/d/.../edit?gid=... 시트 기반으로 기획서 만들어줘"
     ],

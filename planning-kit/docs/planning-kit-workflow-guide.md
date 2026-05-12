@@ -10,11 +10,12 @@
 
 ## 1. 전체 workflow
 
-`planning-kit`은 기본적으로 변환과 리뷰 두 단계로 동작하고, 필요할 때 기준 문서 묶음 자체를 별도로 감사합니다.
+`planning-kit`은 기본적으로 변환, 리뷰, 후보 발행 세 단계로 동작하고, 필요할 때 기준 문서 묶음 자체를 별도로 감사합니다.
 
 1. `planning-format`: 자유로운 기획 초안을 정책서와 기능설계서로 구조화한다.
 2. `planning-review`: 구조화된 산출물이 외부 기준과 맞는지 점검한다.
-3. `ssot-audit`: 현재 프로젝트 Markdown 기준 문서 묶음의 구조·내용 품질을 점검한다.
+3. `planning-publish-confluence`: 현재 context memory의 두 본문을 Confluence `v0.7` 후보 문서로 발행한다.
+4. `ssot-audit`: 현재 프로젝트 Markdown 기준 문서 묶음의 구조·내용 품질을 점검한다.
 
 ```mermaid
 flowchart LR
@@ -35,6 +36,13 @@ flowchart LR
   G --> I["R2 AC 검증가능성"]
   G --> J["R3 의존 영향"]
 
+  H --> P["planning-publish-confluence"]
+  C --> P
+  D --> P
+  P --> Q["Confluence<br/>[기능명] v0.7"]
+  Q --> Q1["정책서 v0.7"]
+  Q --> Q2["기능 설계서 v0.7"]
+
   K["프로젝트 기준 문서 묶음"] --> L["ssot-audit"]
   L --> M["구조 품질"]
   L --> N["내용 품질"]
@@ -45,6 +53,7 @@ flowchart LR
 
 - `planning-format`은 문서를 만든다.
 - `planning-review`는 만든 문서가 외부 기준과 맞는지 검증한다.
+- `planning-publish-confluence`는 검토된 두 본문을 아직 확정 SSOT가 아닌 `v0.7` 후보로 Confluence에 올린다.
 - `ssot-audit`는 기존 SSOT 체계 자체의 중복, 부재, 낮은 버전 참조, 내용 충돌을 점검한다.
 - AI가 최종 승인하지 않는다. AI는 구조화, 누락 탐지, 충돌 후보 표시를 돕는다.
 - 최종 v1.0 확정은 기획팀과 실무팀 리뷰 이후 Confluence `[SSOT]`에서 한다.
@@ -205,7 +214,37 @@ flowchart LR
 
 ---
 
-## 4. 입력 자료 수집과 SSOT 자료 수집의 경계
+## 4. planning-publish-confluence 흐름
+
+`planning-publish-confluence`는 현재 context memory에 있는 정책서와 기능 설계서 두 본문을 Confluence에 올리는 마지막 후보 발행 단계입니다. 0.2.13에서는 파일 경로, URL, `planning-format --save` 산출물 경로를 입력으로 받지 않습니다.
+
+```mermaid
+flowchart LR
+  A["현재 context memory"] --> B{"정책서 + 기능 설계서<br/>1쌍 식별?"}
+  B -->|"아니오"| X["발행 취소<br/>Confluence 조회 없음"]
+  B -->|"예"| C["parent 선택<br/>기본 SSOT / 직접 입력 / 취소"]
+  C --> D["parent preflight<br/>읽기·쓰기 권한"]
+  D --> E["target hierarchy<br/>[기능명] v0.7"]
+  E --> F["duplicate/update preflight"]
+  F --> G["최종 확인"]
+  G --> H["Confluence create/update"]
+  H --> I["readback 검증"]
+  I --> J["성공 / 부분 완료 / 변경 없음"]
+```
+
+핵심 동작:
+
+- 호출 인자에 위치 인자나 `--` 옵션이 있으면 로컬 파일 read, URL fetch, connector fallback, Confluence 조회 없이 취소한다.
+- 기본 parent는 `https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT`이고, 사용자는 실행 중 다른 Confluence parent URL을 직접 입력할 수 있다.
+- 발행 구조는 `[기능명] v0.7` container 아래 `[기능명] 정책서 v0.7`, `[기능명] 기능 설계서 v0.7` child page이다.
+- `발행 label: v0.7`, `문서 상태: SSOT 후보`를 표시해 확정 SSOT가 아님을 구분한다.
+- 같은 target 위치의 같은 문서 종류와 같은 `v0.7` label page만 update target이다. `v0.7` 없는 page는 자동 업데이트하지 않는다.
+- Confluence write 전 최종 확인과 write 후 readback 검증이 필수이다.
+- page move는 0.2.13 범위 밖이다.
+
+---
+
+## 5. 입력 자료 수집과 SSOT 자료 수집의 경계
 
 `planning-review`에서 가장 헷갈리기 쉬운 부분은 review 대상 본문을 만들기 위한 자료 수집과, 기존 기준을 확인하기 위한 SSOT 자료 수집의 차이입니다.
 
@@ -237,7 +276,7 @@ flowchart LR
 
 ---
 
-## 5. 자체 검증과 외부 검증의 차이
+## 6. 자체 검증과 외부 검증의 차이
 
 `planning-format`과 `planning-review`가 모두 "검증"을 말하지만 검증 범위가 다릅니다.
 
@@ -263,7 +302,7 @@ flowchart TD
 
 ---
 
-## 6. 기준 문서 묶음 감사
+## 7. 기준 문서 묶음 감사
 
 `ssot-audit`는 새 기획 산출물을 리뷰하는 도구가 아니라, 기존 기준 문서 묶음이 유지보수 가능한 상태인지 보는 도구입니다.
 
@@ -290,9 +329,9 @@ flowchart LR
 
 ---
 
-## 7. 출력물 읽는 법
+## 8. 출력물 읽는 법
 
-### 7.1 planning-format 출력
+### 8.1 planning-format 출력
 
 본문뿐 아니라 아래 신호를 함께 확인합니다.
 
@@ -307,7 +346,7 @@ flowchart LR
 | 입력 제외 요약 | 본문에 넣지 않은 이유와 후속 확인 대상 |
 | 상세 추적 | 실패 출처, full 입력 제외 항목, 보정 로그 |
 
-### 7.2 planning-review 출력
+### 8.2 planning-review 출력
 
 | 출력 | 읽는 법 |
 |---|---|
@@ -319,7 +358,19 @@ flowchart LR
 | 검증 범위와 한계 | readable projection, 본문 없는 문서, 본문 가져오기 실패, 비활성 축 한계 |
 | 상세 추적 | full 입력 출처, SSOT 출처, 축별 원시 발견 |
 
-### 7.3 ssot-audit 출력
+### 8.3 planning-publish-confluence 출력
+
+| 출력 | 읽는 법 |
+|---|---|
+| 판정 | 성공 / 부분 완료 / 변경 없음 / 발행 취소 |
+| Confluence 변경 | 생성, 업데이트, 변경 없음 page 수 |
+| Parent | 실제 선택된 Confluence parent title, URL, page id, space key |
+| 발행 label | `v0.7` 후보 문서인지 확인 |
+| 페이지 | container, 정책서, 기능 설계서 page URL과 version |
+| readback 검증 | page id, parent, version, fingerprint, 문서 종류 marker 확인 |
+| 실패/스킵 | 중복, 권한, version conflict, fingerprint mismatch, 취소 사유 |
+
+### 8.4 ssot-audit 출력
 
 | 출력 | 읽는 법 |
 |---|---|
@@ -332,7 +383,7 @@ flowchart LR
 
 ---
 
-## 8. 예시 workflow
+## 9. 예시 workflow
 
 ```text
 1. 기획자가 Confluence [Origin]에 개인 초안을 올린다.
@@ -340,8 +391,8 @@ flowchart LR
 3. planning-kit 실행 담당이 Origin 링크를 planning-format에 입력한다.
 4. planning-format이 생성 결과 요약, 필요 시 결정 보드, 정책서, 기능설계서, 검증 피드백, 입력 제외 요약을 만든다.
 5. 실행 담당과 기획팀이 생성 결과 요약과 결정 보드의 결정·작업·출시 전 해결 필요 항목을 먼저 확인한 뒤 [TBD], 검증 피드백, 입력 제외 요약을 확인한다.
-6. formatting 결과를 Confluence [SSOT]에 올린다.
-7. planning-review로 SSOT 충돌, AC 검증가능성, 의존 영향을 점검한다.
-8. 발견 항목을 수정하거나 리뷰 안건으로 남긴다.
+6. planning-review로 SSOT 충돌, AC 검증가능성, 의존 영향을 점검한다.
+7. 발견 항목을 수정하거나 리뷰 안건으로 남긴다.
+8. 현재 context memory에 정책서와 기능 설계서 두 본문이 명확히 남아 있을 때 planning-publish-confluence로 Confluence [SSOT] 하위에 v0.7 후보를 발행한다.
 9. 기획팀 리뷰와 실무 리뷰를 거쳐 v1.0을 확정한다.
 ```
