@@ -1,10 +1,12 @@
 # planning-kit PRD chain
 
-planning-kit PRD 15건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
+planning-kit PRD 16건의 관계·읽는 순서·핵심 변경 1줄 요약을 한 문서로 가이드.
+
+> 주의: `prd-0.2.12.md`는 0.2.11에서 0.2.12로 넘어가기 위한 목표 계약이다. runtime/설치 표면은 manifest, marketplace/cache 동기화와 검증 결과를 함께 확인해 판단한다.
 
 ## 읽는 순서
 
-- **신규 사용자**: 본 README → `prd-0.2.11.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
+- **신규/구현자**: 본 README → `prd-0.2.12.md` → (필요 시) 역방향으로 상위 PRD 참고. 각 PRD 본문에 베이스가 명시돼 있어 chain 추적 가능.
 - **기존 사용자**: 신규 PRD만 읽으면 충분 — 각 PRD가 incremental 베이스를 명시한다.
 
 ## PRD 관계도
@@ -26,11 +28,12 @@ planning-kit PRD 15건의 관계·읽는 순서·핵심 변경 1줄 요약을 �
 | 0.2.9 | incremental | 0.2.8 | planning-format + planning-review 출력 품질 개선 — 진행 로그 제거, readable 결정 문서 우선 출력, 자체 검증 피드백 우선, review 판정/신뢰도/액션 backlog 우선 출력, `--save` 경로 `planning/` 고정, `planning/**` SSOT 제외 |
 | 0.2.10 | incremental | 0.2.9 | 상단 결정 보드 도입 — `planning-format`은 사용자 확인·릴리즈 차단 항목이 있을 때 조건부로, `planning-review`는 항상 `## 결정 보드`를 출력한다. 외부 결정 필요 P0/P1을 `D*` 결정 항목과 `A*` 실행 백로그로 묶고, 독립 차단은 필요 시 `T*`로 별도 추적. 결정 질문·선택지·완료 조건·검증 방법·담당/결정 필요자를 먼저 표시하고 원시 발견 ID는 상세 추적으로 내린다. `planning-review`의 top-level `## 최우선 수정 항목`·`## 작업 백로그`는 0.2.x 호환용 요약으로 유지 |
 | 0.2.11 | incremental | 0.2.10 | 사용자-facing 섹션 기호 제거 — `planning-format`과 `planning-review`의 최종 화면, 생성 문서, 상세 추적에서 `§`를 쓰지 않고 `정책서 5.1`, `기능설계서 7`, `입력 제외 섹션`, `보조 표`처럼 clean display로 출력한다. legacy `§5.1` 입력은 계속 읽기 호환으로 유지한다 |
+| 0.2.12 | incremental | 0.2.11 | 결과 인지성 개선 — `planning-format`은 본문 앞에 항상 `## 생성 결과 요약`을 출력해 문서 생성 결과·검증 상태·확인 필요·출처 영향을 먼저 보여주고, `planning-review`는 `## 결정 보드`를 유일한 실행 기준으로 선언해 legacy `## 최우선 수정 항목`·`## 작업 백로그`의 중복 상세를 최소화한다 |
 
 ## 호환성 요약
 
 - **0.1.x → 0.2.0**: **breaking** (스킬 이름 변경 + 분할). 호출자 마이그레이션 필요 — `formalize` → `planning-format` + 선택적 `planning-review`.
-- **그 외**: incremental, 출력 markdown micro-breaking 가능 (다운스트림 파서 영향 시 각 PRD 호환성 절 참조). 0.2.10부터 `## 결정 보드` wrapper heading이 추가되므로 parser는 첫 H2를 산출 본문으로 가정하지 말고 줄 시작의 정확한 `## 정책서`/`## 기능설계서` 경계를 찾아야 한다. `planning-review`에서는 첫 `## 결론` 전의 첫 `## 결정 보드`만 metadata로 취급한다. fenced code block·blockquote·리스트 하위의 `## 결정 보드` 문자열은 wrapper로 취급하지 않는다. duplicate/misplaced decision board는 body에서 제외하고 `readable projection boundary ambiguous` warning으로 처리한다. 0.2.11부터 출력 위치 표기는 `정책서 5.1`과 같은 clean display가 기본이며, parser는 legacy `정책서 §5.1`과 clean display를 모두 읽어야 한다.
+- **그 외**: incremental, 출력 markdown micro-breaking 가능 (다운스트림 파서 영향 시 각 PRD 호환성 절 참조). 0.2.10부터 `## 결정 보드` wrapper heading이 추가되므로 parser는 첫 H2를 산출 본문으로 가정하지 말고 줄 시작의 정확한 `## 정책서`/`## 기능설계서` 경계를 찾아야 한다. `planning-review`에서는 첫 `## 결론` 전의 첫 `## 결정 보드`만 metadata로 취급한다. fenced code block·blockquote·리스트 하위의 `## 결정 보드` 문자열은 wrapper로 취급하지 않는다. duplicate/misplaced decision board는 body에서 제외하고 `readable projection boundary ambiguous` warning으로 처리한다. 0.2.11부터 출력 위치 표기는 `정책서 5.1`과 같은 clean display가 기본이며, parser는 legacy `정책서 §5.1`과 clean display를 모두 읽어야 한다. 0.2.12부터 `planning-format` 화면 출력의 `## 생성 결과 요약`은 메타데이터 영역으로 취급하고, `planning-review` 호환용 섹션은 고정 위치가 아니라 heading 이름으로 찾아야 한다. 단, 0.2.12는 PRD 13장 롤아웃이 끝나기 전까지 현재 runtime 계약이 아니라 release target이다.
 
 ## PRD 파일
 
@@ -49,7 +52,9 @@ planning-kit PRD 15건의 관계·읽는 순서·핵심 변경 1줄 요약을 �
 - [`prd-0.2.9.md`](./prd-0.2.9.md) — planning-format + planning-review 출력 개선: 진행 로그 제거, readable 결정 문서/report 우선 출력, 자체 검증 피드백 우선, 새 옵션 없이 추적 정보 하단 분리, `--save` 경로 `planning/` 고정, SSOT 폴더명 기반 corpus 제한.
 - [`prd-0.2.10.md`](./prd-0.2.10.md) — planning-format + planning-review 상단 결정 보드: planning-format은 조건부, planning-review는 항상 출력. 첫 화면 요약, 지금 결정해야 할 항목, 바로 수정할 문서 작업, 릴리즈 차단 항목, 결정 질문, 선택지, 완료 조건, 검증 방법, 담당/결정 필요자 우선 표시. `## 결정 보드`는 산출 본문이 아닌 report metadata이며, legacy parser 호환을 위해 `planning-review`의 `## 최우선 수정 항목`과 `## 작업 백로그`는 유지한다.
 - [`prd-0.2.11.md`](./prd-0.2.11.md) — 사용자-facing 섹션 기호 제거: 최종 화면, 생성 문서, 상세 추적에서 `§`를 출력하지 않고 clean display를 사용한다. 기존 `§` 입력은 `planning-review`와 downstream parser에서 계속 읽기 호환으로 유지한다.
+- [`prd-0.2.12.md`](./prd-0.2.12.md) — `planning-format`은 `## 생성 결과 요약`으로 문서 결과·검증 상태·확인 필요·출처 영향을 본문 전에 보여주고, `planning-review`는 `## 결정 보드`를 실행 기준으로 단일화해 호환용 섹션의 중복 상세를 줄인다.
 
 ## 검증 fixture
 
 - [`fixtures/prd-0.2.10-fixtures.yml`](./fixtures/prd-0.2.10-fixtures.yml) — 0.2.10 결정 보드, parser boundary, legacy summary, release metadata, workflow diagram 기대값. 현재 저장소에는 fixture runner가 없으므로 PRD 0.2.10 14장의 golden expectation을 기계가 읽을 수 있는 데이터로 보관한다.
+- [`fixtures/prd-0.2.12-fixtures.yml`](./fixtures/prd-0.2.12-fixtures.yml) — PRD 0.2.12 생성 결과 요약, 결정 보드 단일 실행 기준, parser boundary, legacy 호환 최소 표시, SSOT 부족 상태, 문서 hygiene 기대값.
