@@ -11,5 +11,6 @@ planning/
 
 .claude/
 .codex/
+.plugin-eval/
 AGENTS.md
 CLAUDE.md
