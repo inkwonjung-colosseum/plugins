@@ -1,0 +1,20 @@
+I used the local `planning-kit` contract in the repo rather than any live Confluence connector. The publish skill rejects URL input at the first gate, so the attempted prepare stops immediately with no file reads, no URL fetch, no Confluence lookup, and no write. That behavior is defined in [SKILL.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/SKILL.md:10 ) and [runtime-contract.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/references/runtime-contract.md:35 ).
+
+```md
+# planning-publish-confluence
+- 상태: 취소
+- 입력: URL
+- 이유: `planning-publish-confluence`는 URL 입력을 지원하지 않음
+- 변경: 없음
+- 중단 지점: Step 1 입력 gate
+```
+
+The accepted local-folder input is one folder only, shaped exactly like `planning/[safe-feature-name]--YYYY-MM-DD-HHMMSS/`, with these two files directly inside it: `*_정책서.md` and `*_기능설계서.md` ([runtime-contract.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/references/runtime-contract.md:73 )). If your source is a URL, the supported flow is to run `planning-format` first, because that skill does accept `https?://` input and saves by default under `planning/...` ([planning-format SKILL.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-format/SKILL.md:10 )). Then you pass that saved folder to publish, for example:
+
+```text
+planning/My-Feature--2026-05-19-153000/
+  My-Feature_정책서.md
+  My-Feature_기능설계서.md
+```
+
+I stopped before any parent selection, preflight, or live Confluence write.

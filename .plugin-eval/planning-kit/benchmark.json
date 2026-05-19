@@ -1,0 +1,82 @@
+{
+  "kind": "plugin-eval-benchmark",
+  "schemaVersion": 2,
+  "version": 2,
+  "targetKind": "plugin",
+  "targetName": "planning-kit",
+  "runner": {
+    "type": "codex-cli",
+    "model": "gpt-5.4",
+    "sandbox": "workspace-write",
+    "approvalPolicy": "never",
+    "extraArgs": []
+  },
+  "workspace": {
+    "sourcePath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/.plugin-eval/fixtures/planning-kit-workspace",
+    "setupMode": "copy",
+    "preserve": "on-failure"
+  },
+  "targetProvisioning": {
+    "mode": "workspace-plugin-marketplace"
+  },
+  "verifiers": {
+    "commands": [
+      "python3 -m json.tool plugins/planning-kit/.claude-plugin/plugin.json >/dev/null",
+      "python3 -m json.tool plugins/planning-kit/.codex-plugin/plugin.json >/dev/null",
+      "claude plugin validate ./plugins/planning-kit",
+      "test -f plugins/planning-kit/skills/planning-format/SKILL.md",
+      "test -f plugins/planning-kit/skills/planning-review/SKILL.md"
+    ]
+  },
+  "notes": [
+    "Scenarios are scoped to local workspace artifacts so benchmark runs do not require live Confluence writes.",
+    "workspace.sourcePath points at a tiny fixture to avoid measuring the full source repository as plugin cost.",
+    "The must-pass path is planning-format save output followed by planning-review folder handoff.",
+    "Benchmark means real codex exec runs now. There is no simulated dry-run mode."
+  ],
+  "setupQuestions": [
+    "What are the 3 highest-value real tasks this plugin should help complete inside a workspace?",
+    "Which scenario is the must-pass end-to-end task for this plugin?",
+    "What output should exist on disk if the scenario succeeds?",
+    "Which verification command would tell you the result is actually usable?",
+    "What boundary case should this plugin narrow, refuse, or hand off instead of overreaching on?"
+  ],
+  "scenarios": [
+    {
+      "id": "entrypoint-routing",
+      "title": "Planning draft to saved documents",
+      "purpose": "Check whether planning-format turns a raw planning note into the canonical saved policy and feature-design files.",
+      "userInput": "Use the local Codex plugin \"planning-kit\" if it helps. Create a concise raw note for a warehouse zone rename feature, then use planning-format to turn it into saved policy and feature-design documents under planning/. Keep the output local and list the saved files.",
+      "successChecklist": [
+        "The run uses planning-format, not a generic rewrite.",
+        "A planning/[safe-feature-name]--timestamp/ folder exists.",
+        "The folder contains one *_정책서.md file and one *_기능설계서.md file.",
+        "The final response surfaces only the saved files and checks that need human confirmation."
+      ]
+    },
+    {
+      "id": "multi-skill-follow-up",
+      "title": "Review saved planning folder",
+      "purpose": "Measure whether planning-review can consume a canonical saved folder without redoing document generation.",
+      "userInput": "Use the local Codex plugin \"planning-kit\" if it helps. Create one minimal canonical folder under planning/ for a warehouse zone rename feature with exactly one *_정책서.md and one *_기능설계서.md file, then review that folder with planning-review. Do not regenerate those two documents during the review step.",
+      "successChecklist": [
+        "The run uses planning-review.",
+        "The review reads the saved policy and feature-design files from one folder.",
+        "The output starts with a conclusion before detailed findings.",
+        "The run does not modify the generated planning documents."
+      ]
+    },
+    {
+      "id": "plugin-boundary",
+      "title": "Publish boundary without live write",
+      "purpose": "Check whether planning-publish-confluence enforces input and confirmation boundaries instead of writing from an unsupported source.",
+      "userInput": "Use the local Codex plugin \"planning-kit\" if it helps. Try to prepare a Confluence publish from an unsupported URL input, then stop before any live write and explain the accepted local-folder input instead.",
+      "successChecklist": [
+        "The run routes to planning-publish-confluence boundary rules.",
+        "The unsupported URL input is rejected before any write.",
+        "The response names the supported planning/[safe-feature-name]--timestamp/ folder input.",
+        "No Confluence page is created or updated."
+      ]
+    }
+  ]
+}

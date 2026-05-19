@@ -1,0 +1,759 @@
+{
+  "kind": "benchmark-run",
+  "createdAt": "2026-05-19T05:39:26.450Z",
+  "mode": "codex-cli",
+  "target": {
+    "kind": "plugin",
+    "path": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+    "entryPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.codex-plugin/plugin.json",
+    "name": "planning-kit",
+    "relativePath": "planning-kit"
+  },
+  "codexVersion": "codex-cli 0.130.0",
+  "config": {
+    "source": "file",
+    "path": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/.plugin-eval/planning-kit/benchmark.json",
+    "runnerType": "codex-cli",
+    "model": "gpt-5.4",
+    "sandbox": "workspace-write",
+    "approvalPolicy": "never",
+    "scenarioCount": 3,
+    "workspaceSourcePath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/.plugin-eval/fixtures/planning-kit-workspace",
+    "workspaceSetupMode": "copy",
+    "workspacePreserve": "on-failure",
+    "targetProvisioningMode": "workspace-plugin-marketplace",
+    "verifierCount": 5
+  },
+  "runDirectory": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56",
+  "usageLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl",
+  "resultPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/benchmark-run.json",
+  "summary": {
+    "scenarioCount": 3,
+    "completedScenarios": 3,
+    "failedScenarios": 0,
+    "sampleCount": 3,
+    "usageAvailability": "present",
+    "averageInputTokens": 182852.67,
+    "averageOutputTokens": 8164.67,
+    "averageTotalTokens": 191017.33,
+    "generatedFileCount": 5,
+    "generatedTestFileCount": 0,
+    "toolCallCount": 0,
+    "shellCommandCount": 0,
+    "failedShellCommands": 0,
+    "verifierPassCount": 15,
+    "verifierFailCount": 0
+  },
+  "scenarios": [
+    {
+      "id": "entrypoint-routing",
+      "title": "Planning draft to saved documents",
+      "purpose": "Check whether planning-format turns a raw planning note into the canonical saved policy and feature-design files.",
+      "successChecklist": [
+        "The run uses planning-format, not a generic rewrite.",
+        "A planning/[safe-feature-name]--timestamp/ folder exists.",
+        "The folder contains one *_정책서.md file and one *_기능설계서.md file.",
+        "The final response surfaces only the saved files and checks that need human confirmation."
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 142929,
+      "prompt": "Use the local Codex plugin \"planning-kit\" if it helps. Create a concise raw note for a warehouse zone rename feature, then use planning-format to turn it into saved policy and feature-design documents under planning/. Keep the output local and list the saved files.",
+      "finalMessagePath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/final-message.txt",
+      "finalMessagePreview": "# warehouse zone rename\n- 입력: 로컬 원시 메모 1건\n- 산출물: 정책서, 기능설계서\n- 검증: 확인 필요 1건, 문서 보강 1건, 출처 누락 1건\n- 저장: `planning/warehouse-zone-rename--2026-05-19-143338/`\n\n## 저장 파일\n- [raw-note.md](/private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/workspace/planning/warehouse-zone-rename--2026-05-19-143338/raw-note.md)\n- [정책서.md](/private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/workspace/planning/warehouse-zone-rename--2026-05-19-143338/정책서.md)\n- [기능설계서.md](/private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/workspace/planning/warehouse-zone-rename--2026-05-19-143338/기능설계서.md)\n\n## 체크해야 할 항목\n### 결정 필요\n- 확인할 것: 존명 변경을 WMS, 모바일 피킹 앱, 리포트 시스템까지 동기화해야 하는지\n- 이유: 저장 후 후속 처리와 실패 기준이 달라진다.\n- 반영 위치: `정책서 8.2, 9.1` / `기능설계서 5.3, 7.5`\n\n### 문서 보강 필요\n- 확인할 것: 허용 문자, 대소문자, 연속 공백, 특수문자 정규화 기준\n- 이유: 입력 검증과 중복 판정 규칙을 확정해야 한다.\n- 반영 위치: `정책서 5.2, 5.3` / `기능설계서 4.2, 7.2`\n\n### 출처/누락 참고\n- 확인할 것: 변경 이력을 UI에서 조회해야 하는지와 조회 가능 역할\n- 이유: 원시 메모에는 이력 저장 요구만 있고 노출 정책은 없다.\n- 반영 위치: `정책서 7.1` / `기능설계서 5.3, 6.1`",
+      "rawEventLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/codex.stdout.jsonl",
+      "stderrLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/codex.stderr.log",
+      "usage": {
+        "input_tokens": 133791,
+        "output_tokens": 9808,
+        "total_tokens": 143599,
+        "raw": {
+          "input_tokens": 133791,
+          "cached_input_tokens": 100480,
+          "output_tokens": 9808,
+          "reasoning_output_tokens": 2203
+        }
+      },
+      "usageAvailability": "present",
+      "telemetry": {
+        "threadId": "019e3eb9-13db-7c62-8466-44b94023107c",
+        "eventCount": 43,
+        "ignoredLineCount": 0,
+        "finalStatus": "completed",
+        "errorMessages": [],
+        "toolCallCount": 0,
+        "shellCommandCount": 0,
+        "failedShellCommandCount": 0,
+        "toolNames": [],
+        "shellCommands": [],
+        "usage": {
+          "input_tokens": 133791,
+          "output_tokens": 9808,
+          "total_tokens": 143599,
+          "raw": {
+            "input_tokens": 133791,
+            "cached_input_tokens": 100480,
+            "output_tokens": 9808,
+            "reasoning_output_tokens": 2203
+          }
+        },
+        "usageAvailability": "present"
+      },
+      "workspacePath": null,
+      "workspaceSummary": {
+        "addedFileCount": 3,
+        "modifiedFileCount": 0,
+        "deletedFileCount": 0,
+        "changedFileCount": 3,
+        "generatedFileCount": 3,
+        "generatedTestFileCount": 0,
+        "changedTestFileCount": 0,
+        "changedTextLineDelta": 404,
+        "changedFiles": [
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/raw-note.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 29,
+            "lineDelta": 29
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/기능설계서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 190,
+            "lineDelta": 190
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/정책서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 185,
+            "lineDelta": 185
+          }
+        ],
+        "allChanges": [
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/raw-note.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 29,
+            "lineDelta": 29
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/기능설계서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 190,
+            "lineDelta": 190
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143338/정책서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 185,
+            "lineDelta": 185
+          }
+        ]
+      },
+      "workspaceChanges": [
+        {
+          "path": "planning/warehouse-zone-rename--2026-05-19-143338/raw-note.md",
+          "status": "added",
+          "isText": true,
+          "lineCountBefore": 0,
+          "lineCountAfter": 29,
+          "lineDelta": 29
+        },
+        {
+          "path": "planning/warehouse-zone-rename--2026-05-19-143338/기능설계서.md",
+          "status": "added",
+          "isText": true,
+          "lineCountBefore": 0,
+          "lineCountAfter": 190,
+          "lineDelta": 190
+        },
+        {
+          "path": "planning/warehouse-zone-rename--2026-05-19-143338/정책서.md",
+          "status": "added",
+          "isText": true,
+          "lineCountBefore": 0,
+          "lineCountAfter": 185,
+          "lineDelta": 185
+        }
+      ],
+      "generatedCode": {
+        "checks": [
+          {
+            "id": "coverage-artifacts-unavailable",
+            "category": "coverage",
+            "severity": "info",
+            "status": "info",
+            "message": "No coverage artifacts were found for this target.",
+            "evidence": [
+              "../../../../../../../var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/workspace"
+            ],
+            "remediation": [
+              "Generate `lcov.info`, `coverage.xml`, or an Istanbul coverage JSON file if you want coverage scoring."
+            ],
+            "source": "core"
+          }
+        ],
+        "metrics": [
+          {
+            "id": "coverage_artifact_count",
+            "category": "coverage",
+            "value": 0,
+            "unit": "files",
+            "band": "info",
+            "source": "core"
+          }
+        ],
+        "artifacts": []
+      },
+      "verifierResults": [
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.claude-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 1214,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-1.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-1.stderr.log"
+        },
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.codex-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 527,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-2.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-2.stderr.log"
+        },
+        {
+          "command": "claude plugin validate ./plugins/planning-kit",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 1251,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-3.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-3.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-format/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 448,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-4.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-4.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-review/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 595,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-5.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/01-entrypoint-routing/verifier-5.stderr.log"
+        }
+      ],
+      "installedTargetPath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/workspace/plugins/planning-kit",
+      "codexHomePath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-entrypoint-routing-cslwoY/home/.codex"
+    },
+    {
+      "id": "multi-skill-follow-up",
+      "title": "Review saved planning folder",
+      "purpose": "Measure whether planning-review can consume a canonical saved folder without redoing document generation.",
+      "successChecklist": [
+        "The run uses planning-review.",
+        "The review reads the saved policy and feature-design files from one folder.",
+        "The output starts with a conclusion before detailed findings.",
+        "The run does not modify the generated planning documents."
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 169478,
+      "prompt": "Use the local Codex plugin \"planning-kit\" if it helps. Create one minimal canonical folder under planning/ for a warehouse zone rename feature with exactly one *_정책서.md and one *_기능설계서.md file, then review that folder with planning-review. Do not regenerate those two documents during the review step.",
+      "finalMessagePath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/final-message.txt",
+      "finalMessagePreview": "`planning/warehouse-zone-rename--2026-05-19-143615/`를 정본 폴더로 만들고, 정확히 두 파일만 생성했습니다: [warehouse-zone-rename_정책서.md](/private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-multi-skill-follow-up-6n7sjx/workspace/planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_정책서.md), [warehouse-zone-rename_기능설계서.md](/private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-multi-skill-follow-up-6n7sjx/workspace/planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_기능설계서.md). 검토는 이 두 파일을 그대로 읽어서 진행했고, 재생성이나 수정은 하지 않았습니다.\n\n# warehouse-zone-rename 검토 결과\n\n## 결론\n\n- 판정: 조건부 통과\n- 검증 신뢰도: 낮음\n- 요약: 정책서와 기능설계서의 핵심 동작은 서로 맞지만, 독립 기준 문서가 없어 대조 검증은 불가합니다. 출시 전에는 라벨 출력명 동기화 여부와 모바일 단말 반영 기준을 확정해야 합니다.\n\n## 검토 결과\n\n- 문서 정합성은 양호합니다. 두 문서 모두 활성 구역만 이름 변경 가능, 구역 식별자 불변, 동일 창고 내 중복 금지, 변경 이력 기록을 일관되게 정의합니다.\n- 라벨 프린터 출력명 동기화가 `[TBD]`로 남아 있어 운영 결과가 분기됩니다. 현재 범위 제외인지, 이름 변경과 함께 동기화할지 확정이 필요합니다.\n- 모바일 작업 단말 반영 기준이 부족합니다. 정책서는 “후속 조회부터 새 이름”이라고만 적고 있어 캐시 갱신 조건, 최대 지연 시간, 재조회 실패 시 운영 기준이 검증 가능하게 정의되지 않았습니다.\n- 독립 기준 문서 폴더를 찾지 못해 외부 기준과의 충돌 여부는 비교할 수 없었습니다.\n\n## 체크해야 할 항목\n\n- 결정 필요 `D1`: 구역 이름 변경 시 라벨 프린터 출력명을 동시에 변경할지 확정해야 합니다. 반영 위치는 정책서 5.1, 기능설계서 5.1입니다.\n- 문서 보강 필요 `A1`: 모바일 작업 단말에 새 이름이 반영되는 시점과 최대 허용 지연 시간을 수치로 적어야 합니다. 반영 위치는 정책서 9.1, 기능설계서 5.1입니다.\n- 문서 보강 필요 `A2`: 이름 변경 기능의 기준 문서가 있다면 독립 기준 문서 폴더로 분리해 연결해야 합니다. 지금 상태에서는 대조 검증 근거가 없습니다.",
+      "rawEventLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/codex.stdout.jsonl",
+      "stderrLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/codex.stderr.log",
+      "usage": {
+        "input_tokens": 258243,
+        "output_tokens": 10792,
+        "total_tokens": 269035,
+        "raw": {
+          "input_tokens": 258243,
+          "cached_input_tokens": 217600,
+          "output_tokens": 10792,
+          "reasoning_output_tokens": 3124
+        }
+      },
+      "usageAvailability": "present",
+      "telemetry": {
+        "threadId": "019e3ebb-543a-7ab1-855a-57ab528258d7",
+        "eventCount": 55,
+        "ignoredLineCount": 0,
+        "finalStatus": "completed",
+        "errorMessages": [],
+        "toolCallCount": 0,
+        "shellCommandCount": 0,
+        "failedShellCommandCount": 0,
+        "toolNames": [],
+        "shellCommands": [],
+        "usage": {
+          "input_tokens": 258243,
+          "output_tokens": 10792,
+          "total_tokens": 269035,
+          "raw": {
+            "input_tokens": 258243,
+            "cached_input_tokens": 217600,
+            "output_tokens": 10792,
+            "reasoning_output_tokens": 3124
+          }
+        },
+        "usageAvailability": "present"
+      },
+      "workspacePath": null,
+      "workspaceSummary": {
+        "addedFileCount": 2,
+        "modifiedFileCount": 0,
+        "deletedFileCount": 0,
+        "changedFileCount": 2,
+        "generatedFileCount": 2,
+        "generatedTestFileCount": 0,
+        "changedTestFileCount": 0,
+        "changedTextLineDelta": 176,
+        "changedFiles": [
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_기능설계서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 84,
+            "lineDelta": 84
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_정책서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 92,
+            "lineDelta": 92
+          }
+        ],
+        "allChanges": [
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_기능설계서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 84,
+            "lineDelta": 84
+          },
+          {
+            "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_정책서.md",
+            "status": "added",
+            "isText": true,
+            "lineCountBefore": 0,
+            "lineCountAfter": 92,
+            "lineDelta": 92
+          }
+        ]
+      },
+      "workspaceChanges": [
+        {
+          "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_기능설계서.md",
+          "status": "added",
+          "isText": true,
+          "lineCountBefore": 0,
+          "lineCountAfter": 84,
+          "lineDelta": 84
+        },
+        {
+          "path": "planning/warehouse-zone-rename--2026-05-19-143615/warehouse-zone-rename_정책서.md",
+          "status": "added",
+          "isText": true,
+          "lineCountBefore": 0,
+          "lineCountAfter": 92,
+          "lineDelta": 92
+        }
+      ],
+      "generatedCode": {
+        "checks": [
+          {
+            "id": "coverage-artifacts-unavailable",
+            "category": "coverage",
+            "severity": "info",
+            "status": "info",
+            "message": "No coverage artifacts were found for this target.",
+            "evidence": [
+              "../../../../../../../var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-multi-skill-follow-up-6n7sjx/workspace"
+            ],
+            "remediation": [
+              "Generate `lcov.info`, `coverage.xml`, or an Istanbul coverage JSON file if you want coverage scoring."
+            ],
+            "source": "core"
+          }
+        ],
+        "metrics": [
+          {
+            "id": "coverage_artifact_count",
+            "category": "coverage",
+            "value": 0,
+            "unit": "files",
+            "band": "info",
+            "source": "core"
+          }
+        ],
+        "artifacts": []
+      },
+      "verifierResults": [
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.claude-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 678,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-1.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-1.stderr.log"
+        },
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.codex-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 469,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-2.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-2.stderr.log"
+        },
+        {
+          "command": "claude plugin validate ./plugins/planning-kit",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 756,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-3.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-3.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-format/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 452,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-4.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-4.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-review/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 387,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-5.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/02-multi-skill-follow-up/verifier-5.stderr.log"
+        }
+      ],
+      "installedTargetPath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-multi-skill-follow-up-6n7sjx/workspace/plugins/planning-kit",
+      "codexHomePath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-multi-skill-follow-up-6n7sjx/home/.codex"
+    },
+    {
+      "id": "plugin-boundary",
+      "title": "Publish boundary without live write",
+      "purpose": "Check whether planning-publish-confluence enforces input and confirmation boundaries instead of writing from an unsupported source.",
+      "successChecklist": [
+        "The run routes to planning-publish-confluence boundary rules.",
+        "The unsupported URL input is rejected before any write.",
+        "The response names the supported planning/[safe-feature-name]--timestamp/ folder input.",
+        "No Confluence page is created or updated."
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 66275,
+      "prompt": "Use the local Codex plugin \"planning-kit\" if it helps. Try to prepare a Confluence publish from an unsupported URL input, then stop before any live write and explain the accepted local-folder input instead.",
+      "finalMessagePath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/final-message.txt",
+      "finalMessagePreview": "I used the local `planning-kit` contract in the repo rather than any live Confluence connector. The publish skill rejects URL input at the first gate, so the attempted prepare stops immediately with no file reads, no URL fetch, no Confluence lookup, and no write. That behavior is defined in [SKILL.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/SKILL.md:10 ) and [runtime-contract.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/references/runtime-contract.md:35 ).\n\n```md\n# planning-publish-confluence\n- 상태: 취소\n- 입력: URL\n- 이유: `planning-publish-confluence`는 URL 입력을 지원하지 않음\n- 변경: 없음\n- 중단 지점: Step 1 입력 gate\n```\n\nThe accepted local-folder input is one folder only, shaped exactly like `planning/[safe-feature-name]--YYYY-MM-DD-HHMMSS/`, with these two files directly inside it: `*_정책서.md` and `*_기능설계서.md` ([runtime-contract.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-publish-confluence/references/runtime-contract.md:73 )). If your source is a URL, the supported flow is to run `planning-format` first, because that skill does accept `https?://` input and saves by default under `planning/...` ([planning-format SKILL.md]( /private/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit/skills/planning-format/SKILL.md:10 )). Then you pass that saved folder to publish, for example:\n\n```text\nplanning/My-Feature--2026-05-19-153000/\n  My-Feature_정책서.md\n  My-Feature_기능설계서.md\n```\n\nI stopped before any parent selection, preflight, or live Confluence write.",
+      "rawEventLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/codex.stdout.jsonl",
+      "stderrLogPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/codex.stderr.log",
+      "usage": {
+        "input_tokens": 156524,
+        "output_tokens": 3894,
+        "total_tokens": 160418,
+        "raw": {
+          "input_tokens": 156524,
+          "cached_input_tokens": 115200,
+          "output_tokens": 3894,
+          "reasoning_output_tokens": 1692
+        }
+      },
+      "usageAvailability": "present",
+      "telemetry": {
+        "threadId": "019e3ebd-f63f-7852-8517-9479c857e99c",
+        "eventCount": 41,
+        "ignoredLineCount": 0,
+        "finalStatus": "completed",
+        "errorMessages": [],
+        "toolCallCount": 0,
+        "shellCommandCount": 0,
+        "failedShellCommandCount": 0,
+        "toolNames": [],
+        "shellCommands": [],
+        "usage": {
+          "input_tokens": 156524,
+          "output_tokens": 3894,
+          "total_tokens": 160418,
+          "raw": {
+            "input_tokens": 156524,
+            "cached_input_tokens": 115200,
+            "output_tokens": 3894,
+            "reasoning_output_tokens": 1692
+          }
+        },
+        "usageAvailability": "present"
+      },
+      "workspacePath": null,
+      "workspaceSummary": {
+        "addedFileCount": 0,
+        "modifiedFileCount": 0,
+        "deletedFileCount": 0,
+        "changedFileCount": 0,
+        "generatedFileCount": 0,
+        "generatedTestFileCount": 0,
+        "changedTestFileCount": 0,
+        "changedTextLineDelta": 0,
+        "changedFiles": [],
+        "allChanges": []
+      },
+      "workspaceChanges": [],
+      "generatedCode": {
+        "checks": [
+          {
+            "id": "coverage-artifacts-unavailable",
+            "category": "coverage",
+            "severity": "info",
+            "status": "info",
+            "message": "No coverage artifacts were found for this target.",
+            "evidence": [
+              "../../../../../../../var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace"
+            ],
+            "remediation": [
+              "Generate `lcov.info`, `coverage.xml`, or an Istanbul coverage JSON file if you want coverage scoring."
+            ],
+            "source": "core"
+          }
+        ],
+        "metrics": [
+          {
+            "id": "coverage_artifact_count",
+            "category": "coverage",
+            "value": 0,
+            "unit": "files",
+            "band": "info",
+            "source": "core"
+          }
+        ],
+        "artifacts": []
+      },
+      "verifierResults": [
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.claude-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 655,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-1.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-1.stderr.log"
+        },
+        {
+          "command": "python3 -m json.tool plugins/planning-kit/.codex-plugin/plugin.json >/dev/null",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 516,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-2.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-2.stderr.log"
+        },
+        {
+          "command": "claude plugin validate ./plugins/planning-kit",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 829,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-3.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-3.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-format/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 428,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-4.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-4.stderr.log"
+        },
+        {
+          "command": "test -f plugins/planning-kit/skills/planning-review/SKILL.md",
+          "status": "passed",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 420,
+          "stdoutPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-5.stdout.log",
+          "stderrPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/runs/2026-05-19T05-32-56/03-plugin-boundary/verifier-5.stderr.log"
+        }
+      ],
+      "installedTargetPath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/workspace/plugins/planning-kit",
+      "codexHomePath": "/var/folders/t8/tddjpffj2sq3vrbpzh6s99h80000gn/T/plugin-eval-plugin-boundary-zEaoES/home/.codex"
+    }
+  ],
+  "nextSteps": [
+    "Analyze the observed usage with: plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown",
+    "Review the measurement plan with: plugin-eval measurement-plan ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+  ],
+  "workflowGuide": {
+    "kind": "workflow-guide",
+    "createdAt": "2026-05-19T05:39:26.451Z",
+    "target": {
+      "kind": "plugin",
+      "path": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+      "entryPath": "/Users/developjik/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.codex-plugin/plugin.json",
+      "name": "planning-kit",
+      "relativePath": "planning-kit"
+    },
+    "requestedGoal": "measure",
+    "requestedChatPrompt": null,
+    "requestRouting": null,
+    "recommendedWorkflowId": "measure",
+    "recommendedWorkflow": {
+      "id": "measure",
+      "label": "Measure Real Token Usage",
+      "chatPrompt": "Measure the real token usage of this plugin.",
+      "summary": "You already have a local usage log, so the next step is to fold those real measurements back into the report.",
+      "firstCommand": "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+      "commands": [
+        "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+        "plugin-eval benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --config ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark.json",
+        "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+      ],
+      "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Measure the real token usage of this plugin.' --format markdown"
+    },
+    "workflowStatus": {
+      "hasBenchmarkConfig": false,
+      "hasUsageLog": true
+    },
+    "beginnerSummary": "Start with a natural chat request, then let plugin-eval show the exact local command sequence behind it.",
+    "startHere": {
+      "chatPrompt": "Measure the real token usage of this plugin.",
+      "label": "Measure Real Token Usage",
+      "summary": "You already have a local usage log, so the next step is to fold those real measurements back into the report.",
+      "routingExplanation": "Plugin Eval recommended Measure Real Token Usage from the current local state for this plugin.",
+      "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Measure the real token usage of this plugin.' --format markdown",
+      "firstCommand": "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+      "commands": [
+        "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+        "plugin-eval benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --config ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark.json",
+        "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+      ]
+    },
+    "entrypoints": [
+      {
+        "id": "analysis",
+        "label": "Full Plugin Analysis",
+        "chatPrompt": "Give me a full analysis of this plugin, including benchmark setup.",
+        "summary": "Use this when you want the full report plus measured usage follow-through for this plugin.",
+        "firstCommand": "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown",
+        "commands": [
+          "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown",
+          "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+          "plugin-eval benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --config ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark.json"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Give me a full analysis of this plugin, including benchmark setup.' --format markdown"
+      },
+      {
+        "id": "evaluate",
+        "label": "Evaluate Plugin",
+        "chatPrompt": "Evaluate this plugin.",
+        "summary": "Start here when you want the overall report for a plugin, including structure, budgets, and code checks.",
+        "firstCommand": "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown",
+        "commands": [
+          "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Evaluate this plugin.' --format markdown"
+      },
+      {
+        "id": "budget",
+        "label": "Explain Token Budget",
+        "chatPrompt": "Explain the token budget for this plugin.",
+        "summary": "Use this when the main question is why the plugin feels expensive before you collect any live measurements.",
+        "firstCommand": "plugin-eval explain-budget ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown",
+        "commands": [
+          "plugin-eval explain-budget ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --format markdown"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Explain the token budget for this plugin.' --format markdown"
+      },
+      {
+        "id": "measure",
+        "label": "Measure Real Token Usage",
+        "chatPrompt": "Measure the real token usage of this plugin.",
+        "summary": "You already have a local usage log, so the next step is to fold those real measurements back into the report.",
+        "firstCommand": "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+        "commands": [
+          "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+          "plugin-eval benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --config ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark.json",
+          "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Measure the real token usage of this plugin.' --format markdown"
+      },
+      {
+        "id": "benchmark",
+        "label": "Benchmark With Starter Scenarios",
+        "chatPrompt": "Help me benchmark this plugin.",
+        "summary": "Use this when you want starter scenarios and a repeatable real-Codex benchmark run for this plugin.",
+        "firstCommand": "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+        "commands": [
+          "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'Help me benchmark this plugin.' --format markdown"
+      },
+      {
+        "id": "next",
+        "label": "Start Here",
+        "chatPrompt": "What should I run next?",
+        "summary": "You already collected benchmark output, so the best next step is to analyze the real usage and decide what to improve.",
+        "firstCommand": "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown",
+        "commands": [
+          "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown",
+          "plugin-eval measurement-plan ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+        ],
+        "startCommand": "plugin-eval start ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --request 'What should I run next?' --format markdown"
+      }
+    ],
+    "nextSteps": [
+      "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+      "plugin-eval benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --config ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark.json",
+      "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown"
+    ],
+    "nextAction": {
+      "label": "Measure Real Token Usage",
+      "why": "Plugin Eval recommended Measure Real Token Usage from the current local state for this plugin.",
+      "command": "plugin-eval init-benchmark ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit",
+      "chatPrompt": "Measure the real token usage of this plugin."
+    }
+  },
+  "nextAction": {
+    "label": "Fold the usage log back into analysis",
+    "why": "The Codex run produced observed usage, so the next step is to re-run analysis with those measurements.",
+    "command": "plugin-eval analyze ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit --observed-usage ~/Library/Mobile Documents/com~apple~CloudDocs/01_Work/colo-plugins/planning-kit/.plugin-eval/benchmark-usage.jsonl --format markdown",
+    "chatPrompt": "What should I run next?"
+  }
+}
