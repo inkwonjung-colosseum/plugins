@@ -1,6 +1,6 @@
 {
   "name": "planning-kit",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "planning-format 저장 파일, planning-review 통합 리뷰, ssot-audit, planning-publish-confluence.",
   "author": {
     "name": "developjik",

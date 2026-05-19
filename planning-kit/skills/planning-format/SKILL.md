@@ -28,4 +28,12 @@ Dispatch input, collect linked sources, fetch breadth-first unless disabled, mer
 
 ## References
 
-Read `references/runtime-contract.md` for edge cases. Load `connector-routing`, `conversion-rules`, `exclusion-rules`, `self-review-rules`, `output-contract`, and the two templates only when that detail is needed.
+Load only what the current step needs:
+
+- `references/runtime-contract.md`: input dispatch, save, or output edge cases.
+- `references/connector-routing.md`: URL fetch or connector fallback.
+- `references/conversion-rules.md`: image handling, merge, mapping, or template conversion.
+- `references/exclusion-rules.md`: unmapped input, `[TBD]`, or omission tracking.
+- `references/self-review-rules.md`: F1-F6 quality review.
+- `references/output-contract.md`: save handoff, checklist, or final response shape.
+- `templates/정책서.md` and `templates/기능설계서.md`: Step 6 document generation.

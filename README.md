@@ -32,7 +32,7 @@ Cowork는 Claude Desktop 앱에서 plugin을 설치합니다. 현재는 `Cowork`
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `planning-kit` | `0.2.15` | 기획 초안을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 보여주는 `planning-format`, 결론·검토 결과를 먼저 보여주는 `planning-review`, 현재 context memory 또는 명시적 저장 폴더를 `v0.7` Confluence 후보 문서로 발행하는 `planning-publish-confluence`, 독립 `SSOT` 표시 폴더 Markdown만 감사하는 `ssot-audit` 네 스킬 구조. 전문을 화면에 펼치려면 `--no-save`를 사용합니다. | `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` | [README](./planning-kit/README.md) |
+| `planning-kit` | `0.2.16` | 기획 초안을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 보여주는 `planning-format`, 결론·검토 결과를 먼저 보여주는 `planning-review`, 현재 context memory 또는 명시적 저장 폴더를 `v0.7` Confluence 후보 문서로 발행하는 `planning-publish-confluence`, 독립 `SSOT` 표시 폴더 Markdown만 감사하는 `ssot-audit` 네 스킬 구조. 전문을 화면에 펼치려면 `--no-save`를 사용합니다. | `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` | [README](./planning-kit/README.md) |
 
 ## 사용 문법
 

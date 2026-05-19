@@ -1,6 +1,6 @@
 # planning-format workflow
 
-`/planning-kit:planning-format` 한 호출의 0.2.14 흐름을 정리한 문서입니다. 동작 명세는 `skills/planning-format/SKILL.md`, 출력 계약은 `skills/planning-format/references/output-contract.md`에 있습니다.
+`/planning-kit:planning-format` 한 호출의 0.2.16 흐름을 정리한 문서입니다. 0.2.16 runtime은 0.2.14에서 확정한 결과 우선 출력 계약을 유지합니다. 동작 명세는 [SKILL.md](../../../planning-kit/skills/planning-format/SKILL.md), 출력 계약은 [output-contract.md](../../../planning-kit/skills/planning-format/references/output-contract.md)에 있습니다.
 
 ## 1. 전체 시퀀스
 

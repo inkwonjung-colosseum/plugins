@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "planning-kit",
-      "version": "0.2.15",
+      "version": "0.2.16",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit.",
       "source": {
         "source": "local",

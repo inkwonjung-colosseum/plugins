@@ -1,6 +1,6 @@
 # planning-review workflow
 
-`/planning-kit:planning-review` 한 호출의 0.2.14 흐름을 정리한 문서입니다. 동작 명세는 `skills/planning-review/SKILL.md`, 검증 기준은 `skills/planning-review/references/ssot-rules.md`·`ac-rules.md`·`deps-rules.md`에 있습니다.
+`/planning-kit:planning-review` 한 호출의 0.2.16 흐름을 정리한 문서입니다. 0.2.16 runtime은 0.2.14에서 확정한 저장 파일 handoff와 결과 우선 출력 계약을 유지합니다. 동작 명세는 [SKILL.md](../../../planning-kit/skills/planning-review/SKILL.md), 검증 기준은 [ssot-rules.md](../../../planning-kit/skills/planning-review/references/ssot-rules.md)·[ac-rules.md](../../../planning-kit/skills/planning-review/references/ac-rules.md)·[deps-rules.md](../../../planning-kit/skills/planning-review/references/deps-rules.md)에 있습니다.
 
 ## 1. 전체 시퀀스
 
@@ -31,7 +31,7 @@ flowchart TD
 
 ## 2. 저장 파일 handoff
 
-0.2.14에서 `planning-format` 기본 저장 성공 출력은 정책서·기능설계서 전문을 화면에 펼치지 않습니다. 그래서 `planning-review` 0개 인자 conversation 모드는 직전 출력의 `## 저장 파일`을 안전하게 읽을 수 있습니다.
+0.2.16에서도 `planning-format` 기본 저장 성공 출력은 정책서·기능설계서 전문을 화면에 펼치지 않습니다. 그래서 `planning-review` 0개 인자 conversation 모드는 직전 출력의 `## 저장 파일`을 안전하게 읽을 수 있습니다.
 
 허용 bullet:
 
@@ -106,8 +106,8 @@ flowchart LR
 
 | 파일 | 역할 |
 |---|---|
-| `skills/planning-review/SKILL.md` | 동작 시퀀스 골격 |
-| `skills/planning-review/references/ssot-rules.md` | R1 SSOT 충돌 점검 |
-| `skills/planning-review/references/ac-rules.md` | R2 Acceptance Criteria 기준 |
-| `skills/planning-review/references/deps-rules.md` | R3 의존·영향 기준 |
-| `skills/planning-format/references/output-contract.md` | 0.2.14 저장 파일, `--no-save`, parser boundary |
+| [SKILL.md](../../../planning-kit/skills/planning-review/SKILL.md) | 동작 시퀀스 골격 |
+| [ssot-rules.md](../../../planning-kit/skills/planning-review/references/ssot-rules.md) | R1 SSOT 충돌 점검 |
+| [ac-rules.md](../../../planning-kit/skills/planning-review/references/ac-rules.md) | R2 Acceptance Criteria 기준 |
+| [deps-rules.md](../../../planning-kit/skills/planning-review/references/deps-rules.md) | R3 의존·영향 기준 |
+| [output-contract.md](../../../planning-kit/skills/planning-format/references/output-contract.md) | 0.2.16 저장 파일, `--no-save`, parser boundary |
