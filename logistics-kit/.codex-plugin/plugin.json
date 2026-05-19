@@ -1,0 +1,22 @@
+{
+  "name": "logistics-kit",
+  "version": "0.1.0",
+  "description": "Logistics domain expert Skills (WMS/TMS/OMS/3PL).",
+  "author": { "name": "inkwonjung-colosseum", "email": "developjik@colosseum.kr" },
+  "license": "MIT",
+  "keywords": ["logistics", "wms", "tms", "oms"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "logistics-kit",
+    "shortDescription": "Logistics Skills",
+    "longDescription": "12 Skills providing on-demand logistics domain expertise across WMS, TMS, OMS, 3PL — design advisory, code review, ops debugging, regulatory check.",
+    "developerName": "inkwonjung-colosseum",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-kit#privacy",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-kit#terms",
+    "defaultPrompt": ["WMS 재고 검토"],
+    "brandColor": "#0E7490"
+  }
+}

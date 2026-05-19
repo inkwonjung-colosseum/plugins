@@ -1,6 +1,6 @@
-# planning-kit (0.2.16)
+# planning-kit (0.2.17)
 
-기획 초안을 정책서·기능설계서로 정리하고, review, SSOT audit, Confluence 후보 발행까지 이어주는 4-skill 플러그인입니다. 0.2.16 runtime은 0.2.14의 결과 우선 출력과 저장 파일 handoff 계약을 유지합니다.
+기획 초안을 정책서·기능설계서로 정리하고, review, SSOT audit, Confluence 후보 발행까지 이어주는 4-skill 플러그인입니다. 0.2.17 runtime은 0.2.14의 결과 우선 출력과 저장 파일 handoff 계약을 유지하고 Cursor marketplace 매니페스트를 추가합니다.
 
 ## 현재 품질 상태
 

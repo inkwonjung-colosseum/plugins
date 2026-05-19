@@ -1,0 +1,15 @@
+{
+  "name": "logistics-kit",
+  "version": "0.1.0",
+  "description": "Use when 물류 도메인(WMS/TMS/OMS/3PL) 설계/리뷰/운영/규제 검토. 12 Skills — inventory, routing, fulfillment, returns, cold-chain, compliance, settlement, data-model, events, idempotency, KPI, glossary.",
+  "author": {
+    "name": "inkwonjung-colosseum",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/logistics-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": ["logistics", "wms", "tms", "oms"],
+  "skills": "./skills/"
+}

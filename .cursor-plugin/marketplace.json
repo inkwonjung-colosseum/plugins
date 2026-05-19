@@ -1,0 +1,27 @@
+{
+  "name": "inkwonjung-colosseum",
+  "owner": {
+    "name": "inkwonjung-colosseum",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "plugins": [
+    {
+      "name": "planning-kit",
+      "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit.",
+      "source": "./planning-kit",
+      "version": "0.2.17"
+    },
+    {
+      "name": "dbml-translator",
+      "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+      "source": "./dbml-translator",
+      "version": "0.1.0"
+    },
+    {
+      "name": "logistics-kit",
+      "description": "물류 도메인 전반(WMS/TMS/OMS/3PL) 상시 전문가 Skills 12종. 설계 자문·코드 리뷰·운영 질의·규제 검토.",
+      "source": "./logistics-kit",
+      "version": "0.1.0"
+    }
+  ]
+}

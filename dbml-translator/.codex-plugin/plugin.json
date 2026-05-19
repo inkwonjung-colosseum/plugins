@@ -1,0 +1,44 @@
+{
+  "name": "dbml-translator",
+  "version": "0.1.0",
+  "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+  "author": {
+    "name": "정인권",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "category": "documentation",
+  "keywords": [
+    "dbml",
+    "database",
+    "schema",
+    "documentation",
+    "prd",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "features": {
+    "plugin_hooks": false
+  },
+  "interface": {
+    "displayName": "DBML Translator",
+    "shortDescription": "Translate DBML schemas and diff them against product specs",
+    "longDescription": "Two skills for DBML workflows: dbml-explain turns a DBML schema into PM-readable narrative (entities, relations, enums, scenarios) and dbml-spec-diff compares a DBML schema against a PRD/기획서 to surface missing entities, drift, and cardinality conflicts.",
+    "developerName": "정인권",
+    "category": "Documentation",
+    "capabilities": [
+      "Read"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+    "defaultPrompt": [
+      "Explain this DBML schema to a non-technical stakeholder",
+      "Compare this DBML schema against the product spec and find gaps"
+    ],
+    "brandColor": "#0F766E"
+  }
+}

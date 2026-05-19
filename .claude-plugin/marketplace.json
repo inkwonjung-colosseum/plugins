@@ -12,9 +12,47 @@
       "name": "planning-kit",
       "source": "./planning-kit",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.2.16",
+      "version": "0.2.17",
       "license": "MIT",
-      "tags": ["planning", "product", "documentation", "review"]
+      "tags": [
+        "planning",
+        "product",
+        "documentation",
+        "review"
+      ]
+    },
+    {
+      "name": "dbml-translator",
+      "version": "0.1.0",
+      "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+      "source": "local",
+      "path": "./dbml-translator",
+      "author": {
+        "name": "정인권",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "category": "documentation"
+    },
+    {
+      "name": "logistics-kit",
+      "version": "0.1.0",
+      "description": "물류 도메인 전반(WMS/TMS/OMS/3PL) 상시 전문가 Skills 12종. 설계 자문·코드 리뷰·운영 질의·규제 검토.",
+      "source": "local",
+      "path": "./logistics-kit",
+      "author": {
+        "name": "inkwonjung-colosseum",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "category": "productivity",
+      "tags": [
+        "logistics",
+        "wms",
+        "tms",
+        "oms",
+        "supply-chain"
+      ]
     }
   ]
 }

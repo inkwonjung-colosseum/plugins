@@ -1,0 +1,12 @@
+{
+  "name": "dbml-translator",
+  "version": "0.1.0",
+  "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+  "author": {
+    "name": "정인권",
+    "email": "developjik@colosseum.kr"
+  },
+  "license": "MIT",
+  "category": "documentation",
+  "skills": "./skills/"
+}

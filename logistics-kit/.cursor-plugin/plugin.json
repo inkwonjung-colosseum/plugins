@@ -1,0 +1,8 @@
+{
+  "name": "logistics-kit",
+  "version": "0.1.0",
+  "description": "물류 도메인 전반(WMS/TMS/OMS/3PL) 상시 전문가 Skills 12종. 설계 자문·코드 리뷰·운영 질의·규제 검토.",
+  "author": {
+    "name": "inkwonjung-colosseum"
+  }
+}
