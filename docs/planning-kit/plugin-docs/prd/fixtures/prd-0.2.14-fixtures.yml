@@ -1,7 +1,7 @@
 schema_version: 1
 prd: "planning-kit PRD 0.2.14"
 purpose: "Golden expectations for result-first planning-format, saved-file handoff planning-review, explicit storage-folder publish input, parser boundaries, and save-failure fallback."
-status: "spec fixture data plus automated contract checks in planning-kit/tests/test_0_2_14_contract.py"
+status: "spec fixture data for result-first planning-format, saved-file handoff planning-review, and explicit storage-folder publish input."
 
 defaults:
   format: &format_fixture

@@ -1,7 +1,7 @@
 schema_version: 1
 prd: "planning-kit PRD 0.2.13"
 purpose: "Golden expectations for planning-publish-confluence context-memory-only publishing, v0.7 Confluence title labels, pre-confirm no-write safety, duplicate handling, readback, and partial failure."
-status: "spec fixture data plus automated mock dry-run release gates in planning-kit/tests/test_0_2_13_publish_dry_run.py"
+status: "spec fixture data for planning-publish-confluence mock dry-run release gates."
 
 defaults:
   publish: &publish_fixture

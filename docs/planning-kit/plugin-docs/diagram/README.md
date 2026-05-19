@@ -1,6 +1,6 @@
 # planning-kit diagram index
 
-PRD 문서를 제외한 `planning-kit/docs` Markdown의 Mermaid 블록을 `diagram-design` 스타일의 독립 HTML/SVG로 변환한 0.2.14 산출물입니다.
+PRD 문서를 제외한 `planning-kit/docs` Markdown의 Mermaid 블록을 독립 HTML/SVG로 변환한 0.2.14 산출물입니다.
 
 | Source | Section | Diagram | Nodes | Edges |
 |---|---|---:|---:|---:|

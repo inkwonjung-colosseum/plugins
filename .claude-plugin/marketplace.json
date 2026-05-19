@@ -9,42 +9,10 @@
   },
   "plugins": [
     {
-      "name": "product-team-kit",
-      "source": "./product-team-kit",
-      "description": "기획 입력을 기능설계서와 정책서 초안으로 정리하고, 로컬 config와 CLAUDE.md/AGENTS.md 안내 블록 설정, Product Docs SSOT 기반 2축(SSOT 충돌·용어 일관성) 외부 반영 전 검토까지 돕는 제품팀 도구입니다.",
-      "version": "0.7.5",
-      "license": "MIT",
-      "tags": ["planning", "product", "project-docs", "documentation"]
-    },
-    {
-      "name": "diagram-design",
-      "source": "./diagram-design",
-      "description": "기술·제품 다이어그램을 브랜드 스타일을 반영한 독립 HTML/SVG 산출물로 만드는 도구입니다.",
-      "version": "1.0.3",
-      "license": "MIT",
-      "tags": ["diagrams", "svg", "architecture", "flowchart", "visualization", "editorial"]
-    },
-    {
-      "name": "logistics-expert-kit",
-      "source": "./logistics-expert-kit",
-      "description": "물류 이슈 범위 정의, 운영 진단, KPI 설계, 리스크 검토를 돕는 범용 물류 도메인 도구입니다.",
-      "version": "0.1.1",
-      "license": "MIT",
-      "tags": ["logistics", "supply-chain", "operations", "warehouse", "transportation"]
-    },
-    {
-      "name": "ai-utility-kit",
-      "source": "./ai-utility-kit",
-      "description": "기획안 검토, 맥락 파악, 회의 요약, 용어 정리를 돕는 한국어 우선 AI 작업 유틸리티입니다.",
-      "version": "0.1.1",
-      "license": "MIT",
-      "tags": ["ai", "productivity", "thinking", "meeting-notes", "glossary"]
-    },
-    {
       "name": "planning-kit",
       "source": "./planning-kit",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.2.14",
+      "version": "0.2.15",
       "license": "MIT",
       "tags": ["planning", "product", "documentation", "review"]
     }

@@ -5,56 +5,8 @@
   },
   "plugins": [
     {
-      "name": "product-team-kit",
-      "source": {
-        "source": "local",
-        "path": "./product-team-kit"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "diagram-design",
-      "source": {
-        "source": "local",
-        "path": "./diagram-design"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "logistics-expert-kit",
-      "source": {
-        "source": "local",
-        "path": "./logistics-expert-kit"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "ai-utility-kit",
-      "source": {
-        "source": "local",
-        "path": "./ai-utility-kit"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "planning-kit",
-      "version": "0.2.14",
+      "version": "0.2.15",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit.",
       "source": {
         "source": "local",

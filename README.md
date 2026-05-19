@@ -10,11 +10,7 @@ GitHub repository marketplace를 추가한 뒤 필요한 플러그인을 설치�
 
 ```bash
 claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins
-claude plugin install product-team-kit@inkwonjung-colosseum
 claude plugin install planning-kit@inkwonjung-colosseum
-claude plugin install diagram-design@inkwonjung-colosseum
-claude plugin install logistics-expert-kit@inkwonjung-colosseum
-claude plugin install ai-utility-kit@inkwonjung-colosseum
 ```
 
 현재 Claude Code CLI 기준으로 plugin 관리 명령은 `marketplace add`, `marketplace update`, `install`, `update`, `list`, `enable`, `disable`, `uninstall`, `validate`, `tag`입니다. 예전 문서에 있던 `claude plugin add ./<plugin-dir>` 형식은 사용하지 않습니다.
@@ -23,7 +19,7 @@ claude plugin install ai-utility-kit@inkwonjung-colosseum
 
 Codex App을 사용하는 경우 Microsoft Store에서 Windows 앱을 설치한 뒤, 앱에서 `/plugins` 또는 plugin/skill 설정 화면을 열어 필요한 플러그인을 설치/활성화합니다. 플러그인 링크는 [https://github.com/inkwonjung-colosseum/plugins](https://github.com/inkwonjung-colosseum/plugins)입니다.
 
-스킬은 `$plan-format`, `$plan-review`, `$set-config`, `$planning-format`, `$planning-review`, `$planning-publish-confluence`, `$ssot-audit`, `$diagram-design`, `$logistics-scope`, `$ai-grill` 같은 skill invocation으로 사용합니다.
+스킬은 `$planning-format`, `$planning-review`, `$planning-publish-confluence`, `$ssot-audit` 같은 skill invocation으로 사용합니다.
 
 ### Cowork
 
@@ -36,70 +32,31 @@ Cowork는 Claude Desktop 앱에서 plugin을 설치합니다. 현재는 `Cowork`
 
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
-| `product-team-kit` | `0.7.5` | 기획 입력을 기능설계서와 정책서 초안으로 단일 패스 작성·자체 검증하며, `.product-team-kit/config.json`과 `CLAUDE.md`/`AGENTS.md` 안내 블록 설정, 단계별 lazy read, Product Docs SSOT 근거 기반 2축 점검(SSOT 충돌·용어 일관성)을 지원합니다. | `set-config`, `plan-format`, `plan-review` | [README](./product-team-kit/README.md) |
-| `planning-kit` | `0.2.14` | 기획 초안을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 보여주는 `planning-format`, 결론·검토 결과를 먼저 보여주는 `planning-review`, 현재 context memory 또는 명시적 저장 폴더를 `v0.7` Confluence 후보 문서로 발행하는 `planning-publish-confluence`, 독립 `SSOT` 표시 폴더 Markdown만 감사하는 `ssot-audit` 네 스킬 구조. 전문을 화면에 펼치려면 `--no-save`를 사용합니다. | `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` | [README](./planning-kit/README.md) |
-| `diagram-design` | `1.0.3` | 기술/제품 다이어그램 제작 workflow. architecture, flowchart, sequence, ER, timeline 등 타입별 standalone HTML/SVG 다이어그램 생성을 안내합니다. | `diagram-design` | [README](./diagram-design/README.md) |
-| `logistics-expert-kit` | `0.1.1` | 범용 물류 도메인 조언 도구. 물류 이슈 범위 정리, 운영 문제 진단, KPI 설계, 정책/프로세스 리스크 검토를 대화형으로 지원합니다. | `logistics-scope`, `logistics-diagnose`, `logistics-metrics`, `logistics-risk` | [README](./logistics-expert-kit/README.md) |
-| `ai-utility-kit` | `0.1.1` | 한국어 우선 범용 AI 활용 도구. 계획 검토, 맥락 지도화, 회의록 정리, 용어 정리를 대화형으로 지원합니다. | `ai-grill`, `context-map`, `meeting-brief`, `term-clarifier` | [README](./ai-utility-kit/README.md) |
-
-## 프로젝트 다이어그램
-
-프로젝트 workflow 다이어그램은 `docs/diagrams/` 아래의 standalone HTML/SVG 파일로 관리합니다. `product-team-kit` 다이어그램 2개는 `docs/diagrams/product-team-kit-workflow.source.json`에서 생성하므로 HTML을 직접 수정하지 않고 `python3 docs/diagrams/render_product_team_kit_workflow.py --write`로 갱신합니다.
-
-| 다이어그램 | 설명 |
-|---|---|
-| [`planning-confluence-document-workflow.html`](./docs/diagrams/planning-confluence-document-workflow.html) | Confluence export를 Product Docs Markdown 후보로 가져오는 보조 문서 운영 흐름 |
-| [`product-team-kit-workflow.html`](./docs/diagrams/product-team-kit-workflow.html) | `set-config`, agent 안내 블록, `plan-format`, `plan-review`, lazy read, 저장 보류, 재검토 안내, 발행 준비, 팀 handoff를 요약한 generated overview |
-| [`product-team-kit-workflow-analysis.html`](./docs/diagrams/product-team-kit-workflow-analysis.html) | 같은 source에서 생성한 상세 분석 view. set-config의 config·agent 안내 정렬, lazy read, 입력 보완, SSOT 근거 경계, 보수적 종료 조건, 발행 준비 경계를 함께 표시 |
-| [`diagram-design-workflow.html`](./docs/diagrams/diagram-design-workflow.html) | `diagram-design`의 타입 선택, style guide gate, taste gate 기반 HTML/SVG 생성 흐름 |
+| `planning-kit` | `0.2.15` | 기획 초안을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 보여주는 `planning-format`, 결론·검토 결과를 먼저 보여주는 `planning-review`, 현재 context memory 또는 명시적 저장 폴더를 `v0.7` Confluence 후보 문서로 발행하는 `planning-publish-confluence`, 독립 `SSOT` 표시 폴더 Markdown만 감사하는 `ssot-audit` 네 스킬 구조. 전문을 화면에 펼치려면 `--no-save`를 사용합니다. | `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` | [README](./planning-kit/README.md) |
 
 ## 사용 문법
 
 Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용합니다.
 
 ```text
-/product-team-kit:plan-format
-/product-team-kit:plan-review
-/product-team-kit:set-config
 /planning-kit:planning-format
 /planning-kit:planning-review
 /planning-kit:planning-publish-confluence
 /planning-kit:ssot-audit
-/diagram-design:diagram-design
-/logistics-expert-kit:logistics-scope
-/logistics-expert-kit:logistics-diagnose
-/logistics-expert-kit:logistics-metrics
-/logistics-expert-kit:logistics-risk
-/ai-utility-kit:ai-grill
-/ai-utility-kit:context-map
-/ai-utility-kit:meeting-brief
-/ai-utility-kit:term-clarifier
 ```
 
 Codex는 설치된 플러그인의 skill invocation을 사용합니다.
 
 ```text
-$plan-format
-$plan-review
-$set-config
 $planning-format
 $planning-review
 $planning-publish-confluence
 $ssot-audit
-$diagram-design
-$logistics-scope
-$logistics-diagnose
-$logistics-metrics
-$logistics-risk
-$ai-grill
-$context-map
-$meeting-brief
-$term-clarifier
 ```
 
 여러 플러그인이 같은 스킬 이름을 제공하는 경우에는 Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
 
-Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit`, `diagram-design` 같은 스킬을 선택합니다.
+Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` 같은 스킬을 선택합니다.
 
 ## 저장소 구조
 
@@ -110,13 +67,6 @@ colo-plugins/
 │       └── marketplace.json        # Codex marketplace catalog
 ├── .claude-plugin/
 │   └── marketplace.json            # Claude Code marketplace catalog
-├── product-team-kit/
-│   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
-│   ├── agents/
-│   ├── references/
-│   ├── skills/
-│   └── docs/
 ├── planning-kit/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
@@ -125,23 +75,6 @@ colo-plugins/
 │   │   ├── planning-review/
 │   │   ├── planning-publish-confluence/
 │   │   └── ssot-audit/
-│   └── docs/
-├── diagram-design/
-│   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
-│   ├── skills/
-│   └── docs/
-├── logistics-expert-kit/
-│   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
-│   ├── skills/
-│   ├── references/
-│   ├── templates/
-│   └── docs/
-├── ai-utility-kit/
-│   ├── .claude-plugin/plugin.json
-│   ├── .codex-plugin/plugin.json
-│   ├── skills/
 │   └── docs/
 └── README.md
 ```
@@ -169,17 +102,7 @@ Cowork 조직 catalog 배포는 추후 도입 예정입니다.
 
 ```bash
 claude plugin validate ./.claude-plugin/marketplace.json
-claude plugin validate ./product-team-kit
 claude plugin validate ./planning-kit
-claude plugin validate ./diagram-design
-claude plugin validate ./logistics-expert-kit
-claude plugin validate ./ai-utility-kit
-```
-
-generated 다이어그램 source를 바꾼 경우에는 HTML 산출물이 최신인지 확인합니다.
-
-```bash
-python3 docs/diagrams/render_product_team_kit_workflow.py --check
 ```
 
 문서만 수정한 경우에도 Markdown diff에 공백 문제가 없는지 확인합니다.

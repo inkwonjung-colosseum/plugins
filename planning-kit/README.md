@@ -1,4 +1,4 @@
-# planning-kit (0.2.14)
+# planning-kit (0.2.15)
 
 `planning-kit`은 기획 초안을 정책서·기능설계서로 정리하고, 그 산출물을 외부 기준과 비교하며, Confluence `v0.7` 후보 문서로 발행하고, 선언된 SSOT 문서 묶음의 구조·내용 품질을 감사하는 플러그인입니다.
 
@@ -100,7 +100,6 @@ planning/Zone-관리--2026-05-12-120000/
 /planning-kit:planning-review ./docs/주문-정책.md ./docs/주문-기능.md
 /planning-kit:planning-review "## 정책서 ... ## 기능설계서 ..."
 /planning-kit:planning-review https://wiki.example/policy/order-cancel https://docs.example/feature/order-cancel
-/planning-kit:planning-review --axes ac
 ```
 
 0개 인자 실행 시 직전 `planning-format` 출력에서 본문을 찾습니다. 0.2.14 기본 저장 성공 출력처럼 본문이 없고 `## 저장 파일`만 있으면, 정책서와 기능설계서 path가 같은 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 폴더를 가리킬 때만 두 파일을 읽습니다. 후보가 0개, 2개 이상, 서로 다른 폴더, 누락 파일이면 임의 선택하지 않고 경로 명시를 요청합니다.

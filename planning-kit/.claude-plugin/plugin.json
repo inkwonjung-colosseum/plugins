@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.2.14",
-  "description": "기획 초안을 정책서·기능설계서 두 본문으로 변환하고 기본적으로 planning/[안전기능명]--YYYY-MM-DD-HHMMSS/ 저장 파일을 만든 뒤 체크해야 할 항목을 결과 우선으로 보여주는 planning-format, 산출물을 SSOT 충돌·acceptance criteria·의존 영향 3축으로 결론·검토 결과 우선 점검하는 planning-review, 선언된 SSOT 표시 폴더 Markdown을 구조·내용 2축으로 감사하는 ssot-audit, 현재 context memory 안의 두 본문 또는 명시적 저장 폴더만 Product Team Space SSOT 하위 Confluence page로 발행하는 planning-publish-confluence 네 스킬로 구성된다. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고, 기본 parent https://colosseum.atlassian.net/wiki/spaces/PROD/pages/1767604270/SSOT 또는 사용자 직접 입력 parent를 선택한 뒤 v0.7 label이 붙은 기능 container와 정책서/기능 설계서 child page를 최종 확인 후 create/update하고 readback으로 검증한다. planning/**과 .planning-kit/**은 SSOT 근거에서 제외한다.",
+  "version": "0.2.15",
+  "description": "planning-format 저장 파일, planning-review 통합 리뷰, ssot-audit, planning-publish-confluence.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
