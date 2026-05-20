@@ -25,8 +25,7 @@
       "name": "dbml-translator",
       "version": "0.1.0",
       "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
-      "source": "local",
-      "path": "./dbml-translator",
+      "source": "./dbml-translator",
       "author": {
         "name": "정인권",
         "email": "developjik@colosseum.kr"
@@ -38,8 +37,7 @@
       "name": "logistics-kit",
       "version": "0.1.0",
       "description": "물류 도메인 전반(WMS/TMS/OMS/3PL) 상시 전문가 Skills 12종. 설계 자문·코드 리뷰·운영 질의·규제 검토.",
-      "source": "local",
-      "path": "./logistics-kit",
+      "source": "./logistics-kit",
       "author": {
         "name": "inkwonjung-colosseum",
         "email": "developjik@colosseum.kr"
