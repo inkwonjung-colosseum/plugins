@@ -1,6 +1,6 @@
 ---
 name: ssot-audit
-description: "현재 프로젝트에서 폴더명에 독립 SSOT token이 있는 Markdown 기준 문서 묶음만 구조 품질·내용 품질 2축으로 감사하고, 제외 요약·SSOT 인벤토리·발견/권고·개선 백로그를 report-first markdown으로 출력할 때 사용한다. planning/**, .planning-kit/**, 내부 plugin/skill 문서는 corpus가 아니며 SSOT token 폴더가 없으면 프로젝트 전체 Markdown으로 fallback하지 않는다."
+description: "현재 프로젝트에서 폴더명에 독립 SSOT token이 있는 Markdown 기준 문서 묶음만 구조 품질·내용 품질 2축으로 감사하고, 제외 요약·SSOT 인벤토리·발견/권고·개선 백로그를 report-first markdown으로 출력할 때 사용한다. planning/**, .planning-kit/**, 내부 plugin/skill 문서는 corpus가 아니며 SSOT token 폴더가 없으면 프로젝트 전체 Markdown으로 fallback하지 않는다. 0.3.0부터 파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보다."
 argument-hint: "[--ssot-include <glob>] [--exclude <glob>] [--axes <structure,content>] [--no-follow-links] [--no-image]"
 ---
 
@@ -46,10 +46,11 @@ cap 관련 인자(`--depth`, `--max-pages`, `--max-body`, `--max-image`)는 두�
 3. `planning/**`과 `.planning-kit/**`은 항상 제외한다. 이 제외가 SSOT token 폴더 허용보다 우선한다.
 4. path segment 단위로 폴더명을 검사한다. segment를 공백, 대괄호, 소괄호, 중괄호, underscore로 나눴을 때 `SSOT`와 대소문자 무관으로 같은 token이 있어야 corpus 후보다.
 5. 단순 substring은 허용하지 않는다. `ProductSSOT/**`, `docs/ssot-audit/**`, `planning-kit/skills/ssot-audit/**`는 corpus가 아니다.
-6. `--ssot-include`가 있으면 SSOT token 후보 안에서만 narrowing한다. SSOT 폴더 밖 glob은 0건으로 처리하고 제외 사유를 남긴다.
-7. `--exclude`가 있으면 후보에서 제거한다. 기본 제외는 유지한다.
-8. 각 후보 파일에서 path, filename, frontmatter, 첫 heading, heading tree, markdown link, decision sentence 후보를 읽는다.
-9. 빈 파일, frontmatter-only, H1-only, "작성 예정" 한 줄, 빈 표는 placeholder로 판정한다.
+6. 버전 게이트: 파일명 basename에서 case-insensitive `v(\d+)\.(\d+)` 정규식 마지막 매칭을 `(major, minor)`로 파싱한다. 매칭이 있으면 semantic compare로 `(0, 8)` 이상만 corpus 후보다 (`v0.10 > v0.9`처럼 integer 비교). 매칭이 없으면 corpus 후보로 인정하고 `버전 없음` 집계에 포함한다. cutoff 미만 file은 corpus에서 제외하고 `버전 미달` 집계에 포함한다. `v0.8.0`, `v0.8-beta`는 major.minor만 추출해 동일 처리한다.
+7. `--ssot-include`가 있으면 SSOT token 후보 안에서만 narrowing한다. SSOT 폴더 밖 glob은 0건으로 처리하고 제외 사유를 남긴다.
+8. `--exclude`가 있으면 후보에서 제거한다. 기본 제외는 유지한다.
+9. 각 후보 파일에서 path, filename, frontmatter, 첫 heading, heading tree, markdown link, decision sentence 후보를 읽는다.
+10. 빈 파일, frontmatter-only, H1-only, "작성 예정" 한 줄, 빈 표는 placeholder로 판정한다.
 
 Sanity:
 
@@ -57,9 +58,10 @@ Sanity:
 |---|---|
 | SSOT token 폴더 없음 | `감사 불가 — 선언된 SSOT token 폴더 없음` |
 | SSOT token 폴더 Markdown 0개 | `감사 불가 — SSOT token 폴더 안 Markdown 없음` |
+| SSOT token 폴더 안 후보가 모두 버전 미달 | `감사 불가 — 버전 cutoff (>= v0.8) 통과 후보 0건` |
 | `--ssot-include`가 SSOT 경계 밖만 매칭 | `감사 불가 — 명시 include가 SSOT 폴더 경계 밖이라 제외됨` |
 
-위 케이스에서도 프로젝트 전체 Markdown으로 fallback하지 않는다. 출력에는 제외 요약과 개선 백로그를 포함한다.
+위 케이스에서도 프로젝트 전체 Markdown으로 fallback하지 않는다. 버전 미달 cutoff로의 자동 완화 fallback도 하지 않는다. 출력에는 제외 요약과 개선 백로그를 포함한다.
 
 ### Step 3: 문서 역할과 placeholder 분류
 

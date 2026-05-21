@@ -1,6 +1,6 @@
-# planning-kit (0.2.17)
+# planning-kit (0.3.0)
 
-기획 초안을 정책서·기능설계서로 정리하고, review, SSOT audit, Confluence 후보 발행까지 이어주는 4-skill 플러그인입니다. 0.2.17 runtime은 0.2.14의 결과 우선 출력과 저장 파일 handoff 계약을 유지하고 Cursor marketplace 매니페스트를 추가합니다.
+기획 초안을 정책서·기능설계서로 정리하고, review, SSOT audit, Confluence 후보 발행까지 이어주는 4-skill 플러그인입니다. 0.3.0 runtime은 0.2.14의 결과 우선 출력과 저장 파일 handoff 계약을 유지하면서, SSOT corpus 진입 조건에 파일명 basename version cutoff `>= v0.8`(또는 버전 표기 없음)을 추가합니다. `v0.7` 이하 파일은 `버전 미달`로 별도 집계되고 corpus에서 제외됩니다.
 
 ## 현재 품질 상태
 
@@ -82,4 +82,14 @@ git diff --check
 
 ## ssot-audit
 
-`planning/**`, `.planning-kit/**`, dependency/vendor/build/cache/generated 경로를 제외하고, 독립 `SSOT` 표시 폴더 Markdown만 감사합니다.
+`planning/**`, `.planning-kit/**`, dependency/vendor/build/cache/generated 경로를 제외하고, 독립 `SSOT` 표시 폴더 Markdown만 감사합니다. 0.3.0부터 파일명 basename에서 추출한 버전이 cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보입니다. `v0.7` 이하 파일은 `버전 미달`로 별도 집계되며 발견/권고 판단에서 제외됩니다. 버전 비교는 semantic compare(`v0.10 > v0.9`)로 동작합니다.
+
+## SSOT 진입 게이트 요약
+
+corpus 진입은 다음 세 조건을 모두 통과해야 합니다.
+
+1. 폴더 path segment에 독립 `SSOT` token (공백·대괄호·소괄호·중괄호·underscore 단위 split, case-insensitive).
+2. `planning/**`·`.planning-kit/**`·기본 제외 경로 밖.
+3. 파일명 basename에서 `v(\d+)\.(\d+)` 마지막 매칭이 없거나, 매칭이 있으면 `(major, minor) >= (0, 8)`.
+
+`planning-publish-confluence`의 publish label `v0.7`은 의도적으로 cutoff 미만이라 Confluence 발행 사본은 SSOT corpus로 승격되지 않습니다.

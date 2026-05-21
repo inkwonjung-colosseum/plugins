@@ -19,7 +19,7 @@ Review `planning-format` output. This skill does not create or auto-fix document
 - Review axes run as one consolidated pass; axis-selection is not a public option.
 - Handoff marker: Step 1.1.3 planning-format 기본 저장 출력 handoff (0.2.14); `## 저장 파일`; exactly one `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` folder.
 - Exclusion marker: 직전 출력의 `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 상세 추적`, `## 저장 실패 상세`는 review 대상 본문에 합류하지 않는다.
-- SSOT marker: `planning/**`은 계속 기준 문서 묶음 근거에서 제외.
+- SSOT marker: `planning/**`은 계속 기준 문서 묶음 근거에서 제외. 0.3.0부터 SSOT 표시 폴더 후보 중 파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보다.
 
 ## Workflow
 

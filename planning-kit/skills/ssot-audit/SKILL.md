@@ -11,7 +11,8 @@ Audit the current project's declared SSOT Markdown corpus. This skill does not r
 
 - Options: `--ssot-include`, `--exclude`, `--axes <structure,content>`, `--no-follow-links`, `--no-image`.
 - SSOT candidates must live under folder path segments with an independent `SSOT` token.
-- Never fall back to all project Markdown when no SSOT token folder exists.
+- SSOT candidates must also pass the filename version gate: `(?i)v(\d+)\.(\d+)` last match `>= (0, 8)` by semantic compare, or no version match at all. Below-cutoff files (`v0.7` 이하) are counted as `버전 미달` and excluded from corpus.
+- Never fall back to all project Markdown when no SSOT token folder exists, and never auto-relax the version cutoff when only below-cutoff files exist.
 - Always exclude `planning/**`, `.planning-kit/**`, dependency/build/cache output, and internal plugin/skill docs from corpus evidence.
 
 ## Workflow

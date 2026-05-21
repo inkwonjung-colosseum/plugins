@@ -1,14 +1,14 @@
 # Output Contract
 
-`ssot-audit`는 화면 markdown only로 출력한다. 파일 저장, `--save`, 점수, 등급, health score를 만들지 않는다. 0.2.9부터 기본 corpus는 프로젝트 전체 Markdown이 아니라 폴더명에 독립 `SSOT` token이 있는 하위 폴더 안의 Markdown이다.
+`ssot-audit`는 화면 markdown only로 출력한다. 파일 저장, `--save`, 점수, 등급, health score를 만들지 않는다. 0.2.9부터 기본 corpus는 프로젝트 전체 Markdown이 아니라 폴더명에 독립 `SSOT` token이 있는 하위 폴더 안의 Markdown이다. 0.3.0부터 파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보다.
 
 ## 1. 기본 출력
 
 ````markdown
 # ssot-audit
 
-- 감사 범위: SSOT token 폴더 Markdown N개
-- 제외: planning/**, .planning-kit/**, 내부 plugin/skill 문서, SSOT token 밖 Markdown M개
+- 감사 범위: SSOT token 폴더 Markdown N개 (버전 게이트 `>= v0.8` 통과)
+- 제외: planning/**, .planning-kit/**, 내부 plugin/skill 문서, SSOT token 밖 Markdown M개, 버전 미달 Q개
 - 분석 축: structure, content
 - 외부 링크: 활성 / --no-follow-links
 - 이미지: 활성 / --no-image
@@ -24,8 +24,10 @@
 
 | 구분 | 건수 | 대표 경로 | 비고 |
 |---|---:|---|---|
-| 실질 본문 | N | Product SSOT/policy.md | 결정 문장 있음 |
+| 실질 본문 | N | Product SSOT/policy_v0.8.md | 결정 문장 있음 |
 | 본문 없는 자리표시자 | M | Product SSOT/todo.md | 비교/감사 한계 |
+| 버전 없음 | W | Product SSOT/policy.md | 버전 표기 없음, corpus 포함 |
+| 버전 미달 | Q | Product SSOT/policy_v0.7.md | cutoff `>= v0.8` 미만, corpus 제외 |
 
 ## 제외 요약
 
@@ -34,6 +36,7 @@
 | SSOT token 폴더 밖 | N | docs/example.md |
 | 생성 초안 영역 | N | planning/example/정책서.md |
 | 내부 plugin/skill 문서 | N | planning-kit/skills/ssot-audit/SKILL.md |
+| 버전 미달 (`>= v0.8` 미만) | Q | Product SSOT/policy_v0.7.md |
 
 ## 발견 및 권고
 
@@ -82,6 +85,7 @@
 |---|---|
 | SSOT token 폴더 없음 | `감사 불가 — 선언된 SSOT token 폴더 없음` |
 | SSOT token 폴더 Markdown 0개 | `감사 불가 — SSOT token 폴더 안 Markdown 없음` |
+| SSOT token 폴더 안 후보가 모두 버전 미달 | `감사 불가 — 버전 cutoff (>= v0.8) 통과 후보 0건` |
 | `--ssot-include`가 SSOT 경계 밖만 매칭 | `감사 불가 — 명시 include가 SSOT 폴더 경계 밖이라 제외됨` |
 | `--axes` 빈 값 | `--axes에 감사 축을 1개 이상 지정하세요. (structure, content)` |
 | 알 수 없는 축 | `지원하지 않는 감사 축입니다: <axis>. 사용 가능: structure, content` |
@@ -94,6 +98,7 @@
 |---|---|
 | SSOT token 폴더 없음 또는 후보 0건 | 후보 탐색/제외 요약 full table 출력 |
 | placeholder가 1건 이상 | placeholder 경로와 판정 사유 요약 출력 |
+| 버전 미달 file이 1건 이상 | 버전 미달 경로와 버전 값 요약 출력 |
 | `--ssot-include`가 SSOT 경계 밖만 매칭 | include glob, 경계 밖 매칭 수, 제외 사유 출력 |
 | 외부 follow 또는 image 처리 1건 이상 | 외부 출처표 출력 |
 | 외부 fetch 실패, 인증 실패, 본문 미사용 출처 1건 이상 | 외부 출처표 출력 |
@@ -103,11 +108,14 @@
 ```markdown
 ### SSOT 후보
 
-| 경로 | SSOT token segment | placeholder | 본문 사용 | 비고 |
-|---|---|---|---|---|
-| Product SSOT/policy.md | Product SSOT | 아니오 | O | 결정 문장 있음 |
-| ProductSSOT/policy.md | - | - | X | SSOT substring만 있어 제외 |
-| planning/[SSOT]/draft.md | [SSOT] | - | X | planning/** 생성 초안 영역 |
+| 경로 | SSOT token segment | 파일명 버전 | placeholder | 본문 사용 | 비고 |
+|---|---|---|---|---|---|
+| Product SSOT/policy_v0.8.md | Product SSOT | v0.8 | 아니오 | O | 결정 문장 있음 |
+| Product SSOT/policy.md | Product SSOT | 버전 없음 | 아니오 | O | 버전 표기 없음, corpus 포함 |
+| Product SSOT/policy_v0.10.md | Product SSOT | v0.10 | 아니오 | O | semantic compare (0, 10) >= (0, 8) |
+| Product SSOT/policy_v0.7.md | Product SSOT | v0.7 | - | X | 버전 미달 (cutoff `>= v0.8`) |
+| ProductSSOT/policy.md | - | - | - | X | SSOT substring만 있어 제외 |
+| planning/[SSOT]/draft.md | [SSOT] | - | - | X | planning/** 생성 초안 영역 |
 ```
 
 ### 5.2 외부 출처표

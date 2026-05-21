@@ -1,15 +1,18 @@
 # SSOT Rules (R1)
 
-`planning-review`의 SSOT 충돌 점검 축(R1). 0.2.9부터 기준 문서 묶음은 프로젝트 전체 Markdown이 아니라 폴더명에 독립 `SSOT` 표시가 있는 하위 폴더 안의 Markdown으로 제한한다. `planning/**`과 `.planning-kit/**`은 생성 초안 영역이므로 항상 제외한다.
+`planning-review`의 SSOT 충돌 점검 축(R1). 0.2.9부터 기준 문서 묶음은 프로젝트 전체 Markdown이 아니라 폴더명에 독립 `SSOT` 표시가 있는 하위 폴더 안의 Markdown으로 제한한다. `planning/**`과 `.planning-kit/**`은 생성 초안 영역이므로 항상 제외한다. 0.3.0부터 파일명 basename에서 추출한 버전 cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보다.
 
 ## 용어
 
-- **기준 문서 묶음**: 폴더명에 독립 `SSOT` 표시가 있는 기준 문서 폴더 안의 Markdown 후보 중 키워드 매칭과 `--ssot-include` narrowing을 통과한 corpus.
+- **기준 문서 묶음**: 폴더명에 독립 `SSOT` 표시가 있는 기준 문서 폴더 안의 Markdown 후보 중 버전 게이트, 키워드 매칭, `--ssot-include` narrowing을 모두 통과한 corpus.
 - **input collection**: `planning-review`가 review 대상 본문을 만들기 위해 URL·파일·디렉터리·텍스트·이미지를 수집하는 단계. 입력 URL source 자체는 기준 문서 묶음이 아니다.
 - **input fetch**: input collection 안 URL fetch. `--no-input-fetch`로 봉쇄하며, R1/R3 기준 문서 link follow와 별도 visited set을 가진다.
 - **SSOT fetch**: R1/R3 기준 문서 link follow. `--no-ssot-fetch`로 봉쇄하며, input fetch와 별도 visited set·출처 블록을 가진다.
 - **확정 문장**: 변환 본문 중 `[TBD]`가 아닌 단정 표현.
 - **본문 없는 문서**: 빈 파일, frontmatter-only, H1-only, "작성 예정" 한 줄, 빈 표/헤더만 있는 표처럼 정책 값·상태·권한·임계값 등 결정 문장이 없는 파일.
+- **버전 cutoff**: 파일명 basename에서 case-insensitive `v(\d+)\.(\d+)` 정규식 마지막 매칭을 `(major, minor)`로 추출했을 때 `(0, 8)` 이상이어야 corpus 후보다. `v0.8.0`, `v0.8-beta`도 major.minor만 추출해 동일 처리한다.
+- **버전 미달 문서**: SSOT token 폴더 안 Markdown 중 파일명 버전이 cutoff 미만(`v0.7` 이하)인 파일. corpus 후보 아님. 출처표/상세 추적에 `버전 미달` 사유로 표시한다.
+- **버전 없음 문서**: 파일명 basename에 `v\d+\.\d+` 매칭이 없는 파일. corpus 후보로 인정한다. 출처표는 `버전 없음`으로 표시한다.
 - **보조 표 heading 호환**: 0.2.8 clean header(`### N.M ... 보조 표`)와 0.2.4~0.2.7 legacy backlink header(`### N.M ... 보조 표 (§N row M)`)를 모두 보조 표로 인식한다. 일부 중간 산출물의 `(N row M)` backlink도 읽기 호환으로 보조 표 처리한다. legacy header 자체는 R1 발견으로 강제하지 않는다.
 
 ## R1.1 `SSOT` 표시 폴더 후보 추출
@@ -19,7 +22,8 @@
 3. path segment 단위로 폴더명을 검사한다. segment를 공백, 대괄호, 소괄호, 중괄호, underscore로 나눴을 때 `SSOT`와 대소문자 무관으로 같은 token이 있어야 후보다.
 4. 단순 substring은 허용하지 않는다. 하이픈으로 이어진 `ssot-audit`는 도구명이지 기준 문서 폴더 token이 아니다.
 5. symlink는 기본적으로 follow하지 않는다.
-6. `--ssot-include <glob>`이 있으면 위 후보 안에서만 narrowing한다. glob이 `SSOT` 표시 폴더 밖만 가리키면 결과는 0건이고 `검증 범위와 한계` 및 `## 상세 추적`에 `명시 include가 기준 문서 폴더 경계 밖이라 제외됨`을 남긴다.
+6. 버전 게이트: 파일명 basename에서 case-insensitive `v(\d+)\.(\d+)` 정규식 모든 매칭 중 **마지막 매칭**을 `(major, minor)`로 파싱한다. 매칭이 있으면 semantic compare로 `(0, 8)` 이상만 corpus 후보다. `v0.10 > v0.9`처럼 integer 비교로 한다. 매칭이 없으면 corpus 후보로 인정한다. cutoff 미만 파일은 corpus에서 제외하고 `버전 미달`로 별도 집계한다.
+7. `--ssot-include <glob>`이 있으면 위 후보 안에서만 narrowing한다. glob이 `SSOT` 표시 폴더 밖만 가리키면 결과는 0건이고 `검증 범위와 한계` 및 `## 상세 추적`에 `명시 include가 기준 문서 폴더 경계 밖이라 제외됨`을 남긴다.
 
 허용 예:
 
@@ -28,6 +32,10 @@ Product Docs SSOT/**/*.md
 [SSOT] 정책서/**/*.md
 Confluence [SSOT] Export/**/*.md
 Product_SSOT/**/*.md
+Product SSOT/order_v0.8.md
+Product SSOT/order_v1.0.md
+Product SSOT/order.md
+Product SSOT/order_V0.10.md
 ```
 
 제외 예:
@@ -41,14 +49,16 @@ planning-kit/docs/prd/**/*.md
 planning-kit/skills/ssot-audit/**/*.md
 docs/ssot-audit/**/*.md
 ProductSSOT/**/*.md
+Product SSOT/order_v0.1.md
+Product SSOT/order_v0.7.md
 ```
 
-`SSOT` 표시 폴더가 없거나 해당 폴더 안 Markdown이 비어 있으면 `기준 문서 묶음: 0건` 또는 `비교 근거 부족: 비교 대상 본문 없음`으로 표시하고, 프로젝트 전체 Markdown으로 fallback하지 않는다.
+`SSOT` 표시 폴더가 없거나 해당 폴더 안 Markdown이 비어 있거나 모든 후보가 버전 미달이면 `기준 문서 묶음: 0건` 또는 `비교 근거 부족: 비교 대상 본문 없음`으로 표시하고, 프로젝트 전체 Markdown으로 fallback하지 않는다.
 
 ## R1.2 corpus 매칭 절차
 
 1. 변환 본문에서 키워드 추출: 기능명·도메인 stem·역할명·상태명·권한명·정책 핵심어.
-2. R1.1 후보 안에서 키워드 `grep -l` 또는 `rg -l`로 본문 매칭 → 매칭 file 목록 확정.
+2. R1.1 후보(버전 게이트 통과 file만) 안에서 키워드 `grep -l` 또는 `rg -l`로 본문 매칭 → 매칭 file 목록 확정. 버전 미달 file은 후보 단계에서 이미 제외되어 본문 매칭에 들어오지 않는다.
 3. 본문 없는 문서 여부를 판정한다.
 4. 매칭 file을 직접 읽는다. 인덱스 스캔 단계 없음.
 5. 매칭 file 본문에서 URL·이미지 참조 추출 — markdown link / autolink / HTML href·src·img / plain URL / markdown image / data URI. self-anchor·`mailto:`/`tel:`/`javascript:`/`blob:` 제외.
@@ -57,7 +67,7 @@ ProductSSOT/**/*.md
 8. 이미지 multimodal 해석 — 지원 확장자·해석 프롬프트는 `planning-format` 4 그대로. `--no-ssot-image` ON이면 image content-type 응답 합류 안 함.
 9. 외부 fetch 본문 + 이미지 해석 결과를 기준 문서 body에 합류. visited set으로 cycle 방지. cap 없음.
 
-## R1.3 본문 없는 문서 규칙
+## R1.3 본문 없는 문서·버전 미달 규칙
 
 본문 없는 문서 판정 예:
 
@@ -70,10 +80,22 @@ ProductSSOT/**/*.md
 | 빈 표 또는 헤더만 있는 표 | 본문 없는 문서 |
 | 정책 값·상태·권한·임계값 같은 결정 문장이 1개 이상 있는 파일 | 실질 본문 |
 
+버전 게이트 판정 예 (R1.1 단계에서 corpus 진입 결정):
+
+| 파일명 | (major, minor) | corpus | 출처 표시 |
+|---|---|---|---|
+| `order_v0.8.md` | (0, 8) | O | `실질 본문` 또는 `본문 없는 문서` |
+| `order_v1.0.md` | (1, 0) | O | (동일) |
+| `order_v0.10.md` | (0, 10) | O | (동일) |
+| `order.md` | 없음 | O | `버전 없음` |
+| `order_v0.7.md` | (0, 7) | X | `버전 미달 (v0.7)` |
+| `order_v0.1.md` | (0, 1) | X | `버전 미달 (v0.1)` |
+| `order_v0.md` | 없음(minor 없음) | O | `버전 없음` |
+
 규칙:
 
 - R1 count는 `0건`으로 두되, 설명은 `충돌 없음`이 아니라 `비교 근거 부족: 비교 대상 본문 없음`으로 쓴다.
-- `ssot` 축이 활성이고 기준 문서 묶음이 0건 또는 모두 본문 없는 문서이면 검증 신뢰도는 `낮음`이다.
+- `ssot` 축이 활성이고 기준 문서 묶음이 0건, 모두 본문 없는 문서, 모두 버전 미달이면 검증 신뢰도는 `낮음`이다.
 - R2/R3에서 P0/P1 발견이 있으면 최종 판정은 `수정 필요`다.
 - R2/R3가 P2-only이고 활성 핵심 축의 비교 대상이 없는 상태라면 `검토 필요`보다 `비교 불가`가 우선한다.
 - 본문 없는 문서만 있는 한계는 `SSOT 보강` 체크 항목에 올릴 수 있지만 verdict용 P2 finding count에는 포함하지 않는다.
@@ -85,10 +107,11 @@ ProductSSOT/**/*.md
 
 ## R1.4 매칭 0건
 
-- `SSOT` 표시 폴더 후보 0건 또는 keyword 매칭 0건 → R1 결과 `비교 근거 부족: 비교 대상 본문 없음`.
+- `SSOT` 표시 폴더 후보 0건, 버전 게이트 통과 후보 0건, 또는 keyword 매칭 0건 → R1 결과 `비교 근거 부족: 비교 대상 본문 없음`.
 - 프로젝트 전체 Markdown으로 fallback하지 않는다.
-- `## 검증 범위와 한계`에 `SSOT` 표시 폴더 경계와 제외 요약을 남긴다.
-- `## 상세 추적`에는 후보/제외/본문 없는 문서 경로 요약 또는 include 경계 밖 사유를 남긴다.
+- 버전 미달 cutoff로의 자동 완화 fallback도 하지 않는다. `v0.7` 이하만 있어도 cutoff를 내리지 않는다.
+- `## 검증 범위와 한계`에 `SSOT` 표시 폴더 경계, 버전 cutoff `>= v0.8`, 제외 요약을 남긴다.
+- `## 상세 추적`에는 후보/제외/본문 없는 문서/버전 미달 경로 요약 또는 include 경계 밖 사유를 남긴다.
 - R2·R3는 활성 축이면 별도 진행한다.
 
 ## R1.5 매칭 ≥1건
@@ -142,6 +165,7 @@ ProductSSOT/**/*.md
 - link follow가 1건 이상 진행됨.
 - 기준 문서 묶음 0건.
 - 매칭 기준 문서가 모두 본문 없는 문서.
+- SSOT token 폴더 안에 버전 미달 file이 1건 이상 있음.
 - `--ssot-include`가 SSOT 폴더 경계 밖만 가리켜 후보가 0건.
 - 기준 문서 외부 링크 처리 실패, 인증 실패, 본문 미사용 출처가 1건 이상.
 
@@ -150,14 +174,17 @@ ProductSSOT/**/*.md
 
 매칭 *.md: N개
 본문 없는 문서: P개
+버전 미달: Q개 (cutoff `>= v0.8`)
+버전 없음: W개
 재귀 본문 가져오기: 성공 K개 / 실패 J개 (cap 없음)
 
 | # | 출처 종류 | URL/경로 | origin (.md file:line) | 상태 | 본문 사용 |
 |---|---|---|---|---|---|
-| 1 | 매칭 *.md | Product SSOT/zone.md | - | 실질 본문 | O |
-| 2 | 매칭 *.md | Product SSOT/todo.md | - | 본문 없는 문서 | X |
-| 3 | 자식 URL | https://wiki.example/policy/zone | Product SSOT/todo.md:3 | 200 (via WebFetch) | O |
-| 4 | 자식 URL | https://docs.google.com/.../edit?gid=... | Product SSOT/zone.md:88 | 인증 필요 (Google Drive connector 미인증) | X |
+| 1 | 매칭 *.md | Product SSOT/zone_v0.8.md | - | 실질 본문 | O |
+| 2 | 매칭 *.md | Product SSOT/todo.md | - | 본문 없는 문서·버전 없음 | X |
+| 3 | 매칭 *.md | Product SSOT/zone_v0.7.md | - | 버전 미달 (v0.7) | X |
+| 4 | 자식 URL | https://wiki.example/policy/zone | Product SSOT/todo.md:3 | 200 (via WebFetch) | O |
+| 5 | 자식 URL | https://docs.google.com/.../edit?gid=... | Product SSOT/zone_v0.8.md:88 | 인증 필요 (Google Drive connector 미인증) | X |
 ```
 
 실패 행도 list에 포함한다. 실패 0건이면 표 아래 `모든 기준 문서 외부 링크 처리 성공` 한 줄을 둘 수 있다.

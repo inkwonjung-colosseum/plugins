@@ -1,7 +1,7 @@
 {
   "name": "dbml-translator",
-  "version": "0.1.0",
-  "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+  "version": "0.2.0",
+  "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
   "author": {
     "name": "정인권",
     "email": "developjik@colosseum.kr"
