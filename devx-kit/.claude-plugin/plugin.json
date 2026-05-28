@@ -1,0 +1,21 @@
+{
+  "name": "devx-kit",
+  "version": "0.1.0",
+  "description": "Stack-agnostic developer productivity skills",
+  "author": {
+    "name": "정인권",
+    "email": "developjik@colosseum.kr"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/devx-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "category": "productivity",
+  "keywords": [
+    "productivity",
+    "devx",
+    "frontend",
+    "backend",
+    "workflow"
+  ],
+  "skills": "./skills/"
+}
