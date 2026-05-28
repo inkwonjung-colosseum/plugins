@@ -1,0 +1,21 @@
+{
+  "name": "colonova-confluence-kit",
+  "version": "0.1.0",
+  "description": "Use when ColoNova Engineering Confluence 8.8 문서 트리 감사, 위치 추천, 템플릿 변환, 승인 후 게시 검증이 필요할 때.",
+  "author": {
+    "name": "inkwonjung-colosseum",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/colonova-confluence-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "colonova",
+    "confluence",
+    "documentation",
+    "audit",
+    "publishing"
+  ],
+  "skills": "./skills/"
+}

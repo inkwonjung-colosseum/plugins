@@ -1,0 +1,45 @@
+{
+  "name": "colonova-confluence-kit",
+  "version": "0.1.0",
+  "description": "ColoNova Engineering Confluence document routing, audit, and publishing skills.",
+  "author": {
+    "name": "inkwonjung-colosseum",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/colonova-confluence-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "colonova",
+    "confluence",
+    "documentation",
+    "routing",
+    "audit"
+  ],
+  "skills": "./skills/",
+  "features": {
+    "plugin_hooks": false
+  },
+  "interface": {
+    "displayName": "colonova-confluence-kit",
+    "shortDescription": "Route, publish, and audit ColoNova Confluence docs",
+    "longDescription": "Two focused skills for the ColoNova Engineering Confluence tree: colonova-folder-audit performs read-only tree audits and execution queue planning, while colonova-doc-router-publisher routes drafts, rewrites them with templates, and publishes only after explicit approval with readback verification.",
+    "developerName": "inkwonjung-colosseum",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/colonova-confluence-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/colonova-confluence-kit",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/colonova-confluence-kit",
+    "defaultPrompt": [
+      "Audit the 8.8 ColoNova Confluence tree for archive and placement candidates",
+      "Route this ColoNova draft to the right Confluence folder and rewrite it",
+      "Prepare a publish-ready ColoNova Confluence document package"
+    ],
+    "brandColor": "#0F766E"
+  }
+}
