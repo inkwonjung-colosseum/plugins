@@ -15,7 +15,15 @@
 4. **식약처/KC** — 식품·의약품·전기용품 인증번호 필수. 미인증 SKU 판매 차단 로직?
 5. **개인통관고유부호(PCC)** — 해외직구 시 PCC 형식 검증(P + 12자리), 1인당 면세 한도($150) 누적?
 6. **개인정보** — 수하인 정보 보관기간(5년), 배송 완료 후 마스킹 정책, 위탁사 접근 권한?
-7. **원산지 증명(C/O)** — FTA 협정 활용 시 원산지 결정 기준 자동 판정 가능?
+7. **원산지 증명(C/O)** — FTA 협정 활용 시 원산지 결정 기준 자동 판정 가능? 깊은 결정 트리는 `fta-origin` 위임.
+8. **위험물 segregation·DGR 깊이** — IMDG/IATA/ADR 모드별 분리·LQ·리튬 PI는 `dangerous-goods` 위임
+9. **제재 스크리닝 (denied party)** — OFAC SDN/EU/UN/전략물자, end-use/end-user 검증은 `trade-sanctions` 위임
+10. **식약처 인증 워크플로** — 의약품 GDP·DSCSA·KIMS-K(직렬화)는 `pharma-gdp-serialization`, 식품 HACCP은 `haccp-food-safety` 위임
+11. **개인정보(PIPA/GDPR)** — 수하인 PII·SCC·DSR은 `data-privacy-logistics` 위임
+12. **회수·식약처/FDA 보고** — recall class·시한·보고는 `recall-traceability` 위임
+13. **국제 운송 사전신고** — ISF/AMS/ENS·B/L·AWB는 `freight-forwarding` 위임
+14. **chain of custody** — 주류·담배·마약류·controlled substance는 `chain-of-custody` 위임
+15. **AEO/C-TPAT** — 신뢰통관 자격, 갱신 주기, 혜택 매트릭스
 
 ## 응답 형식
 
@@ -27,4 +35,13 @@
 
 - 운임/관세 정산·분개 → `logistics-settlement`
 - KPI 통계 → `logistics-kpi`
-- 위험물 운송 차량 제약 → `tms-routing`
+- 위험물 운송 차량 제약 → `tms-routing`/`dangerous-goods`
+- FTA 원산지 결정 트리 → `fta-origin`
+- 제재 스크리닝·EAR/ITAR → `trade-sanctions`
+- 의약품 GDP·serialization → `pharma-gdp-serialization`
+- 식품 HACCP → `haccp-food-safety`
+- 회수·class 결정 → `recall-traceability`
+- chain of custody → `chain-of-custody`
+- 국제 운송·B/L → `freight-forwarding`
+- PII·PIPA·GDPR → `data-privacy-logistics`
+- 탄소 CBAM → `sustainability-carbon`

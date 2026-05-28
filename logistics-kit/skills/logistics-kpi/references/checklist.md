@@ -26,4 +26,10 @@
 
 - 보상·정산 적용 → `logistics-settlement`
 - 데이터 소스·집계 모델 → `logistics-data-model`
-- 타임존·로케일 → `localization-audit`
+- 타임존·환율·로케일 → `localization-audit`
+- 관측성·SLO·alert → `logistics-observability`
+- 예측 정확도·FVA → `demand-forecast`
+- 재고 정확도·shrinkage → `inventory-accuracy`
+- 노동 생산성 UPH → `labor-mgmt`
+- 탄소·GLEC → `sustainability-carbon`
+- 회수 traceability KPI → `recall-traceability`

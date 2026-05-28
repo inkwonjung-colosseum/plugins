@@ -14,7 +14,13 @@
 3. **SKU master** — 옵션(색상/사이즈)/번들이 별도 SKU vs 부모-자식 관계? 자식 SKU 재고 차감 일관 전파?
 4. **WMS↔OMS 연동** — 출고 지시 후 ack 누락 재시도 정책? 멱등성 키는? (→ `logistics-idempotency`)
 5. **3PL 핸드오프** — 외부 3PL 시스템 sync 주기, 실패 시 reconciliation 배치?
-6. **옴니채널 재고** — 채널별 노출 vs 단일 풀(common pool) 정책 명확?
+6. **옴니채널 재고** — 채널별 노출 vs 단일 풀(common pool) 정책 명확? oversell guard·rate-limit은 `channel-sync` 참조.
+7. **saga·보상 흐름** — 주문→결제→재고 차감→출고 지시→라벨 saga의 보상 정의(→ `logistics-saga`)
+8. **bulk operation** — 대량 주문 import·취소·라벨 재발행 시 chunking·partial fail (→ `bulk-operations`)
+9. **tenant 격리** — 화주·marketplace 별 격리, oversell·noisy neighbor (→ `logistics-multitenancy`)
+10. **catalog versioning·effective date** — listing 변경 시점·cache invalidation (→ `mdm-reference-data`)
+11. **rate-limit·외부 통합 호출** — 채널·캐리어 API rate-limit, circuit breaker (→ `resilience-patterns`/`channel-sync`)
+12. **kit/번들 BOM 정합성** — 자식 SKU 재고 차감 흐름·VAS (→ `cross-dock-kitting`)
 
 ## 응답 형식
 
@@ -28,3 +34,10 @@
 - 반품 흐름 → `returns-rma`
 - 배차·운송 → `tms-routing`
 - 출고 지시 멱등성 → `logistics-idempotency`
+- 채널·marketplace sync → `channel-sync`
+- saga·보상 → `logistics-saga`
+- bulk 작업 → `bulk-operations`
+- tenant 격리 → `logistics-multitenancy`
+- 라벨 발급·voiding → `carrier-edi`
+- kit/VAS → `cross-dock-kitting`
+- 추적·고객 알림 → `track-trace`

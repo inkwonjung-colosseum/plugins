@@ -16,6 +16,14 @@
 5. **감사 로그** — `created_at/updated_at/created_by/updated_by`만으로 부족. 조정·삭제·승인 시 별도 audit table 필요.
 6. **파티셔닝 키** — 재고 트랜잭션은 시간 또는 location 기반. 쿼리 패턴과 일치?
 7. **soft delete** — 주문/재고는 hard delete 금지. `deleted_at` + 모든 쿼리 필터 일관성?
+8. **tenant_id 컬럼 정책** — 모든 tenant-scoped 테이블에 `tenant_id` not-null + composite PK, FK 일관성, RLS 적용 (→ `logistics-multitenancy`)
+9. **파티셔닝 by tenant + time** — `(tenant_id, occurred_at)` 복합 파티션, noisy neighbor 격리
+10. **inventory snapshot 테이블** — 일·시간 단위 snapshot + event log replay로 임의 시점 복구 (→ `logistics-dr`)
+11. **CDC source-of-truth markers** — outbox·debezium용 CDC 컬럼(`_lsn`, `_op_type`, `_committed_at`), retention 정책
+12. **audit log immutability** — append-only, hash chain·trusted timestamping, hard delete 금지 검증
+13. **PII column tagging** — 컬럼 단위 PII tag·마스킹 정책·복호화 권한 (→ `data-privacy-logistics`)
+14. **MDM 마스터 lifecycle** — effective_date·end_date·current_flag, supersession (→ `mdm-reference-data`)
+15. **이벤트 소싱 + projection** — 명시적 이벤트 모델 vs 트랜잭션 로그 + projection, snapshot+replay 패턴
 
 ## 응답 형식
 
@@ -28,3 +36,8 @@
 - 도메인 비즈니스 규칙 → `wms-inventory`/`oms-fulfillment`
 - 이벤트 스키마·outbox → `logistics-event-schema`
 - 컨슈머 멱등성 → `logistics-idempotency`
+- tenant 격리·RLS → `logistics-multitenancy`
+- 마스터·MDM lifecycle → `mdm-reference-data`
+- DR·snapshot → `logistics-dr`
+- PII·마스킹 → `data-privacy-logistics`
+- 관측성·CDC 메타 → `logistics-observability`

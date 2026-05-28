@@ -17,6 +17,12 @@
 6. **at-least-once vs exactly-once** — Kafka exactly-once는 transactional producer + consumer commit 결합. 부분 채택 시 한쪽이 깨짐.
 7. **타임아웃·부분 실패** — HTTP 504 후 재시도 vs 백오프 + jitter. 외부 시스템 멱등성 미지원 시 reconciliation 배치?
 8. **dedup 윈도우** — 무한 보존 불가. 윈도우 안에서만 보장한다는 점이 컨슈머에 문서화?
+9. **distributed lock vs idempotency-key 트레이드오프** — pessimistic lock(`SELECT FOR UPDATE`·advisory lock) vs idempotency-key, 동시성 vs throughput 매트릭스
+10. **retry-storm + circuit-breaker 결합** — retry budget·exponential backoff + circuit breaker open 시 retry 차단 (→ `resilience-patterns`)
+11. **reconciliation 패턴 확장** — 정기 batch reconcile + 실시간 diff, 결과 차이 alert·자동 보정 trigger, 외부 시스템 멱등성 미지원 시 fallback
+12. **saga 단계별 멱등성** — 보상 트랜잭션도 멱등 보장, 부분 보상 후 재실행 안전 (→ `logistics-saga`)
+13. **bulk 작업 멱등성** — `bulk_job_id + item_id` 키, 일부 성공 후 재실행 누락/중복 방지 (→ `bulk-operations`)
+14. **webhook receiver 멱등성** — 캐리어·채널 webhook의 `event_id`·`transaction_id` 기반 dedup (→ `carrier-edi`/`channel-sync`)
 
 ## 응답 형식
 
@@ -28,3 +34,8 @@
 
 - 이벤트 스키마·outbox → `logistics-event-schema`
 - 도메인 비즈니스 규칙 → `wms-inventory`/`oms-fulfillment`/`logistics-settlement`
+- 복원 패턴(circuit breaker·bulkhead) → `resilience-patterns`
+- saga·보상 → `logistics-saga`
+- bulk·partial failure → `bulk-operations`
+- webhook receiver (캐리어·채널) → `carrier-edi`/`channel-sync`
+- DR·event replay → `logistics-dr`

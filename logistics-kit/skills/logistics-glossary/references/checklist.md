@@ -23,3 +23,5 @@
 ## Hand-off
 
 - i18n 키 네이밍 컨벤션 자체 → 프로젝트의 `i18n-key-guard` 스킬(있을 경우)로 위임
+- 타임존·환율·로케일·휴일 → `localization-audit`
+- KPI 용어 표준 → `logistics-kpi`

@@ -17,6 +17,13 @@
 6. **at-least-once vs exactly-once** — Kafka 기본은 at-least-once. 컨슈머 멱등성(→ `logistics-idempotency`) 보장 필수.
 7. **PII/민감 정보** — 수하인 정보가 이벤트에 raw로 실리지 않나? 마스킹/별도 topic 분리?
 8. **DLQ(dead letter queue)** — 파싱·처리 실패 메시지 격리 + 재처리 도구?
+9. **DLQ replay tooling** — replay GUI/CLI, target offset 지정·기간·필터, replay 시 부작용 격리·멱등성 보장
+10. **Schema Registry 호환성 매트릭스** — BACKWARD / FORWARD / FULL / BACKWARD_TRANSITIVE — 도메인별 정책 표(예: 주문/inventory FULL, 추적 BACKWARD)
+11. **Outbox → Debezium 레퍼런스** — outbox table 구조(`id`, `aggregate_type`, `aggregate_id`, `type`, `payload`, `published_at`), Debezium SMT 변환 표준
+12. **retention·compaction 정책** — log 보존(7~30일), compacted topic(latest 보존), tiered storage·archive
+13. **partitioning key 전략** — entity ID 기반(예: `order_id`), tenant_id 결합, 순서 보장 vs 부하 분산 트레이드오프
+14. **key rotation·PII 토큰화** — payload 내 PII 토큰화 + 별도 vault, encryption key rotation, key versioning
+15. **contract testing** — producer/consumer pact, Schema Registry CI 검증, breaking change 자동 감지
 
 ## 응답 형식
 
@@ -28,3 +35,9 @@
 
 - 컨슈머 멱등성·dedup → `logistics-idempotency`
 - DB 모델·이벤트 소싱 → `logistics-data-model`
+- 관측성·trace 전파 → `logistics-observability`
+- saga·보상 → `logistics-saga`
+- DR·replay 복구 → `logistics-dr`
+- bulk 작업·DLQ replay → `bulk-operations`
+- 다중 채널 fan-out (webhook) → `api-design-logistics`/`channel-sync`
+- PII 토큰화 → `data-privacy-logistics`
