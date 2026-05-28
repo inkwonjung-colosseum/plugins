@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "planning-kit",
-      "version": "0.2.17",
+      "version": "0.3.0",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit.",
       "source": {
         "source": "local",
@@ -24,8 +24,8 @@
         "source": "local",
         "path": "./dbml-translator"
       },
-      "version": "0.1.0",
-      "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+      "version": "0.2.0",
+      "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
       "author": {
         "name": "정인권",
         "email": "developjik@colosseum.kr"
@@ -45,6 +45,44 @@
       },
       "version": "0.1.0",
       "description": "물류 도메인 전반(WMS/TMS/OMS/3PL) 상시 전문가 Skills 12종. 설계 자문·코드 리뷰·운영 질의·규제 검토.",
+      "author": {
+        "name": "inkwonjung-colosseum",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "devx-kit",
+      "source": {
+        "source": "local",
+        "path": "./devx-kit"
+      },
+      "version": "0.1.0",
+      "description": "Stack-agnostic developer productivity skills",
+      "author": {
+        "name": "정인권",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "colonova-confluence-kit",
+      "source": {
+        "source": "local",
+        "path": "./colonova-confluence-kit"
+      },
+      "version": "0.1.0",
+      "description": "ColoNova Engineering Confluence document routing, audit, and publishing skills.",
       "author": {
         "name": "inkwonjung-colosseum",
         "email": "developjik@colosseum.kr"

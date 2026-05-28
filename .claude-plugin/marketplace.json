@@ -12,7 +12,7 @@
       "name": "planning-kit",
       "source": "./planning-kit",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.2.17",
+      "version": "0.3.0",
       "license": "MIT",
       "tags": [
         "planning",
@@ -23,8 +23,8 @@
     },
     {
       "name": "dbml-translator",
-      "version": "0.1.0",
-      "description": "DBML schemas explained to non-developers, and gap analysis between DBML designs and product specs.",
+      "version": "0.2.0",
+      "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
       "source": "./dbml-translator",
       "author": {
         "name": "정인권",
@@ -50,6 +50,44 @@
         "tms",
         "oms",
         "supply-chain"
+      ]
+    },
+    {
+      "name": "devx-kit",
+      "version": "0.1.0",
+      "description": "Frontend·backend 무관 개발 생산성 스킬 모음. 코드·diff·로그·테스트·환경 변수 등 일상 개발 업무의 반복 작업을 줄이는 stack-agnostic kit.",
+      "source": "./devx-kit",
+      "author": {
+        "name": "정인권",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "category": "productivity",
+      "tags": [
+        "productivity",
+        "devx",
+        "frontend",
+        "backend",
+        "workflow"
+      ]
+    },
+    {
+      "name": "colonova-confluence-kit",
+      "version": "0.1.0",
+      "description": "ColoNova Engineering Confluence 8.8 문서 트리 감사, 위치 추천, 템플릿 변환, 승인 후 게시 검증을 지원하는 문서 운영 스킬 묶음.",
+      "source": "./colonova-confluence-kit",
+      "author": {
+        "name": "inkwonjung-colosseum",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "category": "documentation",
+      "tags": [
+        "colonova",
+        "confluence",
+        "documentation",
+        "audit",
+        "publishing"
       ]
     }
   ]
