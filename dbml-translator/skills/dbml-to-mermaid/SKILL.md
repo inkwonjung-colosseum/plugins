@@ -15,49 +15,37 @@ Convert a DBML schema into a Mermaid `erDiagram` block ready to embed in Conflue
 ## When to use
 
 - A `.dbml` file or DBML block (`Table`, `Ref:`, `Enum`, `TableGroup`) is in the conversation.
-- User asks: "ERD 만들어줘", "mermaid로 그려줘", "Confluence에 붙일 다이어그램", "render this DBML".
+- 사용자가 "ERD 만들어줘", "mermaid로 그려줘", "Confluence에 붙일 다이어그램", "render this DBML".
 - A planning-kit doc needs a schema diagram before `planning-publish-confluence`.
 
-Do NOT use for plain SQL DDL — only DBML syntax. For non-ER diagrams (flow/sequence/state), hand off to `diagram-design`.
+비-ER 다이어그램(flow/sequence/state)은 `diagram-design`으로 핸드오프.
 
-## Input handshake
+## 절차
 
-State in one line what is being converted, then proceed:
+1. **입력 검증.** SQL DDL(`CREATE TABLE`, `FOREIGN KEY ... REFERENCES`, 끝 `;` 등)이거나 불완전하면 **추정 진행 금지**, 멈춘다. (상세: `references/example.md`)
+2. **Input handshake** — 변환 대상을 한 줄 명시. grouping 모호하면 확인.
+3. **`references/example.md`를 읽는다** — worked example, 변환 규칙, cardinality 매핑표, alias/self-ref 처리, embed 타깃, loss-item 전체가 거기 있다.
+4. 아래 출력을 순서대로 생성.
 
-> DBML: `schemas/order.dbml` (6 tables, 4 refs, 2 enums)
-> Target: Mermaid `erDiagram` (single block / grouped by TableGroup)
+## 출력 (순서 고정)
 
-If grouping is ambiguous, confirm before rendering.
+1. **Mermaid block** — fenced `mermaid` 블록. `TableGroup`이 있으면 그룹당 1개, 없으면 단일.
+2. **한국어 캡션** (1~2줄) — PM 가독, [[dbml-explain]]과 같은 비즈니스 톤. 추정 cardinality는 "(추정)".
+3. **범례(legend)** — Mermaid 블록 직후 **항상**: "PK=각 행을 구분하는 고유값, FK=다른 표를 가리키는 연결, UK=중복 불가". (PM이 개발자 옆에서 마커를 해독하게.)
+4. **Embed guide** (3줄 max) — Confluence / README / dbdocs.
+5. **Loss notes** — DBML이 표현하나 Mermaid가 못 하는 것. 각 1줄, 사유+대안.
 
-## Output
+## 핵심 규칙 (상세는 reference)
 
-Produce in order:
-
-1. **Mermaid block** — fenced `mermaid` code block(s). One per `TableGroup` if present, else single block.
-2. **Korean caption** (1~2 lines) — PM-readable, business tone matching [[dbml-explain]].
-3. **Embed guide** (3 lines max) — Confluence / README / dbdocs targets. Detail in `references/example.md`.
-4. **Loss notes** — short bullets: what DBML expresses but Mermaid cannot. Each item: 1 line, reason + alternative.
-
-## Rules
-
-- Table/column names verbatim, preserve `snake_case`.
-- Columns → `type name PK|FK|UK` form. Drop system columns (`created_at`, `updated_at`, `deleted_at`, `version`) unless requested.
-- Cardinality: `>` → `}o--||`, `<` → `||--o{`, `-` → `||--||`, `<>` → preserve join table.
-- Label relations with FK column name in quotes.
-- Quote identifiers with characters Mermaid rejects.
-- More than 12 tables → suggest split by `TableGroup` or FK cluster.
-- Inferred cardinality (no explicit `Ref`) → mark "(추정)" in caption.
-- No `classDef` styling unless user requests.
-- Korean caption default; English if input is English.
-- Mermaid block always fenced, never inline.
-
-## Reference
-
-For a worked example, cardinality mapping table, embed targets detail, and full loss-item list, read `references/example.md`.
+- Table/column명 verbatim, `snake_case` 유지. 시스템 컬럼은 생략.
+- **Cardinality 방향**: 항상 부모(1쪽) 먼저 + `||--o{`로 통일 → 까마귀발 역전 방지 (가장 치명적 오류). 예: `users ||--o{ orders : "user_id"`.
+- alias는 실제 테이블명으로 환원, self-ref는 같은 엔티티 양끝. 12개 초과면 분할 제안.
+- 약어 풀이는 `../dbml-explain/references/glossary.md` 기준. Mermaid 블록은 항상 fenced.
 
 ## Related
 
-- [[dbml-explain]] — narrative without diagram.
-- [[dbml-spec-diff]] — PRD gap diagnosis.
-- `planning-publish-confluence` — publish step downstream.
-- `diagram-design` — non-ER diagrams.
+- [[dbml-explain]] — 다이어그램 없는 서술.
+- [[dbml-spec-diff]] — PRD 갭 진단.
+- [[dbml-questions]] — 개발자 확인 질문 묶음.
+- 공통 용어집 `../dbml-explain/references/glossary.md`.
+- `planning-publish-confluence` — 다운스트림 publish. `diagram-design` — 비-ER 다이어그램.

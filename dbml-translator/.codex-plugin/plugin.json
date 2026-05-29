@@ -1,7 +1,7 @@
 {
   "name": "dbml-translator",
-  "version": "0.2.0",
-  "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
+  "version": "0.3.0",
+  "description": "Explain DBML to non-developers, diff against specs, draft developer questions, render Mermaid ERDs.",
   "author": {
     "name": "정인권",
     "email": "developjik@colosseum.kr",
@@ -26,7 +26,7 @@
   "interface": {
     "displayName": "DBML Translator",
     "shortDescription": "Translate DBML schemas, diff them against product specs, and render Mermaid ERDs",
-    "longDescription": "Three skills for DBML workflows: dbml-explain turns a DBML schema into PM-readable narrative (entities, relations, enums, scenarios), dbml-spec-diff compares a DBML schema against a PRD/기획서 to surface missing entities, drift, and cardinality conflicts, and dbml-to-mermaid converts DBML into a Mermaid erDiagram block ready to embed in Confluence or README.",
+    "longDescription": "Four skills that let a non-developer read a DBML schema and talk to engineers: dbml-explain (business narrative), dbml-spec-diff (PRD vs schema gaps), dbml-questions (prioritized questions to send a developer), dbml-to-mermaid (erDiagram for Confluence/README).",
     "developerName": "정인권",
     "category": "Documentation",
     "capabilities": [
@@ -36,9 +36,9 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
     "defaultPrompt": [
-      "Explain this DBML schema to a non-technical stakeholder",
-      "Compare this DBML schema against the product spec and find gaps",
-      "Render this DBML as a Mermaid erDiagram for Confluence"
+      "Explain this DBML schema for a non-developer",
+      "Find gaps between this DBML and the spec",
+      "Questions to ask a developer about this DBML"
     ],
     "brandColor": "#0F766E"
   }

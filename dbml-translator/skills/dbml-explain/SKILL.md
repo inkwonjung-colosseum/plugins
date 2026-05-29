@@ -15,59 +15,37 @@ Translate a DBML schema into business-readable narrative for non-developers.
 ## When to use
 
 - A `.dbml` file is in the conversation or referenced by path.
-- A DBML code block appears (look for `Table`, `Ref:`, `Enum`, `Project` keywords).
-- The user asks: "explain this schema", "what does this table store", "translate for PM", "비개발자도 이해하게 설명".
+- A DBML code block appears. 탐지 신호: `Table X { ... }` 블록 + 관계 표기 중 하나 — `Ref:`(standalone), `[ref:`(inline), `Ref name { ... }`(block). `Enum`/`Project`/`TableGroup`도 신호.
+- 사용자가 "이 스키마 설명", "이 표에 뭐가 저장돼?", "PM에게 설명", "비개발자도 이해하게 설명" 요청.
 
-Do NOT use for plain SQL DDL — only DBML syntax. If unsure, check for `Ref:` shorthand or `Table X { ... }` block style.
+Do NOT use for plain SQL DDL — only DBML. 헷갈리면 `Ref:` 약어나 `Table X { ... }` 블록 스타일을 확인.
 
-## Output structure
+## 절차
 
-Produce these sections in order, in the user's language (default Korean if user wrote Korean):
+1. **입력 검증 먼저.** SQL DDL(`CREATE TABLE`, `VARCHAR(n)`, `FOREIGN KEY ... REFERENCES`, 끝 `;` 등) 또는 불완전/잘린 입력이면 **추정으로 진행하지 말고** 멈춘다. 거부 스크립트와 malformed/dangling-ref 처리 규칙은 `references/output-spec.md`의 "Input validation 상세" 참고.
+2. **`references/output-spec.md`를 읽는다** — 6개 출력 섹션의 정확한 형식·예시·엣지 규칙(alias, composite/self-ref, 참조 액션, 카디널리티 풀이, index, 대용량 처리)이 거기 있다.
+3. 아래 6개 섹션을 사용자 언어(한국어 입력이면 한국어)로 순서대로 출력한다.
 
-### 1. 한 줄 요약
-One sentence: what business domain does this schema model? (e.g., "전자상거래 주문/결제 도메인").
+## 출력 섹션 (순서 고정)
 
-### 2. 핵심 엔티티 (Tables)
-For each `Table`, write:
-- **테이블 이름** (technical) — **비즈니스 의미** (business-friendly name)
-- 한 줄로 "무엇을 저장하는가" 설명. 기술 용어 금지 (PK/FK/index 등 등장하면 풀어쓴다).
-- 주요 컬럼 3–5개만 골라 자연어로 풀이. `created_at` 같은 시스템 컬럼은 생략.
+1. **한 줄 요약** — 어떤 비즈니스 도메인인가. `Project` Note가 있으면 1차 근거.
+2. **핵심 엔티티** — 각 `Table`을 기술명 — 비즈니스 의미 + 무엇을 저장하는지. 주요 컬럼 3–5개 + 연결(`_id`) 컬럼은 항상. Note/nullable 반영.
+3. **엔티티 간 관계** — 각 ref를 비즈니스 문장으로(never "FK"). 카디널리티 약어는 첫 등장 시 괄호 풀이, `N:M`은 연결 테이블 문장 강제.
+4. **상태/분류값 (Enums)** — 허용 값 + 비즈니스 의미. Note 없으면 (추정).
+5. **비즈니스 시나리오** — 실제 식별자로 1–2개 서술. `default` 상태는 초기값으로 명시. *PM이 실제로 읽는 섹션.*
+6. **누락/모호 → 개발자 질문** — 막힌 지점을 개발자에게 보낼 **질문 1줄씩**. 비대칭 관계는 단정 말고 질문. 5개 초과면 [[dbml-questions]]로 라우팅.
 
-Example:
-> **orders** — 주문
-> 고객이 결제한 주문 내역을 보관한다. 누가(`user_id`), 언제(`placed_at`), 얼마(`total_amount`), 어떤 상태(`status`)인지를 기록.
+각 섹션의 예시·세부 규칙은 모두 `references/output-spec.md`를 따른다.
 
-### 3. 엔티티 간 관계 (Refs)
-Walk through each `Ref:` as a business sentence — never as "FK".
+## 핵심 스타일 (상세는 reference)
 
-DBML: `Ref: orders.user_id > users.id`
-→ "한 명의 **사용자**는 여러 개의 **주문**을 가질 수 있다. (1:N)"
+- 기술 용어 풀어쓰기 — PK/FK/UK 등은 `references/glossary.md` 기준 통일.
+- 추측은 "(추정)" 표기. 코드블록 미사용, 식별자만 백틱.
+- 길이 1–2화면. 컬럼 전부 나열 금지. 대용량(20+ 테이블)은 핵심+요약, 무언급 누락 금지.
 
-Group by cardinality (1:1 / 1:N / N:M) and order from most central entity outward.
+## Related
 
-### 4. 상태/분류값 (Enums)
-Each `Enum` becomes a bullet list of allowed states with what each means in business terms. If the DBML has no `Note`, infer from naming but flag as inferred.
-
-### 5. 비즈니스 시나리오 예시
-Write 1–2 short narrative scenarios using the actual table/column names, e.g.:
-> 사용자가 회원가입(`users` 신규 row) → 상품을 장바구니에 담음(`cart_items` 추가) → 결제하면 `orders` 한 건과 `order_items` 다건 생성, `status=paid`.
-
-This is the section non-developers will actually read.
-
-### 6. 누락/모호한 지점
-Last section, short bullets. Things that surprised you while reading:
-- 컬럼명만 보고는 의미가 불명확한 것 (e.g., `status_v2` — 왜 v2인지?)
-- `Note` 없는 enum
-- 비대칭적 관계 (있어야 할 것 같은데 없는 ref)
-- 명명 일관성 깨진 부분
-
-Keep this short — it is not a code review, just "things a PM would want to ask".
-
-## Style rules
-
-- 기술 용어 풀어쓰기: PK → "고유 식별값", FK → "~를 가리키는 연결", index → 언급 안 함.
-- `snake_case` 컬럼명은 표기는 그대로 두되 직후에 한국어/자연어로 의미 풀이.
-- 추측한 부분은 "(추정)" 또는 "DBML 주석 없어 명시되지 않음" 명시.
-- 길이: 테이블 10개 기준 1–2화면. 절대 마크다운 테이블에 컬럼 전부 나열하지 않는다 (PM이 안 읽는다).
-- 코드블록 안 사용. 식별자만 백틱.
-
+- [[dbml-spec-diff]] — 기획서/PRD와 스키마 갭 확인.
+- [[dbml-to-mermaid]] — 같은 그림(ERD)으로 개발자와 화면 공유.
+- [[dbml-questions]] — 개발자 확인 질문 묶음 생성.
+- 설명 후 자연스러운 다음 단계 안내 (기획서 비교 → ERD 공유 → 질문 정리).
