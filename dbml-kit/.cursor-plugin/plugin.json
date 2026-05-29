@@ -1,5 +1,5 @@
 {
-  "name": "dbml-translator",
+  "name": "dbml-kit",
   "version": "0.3.0",
   "description": "Explain DBML to non-developers, diff against specs, draft developer questions, render Mermaid ERDs.",
   "author": {

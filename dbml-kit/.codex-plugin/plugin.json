@@ -1,5 +1,5 @@
 {
-  "name": "dbml-translator",
+  "name": "dbml-kit",
   "version": "0.3.0",
   "description": "Explain DBML to non-developers, diff against specs, draft developer questions, render Mermaid ERDs.",
   "author": {
@@ -7,7 +7,7 @@
     "email": "developjik@colosseum.kr",
     "url": "https://github.com/inkwonjung-colosseum"
   },
-  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-kit",
   "repository": "https://github.com/inkwonjung-colosseum/plugins",
   "license": "MIT",
   "category": "documentation",
@@ -24,7 +24,7 @@
     "plugin_hooks": false
   },
   "interface": {
-    "displayName": "DBML Translator",
+    "displayName": "DBML Kit",
     "shortDescription": "Translate DBML schemas, diff them against product specs, and render Mermaid ERDs",
     "longDescription": "Four skills that let a non-developer read a DBML schema and talk to engineers: dbml-explain (business narrative), dbml-spec-diff (PRD vs schema gaps), dbml-questions (prioritized questions to send a developer), dbml-to-mermaid (erDiagram for Confluence/README).",
     "developerName": "정인권",
@@ -32,9 +32,9 @@
     "capabilities": [
       "Read"
     ],
-    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
-    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
-    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-translator",
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-kit",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/dbml-kit",
     "defaultPrompt": [
       "Explain this DBML schema for a non-developer",
       "Find gaps between this DBML and the spec",

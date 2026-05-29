@@ -1,4 +1,4 @@
-# dbml-translator
+# dbml-kit
 
 > DBML 스키마를 비개발자에게 설명하고, 기획서와의 빈틈을 짚고, 개발자 확인 질문을 뽑고, Mermaid ERD로 렌더링하는 네 스킬 패키지. 비개발자가 .dbml을 스스로 이해하고 개발자와 정확히 소통하게 만든다.
 
@@ -37,10 +37,10 @@
 Claude Code:
 
 ```text
-/dbml-translator:dbml-explain
-/dbml-translator:dbml-spec-diff
-/dbml-translator:dbml-questions
-/dbml-translator:dbml-to-mermaid
+/dbml-kit:dbml-explain
+/dbml-kit:dbml-spec-diff
+/dbml-kit:dbml-questions
+/dbml-kit:dbml-to-mermaid
 ```
 
 Codex:
@@ -58,10 +58,10 @@ Claude Code:
 
 ```bash
 claude plugin marketplace add https://github.com/inkwonjung-colosseum/plugins
-claude plugin install dbml-translator@inkwonjung-colosseum
+claude plugin install dbml-kit@inkwonjung-colosseum
 ```
 
-Codex App: 앱의 `/plugins` 화면에서 marketplace를 추가한 뒤 dbml-translator를 활성화합니다.
+Codex App: 앱의 `/plugins` 화면에서 marketplace를 추가한 뒤 dbml-kit을 활성화합니다.
 
 ## 검증
 
@@ -77,7 +77,7 @@ plugin-eval analyze ./skills/dbml-to-mermaid --format markdown
 ## 구성
 
 ```text
-dbml-translator/
+dbml-kit/
 ├── .claude-plugin/plugin.json   # Claude Code manifest
 ├── .codex-plugin/plugin.json    # Codex manifest (interface 완전체)
 └── skills/                         # SKILL.md=절차+섹션 목록, 상세·예시는 references/(deferred)로 이연
