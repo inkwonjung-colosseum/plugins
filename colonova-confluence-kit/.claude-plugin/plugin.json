@@ -1,7 +1,7 @@
 {
   "name": "colonova-confluence-kit",
-  "version": "0.1.0",
-  "description": "Use when ColoNova Engineering Confluence 8.8 문서 트리 감사, 위치 추천, 템플릿 변환, 승인 후 게시 검증이 필요할 때.",
+  "version": "0.7.0",
+  "description": "8.8 ColoNova Confluence 트리의 지속적 유지보수·최신화 관리 플러그인. 두 skill이 감사→갱신 루프로 연결된다: colonova-folder-audit이 최신화 후보·실행 큐를 만들고, colonova-doc-router-publisher가 그 page ID로 실제 갱신을 수행한다. colonova-folder-audit은 트리 전체 또는 특정 폴더를 read-only로 감사하고 freshness/stale 기준 문서(05/08/12 living standard, 07 모니터링 SLO·threshold, Approved 02 Design Review, 09 로드맵)·Archive·Pending supersession(05/08/12/ADR)·Discussion closure incomplete·신규 Subfolder drift 후보와 실행 큐, 다음 감사 권장일을 식별하며, 리포트를 prior-report로 자동 연결해 delta·overdue를 점검한다(스프린트 감사, 최신화 후보 탐지, 정기 점검). colonova-doc-router-publisher는 새 문서 라우팅·유형별 템플릿(11종) 변환·기존 기준 문서 갱신(변경 이력)·최신화 후보 큐 일괄 갱신(Batch Refresh)·ADR 상태 전환·discussion 종결·supersession(inbound 링크 점검)을 version pre-fetch·429 재시도와 승인 게이트 후 Confluence에 게시하고 readback 검증한다(라우팅, 최신화, 갱신, 게시).",
   "author": {
     "name": "inkwonjung-colosseum",
     "email": "developjik@colosseum.kr",
@@ -15,7 +15,10 @@
     "confluence",
     "documentation",
     "audit",
-    "publishing"
+    "publishing",
+    "maintenance",
+    "freshness",
+    "refresh"
   ],
   "skills": "./skills/"
 }
