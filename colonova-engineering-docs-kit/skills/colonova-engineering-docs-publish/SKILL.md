@@ -1,11 +1,11 @@
 ---
-name: colonova-doc-router-publisher
-description: Use when ColoNova 8.8 문서를 Confluence 트리에 게시·관리할 때 — 새 초안의 위치 추천·유형별 템플릿 변환·문서 분리·생성/업데이트·readback 검증. 기존 기준 문서(living standards) 최신화·갱신(변경 이력 기록), 최신화 후보 큐 일괄 갱신(batch refresh), discussion→decision 종결(논의사항 RESOLVED 처리), supersession(구 페이지 SUPERSEDED 처리)에도 발동. colonova-folder-audit이 최신화 후보로 식별한 page ID를 받아 실제 갱신을 수행하는 진입점(예: "감사 결과 page ID 12345 갱신해줘"). broad cleanup·트리 전체 감사는 colonova-folder-audit을 먼저 사용.
+name: colonova-engineering-docs-publish
+description: 'Use when ColoNova 8.8 문서를 Confluence 트리에 게시·관리할 때 — 새 초안의 위치 추천·유형별 템플릿 변환·문서 분리·생성/업데이트·readback 검증. 기존 기준 문서(living standards) 최신화·갱신(변경 이력 기록), 최신화 후보 큐 일괄 갱신(batch refresh), discussion→decision 종결(논의사항 RESOLVED 처리), supersession(구 페이지 SUPERSEDED 처리)에도 발동. colonova-engineering-docs-audit이 최신화 후보로 식별한 page ID를 받아 실제 갱신을 수행하는 진입점(예: "감사 결과 page ID 12345 갱신해줘"). broad cleanup·트리 전체 감사는 colonova-engineering-docs-audit을 먼저 사용.'
 ---
 
-# ColoNova Doc Router Publisher
+# ColoNova Engineering Docs Publish
 
-Use this skill for a single draft or a small package of related documents that should be routed into the ColoNova Engineering Confluence tree, or to refresh/update an existing standard. If the user already provides a specific page ID (or URL) with a clear update intent, enter the update path directly — no prior audit is needed. When no page ID is given and the request is a broad cleanup, defer to `colonova-folder-audit` first.
+Use this skill for a single draft or a small package of related documents that should be routed into the ColoNova Engineering Confluence tree, or to refresh/update an existing standard. If the user already provides a specific page ID (or URL) with a clear update intent, enter the update path directly — no prior audit is needed. When no page ID is given and the request is a broad cleanup, defer to `colonova-engineering-docs-audit` first.
 
 Fixed target:
 
@@ -14,7 +14,7 @@ Fixed target:
 - space key: `COLO`
 - space name: `[팀]Engineering`
 
-For broad tree audits, bulk movement, archive recommendation, or folder-wide mismatch reports, stop and use `colonova-folder-audit`.
+For broad tree audits, bulk movement, archive recommendation, or folder-wide mismatch reports, stop and use `colonova-engineering-docs-audit`.
 
 ## Scope
 
@@ -22,7 +22,7 @@ This skill can recommend location, rewrite a draft with the right template, spli
 
 ### Refresh use case
 
-This skill is also the refresh/update path for keeping living standards (`05. 기술문서`, `08. 결정사항`, `12. 운영 가이드`) current. When the user says a standard is stale or needs 최신화/갱신 and provides an existing page ID or URL, enter the update path: read the current page, apply the new content, and run the supersession check before finishing. `colonova-folder-audit` surfaces which pages are stale; this skill performs the actual refresh.
+This skill is also the refresh/update path for keeping living standards (`05. 기술문서`, `08. 결정사항`, `12. 운영 가이드`) current. When the user says a standard is stale or needs 최신화/갱신 and provides an existing page ID or URL, enter the update path: read the current page, apply the new content, and run the supersession check before finishing. `colonova-engineering-docs-audit` surfaces which pages are stale; this skill performs the actual refresh.
 
 When the user hands more than one page ID at once — for example the whole `## 최신화 후보` queue from an audit report, or a pasted list/table of page IDs — run the Batch Refresh Flow below instead of forcing one single-page call per ID.
 
@@ -62,7 +62,7 @@ Trigger when a new document replaces an existing page, or an update fully replac
 2. Add a `## 대체 문서 링크` (`supersedes: <old URL>`) section to the new page draft; link, do not copy.
 3. After approval, create/update the new page.
 4. Update the old page status to `SUPERSEDED BY <new page link>` and add a top banner; keep it in place unless the user approves moving it to `99. Archive`.
-5. For ADRs and `08. 결정사항` non-ADR decision pages (`templates/decision.md`), set the `## 상태` table status cell to `SUPERSEDED`, populate the `대체 문서` column with the new page URL, then append a `변경 이력` row. For ADRs, additionally confirm via CQL that the prior version exists. This keeps the structured `## 상태` field consistent with the SUPERSEDED banner (SSOT principles #1 and #3); do not leave the status table on `ACTIVE` after superseding. For a `12. 운영 가이드` runbook (`templates/operating-guide.md`, no status table) being replaced by a new runbook, keep the top SUPERSEDED banner from step 4 and append a `변경 이력` row recording the supersession — so the old runbook stays a current-vs-historical separated record (this is the state `colonova-folder-audit` step 6 detects as `Pending supersession` if left incomplete).
+5. For ADRs and `08. 결정사항` non-ADR decision pages (`templates/decision.md`), set the `## 상태` table status cell to `SUPERSEDED`, populate the `대체 문서` column with the new page URL, then append a `변경 이력` row. For ADRs, additionally confirm via CQL that the prior version exists. This keeps the structured `## 상태` field consistent with the SUPERSEDED banner (SSOT principles #1 and #3); do not leave the status table on `ACTIVE` after superseding. For a `12. 운영 가이드` runbook (`templates/operating-guide.md`, no status table) being replaced by a new runbook, keep the top SUPERSEDED banner from step 4 and append a `변경 이력` row recording the supersession — so the old runbook stays a current-vs-historical separated record (this is the state `colonova-engineering-docs-audit` step 6 detects as `Pending supersession` if left incomplete).
 6. Read back both pages; report the backlink/reference count to the old page in the readback. If the count is greater than 0, list up to 5 inbound page titles/IDs and ask the user whether to update those cross-references to point to the new page, or leave them with the SUPERSEDED banner as sufficient. Do not edit inbound pages without approval.
 
 ## Discussion Closure Flow
@@ -76,20 +76,20 @@ Trigger when a `04. 논의사항` discussion reaches a settled conclusion and sh
 
 ## Batch Refresh Flow
 
-Trigger when the user hands several page IDs to refresh in one request — typically the `## 최신화 후보` queue from a `colonova-folder-audit` report, an audit report path, or a pasted list/table of page IDs. This is the most common continuous-maintenance operation (a sprint-close audit usually yields 5–10 refresh candidates), so process the queue as one tracked batch rather than repeated single calls.
+Trigger when the user hands several page IDs to refresh in one request — typically the `## 최신화 후보` queue from a `colonova-engineering-docs-audit` report, an audit report path, or a pasted list/table of page IDs. This is the most common continuous-maintenance operation (a sprint-close audit usually yields 5–10 refresh candidates), so process the queue as one tracked batch rather than repeated single calls.
 
 1. Input: accept a page ID list, an audit report path (parse the `## 최신화 후보` table for page IDs), or a pasted table. Normalize to an ordered list of page IDs. Confirm the count back to the user.
 2. For each page ID in order: fetch the live page (`getConfluencePage`, capturing the current body for the diff; record the `version.number` only for the diff display, not as the value to write), classify its doc type, and prepare the proposed change — including a `변경 이력` row (or `개정 이력` for a Design Review) per step 9. Do not write yet.
 3. Present one batched approval gate, not N separate ones: show a per-page summary table (page ID, 제목, 폴더/유형, 제안 변경 요약, 추가될 변경 이력 row). State: "아래 N개 페이지를 순서대로 갱신합니다. 각 페이지 본문을 확인 후 전체 승인하거나 개별 건너뛸 수 있습니다." Let the user approve all, approve a subset, or skip specific IDs.
 4. Apply approved updates in order. For each page, immediately before calling `updateConfluencePage`, re-fetch `version.number` via `getConfluencePage(pageId)` — do not reuse the `version.number` captured in step 2. The batched approval review of 5–10 pages can take minutes; if another user edited a page during the approval window, the step-2 version is stale and the write would 409-conflict. Reuse the pre-approved body diff, but always write with a fresh version number. If the fresh re-fetch shows the body changed since step 2 (someone else edited it during the approval window), surface that page's new diff to the user and get a per-page re-confirmation before writing it; do not silently overwrite the other edit. Then `updateConfluencePage`, then readback. Accumulate the readback result per page. On a per-page failure, record it and continue to the next page (a batch refresh is independent pages, unlike a split package which stops on first failure — see `publish-safety.md` → Batch Refresh Failure Handling). On HTTP 429, apply the 429 retry sub-clause before recording a failure.
 5. After the batch, report a summary: `N개 갱신 완료, M개 실패 (page ID + 사유), K개 건너뜀`, with each page's Confluence link and readback result. List failures separately for manual follow-up.
-6. Offer to re-run `colonova-folder-audit` (freshness mode) to confirm the refreshed pages cleared the `## 최신화 후보` queue and to pick up the next cadence date.
+6. Offer to re-run `colonova-engineering-docs-audit` (freshness mode) to confirm the refreshed pages cleared the `## 최신화 후보` queue and to pick up the next cadence date.
 
 If any page in the batch needs supersession (it replaces another standard) or is actually a draft, pull it out of the batch and handle it individually via the Supersession Flow or Draft Page Handling — do not silently fold a supersession or draft transition into the batch approval.
 
 ## ADR Number and Status Transition Rule
 
-When creating a new ADR, determine the number, do not guess. The ADR subfolder is a `type: "folder"` entity, so a direct `getConfluencePageDescendants(<ADR-subfolder-id>)` returns 404 (see step 5 and `folder-id-map.md` API note); enumerate the ADR subfolder children via the same root-depth pattern instead: call `getConfluencePageDescendants(933068815, depth=3)` and filter the results to `parentId = 1778810882` (the ADR subfolder, `05. 기술문서 / ADR`). Exhaust all cursor pages (same cursor-exhaustion loop as `colonova-folder-audit` in `references/confluence-tree-audit.md` → Pagination) before computing `max(N)` — the root tree exceeds ~100 descendants, so a single truncated response would miss higher-numbered ADRs and risk proposing a duplicate. Extract the `ADR-NNN` pattern from the filtered ADR titles, find the max N, and propose `ADR-(N+1)`. If the fully-paginated result has no ADR pages under that parent, start at `ADR-001`. If pagination fails partway (a cursor page errors out), do not propose a number; report the partial fetch and ask the user to confirm the ADR number manually. Include the proposed (or user-confirmed) number in the pre-approval diff so the user confirms it.
+When creating a new ADR, determine the number, do not guess. The ADR subfolder is a `type: "folder"` entity, so a direct `getConfluencePageDescendants(<ADR-subfolder-id>)` returns 404 (see step 5 and `folder-id-map.md` API note); enumerate the ADR subfolder children via the same root-depth pattern instead: call `getConfluencePageDescendants(933068815, depth=3)` and filter the results to `parentId = 1778810882` (the ADR subfolder, `05. 기술문서 / ADR`). Exhaust all cursor pages (same cursor-exhaustion loop as `colonova-engineering-docs-audit` in `references/confluence-tree-audit.md` → Pagination) before computing `max(N)` — the root tree exceeds ~100 descendants, so a single truncated response would miss higher-numbered ADRs and risk proposing a duplicate. Extract the `ADR-NNN` pattern from the filtered ADR titles, find the max N, and propose `ADR-(N+1)`. If the fully-paginated result has no ADR pages under that parent, start at `ADR-001`. If pagination fails partway (a cursor page errors out), do not propose a number; report the partial fetch and ask the user to confirm the ADR number manually. Include the proposed (or user-confirmed) number in the pre-approval diff so the user confirms it.
 
 If the root-depth fetch fails (permission error, persistent 5xx/timeout, or the ADR subfolder ID `1778810882` no longer resolves to the ADR subfolder in live), do not propose a number and do not default to `ADR-001` — higher-numbered ADRs may exist but be unreachable, and guessing risks a duplicate number. Report the fetch failure and ask the user to confirm the ADR number manually before continuing. Include the user-supplied number in the pre-approval diff. (This mirrors the confidence-low / Manual review safety pattern used elsewhere.)
 
@@ -160,7 +160,7 @@ After publishing:
 5. remaining checks
 6. for split packages, list successes and failures separately; on partial failure, show created page IDs, failed documents, and the keep/delete decision pending from the user
 7. for supersession, the old page's new status and the backlink/reference count to the new page
-8. for a Batch Refresh Flow, the `N개 갱신 완료, M개 실패, K개 건너뜀` summary with per-page links/readback, failures listed separately, and an offer to re-run `colonova-folder-audit` freshness mode
+8. for a Batch Refresh Flow, the `N개 갱신 완료, M개 실패, K개 건너뜀` summary with per-page links/readback, failures listed separately, and an offer to re-run `colonova-engineering-docs-audit` freshness mode
 
 ## References
 

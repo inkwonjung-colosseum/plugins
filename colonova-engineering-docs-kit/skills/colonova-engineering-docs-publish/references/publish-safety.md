@@ -81,7 +81,7 @@ If the decision page is created successfully but the discussion page `RESOLVED` 
 1. Immediately report the decision page ID + URL and the discussion page ID that was not updated.
 2. Provide the exact text the user must add to the discussion page by hand: the top-line status `RESOLVED — 결정: <decision page URL>` and the `결정 필요 사항 = <decision page URL>` value.
 3. State the closure as `Discussion closure incomplete` and do not report it as completed.
-4. This state is detectable by `colonova-folder-audit` as a `Discussion closure incomplete` Manual review sub-case (see action-taxonomy.md), so the next audit cycle can surface it.
+4. This state is detectable by `colonova-engineering-docs-audit` as a `Discussion closure incomplete` Manual review sub-case (see action-taxonomy.md), so the next audit cycle can surface it.
 
 ### Draft Page Handling
 
@@ -101,7 +101,7 @@ When an update or a new page supersedes an existing standard or ADR, complete th
 4. Update the old page: set its status to `SUPERSEDED BY <new page link>` and add a banner at the top of its body pointing to the new page. Keep the old page in place (principle #3, current vs. historical separation); if the user wants it retired, move to `99. Archive` only on explicit approval.
 5. Read back both pages and report each verification separately. Report the inbound backlink/reference count to the old page (see Inbound Link Check below); if greater than 0, list up to 5 inbound page titles/IDs and ask whether to repoint them to the new page or leave them with the SUPERSEDED banner. Do not edit inbound pages without approval.
 
-For ADRs and `08. 결정사항` non-ADR decision pages (`templates/decision.md`), set the `## 상태` table's status cell to `SUPERSEDED`, fill the `대체 문서` column with the new page URL, and add a 변경 이력 row. Do not leave the structured `## 상태` field on `ACTIVE` after applying the SUPERSEDED banner — the banner and the status table must agree (SSOT #1/#3). For ADRs, additionally confirm the prior version via CQL. For a `12. 운영 가이드` runbook (`templates/operating-guide.md`, which has no status table) replaced by a new runbook, keep the step-4 SUPERSEDED banner and append a 변경 이력 row recording the supersession. `colonova-folder-audit` sweeps `05`, `08`, `12`, and ADR pages for half-completed supersession, so leaving a `12` old runbook without the banner surfaces it as `Pending supersession`.
+For ADRs and `08. 결정사항` non-ADR decision pages (`templates/decision.md`), set the `## 상태` table's status cell to `SUPERSEDED`, fill the `대체 문서` column with the new page URL, and add a 변경 이력 row. Do not leave the structured `## 상태` field on `ACTIVE` after applying the SUPERSEDED banner — the banner and the status table must agree (SSOT #1/#3). For ADRs, additionally confirm the prior version via CQL. For a `12. 운영 가이드` runbook (`templates/operating-guide.md`, which has no status table) replaced by a new runbook, keep the step-4 SUPERSEDED banner and append a 변경 이력 row recording the supersession. `colonova-engineering-docs-audit` sweeps `05`, `08`, `12`, and ADR pages for half-completed supersession, so leaving a `12` old runbook without the banner surfaces it as `Pending supersession`.
 
 #### Inbound Link Check
 
@@ -129,7 +129,7 @@ Confluence has no real transaction, so the new page can be created while the old
 
 1. Immediately show the new page ID and URL.
 2. Provide the exact text the user must add to the old page to retire it manually: a top banner like `SUPERSEDED BY <new page URL>` and, for ADRs, the 상태 table value `SUPERSEDED` with the 대체 문서 link.
-3. Treat the cycle as incomplete until the old page is updated. While it is incomplete, the old page is `Pending supersession`, not `Refresh required`, for `colonova-folder-audit` (see action-taxonomy.md).
+3. Treat the cycle as incomplete until the old page is updated. While it is incomplete, the old page is `Pending supersession`, not `Refresh required`, for `colonova-engineering-docs-audit` (see action-taxonomy.md).
 
 ## Readback Verification
 

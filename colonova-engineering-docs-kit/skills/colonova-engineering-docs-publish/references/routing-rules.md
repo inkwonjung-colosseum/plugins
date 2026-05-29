@@ -45,7 +45,7 @@ Some top-level folders have live subfolders. Route into the subfolder when it ma
 
 Only `03`, `04`, and `05` carry live subfolders today (confirmed 2026-05-29). `01`, `02`, `07`, `08`, `09`, `10`, `11`, `12`, `99` have none yet — place documents directly under those top-level folders.
 
-Subfolders evolve. Always reconcile against live children; if a listed subfolder is gone or a new one appears, trust the live tree. If a new subfolder appears in the live children that is not listed here, place the document into it when it matches, and record it for `colonova-folder-audit` to surface on its next run as a 신규 subfolder so this table (and `folder-id-map.md` → Known Subfolders) can be updated. This closes the drift loop between the routing taxonomy and the live tree.
+Subfolders evolve. Always reconcile against live children; if a listed subfolder is gone or a new one appears, trust the live tree. If a new subfolder appears in the live children that is not listed here, place the document into it when it matches, and record it for `colonova-engineering-docs-audit` to surface on its next run as a 신규 subfolder so this table (and `folder-id-map.md` → Known Subfolders) can be updated. This closes the drift loop between the routing taxonomy and the live tree.
 
 ## Boundary Rules
 

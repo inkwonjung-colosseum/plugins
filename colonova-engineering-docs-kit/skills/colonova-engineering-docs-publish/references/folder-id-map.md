@@ -24,7 +24,7 @@ Re-resolving and writing pageIds back is optional and best-effort. It only helps
 
 ## Known Subfolders
 
-These subfolders are documented in `routing-rules.md` → Subfolder Routing. The pageIds below were resolved from a live `getConfluencePageDescendants(933068815, depth=2)` run on 2026-05-29 (a `confirmed ID` row, not a `fill-on-first-resolution` placeholder). Listing them here lets routing recognize a known subfolder and use its ID directly without re-fetching, and lets `colonova-folder-audit` step 3b skip confirmed rows and flag only genuinely new subfolders. Subfolders evolve, so live children remain authoritative — if a cached ID no longer resolves to the expected subfolder, discard it and re-resolve.
+These subfolders are documented in `routing-rules.md` → Subfolder Routing. The pageIds below were resolved from a live `getConfluencePageDescendants(933068815, depth=2)` run on 2026-05-29 (a `confirmed ID` row, not a `fill-on-first-resolution` placeholder). Listing them here lets routing recognize a known subfolder and use its ID directly without re-fetching, and lets `colonova-engineering-docs-audit` step 3b skip confirmed rows and flag only genuinely new subfolders. Subfolders evolve, so live children remain authoritative — if a cached ID no longer resolves to the expected subfolder, discard it and re-resolve.
 
 | Parent (classification) | Subfolder classification name | Live full title | Live pageId (resolved 2026-05-29) |
 | --- | --- | --- | --- |

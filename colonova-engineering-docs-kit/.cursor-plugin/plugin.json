@@ -1,0 +1,9 @@
+{
+  "name": "colonova-engineering-docs-kit",
+  "version": "0.8.0",
+  "description": "Continuous maintenance and freshness management for the 8.8 ColoNova Confluence tree via an audit→refresh loop: colonova-engineering-docs-audit builds the refresh/execution queues and colonova-engineering-docs-publish runs the updates from those page IDs. Covers routing, audit, freshness/staleness (living standards, 07 monitoring SLO/threshold pages, Approved design reviews, 09 living roadmaps), pending-supersession (05/08/12/ADR), incomplete-discussion-closure and new-subfolder-drift detection, single and batch refresh, supersession with inbound-link reconciliation, and approval-gated publishing skills.",
+  "author": {
+    "name": "inkwonjung-colosseum"
+  },
+  "skills": "./skills/"
+}
