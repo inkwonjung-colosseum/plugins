@@ -1,45 +1,39 @@
 ---
 name: planning-review
-description: Use when policy and feature design documents need SSOT, acceptance criteria, or dependency impact review.
+description: Use when 정책서 and 기능설계서 need SSOT, acceptance criteria, or dependency impact review.
 ---
 
 # planning-review
 
-Review `planning-format` output. This skill does not create or auto-fix documents.
+Review `planning-format` output. Never creates or auto-fixes docs.
 
 ## Inputs
 
-- No arguments: use the previous `planning-format` output or its `## 저장 파일` handoff.
-- One or more `https?://` URLs: fetch each as a root review source.
-- One directory: find policy and feature design files in that directory.
-- One file: same-folder companion read; scan sibling text files and supported images non-recursively to identify the pair.
-- Two non-URL paths: identify policy and feature design by file name or heading.
-- Otherwise: treat input as pasted Markdown text.
+- No arguments: prior `planning-format` output or `## 저장 파일` handoff (one `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`).
+- `https?://` URLs: each = root review source.
+- One directory: find policy + feature design inside.
+- One file: same-folder companion scan to identify the pair.
+- Two non-URL paths: identify by filename or heading.
+- Otherwise: pasted Markdown.
 - Options: `--ssot-include`, `--no-input-fetch`, `--no-input-image`, `--no-ssot-fetch`, `--no-ssot-image`.
-- Review axes run as one consolidated pass; axis-selection is not a public option.
-- Handoff marker: Step 1.1.3 planning-format 기본 저장 출력 handoff (0.2.14); `## 저장 파일`; exactly one `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` folder.
-- Exclusion marker: 직전 출력의 `## 체크해야 할 항목`, `## 출처/누락 요약`, `## 상세 추적`, `## 저장 실패 상세`는 review 대상 본문에 합류하지 않는다.
-- SSOT marker: `planning/**`은 계속 기준 문서 묶음 근거에서 제외. 0.3.0부터 SSOT 표시 폴더 후보 중 파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보다.
+- SSOT marker: `planning/**` excluded. SSOT-tagged folders qualify only when filename version `>= v0.8` or no version.
 
 ## Workflow
 
-Identify exactly one policy body and one feature design body; stop if ambiguous. Keep review inputs separate from SSOT evidence. Use only SSOT-marked folders as evidence, never `planning/**` or `.planning-kit/**`. Run the three review axes in one main pass, merge duplicates by `R1 > R3 > R2`, then report verdict, confidence, conclusion, findings, checklist, evidence summary, and trace when needed.
+Identify exactly one policy + one feature design body; stop if ambiguous. SSOT evidence = SSOT-marked folders only (never `planning/**` or `.planning-kit/**`). Run R1+R2+R3 in one pass; merge by `R1 > R3 > R2`.
+
+Axes:
+- R1: SSOT consistency.
+- R2: each `AC-XXX` is Given-When-Then with measurement + mapped FUNC + TEST when present; NFR numeric; journey emotion 1-5; UX message rows include CTA + destructive-confirm object repetition.
+- R3: policy↔feature ID cross-links resolve; data/API/event contracts close; risks/KPIs/roadmap trace to feature artifacts. Policy strategic completeness (mirrors F11/F12): BIZ-001 Owner+baseline+cadence; BIZ-002 falsification+learning loop; DEC-XXX do-nothing+trade-off+re-eval; section 11 Power×Interest+RACI+Approver 사인오프; section 14 phases DoR/DoD/milestone date/rollback metric+threshold.
 
 ## Output Contract
 
-- Start with `# [feature-name] 검토 결과`; do not print progress logs first.
-- Do not wrap the whole report in a code fence.
-- Show `## 결론` before detailed findings.
-- Put unresolved decisions and document work in `## 체크해야 할 항목`.
-- Keep raw R* finding IDs in `## 상세 추적`, not the top summary.
-- Use clean display labels; do not leak internal terms such as `SSOT corpus`, `fetch`, or `connector fallback`.
-
-## 출력 포맷
-
-Required visible order marker: `# [기능명] 검토 결과`, `## 결론`, `## 검토 결과`, `## 체크해야 할 항목`.
-
-### 최종 clean-display 정규화
+- Required order: `# [기능명] 검토 결과` → `## 결론` → `## 검토 결과` → `## 체크해야 할 항목`.
+- No code fence wrapping; no progress logs first.
+- Raw R* IDs only in `## 상세 추적`.
+- Clean display labels; never leak `SSOT corpus`, `fetch`, `connector fallback`.
 
 ## References
 
-Read `references/runtime-contract.md` for parser and output edge cases. Load `ssot-rules`, `ac-rules`, `deps-rules`, and shared planning-format fetch/image references only when needed.
+Load `references/runtime-contract.md` for parser + output edges. Load `ssot-rules`, `ac-rules`, `deps-rules`, and shared planning-format fetch/image refs only when needed.

@@ -1,10 +1,14 @@
-# planning-kit (0.3.0)
+# planning-kit (0.4.0)
 
-기획 초안을 정책서·기능설계서로 정리하고, review, SSOT audit, Confluence 후보 발행까지 이어주는 4-skill 플러그인입니다. 0.3.0 runtime은 0.2.14의 결과 우선 출력과 저장 파일 handoff 계약을 유지하면서, SSOT corpus 진입 조건에 파일명 basename version cutoff `>= v0.8`(또는 버전 표기 없음)을 추가합니다. `v0.7` 이하 파일은 `버전 미달`로 별도 집계되고 corpus에서 제외됩니다.
+기획 전문가가 즉시 쓸 수 있는 정책서·기능설계서 + review + SSOT audit + Confluence 발행 4-skill 플러그인입니다. 0.4.0은 0.3.0의 결과 우선 출력과 저장 파일 handoff 계약, 그리고 SSOT corpus 진입 조건(파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음)을 유지하면서, 정책서와 기능설계서 템플릿을 다섯 전문가 관점(PM 전략 / BA 추적성 / UX / 기술 명세 / QA)으로 확장합니다.
+
+- 정책서: 정책 규칙·상태·권한·예외·연동 + **사업 케이스(KPI/OKR/가설) · 이해관계자 · 우선순위 · 리스크 레지스터 · 로드맵**.
+- 기능설계서: 화면·흐름·동작·메시지 + **페르소나/사용자 여정 · 수용기준(Given-When-Then) · 데이터 모델 · API/이벤트 계약 · NFR · UX writing · 디자인 시스템 연계 · 테스트 시나리오 · Observability · DoR/DoD**.
+- 모든 항목은 `POL-/BIZ-/RSK-/DEC-/FUNC-/AC-/DATA-/API-/NFR-/TEST-` 요구사항 ID 체계로 정책↔기능 cross-link을 강제합니다.
 
 ## 현재 품질 상태
 
-2026-05-19 기준 `plugin-eval` 정적 평가에서 플러그인과 4개 스킬 모두 `100/100`, 실패/경고 0건입니다.
+2026-05-28 기준 `plugin-eval` 정적 평가에서 0.4.0 플러그인과 4개 스킬 모두 `100/100`, 실패/경고 0건입니다.
 
 - `planning-kit`: `100/100`
 - `planning-format`: `100/100`
@@ -32,8 +36,8 @@ git diff --check
 
 | 스킬 | 목적 |
 |---|---|
-| `planning-format` | 입력을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 출력 |
-| `planning-review` | 산출물을 기준 문서 일치성, 검증가능성, 영향 분석으로 통합 review |
+| `planning-format` | 입력을 PM·BA·UX·기술·QA 5층 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 출력 |
+| `planning-review` | 산출물을 SSOT 일치성(R1), 수용기준 검증가능성(R2 = Given-When-Then + 측정), 의존성·영향(R3 = 요구사항 ID cross-link)으로 통합 review |
 | `planning-publish-confluence` | context 또는 명시 저장 폴더의 두 문서를 `v0.7` 후보로 발행하고 readback 검증 |
 | `ssot-audit` | 독립 `SSOT` 표시 폴더 Markdown의 구조·내용과 backlog 감사 |
 

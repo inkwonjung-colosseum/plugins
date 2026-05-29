@@ -1,39 +1,38 @@
 ---
 name: planning-format
-description: Use when a draft, file, folder, URL, or image must become Korean policy and feature design documents.
+description: Use when a draft, file, folder, URL, or image must become Korean 정책서 and 기능설계서 with full PM, BA, UX, technical, and QA detail.
 ---
 
 # planning-format
 
-Turn one planning input into a policy document and a feature design document.
+Convert one planning input into 정책서 + 기능설계서 covering strategy, traceability, UX, spec, and QA.
 
 ## Inputs
 
-- Required positional input: draft text, file path, directory path, image path, or one or more `https?://` URLs.
-- Options: `--save` (default/no-op alias), `--no-save`, `--no-fetch`, `--no-image`, `--no-self-review`.
-- Mixed URL and non-URL tokens are treated as text input. `file://`, `ftp://`, `mailto:`, and scheme-less strings are not URL mode.
-- Compatibility marker: `[--no-save]`, `--save`, 옵션이 없으면 저장, 0.2.x 호환용 no-op alias.
+- Positional: text, file, directory, image, or `https?://` URLs.
+- Options: `--save` (default), `--no-save`, `--no-fetch`, `--no-image`, `--no-self-review`.
+- Mixed URL and non-URL tokens = text input. `file://`, `ftp://`, `mailto:`, scheme-less = not URL mode.
 
 ## Workflow
 
-Dispatch input, collect linked sources, fetch breadth-first unless disabled, merge bodies, convert through templates, self-review unless disabled, then save by default under `planning/[safe-feature-name]--YYYY-MM-DD-HHMMSS/`. `--no-save` prints both documents. Output starts with `# [feature-name]`.
+Dispatch → collect → fetch BFS unless disabled → merge → convert via templates → self-review unless disabled → save by default under `planning/[safe-feature-name]--YYYY-MM-DD-HHMMSS/`. Output starts with `# [feature-name]`.
 
 ## Output Contract
 
-- Save success: header summary -> `## 저장 파일` -> `## 체크해야 할 항목`.
-- `--no-save`: header summary -> `## 정책서` -> `## 기능설계서` -> `## 체크해야 할 항목`.
-- Save failure: print both full documents and `## 저장 실패 상세`.
-- `planning/**` output may be reviewed or published later, but it is never SSOT evidence.
-- Use clean display labels such as `정책서 5.1`, not legacy section symbols.
+- Save success: header → `## 저장 파일` → `## 체크해야 할 항목`.
+- `--no-save`: header → `## 정책서` → `## 기능설계서` → `## 체크해야 할 항목`.
+- Save failure: both bodies + `## 저장 실패 상세`.
+- `planning/**` is never SSOT evidence.
 
 ## References
 
-Load only what the current step needs:
+Load on demand by step:
 
-- `references/runtime-contract.md`: input dispatch, save, or output edge cases.
-- `references/connector-routing.md`: URL fetch or connector fallback.
-- `references/conversion-rules.md`: image handling, merge, mapping, or template conversion.
-- `references/exclusion-rules.md`: unmapped input, `[TBD]`, or omission tracking.
-- `references/self-review-rules.md`: F1-F6 quality review.
-- `references/output-contract.md`: save handoff, checklist, or final response shape.
-- `templates/정책서.md` and `templates/기능설계서.md`: Step 6 document generation.
+- `references/runtime-contract.md` — dispatch, save, output edges.
+- `references/connector-routing.md` — URL fetch, connector fallback.
+- `references/conversion-rules.md` — image, merge, mapping, template, requirement IDs.
+- `references/exclusion-rules.md` — unmapped input, `[TBD]`, omission.
+- `references/self-review-rules.md` — F1-F12 (F11 strategy, F12 roadmap).
+- `references/output-contract.md` — save handoff, checklist, response shape.
+- Section rules: `business-rules.md` (정책서 1, 10-14), `specification-rules.md` (기능설계서 10-11), `nfr-rules.md` (12), `ux-rules.md` (8, 13-14), `qa-rules.md` (9, 15-17).
+- `templates/정책서.md`, `templates/기능설계서.md` — Step 6 generation.

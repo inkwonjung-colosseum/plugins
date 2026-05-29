@@ -56,4 +56,8 @@ No raw F* dump, connector stack trace, wide table, or full URL table in the defa
 
 Default is save-on. `--save` is a compatibility no-op. Only `--no-save` disables writing. Resolve collisions with `--2`, `--3`, etc.
 
-Use clean display labels such as `정책서 5.1`, `기능설계서 7`, `입력 제외 섹션`, and `보조 표`.
+Use clean display labels such as `정책서 5.1`, `기능설계서 7`, `입력 제외 섹션`, `보조 표`, `여정 표`, `상태 전이 표`, `메시지 표`. Reference requirement IDs with their prefix (e.g., `POL-001`, `FUNC-002`, `AC-003`, `DATA-004`, `API-005`, `NFR-PERF`, `TEST-006`, `RSK-007`, `BIZ-008`, `DEC-009`).
+
+## Requirement ID surfacing
+
+When the checklist references a missing or unresolved item that already has an ID, include the ID in the item's `반영 위치` field. When the body assigns an ID but evidence is missing, mention the ID in `## 출처/누락 요약` (no-save/save-failure outputs only).

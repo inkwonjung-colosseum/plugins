@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.3.0",
-  "description": "planning-format 저장 파일, planning-review 통합 리뷰, ssot-audit (파일명 버전 cutoff >= v0.8), planning-publish-confluence.",
+  "version": "0.4.0",
+  "description": "기획 전문가 산출물(정책서+기능설계서) 생성·리뷰·SSOT 감사·Confluence 발행 4-skill.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "planning-kit",
     "shortDescription": "Draft, review, audit, and publish planning docs",
-    "longDescription": "Four compact planning workflows: planning-format creates 저장 파일, planning-review checks policy/feature docs in one pass, ssot-audit audits SSOT Markdown, and planning-publish-confluence publishes v0.7 candidates with confirmation and readback.",
+    "longDescription": "기획 전문가 4-skill. planning-format으로 정책서·기능설계서를 만들고, planning-review로 SSOT·AC·의존성을 검토, ssot-audit으로 SSOT corpus를 감사, planning-publish-confluence로 v0.7 후보를 발행한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [

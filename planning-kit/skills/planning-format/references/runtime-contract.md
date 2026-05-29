@@ -12,7 +12,7 @@ Options:
 - `--no-save`: print bodies instead of writing files.
 - `--no-fetch`: skip URL fetch and connector fallback.
 - `--no-image`: skip image interpretation.
-- `--no-self-review`: skip F1-F6 review only; keep exclusions and output shape.
+- `--no-self-review`: skip F1-F12 review only; keep exclusions and output shape.
 
 ## Dispatch
 

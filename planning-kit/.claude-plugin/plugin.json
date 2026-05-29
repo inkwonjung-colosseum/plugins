@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.3.0",
-  "description": "planning-format 저장 파일, planning-review 통합 리뷰, ssot-audit (파일명 버전 cutoff >= v0.8), planning-publish-confluence.",
+  "version": "0.4.0",
+  "description": "기획 전문가 산출물(정책서+기능설계서) 생성·리뷰·SSOT 감사·Confluence 발행 4-skill.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
