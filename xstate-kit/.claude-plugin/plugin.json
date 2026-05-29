@@ -1,0 +1,26 @@
+{
+  "name": "xstate-kit",
+  "version": "0.2.0",
+  "description": "XState v5 expert toolkit: author typed statecharts (compound/parallel/history), test (model-based + actor-level mocking), wire React, persist & rehydrate actors, live-inspect with @statelyai/inspect, and export to 14+ graph/diagram formats (Mermaid, DOT, xyflow, GraphML, and more).",
+  "author": {
+    "name": "정인권",
+    "email": "developjik@colosseum.kr"
+  },
+  "license": "MIT",
+  "category": "developer-tools",
+  "keywords": [
+    "xstate",
+    "state-machine",
+    "statechart",
+    "visualization",
+    "testing",
+    "react",
+    "mermaid",
+    "graph",
+    "persistence",
+    "debugging",
+    "inspector"
+  ],
+  "commands": "./commands/",
+  "skills": "./skills/"
+}

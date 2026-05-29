@@ -1,0 +1,50 @@
+{
+  "name": "xstate-kit",
+  "version": "0.2.0",
+  "description": "XState v5 expert toolkit: author statecharts, test, React-wire, persist, live-inspect, and 14-format diagrams.",
+  "author": {
+    "name": "정인권",
+    "email": "developjik@colosseum.kr"
+  },
+  "license": "MIT",
+  "category": "developer-tools",
+  "keywords": [
+    "xstate",
+    "state-machine",
+    "statechart",
+    "visualization",
+    "testing",
+    "react",
+    "mermaid",
+    "graph",
+    "persistence",
+    "debugging",
+    "inspector"
+  ],
+  "skills": "./skills/",
+  "features": {
+    "plugin_hooks": false
+  },
+  "interface": {
+    "displayName": "XState Kit",
+    "shortDescription": "Author, test, persist, inspect, visualize, and React-wire XState v5 statecharts.",
+    "longDescription": "Author typed XState v5 statecharts with compound, parallel, and history states; test them with model-based path coverage and actor-level mocking; wire them into React; persist and rehydrate running actors; live-inspect transitions with @statelyai/inspect; and export any machine to 14 graph/diagram formats including Mermaid, DOT, xyflow, and GraphML.",
+    "developerName": "inkwonjung-colosseum",
+    "category": "developer-tools",
+    "capabilities": [
+      "state-machines",
+      "testing",
+      "persistence",
+      "debugging",
+      "visualization",
+      "react"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/README.md",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/blob/main/README.md",
+    "defaultPrompt": [
+      "Write an XState v5 checkout machine",
+      "Diagram this machine as Mermaid"
+    ]
+  }
+}
