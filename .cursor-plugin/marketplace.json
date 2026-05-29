@@ -12,9 +12,9 @@
       "version": "0.4.0"
     },
     {
-      "name": "dbml-translator",
+      "name": "dbml-kit",
       "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
-      "source": "./dbml-translator",
+      "source": "./dbml-kit",
       "version": "0.3.0"
     },
     {
@@ -30,10 +30,16 @@
       "version": "0.1.0"
     },
     {
-      "name": "colonova-confluence-kit",
-      "description": "Continuous maintenance and freshness management for the 8.8 ColoNova Confluence tree via an audit→refresh loop: colonova-folder-audit builds the refresh/execution queues and colonova-doc-router-publisher runs the updates from those page IDs. Covers routing, audit, freshness/staleness (living standards, 07 monitoring SLO/threshold pages, Approved design reviews, 09 living roadmaps), pending-supersession (05/08/12/ADR), incomplete-discussion-closure and new-subfolder-drift detection, single and batch refresh, supersession with inbound-link reconciliation, and approval-gated publishing skills.",
-      "source": "./colonova-confluence-kit",
-      "version": "0.7.0"
+      "name": "colonova-engineering-docs-kit",
+      "description": "Continuous maintenance and freshness management for the 8.8 ColoNova Confluence tree via an audit→refresh loop: colonova-engineering-docs-audit builds the refresh/execution queues and colonova-engineering-docs-publish runs the updates from those page IDs. Covers routing, audit, freshness/staleness (living standards, 07 monitoring SLO/threshold pages, Approved design reviews, 09 living roadmaps), pending-supersession (05/08/12/ADR), incomplete-discussion-closure and new-subfolder-drift detection, single and batch refresh, supersession with inbound-link reconciliation, and approval-gated publishing skills.",
+      "source": "./colonova-engineering-docs-kit",
+      "version": "0.8.0"
+    },
+    {
+      "name": "xstate-kit",
+      "description": "XState v5 toolkit: author typed state machines, generate model-based tests, wire React, and export machines to 14+ graph/diagram formats (Mermaid, DOT, Cytoscape, xyflow, GraphML, and more).",
+      "source": "./xstate-kit",
+      "version": "0.2.0"
     }
   ]
 }

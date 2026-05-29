@@ -33,10 +33,10 @@ Cowork는 Claude Desktop 앱에서 plugin을 설치합니다. 현재는 `Cowork`
 | 플러그인 | 버전 | 목적 | 대표 스킬 | 문서 |
 |---|---:|---|---|---|
 | `planning-kit` | `0.3.0` | 기획 초안을 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 보여주는 `planning-format`, 결론·검토 결과를 먼저 보여주는 `planning-review`, 현재 context memory 또는 명시적 저장 폴더를 `v0.7` Confluence 후보 문서로 발행하는 `planning-publish-confluence`, 독립 `SSOT` 표시 폴더 Markdown만 감사하는 `ssot-audit` 네 스킬 구조. 전문을 화면에 펼치려면 `--no-save`를 사용합니다. | `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit` | [README](./planning-kit/README.md) |
-| `dbml-translator` | `0.2.0` | `.dbml` 스키마를 비개발자(PM/기획)도 읽을 수 있는 서술로 옮기는 `dbml-explain`, DBML과 PRD/기획서 사이의 누락·드리프트·cardinality 충돌을 한 번에 짚고 Mermaid ERD로 변환하는 DBML 문서화 스킬 묶음입니다. | `dbml-explain`, `dbml-spec-diff`, `dbml-to-mermaid` | [README](./dbml-translator/README.md) |
+| `dbml-kit` | `0.3.0` | `.dbml` 스키마를 비개발자(PM/기획)도 읽을 수 있는 서술로 옮기는 `dbml-explain`, PRD/기획서와의 누락·드리프트·cardinality 충돌을 짚는 `dbml-spec-diff`, 개발자 확인 질문을 뽑는 `dbml-questions`, Mermaid ERD로 변환하는 `dbml-to-mermaid` 네 스킬 묶음입니다. | `dbml-explain`, `dbml-spec-diff`, `dbml-questions`, `dbml-to-mermaid` | [README](./dbml-kit/README.md) |
 | `logistics-kit` | `0.1.0` | 물류 도메인(WMS/TMS/OMS/3PL) 상시 전문가 12 Skills. 재고·배차·주문·반품·콜드체인·통관·정산·KPI·ERD·이벤트 스키마·멱등성·용어집 설계 자문·코드 리뷰·운영 질의·규제 검토. 슬림 SKILL.md + `references/` deferred 분리 구조. plugin-eval 정적 점수 100/100 (plugin + 12 skills 전부). | `wms-inventory`, `tms-routing`, `oms-fulfillment`, `returns-rma`, `logistics-compliance`, `cold-chain-monitor`, `logistics-settlement`, `logistics-data-model`, `logistics-event-schema`, `logistics-idempotency`, `logistics-kpi`, `logistics-glossary` | [README](./logistics-kit/README.md) |
 | `devx-kit` | `0.1.0` | Frontend·backend 무관 개발 생산성 스킬 모음입니다. 코드·diff·로그·테스트·환경 변수 등 일상 개발 업무에서 반복 작업을 줄이는 stack-agnostic kit입니다. | 준비 중 | [README](./devx-kit/README.md) |
-| `colonova-confluence-kit` | `0.1.0` | ColoNova Engineering Confluence `8.8 ColoNova` 트리 전용 문서 운영 스킬 묶음입니다. 폴더 감사, Archive/placement 실행 큐, 문서 위치 추천, 템플릿 변환, 승인 후 게시와 readback 검증을 지원합니다. | `colonova-folder-audit`, `colonova-doc-router-publisher` | [README](./colonova-confluence-kit/README.md) |
+| `colonova-engineering-docs-kit` | `0.8.0` | ColoNova Engineering Confluence `8.8 ColoNova` 트리 전용 문서 운영 스킬 묶음입니다. 폴더 감사, Archive/placement 실행 큐, 문서 위치 추천, 템플릿 변환, 승인 후 게시와 readback 검증을 지원합니다. | `colonova-engineering-docs-audit`, `colonova-engineering-docs-publish` | [README](./colonova-engineering-docs-kit/README.md) |
 
 ## 사용 문법
 
@@ -47,8 +47,8 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 /planning-kit:planning-review
 /planning-kit:planning-publish-confluence
 /planning-kit:ssot-audit
-/dbml-translator:dbml-explain
-/dbml-translator:dbml-spec-diff
+/dbml-kit:dbml-explain
+/dbml-kit:dbml-spec-diff
 /logistics-kit:wms-inventory
 /logistics-kit:tms-routing
 /logistics-kit:oms-fulfillment
@@ -61,8 +61,8 @@ Claude Code는 플러그인 namespace를 붙인 slash command 형태를 사용�
 /logistics-kit:logistics-idempotency
 /logistics-kit:logistics-kpi
 /logistics-kit:logistics-glossary
-/colonova-confluence-kit:colonova-folder-audit
-/colonova-confluence-kit:colonova-doc-router-publisher
+/colonova-engineering-docs-kit:colonova-engineering-docs-audit
+/colonova-engineering-docs-kit:colonova-engineering-docs-publish
 ```
 
 Codex는 설치된 플러그인의 skill invocation을 사용합니다.
@@ -74,13 +74,13 @@ $planning-publish-confluence
 $ssot-audit
 $dbml-explain
 $dbml-spec-diff
-$colonova-folder-audit
-$colonova-doc-router-publisher
+$colonova-engineering-docs-audit
+$colonova-engineering-docs-publish
 ```
 
 여러 플러그인이 같은 스킬 이름을 제공하는 경우에는 Codex의 플러그인 선택 UI에서 의도한 플러그인을 확인합니다.
 
-Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit`, `dbml-explain`, `dbml-spec-diff`, `colonova-folder-audit`, `colonova-doc-router-publisher` 같은 스킬을 선택합니다.
+Claude Desktop Cowork는 설치된 plugin의 Skills를 UI에서 선택합니다. 입력창에서 `/`를 입력하거나 `+` 버튼을 눌러 `planning-format`, `planning-review`, `planning-publish-confluence`, `ssot-audit`, `dbml-explain`, `dbml-spec-diff`, `colonova-engineering-docs-audit`, `colonova-engineering-docs-publish` 같은 스킬을 선택합니다.
 
 ## 저장소 구조
 
@@ -100,7 +100,7 @@ colo-plugins/
 │   │   ├── planning-publish-confluence/
 │   │   └── ssot-audit/
 │   └── docs/
-├── dbml-translator/
+├── dbml-kit/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
 │   ├── .plugin-eval/benchmark.json
@@ -127,13 +127,13 @@ colo-plugins/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
 │   └── skills/
-├── colonova-confluence-kit/
+├── colonova-engineering-docs-kit/
 │   ├── .claude-plugin/plugin.json
 │   ├── .codex-plugin/plugin.json
 │   ├── .cursor-plugin/plugin.json
 │   ├── skills/
-│   │   ├── colonova-folder-audit/
-│   │   └── colonova-doc-router-publisher/
+│   │   ├── colonova-engineering-docs-audit/
+│   │   └── colonova-engineering-docs-publish/
 │   └── README.md
 ├── .cursor-plugin/
 │   └── marketplace.json            # Cursor marketplace catalog
@@ -166,18 +166,18 @@ Cowork 조직 catalog 배포는 추후 도입 예정입니다.
 ```bash
 claude plugin validate ./.claude-plugin/marketplace.json
 claude plugin validate ./planning-kit
-claude plugin validate ./dbml-translator
+claude plugin validate ./dbml-kit
 claude plugin validate ./logistics-kit
-claude plugin validate ./colonova-confluence-kit
+claude plugin validate ./colonova-engineering-docs-kit
 ```
 
 plugin-eval로 정적 점수와 token budget도 확인합니다.
 
 ```bash
 plugin-eval analyze ./planning-kit --format markdown
-plugin-eval analyze ./dbml-translator --format markdown
+plugin-eval analyze ./dbml-kit --format markdown
 plugin-eval analyze ./logistics-kit --format markdown
-plugin-eval analyze ./colonova-confluence-kit --format markdown
+plugin-eval analyze ./colonova-engineering-docs-kit --format markdown
 ```
 
 문서만 수정한 경우에도 Markdown diff에 공백 문제가 없는지 확인합니다.
