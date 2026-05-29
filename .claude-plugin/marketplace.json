@@ -12,7 +12,7 @@
       "name": "planning-kit",
       "source": "./planning-kit",
       "description": "기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "license": "MIT",
       "tags": [
         "planning",
@@ -23,7 +23,7 @@
     },
     {
       "name": "dbml-translator",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "DBML schemas explained to non-developers, gap analysis against product specs, and Mermaid ERD rendering.",
       "source": "./dbml-translator",
       "author": {
@@ -73,8 +73,8 @@
     },
     {
       "name": "colonova-confluence-kit",
-      "version": "0.1.0",
-      "description": "ColoNova Engineering Confluence 8.8 문서 트리 감사, 위치 추천, 템플릿 변환, 승인 후 게시 검증을 지원하는 문서 운영 스킬 묶음.",
+      "version": "0.7.0",
+      "description": "8.8 ColoNova Confluence 트리의 지속적 유지보수·최신화 관리(감사→갱신 루프): folder-audit이 최신화·실행 큐를 만들고 doc-router-publisher가 그 page ID로 갱신을 실행한다. living 기준 문서·07 모니터링 SLO·Approved DR·09 로드맵 freshness 감사, Pending supersession(05/08/12/ADR)·Discussion closure incomplete·Archive·갱신·신규 Subfolder drift 후보 탐지, 다음 감사 권장일 anchor·prior-report delta·overdue 점검, 위치 추천, 유형별 템플릿(11종) 변환, 변경 이력·일괄 갱신(Batch Refresh)·ADR 상태 전환·discussion 종결·supersession(inbound 링크 점검) 처리, version pre-fetch·승인 후 게시·readback 검증.",
       "source": "./colonova-confluence-kit",
       "author": {
         "name": "inkwonjung-colosseum",
@@ -87,7 +87,10 @@
         "confluence",
         "documentation",
         "audit",
-        "publishing"
+        "publishing",
+        "maintenance",
+        "freshness",
+        "refresh"
       ]
     }
   ]
