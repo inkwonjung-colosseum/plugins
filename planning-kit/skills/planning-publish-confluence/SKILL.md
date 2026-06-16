@@ -12,14 +12,14 @@ Publish one 정책서 + one 기능설계서 to Confluence as `v0.7` candidate pa
 - No arguments: find the two publishable bodies in current context memory.
 - One folder: only `planning/[safe-feature-name]--YYYY-MM-DD-HHMMSS/` with canonical 정책서·기능설계서 files directly inside.
 - Reject: URLs, arbitrary `.md`, multiple folders, nested paths, options, anything outside `planning/`.
-- Forbidden inputs stop before local file reads, URL fetches, connector fallback, Confluence lookup, parent questions.
+- Forbidden inputs stop before any read, fetch, connector fallback, or Confluence lookup.
 - argument-hint: `(인자 없음 | [planning/[안전기능명]--YYYY-MM-DD-HHMMSS/])`.
 
 ## Workflow
 
 Gate input before Confluence lookup. Ask parent choice → preflight parent + update targets → prepare `v0.7` container + two child pages → ask final confirmation → write container → 정책서 → 기능설계서, readback after each. Never move pages, batch publish, blind overwrite, append update, or auto-rollback.
 
-Step markers: Step 1 입력 dispatch + 금지 입력 확인; Confluence page create/update; Step 7 write 실행 + readback.
+Step markers: Step 1 입력 dispatch + 금지 입력 확인; Step 7 write + readback.
 
 ## Output Contract
 

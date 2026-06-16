@@ -13,13 +13,7 @@ dispatch, 입력, SSOT 식별, fetch, 출력 계약을 한곳에 둔다. `SKILL.
 - 비-URL 경로 2개: 파일명·헤딩으로 정책/기능 식별.
 - 그 외: 붙여넣은 Markdown.
 
-옵션:
-
-- `--ssot-include`: SSOT 표식 폴더/경로를 R1 외부 교차검증 소스로 포함한다. 미지정이면 입력 문서 짝만 검토하고 R1은 보류로 표기.
-- `--no-input-fetch`: 입력 문서의 URL fetch 생략.
-- `--no-input-image`: 입력 문서의 이미지 해석 생략.
-- `--no-ssot-fetch`: SSOT 소스의 URL fetch 생략.
-- `--no-ssot-image`: SSOT 소스의 이미지 해석 생략.
+옵션 없음 — 모든 동작 기본 ON. SSOT 표식 폴더는 항상 R1 외부 교차검증 소스로 포함하고, 입력·SSOT 양쪽의 URL fetch와 이미지 해석을 항상 수행한다.
 
 URL과 비-URL 토큰이 섞이면 텍스트(붙여넣기) 모드. `file://`, `ftp://`, `mailto:`, 스킴 없는 문자열은 URL 모드가 아니다.
 
@@ -40,16 +34,16 @@ URL과 비-URL 토큰이 섞이면 텍스트(붙여넣기) 모드. `file://`, `f
 ## Sequence
 
 1. 입력 dispatch → 정책서·기능설계서 1쌍 식별. 모호하면 중단.
-2. SSOT 소스 식별 (표식 폴더만, `--ssot-include` 또는 입력에 SSOT 경로가 있을 때).
-3. `--no-input-fetch`/`--no-ssot-fetch`가 아니면 URL 본문을 BFS로 fetch. 비공개로 보여도 시도 후 실패를 기록.
-4. `--no-input-image`/`--no-ssot-image`가 아니면 이미지 해석.
+2. SSOT 소스 식별 (표식 폴더만, 항상 포함). 적격 SSOT 없으면 R1 보류.
+3. URL 본문을 BFS로 fetch (입력·SSOT 항상). 비공개로 보여도 시도 후 실패를 기록.
+4. 이미지 해석 (입력·SSOT 항상).
 5. R1+R2+R3 한 패스 (`review-axes.md`). 물류 신호 감지 시 R4 추가 (`logistics-lens.md`).
 6. 병합 우선순위 `R1 > R2 > R3 > R4`로 중복 finding을 접는다.
 7. 출력 계약 방출.
 
 ## URL 수집 / connector
 
-- fetch가 켜져 있으면 dequeue된 모든 `https?://` URL을 먼저 직접 fetch. BFS 순회, 정규화 후 visited 집합으로 사이클 방지.
+- dequeue된 모든 `https?://` URL을 먼저 직접 fetch. BFS 순회, 정규화 후 visited 집합으로 사이클 방지.
 - `mailto:`, `tel:`, `javascript:`, `blob:`, self anchor, 스킴 없는 문자열 무시.
 - connector는 직접 fetch가 막히거나 비거나 인증 필요일 때만: Atlassian(Confluence/Jira), Google Drive, Browser/Chrome(로그인 렌더링 필요 시).
 - dequeue된 URL마다 출처 행 1개: URL / status / body used / note.

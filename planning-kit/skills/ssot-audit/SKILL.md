@@ -1,6 +1,6 @@
 ---
 name: ssot-audit
-description: Use when SSOT-marked Markdown folders need structure, content, or backlog audit.
+description: Use when SSOT-marked Markdown needs structure, content, or backlog audit.
 ---
 
 # ssot-audit

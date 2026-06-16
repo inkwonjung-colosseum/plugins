@@ -2,7 +2,7 @@
 
 기획 전문가가 즉시 쓸 수 있는 심층 인터뷰 + 정책서·기능설계서 생성 + 리뷰 + SSOT 감사 + Confluence 발행 + AI 한글 윤문 6-skill 플러그인입니다. 모호한 아이디어를 심층 인터뷰로 먼저 명확화하고, 입력 하나(텍스트·파일·폴더·URL·이미지)를 **기획 레벨** 정책서·기능설계서로 변환하고, 완성된 2-doc 쌍을 외부 SSOT·의존성 관점으로 검토하며, SSOT corpus를 감사하고, Confluence 후보로 발행합니다. Claude Code / Codex / Cursor 3개 플랫폼을 지원합니다.
 
-- **버전:** `0.6.0`
+- **버전:** `0.7.0`
 - **라이선스:** MIT
 - **작성자:** inkwonjung-colosseum
 - **총 Skill 수:** 6 (인터뷰 1 + 생성 1 + 리뷰 1 + 감사 1 + 발행 1 + 윤문 1)
@@ -21,7 +21,7 @@
 
 | 스킬 | 목적 |
 |---|---|
-| `planning-interview` | 모호한 기획 아이디어를 소크라테스식 1문1답으로 명확화하고, 목표·정책·기능·성공기준 4차원 모호도를 점수화해 임계 이하면 명확도 리포트 + planning-format 핸드오프 제안 (문서 생성 안 함) |
+| `planning-interview` | 모호한 기획 아이디어를 소크라테스식 1문1답으로 명확화하고, 목표·정책·기능·성공기준 4차원 모호도를 점수화하며 기획 challenge 4모드로 가정을 압박해, 임계 이하면 명확도 리포트 + planning-format 핸드오프 제안 (문서 생성 안 함) |
 | `planning-format` | 입력 하나를 기획 레벨 정책서·기능설계서로 변환하고 기본 저장 + 체크 항목을 출력 |
 | `planning-review` | 완성된 2-doc 쌍을 외부 SSOT 교차검증(R1)·링크/의존성 완결성(R2)·교차 일관성(R3), 물류 신호 시 도메인 lens(R4)로 심층 리뷰 (생성·수정 안 함) |
 | `planning-publish-confluence` | context 또는 저장 폴더의 두 문서를 `v0.7` 후보로 발행하고 쓰기 후 readback 검증 |
@@ -37,20 +37,20 @@
 /planning-kit:planning-interview "..." --threshold 0.15 --no-context
 ```
 
-모호한 아이디어를 한 번에 한 질문으로 명확화하는 인터뷰어입니다. 매 라운드 가장 약한 차원(목표·정책·기능·성공기준)을 타겟해 가정을 드러내고, 답변마다 모호도를 채점해 투명하게 보여줍니다. `모호도 = 1 − (목표·0.35 + 정책·0.25 + 기능·0.25 + 성공기준·0.15)`이며 기본 임계는 `0.2`입니다.
+모호한 아이디어를 한 번에 한 질문으로 명확화하는 인터뷰어입니다. 매 라운드 가장 약한 차원(목표·정책·기능·성공기준)을 타겟해 가정을 드러내고, 답변마다 모호도를 채점해 투명하게 보여줍니다. `모호도 = 1 − (목표·0.25 + 정책·0.35 + 기능·0.25 + 성공기준·0.15)`이며 — 정책·규칙 비중이 가장 큽니다(기획의 핵심 산출물) — 기본 임계는 `0.2`입니다. 라운드가 깊어지면 기획 challenge 4모드(범위 축소 R3+·이해관계자 R5+·정책 충돌 R7+·엣지/예외 R9+)를 각 1회 주입해 가정을 압박합니다.
 
-**산출물은 명확도 리포트뿐입니다** — 정책서·기능설계서를 만들지 않고, 모호도가 임계 이하면 `## 결론`·`## 명확도`·`## 합의된 결정`·`## 미결 사항`·`## 다음 단계`로 정리한 뒤 `planning-format` 호출을 제안합니다(자동 호출 안 함). 옵션: `--threshold <0~1>`, `--no-context`, `--max-rounds <n>`.
+**산출물은 명확도 리포트뿐입니다** — 정책서·기능설계서를 만들지 않고, 모호도가 임계 이하면 `## 결론`·`## 명확도`·`## 합의된 결정`·`## 미결 사항`·`## 다음 단계`로 정리한 뒤 `planning-format` 호출을 제안합니다(자동 호출 안 함). 옵션: `--threshold <0~1>`, `--no-context`, `--max-rounds <n>`(기본 18).
 
-> 개발자용 deep-interview(수학 게이트·topology·ontology 수렴·lateral review panel·auto-research/answer fragment)의 무거운 머신은 의도적으로 이식하지 않은 **린 코어**입니다. 한 번에 한 질문 + 4차원 점수 + 임계 게이트만 남겼습니다.
+> 개발자용 deep-interview에서 1문1답·4차원 점수·임계 게이트에 더해 challenge 모드를 **기획 도메인용 4종(범위 축소·이해관계자·정책 충돌·엣지/예외)으로 이식**했습니다. 단 수학적 topology gate·ontology 수렴추적·multi-component rotation·lateral review panel·auto-research/answer fragment의 무거운 머신은 의도적으로 제외한 **린 코어**입니다.
 
 ## planning-format
 
 ```text
 /planning-kit:planning-format "주문 취소 정책 ..."
-/planning-kit:planning-format ./docs/draft/주문취소.md --no-save
+/planning-kit:planning-format ./docs/draft/주문취소.md
 ```
 
-기본은 저장입니다. `--save`는 no-op alias이고, 저장하지 않으려면 `--no-save`를 씁니다. 기타 옵션: `--no-fetch`, `--no-image`, `--no-self-review`.
+옵션은 없습니다. fetch·이미지 해석·자가검증·저장은 항상 수행하며, 산출물은 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/`에 무조건 저장됩니다.
 
 ```markdown
 # [기능명]
@@ -67,7 +67,7 @@
 ...
 ```
 
-`--no-save`와 저장 실패 fallback은 `## 정책서`, `## 기능설계서`, `## 체크해야 할 항목` 순서로 전문을 보여줍니다.
+저장 실패 fallback만 `## 정책서`, `## 기능설계서`, `## 체크해야 할 항목` 순서로 전문을 보여줍니다.
 
 **템플릿 구조** — 정책서는 11섹션(목적·적용 범위·용어 정의·정책 원칙·세부 규칙(`POL-`)·상태 및 처리 기준·역할과 권한·예외 및 승인 기준·외부 연동 정책·미결 사항·AI 검증 제외 사항), 기능설계서는 1–7·10–11 섹션(개요·범위·사용자 흐름(`FUNC-`)·화면과 입력 항목·기능 동작·권한과 데이터 접근·예외와 메시지·미결 사항·AI 검증 제외 사항)으로 **8·9는 결번**입니다.
 
@@ -78,7 +78,7 @@
 /planning-kit:planning-review planning/Zone-관리--2026-05-12-120000/
 ```
 
-인자 없음이면 직전 `planning-format` 출력의 `## 저장 파일`이 정확히 하나의 저장 폴더를 가리킬 때만 두 파일을 읽습니다. 정책서 1개 + 기능설계서 1개를 식별하고 모호하면 중단합니다. R1+R2+R3을 한 패스로 돌리고, 물류 신호가 있으면 R4를 추가합니다(병합 우선순위 `R1 > R2 > R3 > R4`). 출력은 `## 결론`, `## 검토 결과`, `## 체크해야 할 항목` 순서입니다.
+인자 없음이면 직전 `planning-format` 출력의 `## 저장 파일`이 정확히 하나의 저장 폴더를 가리킬 때만 두 파일을 읽습니다. 정책서 1개 + 기능설계서 1개를 식별하고 모호하면 중단합니다. 옵션은 없으며 모든 동작이 기본 ON입니다 — SSOT 표식 폴더는 항상 R1 외부 교차검증 소스로 포함하고(적격 SSOT 없으면 R1 보류), 입력·SSOT 양쪽 URL fetch·이미지 해석을 항상 수행합니다. R1+R2+R3을 한 패스로 돌리고, 물류 신호가 있으면 R4를 추가합니다(병합 우선순위 `R1 > R2 > R3 > R4`). 출력은 `## 결론`, `## 검토 결과`, `## 체크해야 할 항목` 순서입니다.
 
 "미결 사항" 섹션·`(Non-MVP)` 항목·8·9 결번은 검토 제외이며, 구 무거운 구조(GWT·NFR 수치·data/API/event 계약·RACI·로드맵 DoR/DoD)의 부재를 finding으로 만들지 않습니다.
 
@@ -114,13 +114,19 @@ AI(ChatGPT·Claude·Gemini)가 쓴 한글 텍스트의 "AI 티"를 한 번의 �
 
 ## 현재 품질 상태
 
-2026-06-16 기준 `plugin-eval analyze` 정적 평가에서 0.6.0 플러그인은 `91/100` (Grade B), 실패 0건·경고 2건입니다. 경고 2건은 모두 cost-only(`invoke_cost_tokens`·`trigger_cost_tokens` heavy)이며, 6번째 스킬(`planning-interview`) 추가로 plugin 전체 invoke/trigger 예산이 올라간 결과입니다. `description-trigger-weak` 같은 구조·트리거 결함은 0건입니다. 스킬 수를 줄이지 않는 의도된 trade-off로, 점수보다 파이프라인 완결성(명확화 앞단 확보)을 우선합니다.
+2026-06-16 기준 `plugin-eval analyze` 정적 평가에서 0.7.0 플러그인과 6개 스킬(`planning-interview`·`planning-format`·`planning-review`·`planning-publish-confluence`·`ssot-audit`·`humanize-korean`)은 **모두** `100/100` (Grade A), 실패·경고·info 0건입니다. 직전 cost 경고 2건(`invoke_cost_tokens`·`trigger_cost_tokens` heavy)은 **스킬 6개를 그대로 둔 채** SKILL.md 본문을 `references/*`로 더 분리하고 manifest·description을 압축해 두 예산을 모두 `moderate` 밴드로 내려 해소했습니다. `description-trigger-weak` 같은 구조·트리거 결함은 0건입니다. 점수보다 파이프라인 완결성(명확화 앞단 확보)을 우선하는 원칙은 유지합니다.
+
+두 예산은 baseline `moderate` 임계 바로 아래라 헤드룸이 크지 않습니다(trigger·invoke 각각 한 자릿수 토큰 여유). 스킬 본문을 키울 때는 상세를 SKILL.md에 인라인하지 말고 `references/*`로 옮겨 골격만 남겨야 다시 `heavy`로 넘어가지 않습니다.
 
 `planning-interview`는 SKILL.md를 골격만 두고 인터뷰 루프·채점 공식·출력 계약을 `references/runtime.md`로 분리해 적재 비용을 억제했습니다.
 
-직전 0.5.0 작업에서 해소한 경고: `default-prompt-too-many`(Codex `defaultPrompt` 4→3개 정리), `humanize-korean:description-trigger-weak`(description을 `Use when ...` trigger 리드로 재작성·242자로 축소), `invoke_cost_tokens`/`trigger_cost_tokens`(humanize-korean SKILL.md를 80줄로 lean화 — 출력 위치·요약 포맷·등급·후속·엣지를 단계 5에서만 적재하는 `references/output-contract.md`로 분리).
+0.7.0 lean 패스에서 해소한 경고: `invoke_cost_tokens`/`trigger_cost_tokens` heavy — `humanize-korean`·`planning-interview` SKILL.md 본문을 references로 더 분리(humanize 처리 순서를 `quick-rules.md`로 이전), `planning-review`·`planning-format` dispatch 상세를 runtime으로 위임, manifest `longDescription`·`defaultPrompt`와 스킬 description을 압축. 직전 0.5.0: `default-prompt-too-many`(4→3 정리), `humanize-korean:description-trigger-weak`, humanize-korean SKILL.md lean화.
 
-`plugin-eval analyze`의 정적 예산은 manifest·`SKILL.md`·bundled reference의 패키지 비용만 봅니다. `plugin-eval benchmark`의 관찰 사용량은 Codex 실행 세션 전체 맥락을 포함하므로 두 값은 같은 기준이 아닙니다. 벤치마크는 비용 절대값보다 시나리오 성공 여부·잘못된 파일 수정 여부·live write 차단 여부를 우선 신호로 봅니다.
+3-플랫폼 일관성: `.claude-plugin`·`.codex-plugin`·`.cursor-plugin` 매니페스트는 name·version(`0.7.0`)·description·skills가 동일하고, 3개 marketplace catalog(`.claude-plugin`·`.cursor-plugin`·`.agents/plugins`)의 planning-kit 엔트리도 version·description이 일치합니다.
+
+벤치마크: `.plugin-eval/benchmark.json`에 planning-kit 실제 태스크 3종(정책서·기능설계서 생성 must-pass / read-only SSOT 감사 / Confluence 발행 경계-거부)을 정의했습니다. `plugin-eval benchmark`는 실제 `codex exec`를 돌려 `.plugin-eval/runs/<timestamp>/`에 로그와 usage를 남기고, 그 usage를 `plugin-eval analyze --observed-usage`로 되먹여 정적 추정과 대조할 수 있습니다. 2026-06-16 실측에서 3개 시나리오 모두 `completed`(실패 shell 0건)였고, must-pass는 2-doc을 디스크에 생성, 감사·발행 경계 시나리오는 파일을 생성·수정하지 않고(발행은 URL 입력을 거부) live write를 차단했습니다.
+
+`plugin-eval analyze`의 정적 예산은 manifest·`SKILL.md`·bundled reference의 패키지 비용만 봅니다. `plugin-eval benchmark`의 관찰 사용량은 Codex 실행 세션 전체 맥락을 포함하므로 두 값은 같은 기준이 아닙니다. 벤치마크는 비용 절대값보다 시나리오 성공 여부·잘못된 파일 수정 여부·live write 차단 여부를 우선 신호로 봅니다. 그래서 `analyze --observed-usage`는 관찰 input(세션 전체, 평균 ~219k 토큰)과 정적 활성 추정(~3.2k 토큰)의 큰 격차 때문에 `observed-usage-estimate-drift`를 의도적으로 표시합니다 — 이는 두 측정의 기준이 다르다는 신호이지 planning-kit 패키지 비용 결함이 아니며, planning-kit의 정식 점수는 plain `plugin-eval analyze`의 `100/100`(Grade A)입니다.
 
 구조 검증:
 

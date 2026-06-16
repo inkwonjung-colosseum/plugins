@@ -1,11 +1,11 @@
 {
   "name": "planning-kit",
-  "version": "0.6.0",
-  "description": "기획 전문가 산출물(정책서+기능설계서) 심층 인터뷰·생성·리뷰·SSOT 감사·Confluence 발행 + AI 한글 윤문 6-skill.",
+  "version": "0.7.0",
+  "description": "기획 전문가 6-skill: 정책서·기능설계서 심층 인터뷰·생성·리뷰·SSOT 감사·Confluence 발행 + AI 한글 윤문.",
   "author": {
-    "name": "developjik",
-    "email": "developjik@users.noreply.github.com",
-    "url": "https://github.com/developjik"
+    "name": "inkwonjung-colosseum",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
   },
   "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-kit",
   "repository": "https://github.com/inkwonjung-colosseum/plugins",
