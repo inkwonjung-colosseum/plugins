@@ -7,9 +7,9 @@
   "plugins": [
     {
       "name": "planning-kit",
-      "description": "모호한 아이디어를 심층 인터뷰로 명확화하고, 기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit.",
+      "description": "모호한 아이디어를 심층 인터뷰로 명확화하고, 기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행, AI가 쓴 한글 텍스트를 사람 글처럼 윤문하는 humanize-korean까지 지원하는 planning-kit.",
       "source": "./planning-kit",
-      "version": "0.6.0"
+      "version": "0.7.0"
     },
     {
       "name": "dbml-kit",
@@ -39,6 +39,12 @@
       "name": "xstate-kit",
       "description": "XState v5 toolkit: author typed state machines, generate model-based tests, wire React, and export machines to 14+ graph/diagram formats (Mermaid, DOT, Cytoscape, xyflow, GraphML, and more).",
       "source": "./xstate-kit",
+      "version": "0.2.0"
+    },
+    {
+      "name": "design-kit",
+      "description": "Colosseum 브랜드 디자인 시스템 + 범용 UI 디자인 지능. '디자인 만들어줘'에 브랜드 일관 self-contained HTML(colosseum-design), 브랜드 무관 스타일·색·폰트·차트·UX 데이터 추천(ui-design-intelligence). Python·daemon·MCP 불필요.",
+      "source": "./design-kit",
       "version": "0.2.0"
     }
   ]

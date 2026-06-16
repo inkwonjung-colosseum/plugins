@@ -11,8 +11,8 @@
     {
       "name": "planning-kit",
       "source": "./planning-kit",
-      "description": "모호한 아이디어를 심층 인터뷰로 명확화하고, 기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 현재 context memory 또는 명시적 저장 폴더의 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행하는 planning-publish-confluence를 지원하는 planning-kit. planning-publish-confluence는 URL/임의 .md/여러 경로 입력을 받지 않고 기본 SSOT parent 또는 직접 입력 parent 아래 기능 container와 두 child page를 최종 확인 후 create/update하고 readback으로 검증한다.",
-      "version": "0.6.0",
+      "description": "모호한 아이디어를 심층 인터뷰로 명확화하고, 기획 초안 변환, 저장 파일 중심 결과 우선 리뷰, SSOT 감사, 정책서·기능 설계서를 v0.7 Confluence 후보 문서로 발행, AI가 쓴 한글 텍스트를 사람 글처럼 윤문하는 humanize-korean까지 지원하는 planning-kit.",
+      "version": "0.7.0",
       "license": "MIT",
       "tags": [
         "planning",
@@ -104,6 +104,25 @@
       },
       "license": "MIT",
       "category": "developer-tools"
+    },
+    {
+      "name": "design-kit",
+      "version": "0.2.0",
+      "description": "Colosseum 브랜드 디자인 시스템 + 범용 UI 디자인 지능. '디자인 만들어줘'에 브랜드 일관 self-contained HTML(colosseum-design), 브랜드 무관 스타일·색·폰트·차트·UX 데이터 추천(ui-design-intelligence). Python·daemon·MCP 불필요.",
+      "source": "./design-kit",
+      "author": {
+        "name": "inkwonjung-colosseum",
+        "email": "developjik@colosseum.kr"
+      },
+      "license": "MIT",
+      "category": "design",
+      "tags": [
+        "design",
+        "colosseum",
+        "branding",
+        "html",
+        "design-system"
+      ]
     }
   ]
 }

@@ -1,0 +1,42 @@
+{
+  "name": "design-kit",
+  "version": "0.2.0",
+  "description": "Colosseum 브랜드 디자인 시스템 + 범용 UI 디자인 지능. '디자인 만들어줘'에 브랜드 일관 self-contained HTML(colosseum-design), 브랜드 무관 스타일·색·폰트·차트·UX 데이터 추천(ui-design-intelligence). Python·daemon·MCP 불필요.",
+  "author": {
+    "name": "inkwonjung-colosseum",
+    "email": "developjik@colosseum.kr",
+    "url": "https://github.com/inkwonjung-colosseum"
+  },
+  "homepage": "https://github.com/inkwonjung-colosseum/plugins/tree/main/design-kit",
+  "repository": "https://github.com/inkwonjung-colosseum/plugins",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "colosseum",
+    "branding",
+    "html",
+    "design-system",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "design-kit",
+    "shortDescription": "Colosseum 브랜드 DS + 범용 UI 디자인 지능",
+    "longDescription": "두 skill. (1) colosseum-design — Colosseum 브랜드 DS 2.0(색·타이포·radius 토큰, Pretendard, CI 로고, web-admin UI 킷). '디자인 만들어줘'로 브랜드 일관 self-contained HTML. (2) ui-design-intelligence — 브랜드 무관 UI 지능: 84 스타일·160 팔레트·73 폰트·25 차트·98 UX 규칙 CSV를 Grep/Read 조회(Python 불필요).",
+    "developerName": "developjik",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/design-kit",
+    "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/design-kit",
+    "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/design-kit",
+    "defaultPrompt": [
+      "콜로세움 브랜드로 주문 목록 화면 만들어줘",
+      "WMS 대시보드 목업 만들어줘",
+      "로그인 화면 PDA용으로 만들어줘"
+    ],
+    "brandColor": "#005BF6"
+  }
+}

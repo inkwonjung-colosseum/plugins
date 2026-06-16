@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Colosseum WMS — Web Admin</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400..700,0..1,-50..200" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #f6f7f9; font-family: var(--font-sans); color: #29313d; -webkit-font-smoothing: antialiased; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; user-select: none; }
+  button { font-family: inherit; }
+  input, select { font-family: inherit; outline: none; }
+  input:focus, select:focus { border-color: #005BF6 !important; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #CACACA; border-radius: 10px; border: 2px solid #f6f7f9; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .caption-hdr { font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="Sidebar.jsx"></script>
+<script type="text/babel" src="StatCard.jsx"></script>
+<script type="text/babel" src="Primitives.jsx"></script>
+<script type="text/babel" src="DataTable.jsx"></script>
+
+<script type="text/babel">
+
+const { useState, useMemo } = React;
+
+const ORDERS = [
+{ id: 'ORD-24081401', customer: '삼성전자', sku: 'SKU-BG-4411', qty: 120, status: 'new', fd: '김FD', date: '2024-08-14 14:22' },
+{ id: 'ORD-24081402', customer: '현대홈쇼핑', sku: 'SKU-EP-2180', qty: 48, status: 'processing', fd: '이FD', date: '2024-08-14 13:10' },
+{ id: 'ORD-24081403', customer: '쿠팡', sku: 'SKU-CB-3309', qty: 1200, status: 'waiting', fd: '박FD', date: '2024-08-14 11:45' },
+{ id: 'ORD-24081404', customer: '롯데마트', sku: 'SKU-MS-5522', qty: 300, status: 'shipped', fd: '최FD', date: '2024-08-14 10:18' },
+{ id: 'ORD-24081405', customer: '11번가', sku: 'SKU-KB-1007', qty: 72, status: 'transit', fd: '김FD', date: '2024-08-14 09:52' },
+{ id: 'ORD-24081406', customer: 'CJ올리브영', sku: 'SKU-CM-8844', qty: 210, status: 'done', fd: '정FD', date: '2024-08-13 18:22' },
+{ id: 'ORD-24081407', customer: '오늘의집', sku: 'SKU-FN-1122', qty: 16, status: 'returning', fd: '이FD', date: '2024-08-13 16:40' },
+{ id: 'ORD-24081408', customer: 'SSG닷컴', sku: 'SKU-FD-7733', qty: 480, status: 'cancel', fd: '박FD', date: '2024-08-13 15:10' }];
+
+
+const Dashboard = ({ onOpenOrders }) =>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div>
+      <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: '#29313d' }}>대시보드</h1>
+      <div style={{ fontSize: 13, color: '#767676', marginTop: 4 }}>2024년 8월 14일 · 실시간 현황</div>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+      <StatCard label="오늘 신규 주문" value="1,284" unit="건" delta="+12.4%" deltaType="up" icon="description" tone="default" />
+      <StatCard label="출고 대기" value="342" unit="건" delta="-8.1%" deltaType="down" icon="outbox" tone="warning" />
+      <StatCard label="출고 완료" value="927" unit="건" delta="+22.0%" deltaType="up" icon="check_circle" tone="safe" />
+      <StatCard label="재고 부족 SKU" value="24" unit="종" delta="+3" deltaType="up" icon="warning" tone="danger" />
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+      <div style={{ background: '#fff', border: '1px solid #e7eaef', borderRadius: 8, padding: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#29313d' }}>시간대별 출고 처리량</h2>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['오늘', '어제', '7일'].map((l, i) =>
+          <button key={l} style={{
+            height: 26, padding: '0 10px', borderRadius: 4,
+            border: i === 0 ? '1px solid #005BF6' : '1px solid #e7eaef',
+            background: i === 0 ? '#D6ECFF' : '#fff',
+            color: i === 0 ? '#005BF6' : '#464646',
+            fontWeight: i === 0 ? 700 : 500, fontSize: 12, cursor: 'pointer'
+          }}>{l}</button>
+          )}
+          </div>
+        </div>
+        <div style={{ height: 180, display: 'flex', alignItems: 'flex-end', gap: 6, padding: '0 6px' }}>
+          {[42, 68, 91, 120, 88, 45, 22, 15, 33, 72, 110, 140, 162, 155, 128, 94, 68, 52, 38, 26, 18, 14, 9, 6].map((v, i) =>
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div style={{
+            width: '100%', height: `${v / 180 * 100}%`,
+            background: v > 100 ? '#005BF6' : '#D6ECFF', borderRadius: '3px 3px 0 0'
+          }} />
+              {i % 4 === 0 && <div style={{ fontSize: 10, color: '#767676', fontFamily: 'var(--font-mono)' }}>{i}시</div>}
+            </div>
+        )}
+        </div>
+      </div>
+
+      <div style={{ background: '#fff', border: '1px solid #e7eaef', borderRadius: 8, padding: 18 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#29313d', marginBottom: 16 }}>주문 상태 분포</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+        { label: '신규ㅇㄹㅎㅁㅇㄴ', count: 284, pct: 22, color: '#005BF6' },
+        { label: '처리중', count: 512, pct: 40, color: '#1a95ff' },
+        { label: '출고대기', count: 342, pct: 27, color: '#ffbb0e' },
+        { label: '완료', count: 127, pct: 10, color: '#289a3a' },
+        { label: '취소', count: 19, pct: 1, color: '#f94949' }].
+        map((s) =>
+        <div key={s.label}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                <span style={{ color: '#464646', fontWeight: 500 }}>{s.label}</span>
+                <span style={{ color: '#29313d', fontFamily: 'var(--font-mono)', fontWeight: 500 }}>{s.count}</span>
+              </div>
+              <div style={{ height: 6, background: '#f6f7f9', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ width: `${s.pct}%`, height: '100%', background: s.color }} />
+              </div>
+            </div>
+        )}
+        </div>
+      </div>
+    </div>
+
+    <div style={{ background: '#fff', border: '1px solid #e7eaef', borderRadius: 8, padding: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#29313d' }}>최근 주문</h2>
+        <Button variant="text" size="sm" icon="arrow_forward" onClick={onOpenOrders}>전체 보기</Button>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {ORDERS.slice(0, 4).map((o) =>
+      <div key={o.id} style={{
+        display: 'grid', gridTemplateColumns: '150px 1fr 80px 100px 140px',
+        gap: 12, alignItems: 'center', padding: '10px 12px', borderRadius: 4,
+        fontSize: 13
+      }}>
+            <div style={{ fontFamily: 'var(--font-mono)', color: '#005BF6', fontWeight: 500 }}>{o.id}</div>
+            <div style={{ color: '#29313d', fontWeight: 500 }}>{o.customer}</div>
+            <div style={{ color: '#464646', fontFamily: 'var(--font-mono)', textAlign: 'right' }}>{o.qty}</div>
+            <div><Tag variant={o.status} /></div>
+            <div style={{ color: '#767676', fontSize: 12, fontFamily: 'var(--font-mono)' }}>{o.date.slice(5)}</div>
+          </div>
+      )}
+      </div>
+    </div>
+  </div>;
+
+
+const Orders = () => {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('전체');
+  const [drawer, setDrawer] = useState(null);
+  const filtered = useMemo(() => {
+    const byFilter = filter === '전체' ? ORDERS : ORDERS.filter((o) => {
+      const map = { '신규': 'new', '처리중': 'processing', '출고대기': 'waiting', '출고완료': 'shipped', '반품요청': 'returning', '취소': 'cancel' };
+      return o.status === map[filter];
+    });
+    return query ? byFilter.filter((o) => o.id.toLowerCase().includes(query.toLowerCase()) || o.customer.toLowerCase().includes(query.toLowerCase()) || o.sku.toLowerCase().includes(query.toLowerCase())) : byFilter;
+  }, [query, filter]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: '#29313d' }}>주문 관리</h1>
+          <div style={{ fontSize: 13, color: '#767676', marginTop: 4 }}>주문 접수부터 출고까지 한 눈에 관리</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button variant="outline" size="md" icon="download">내보내기</Button>
+          <Button variant="primary" size="md" icon="add">신규 주문</Button>
+        </div>
+      </div>
+      <FilterBar query={query} onQueryChange={setQuery} filters={filter} onFilter={setFilter} onSearch={() => {}} onReset={() => {setQuery('');setFilter('전체');}} />
+      {filtered.length === 0 ?
+      <div style={{ background: '#fff', border: '1px solid #e7eaef', borderRadius: 8, padding: 60, textAlign: 'center' }}>
+          <div style={{ width: 56, height: 56, borderRadius: 28, background: '#f6f7f9', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 30, color: '#CACACA' }}>search_off</span>
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#29313d', marginTop: 14 }}>검색 결과가 없습니다</div>
+          <div style={{ fontSize: 13, color: '#767676', marginTop: 6 }}>다른 조건으로 다시 검색해 주세요.</div>
+        </div> :
+
+      <DataTable rows={filtered} onRow={setDrawer} />
+      }
+      <OrderDetailDrawer order={drawer} onClose={() => setDrawer(null)} />
+    </div>);
+
+};
+
+const Inventory = () => {
+  const rows = [
+  { sku: 'SKU-BG-4411', name: '노트북 가방 · 블랙', stock: 2840, min: 500, status: 'normal' },
+  { sku: 'SKU-EP-2180', name: '무선 이어폰 · 화이트', stock: 142, min: 200, status: 'lowStock' },
+  { sku: 'SKU-CB-3309', name: '케이블 · USB-C', stock: 0, min: 100, status: 'outOfStock' },
+  { sku: 'SKU-MS-5522', name: '마우스 패드 · 그레이', stock: 8212, min: 1000, status: 'normal' },
+  { sku: 'SKU-KB-1007', name: '키보드 · 무선', stock: 312, min: 300, status: 'lowStock' },
+  { sku: 'SKU-CM-8844', name: '카메라 삼각대', stock: 1240, min: 200, status: 'normal' },
+  { sku: 'SKU-FN-1122', name: '스탠드 선풍기', stock: 0, min: 50, status: 'outOfStock' },
+  { sku: 'SKU-FD-7733', name: '블루투스 스피커', stock: 482, min: 200, status: 'normal' }];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0, color: '#29313d' }}>재고 현황</h1>
+        <div style={{ fontSize: 13, color: '#767676', marginTop: 4 }}>SKU별 가용 재고 및 안전재고 기준</div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        <StatCard label="총 SKU 수" value="1,284" unit="종" icon="package_2" tone="default" />
+        <StatCard label="정상 재고" value="1,198" unit="종" icon="check_circle" tone="safe" />
+        <StatCard label="재고 부족" value="62" unit="종" icon="warning" tone="warning" />
+        <StatCard label="품절" value="24" unit="종" icon="dangerous" tone="danger" />
+      </div>
+      <div style={{ background: '#fff', border: '1px solid #e7eaef', borderRadius: 8, overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: '#f6f7f9', borderBottom: '1px solid #e7eaef' }}>
+              {['SKU 코드', '상품명', '가용 재고', '안전재고', '충족률', '상태', ''].map((h, i) =>
+              <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 || i === 3 ? 'right' : 'left', fontSize: 12, fontWeight: 500, color: '#52627a' }}>{h}</th>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => {
+              const pct = Math.min(100, r.stock / r.min * 100);
+              return (
+                <tr key={r.sku} style={{ borderBottom: '1px solid #f6f7f9', background: i % 2 === 0 ? '#fff' : '#fafbfc' }}>
+                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: '#005BF6', fontWeight: 500 }}>{r.sku}</td>
+                  <td style={{ padding: '10px 12px', color: '#29313d', fontWeight: 500 }}>{r.name}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#29313d', fontWeight: 700 }}>{r.stock.toLocaleString()}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#767676' }}>{r.min.toLocaleString()}</td>
+                  <td style={{ padding: '10px 12px', width: 160 }}>
+                    <div style={{ height: 6, background: '#f6f7f9', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: r.status === 'outOfStock' ? '#f94949' : r.status === 'lowStock' ? '#ffbb0e' : '#33c249' }} />
+                    </div>
+                  </td>
+                  <td style={{ padding: '10px 12px' }}><Tag variant={r.status} /></td>
+                  <td style={{ padding: '10px 12px' }}>
+                    <Button variant="outline" size="xs">발주</Button>
+                  </td>
+                </tr>);
+
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>);
+
+};
+
+const App = () => {
+  const [activeLeaf, setActiveLeaf] = useState('orders-list');
+  const [drawer, setDrawer] = useState(null);
+
+  // Map leaf id to content screen
+  const isOrdersScreen = activeLeaf && activeLeaf.startsWith('orders-');
+  const isOutboundScreen = activeLeaf && activeLeaf.startsWith('outbound-');
+  const isInventoryScreen = activeLeaf && activeLeaf.startsWith('inventory-');
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', minHeight: 0 }}>
+      <Sidebar activeLeaf={activeLeaf} onLeafClick={setActiveLeaf} onCollapse={() => {}} />
+      <main style={{ flex: 1, overflowY: 'auto', padding: 24, background: "rgb(255, 255, 255)" }}>
+        {isOrdersScreen && <Orders />}
+        {isOutboundScreen && <Orders />}
+        {isInventoryScreen && <Inventory />}
+        {!isOrdersScreen && !isOutboundScreen && !isInventoryScreen &&
+        <div style={{ padding: 60, textAlign: 'center', background: '#fff', border: '1px solid #e7eaef', borderRadius: 8 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#29313d' }}>준비 중인 화면</div>
+            <div style={{ fontSize: 13, color: '#767676', marginTop: 6 }}>이 영역은 UI 키트 범위 밖입니다.</div>
+          </div>
+        }
+      </main>
+    </div>);
+
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

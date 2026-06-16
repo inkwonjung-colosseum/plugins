@@ -1,0 +1,337 @@
+/* =========================================================================
+   Colosseum Design System 2.0 — Colors & Typography
+   B2B Logistics platform (WMS / TMS / OMS / PMS)
+   ========================================================================= */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url('fonts/PretendardVariable.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('fonts/Pretendard-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+  src: url('fonts/Pretendard-Black.woff2') format('woff2');
+}
+
+/* ---------- FOUNDATION TOKENS ---------- */
+:root {
+  /* CL Blue — Brand Primary
+     Primary = clblue.500 (#005BF6). 75 is an exceptional extra step. */
+  --clblue-50:  #FAFCFF;
+  --clblue-75:  #F2FAFF;
+  --clblue-100: #D6ECFF;
+  --clblue-200: #9CCEFF;
+  --clblue-300: #65ACFE;
+  --clblue-400: #3287FB;
+  --clblue-500: #005BF6;  /* ⭐ Primary */
+  --clblue-600: #044ECE;
+  --clblue-700: #0742A7;
+  --clblue-800: #00317A;
+  --clblue-900: #00204F;
+
+  /* Natural — content-oriented warm grays */
+  --natural-50:  #f6f7f9;
+  --natural-100: #e7eaef;
+  --natural-200: #c8cfda;
+  --natural-300: #a3afc1;
+  --natural-400: #8595ad;
+  --natural-500: #677b98;
+  --natural-600: #52627a;
+  --natural-700: #3e4a5c;  /* Static — titles */
+  --natural-800: #29313d;  /* Data */
+  --natural-900: #15191f;
+
+  /* Gray — contrast-tuned neutrals (AA at 500, AAA at 700) */
+  --gray-50:  #F2F2F2;
+  --gray-100: #DEDEDE;
+  --gray-200: #CACACA;  /* default border */
+  --gray-300: #B0B0B0;
+  --gray-400: #929292;
+  --gray-500: #767676;  /* ⭐ Description */
+  --gray-600: #5E5E5E;
+  --gray-700: #464646;  /* ⭐ Title body */
+  --gray-800: #2E2E2E;
+  --gray-900: #1A1A1A;  /* black replacement */
+
+  /* Accent — Red / Error */
+  --red-50:  #fff0f0;
+  --red-500: #f94949;
+  --red-600: #f81616;
+
+  /* Accent — Green / Success */
+  --green-50:  #dff7e2;
+  --green-500: #33c249;
+  --green-600: #289a3a;
+
+  /* Accent — Yellow / Warning */
+  --yellow-100: #fff1cc;
+  --yellow-400: #ffca42;
+  --yellow-500: #ffbb0e;
+
+  /* Accent — Orange / Negative */
+  --orange-50:  #fef3eb;
+  --orange-400: #fea363;
+  --orange-600: #f86702;
+
+  /* Accent — Sky / Info */
+  --sky-50:  #e5f3ff;
+  --sky-300: #4dadff;
+  --sky-400: #1a95ff;
+
+  /* Accent — Purple / Stable */
+  --purple-50:  #f2f0ff;
+  --purple-400: #7055ff;
+  --purple-500: #4724ff;
+
+  /* Accent — Pink */
+  --pink-50:  #ffe6f3;
+  --pink-500: #fc038b;
+
+  /* Primary aliases */
+  --primary-light-blue: #005BF6;
+  --primary-blue:       #0047d9;
+
+  /* ---------- SEMANTIC TOKENS ---------- */
+
+  /* Backgrounds */
+  --color-background-white:         #ffffff;
+  --color-background-gray-bg:       var(--gray-50);
+  --color-background-gray-50:       var(--gray-50);
+  --color-background-gray-100:      var(--gray-100);
+  --color-background-gray-200:      var(--gray-200);
+  --color-background-natural-50:    var(--natural-50);
+  --color-background-natural-100:   var(--natural-100);
+  --color-background-primary:       var(--clblue-500);
+  --color-background-primary-subtle: var(--clblue-100);
+
+  /* Opacity backgrounds — Black */
+  --color-bg-bk4:   rgba(0, 0, 0, 0.04);
+  --color-bg-bk12:  rgba(0, 0, 0, 0.12);
+  --color-bg-bk14:  rgba(0, 0, 0, 0.14);
+  --color-bg-bk78:  rgba(0, 0, 0, 0.78);
+
+  /* Opacity backgrounds — White (for dark UI) */
+  --color-bg-wt12:  rgba(255, 255, 255, 0.12);
+  --color-bg-wt24:  rgba(255, 255, 255, 0.24);
+  --color-bg-wt60:  rgba(255, 255, 255, 0.60);
+  --color-bg-wt90:  rgba(255, 255, 255, 0.90);
+
+  /* Text */
+  --color-text-white:       #ffffff;
+  --color-text-black:       var(--gray-900);
+  --color-text-static:      var(--natural-700); /* Titles */
+  --color-text-data:        var(--gray-700);    /* Body */
+  --color-text-description: var(--gray-500);    /* Helper */
+  --color-text-disabled:    var(--gray-400);
+  --color-text-primary:     var(--clblue-500);
+  --color-text-link:        var(--sky-400);
+  --color-text-red:         var(--red-500);
+
+  /* Icon (mirrors text palette) */
+  --color-icon-white:    #ffffff;
+  --color-icon-black:    var(--gray-900);
+  --color-icon-static:   var(--natural-700);
+  --color-icon-data:     var(--gray-700);
+  --color-icon-primary:  var(--clblue-500);
+  --color-icon-disabled: var(--gray-400);
+
+  /* Borders */
+  --color-borders-outline:     var(--gray-200);
+  --color-borders-outline-20:  rgba(0, 0, 0, 0.2); /* PDA / glare reduction */
+  --color-borders-primary:     var(--clblue-500);
+  --color-borders-static:      var(--natural-600);
+  --color-borders-natural-400: var(--natural-400);
+  --color-borders-red:         var(--red-500);
+
+  /* Focus ring */
+  --focus-ring: rgba(57, 195, 239, 0.7);
+
+  /* Spacing — 4px scale */
+  --spacing-0:   0;
+  --spacing-px:  1px;
+  --spacing-1:   4px;
+  --spacing-2:   8px;
+  --spacing-3:   12px;
+  --spacing-4:   16px;
+  --spacing-5:   20px;
+  --spacing-6:   24px;
+  --spacing-8:   32px;
+  --spacing-10:  40px;
+  --spacing-12:  48px;
+  --spacing-16:  64px;
+  --spacing-20:  80px;
+  --spacing-24:  96px;
+  --spacing-32:  128px;
+
+  /* Radius */
+  --radius-none: 0;
+  --radius-xs:   2px;   /* chips / tags */
+  --radius-sm:   4px;   /* inputs */
+  --radius-base: 6px;   /* ⭐ default — buttons, cards */
+  --radius-md:   8px;   /* modals, dropdowns */
+  --radius-lg:   12px;  /* banners */
+  --radius-xl:   16px;  /* hero cards */
+  --radius-2xl:  20px;
+  --radius-3xl:  24px;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-none:  none;
+  --shadow-sm:    0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base:  0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md:    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl:   0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* ─────────────────────────────────────────────────────
+     Motion — Colosseum standard easing
+     All interactive transitions use easeOutQuint.
+     ───────────────────────────────────────────────────── */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-std:       var(--ease-out-quint);  /* alias */
+  --duration-fast:  150ms;
+  --duration-base:  250ms;
+  --duration-slow:  400ms;
+
+  /* Breakpoints (reference only — @media uses literal values) */
+  --breakpoint-sm:  640px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg:  1024px;
+  --breakpoint-xl:  1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont,
+               system-ui, Roboto, 'Helvetica Neue', 'Segoe UI',
+               'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono',
+               Consolas, 'Courier New', monospace;
+
+  --font-size-xs:   12px;
+  --font-size-sm:   14px;  /* ⭐ default body / UI */
+  --font-size-base: 16px;
+  --font-size-lg:   18px;
+  --font-size-xl:   20px;
+  --font-size-2xl:  22px;
+  --font-size-3xl:  24px;  /* H3 */
+  --font-size-4xl:  28px;  /* H2 */
+  --font-size-5xl:  32px;
+  --font-size-6xl:  40px;  /* H1 */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;  /* ⭐ default */
+  --font-weight-bold:   700;  /* skips 600 */
+
+  --line-height-none:    1;
+  --line-height-tight:   1.2;
+  --line-height-snug:    1.375;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose:   1.75;
+}
+
+/* ---------- SEMANTIC TYPOGRAPHY CLASSES ---------- */
+html { font-family: var(--font-sans); }
+body {
+  margin: 0;
+  background: var(--color-background-gray-bg);
+  color: var(--color-text-data);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.h1, h1 {
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-static);
+  margin: 0;
+}
+.h2, h2 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-static);
+  margin: 0;
+}
+.h3, h3 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+  color: var(--color-text-static);
+  margin: 0;
+}
+.body-lg {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-data);
+}
+.body, p {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-data);
+  margin: 0;
+}
+.caption, small {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-description);
+}
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-static);
+}
+code, .mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Focus ring (keyboard only) */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────
+   Reduced motion — respect OS/browser preference.
+   Durations collapse to ~0 so transitions finish instantly
+   without losing state transitions that depend on them.
+   ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
