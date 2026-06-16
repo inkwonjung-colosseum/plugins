@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.5.0",
-  "description": "기획 전문가 산출물(정책서+기능설계서) 생성·리뷰·SSOT 감사·Confluence 발행 + AI 한글 윤문 5-skill.",
+  "version": "0.6.0",
+  "description": "기획 전문가 산출물(정책서+기능설계서) 심층 인터뷰·생성·리뷰·SSOT 감사·Confluence 발행 + AI 한글 윤문 6-skill.",
   "author": {
     "name": "developjik",
     "email": "developjik@users.noreply.github.com",
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "planning-kit",
     "shortDescription": "Draft, review, audit, and publish planning docs",
-    "longDescription": "기획 전문가 5-skill. planning-format으로 정책서·기능설계서를 만들고, planning-review로 SSOT·AC·의존성을 검토, ssot-audit으로 SSOT corpus를 감사, planning-publish-confluence로 v0.7 후보를 발행하고, humanize-korean으로 AI가 쓴 한글 텍스트를 사람 글처럼 윤문한다.",
+    "longDescription": "기획 전문가 6-skill. planning-interview로 모호한 아이디어를 심층 인터뷰로 명확화하고, planning-format으로 정책서·기능설계서를 만들고, planning-review로 SSOT·AC·의존성을 검토, ssot-audit으로 SSOT corpus를 감사, planning-publish-confluence로 v0.7 후보를 발행하고, humanize-korean으로 AI가 쓴 한글 텍스트를 사람 글처럼 윤문한다.",
     "developerName": "developjik",
     "category": "Productivity",
     "capabilities": [
@@ -33,7 +33,7 @@
     "privacyPolicyURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-kit",
     "termsOfServiceURL": "https://github.com/inkwonjung-colosseum/plugins/tree/main/planning-kit",
     "defaultPrompt": [
-      "기획 초안을 정책서와 기능설계서로 정리해줘",
+      "모호한 기획 아이디어를 planning-interview로 심층 인터뷰해서 명확화해줘",
       "방금 만든 두 문서를 planning-review로 점검해줘",
       "planning-publish-confluence로 v0.7 후보 문서 발행해줘"
     ],

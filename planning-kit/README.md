@@ -1,11 +1,11 @@
 # planning-kit
 
-기획 전문가가 즉시 쓸 수 있는 정책서·기능설계서 생성 + 리뷰 + SSOT 감사 + Confluence 발행 + AI 한글 윤문 5-skill 플러그인입니다. 입력 하나(텍스트·파일·폴더·URL·이미지)를 **기획 레벨** 정책서·기능설계서로 변환하고, 완성된 2-doc 쌍을 외부 SSOT·의존성 관점으로 검토하며, SSOT corpus를 감사하고, Confluence 후보로 발행합니다. Claude Code / Codex / Cursor 3개 플랫폼을 지원합니다.
+기획 전문가가 즉시 쓸 수 있는 심층 인터뷰 + 정책서·기능설계서 생성 + 리뷰 + SSOT 감사 + Confluence 발행 + AI 한글 윤문 6-skill 플러그인입니다. 모호한 아이디어를 심층 인터뷰로 먼저 명확화하고, 입력 하나(텍스트·파일·폴더·URL·이미지)를 **기획 레벨** 정책서·기능설계서로 변환하고, 완성된 2-doc 쌍을 외부 SSOT·의존성 관점으로 검토하며, SSOT corpus를 감사하고, Confluence 후보로 발행합니다. Claude Code / Codex / Cursor 3개 플랫폼을 지원합니다.
 
-- **버전:** `0.5.0`
+- **버전:** `0.6.0`
 - **라이선스:** MIT
 - **작성자:** inkwonjung-colosseum
-- **총 Skill 수:** 5 (생성 1 + 리뷰 1 + 감사 1 + 발행 1 + 윤문 1)
+- **총 Skill 수:** 6 (인터뷰 1 + 생성 1 + 리뷰 1 + 감사 1 + 발행 1 + 윤문 1)
 
 ## 설계 원칙 — 린(lean) 기획 레벨
 
@@ -21,13 +21,27 @@
 
 | 스킬 | 목적 |
 |---|---|
+| `planning-interview` | 모호한 기획 아이디어를 소크라테스식 1문1답으로 명확화하고, 목표·정책·기능·성공기준 4차원 모호도를 점수화해 임계 이하면 명확도 리포트 + planning-format 핸드오프 제안 (문서 생성 안 함) |
 | `planning-format` | 입력 하나를 기획 레벨 정책서·기능설계서로 변환하고 기본 저장 + 체크 항목을 출력 |
 | `planning-review` | 완성된 2-doc 쌍을 외부 SSOT 교차검증(R1)·링크/의존성 완결성(R2)·교차 일관성(R3), 물류 신호 시 도메인 lens(R4)로 심층 리뷰 (생성·수정 안 함) |
 | `planning-publish-confluence` | context 또는 저장 폴더의 두 문서를 `v0.7` 후보로 발행하고 쓰기 후 readback 검증 |
 | `ssot-audit` | 독립 `SSOT` 표시 폴더 Markdown의 구조·내용과 backlog 감사 |
 | `humanize-korean` | AI가 쓴 한글 텍스트의 번역투·AI 티(10 카테고리 40+ 패턴)를 사람 글처럼 윤문 (의미 불변) |
 
-**파이프라인:** `planning-format`(생성) → `planning-review`(검증) → `planning-publish-confluence`(발행). `ssot-audit`·`humanize-korean`은 독립 보조 스킬입니다.
+**파이프라인:** `planning-interview`(명확화) → `planning-format`(생성) → `planning-review`(검증) → `planning-publish-confluence`(발행). `ssot-audit`·`humanize-korean`은 독립 보조 스킬입니다.
+
+## planning-interview
+
+```text
+/planning-kit:planning-interview "주문 취소 기능을 만들고 싶은데 아직 모호해"
+/planning-kit:planning-interview "..." --threshold 0.15 --no-context
+```
+
+모호한 아이디어를 한 번에 한 질문으로 명확화하는 인터뷰어입니다. 매 라운드 가장 약한 차원(목표·정책·기능·성공기준)을 타겟해 가정을 드러내고, 답변마다 모호도를 채점해 투명하게 보여줍니다. `모호도 = 1 − (목표·0.35 + 정책·0.25 + 기능·0.25 + 성공기준·0.15)`이며 기본 임계는 `0.2`입니다.
+
+**산출물은 명확도 리포트뿐입니다** — 정책서·기능설계서를 만들지 않고, 모호도가 임계 이하면 `## 결론`·`## 명확도`·`## 합의된 결정`·`## 미결 사항`·`## 다음 단계`로 정리한 뒤 `planning-format` 호출을 제안합니다(자동 호출 안 함). 옵션: `--threshold <0~1>`, `--no-context`, `--max-rounds <n>`.
+
+> 개발자용 deep-interview(수학 게이트·topology·ontology 수렴·lateral review panel·auto-research/answer fragment)의 무거운 머신은 의도적으로 이식하지 않은 **린 코어**입니다. 한 번에 한 질문 + 4차원 점수 + 임계 게이트만 남겼습니다.
 
 ## planning-format
 
@@ -100,7 +114,9 @@ AI(ChatGPT·Claude·Gemini)가 쓴 한글 텍스트의 "AI 티"를 한 번의 �
 
 ## 현재 품질 상태
 
-2026-06-16 기준 `plugin-eval analyze` 정적 평가에서 0.5.0 플러그인과 5개 스킬 모두 `100/100` (Grade A), 실패·경고 0건입니다.
+2026-06-16 기준 `plugin-eval analyze` 정적 평가에서 0.6.0 플러그인은 `91/100` (Grade B), 실패 0건·경고 2건입니다. 경고 2건은 모두 cost-only(`invoke_cost_tokens`·`trigger_cost_tokens` heavy)이며, 6번째 스킬(`planning-interview`) 추가로 plugin 전체 invoke/trigger 예산이 올라간 결과입니다. `description-trigger-weak` 같은 구조·트리거 결함은 0건입니다. 스킬 수를 줄이지 않는 의도된 trade-off로, 점수보다 파이프라인 완결성(명확화 앞단 확보)을 우선합니다.
+
+`planning-interview`는 SKILL.md를 골격만 두고 인터뷰 루프·채점 공식·출력 계약을 `references/runtime.md`로 분리해 적재 비용을 억제했습니다.
 
 직전 0.5.0 작업에서 해소한 경고: `default-prompt-too-many`(Codex `defaultPrompt` 4→3개 정리), `humanize-korean:description-trigger-weak`(description을 `Use when ...` trigger 리드로 재작성·242자로 축소), `invoke_cost_tokens`/`trigger_cost_tokens`(humanize-korean SKILL.md를 80줄로 lean화 — 출력 위치·요약 포맷·등급·후속·엣지를 단계 5에서만 적재하는 `references/output-contract.md`로 분리).
 
