@@ -1,7 +1,7 @@
 {
   "name": "planning-kit",
-  "version": "0.4.0",
-  "description": "기획 전문가 산출물(정책서+기능설계서) 생성·리뷰·SSOT 감사·Confluence 발행 4-skill.",
+  "version": "0.5.0",
+  "description": "기획 전문가 산출물(정책서+기능설계서) 생성·리뷰·SSOT 감사·Confluence 발행 + AI 한글 윤문 5-skill.",
   "author": {
     "name": "inkwonjung-colosseum"
   }

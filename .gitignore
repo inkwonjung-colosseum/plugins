@@ -11,6 +11,8 @@ planning/
 
 .claude/
 .codex/
+.omc/
+.omo/
 .plugin-eval/
 AGENTS.md
 CLAUDE.md
