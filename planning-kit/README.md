@@ -1,45 +1,33 @@
-# planning-kit (0.4.0)
+# planning-kit
 
-기획 전문가가 즉시 쓸 수 있는 정책서·기능설계서 + review + SSOT audit + Confluence 발행 4-skill 플러그인입니다. 0.4.0은 0.3.0의 결과 우선 출력과 저장 파일 handoff 계약, 그리고 SSOT corpus 진입 조건(파일명 basename version cutoff `>= v0.8` 또는 버전 표기 없음)을 유지하면서, 정책서와 기능설계서 템플릿을 다섯 전문가 관점(PM 전략 / BA 추적성 / UX / 기술 명세 / QA)으로 확장합니다.
+기획 전문가가 즉시 쓸 수 있는 정책서·기능설계서 생성 + 리뷰 + SSOT 감사 + Confluence 발행 + AI 한글 윤문 5-skill 플러그인입니다. 입력 하나(텍스트·파일·폴더·URL·이미지)를 **기획 레벨** 정책서·기능설계서로 변환하고, 완성된 2-doc 쌍을 외부 SSOT·의존성 관점으로 검토하며, SSOT corpus를 감사하고, Confluence 후보로 발행합니다. Claude Code / Codex / Cursor 3개 플랫폼을 지원합니다.
 
-- 정책서: 정책 규칙·상태·권한·예외·연동 + **사업 케이스(KPI/OKR/가설) · 이해관계자 · 우선순위 · 리스크 레지스터 · 로드맵**.
-- 기능설계서: 화면·흐름·동작·메시지 + **페르소나/사용자 여정 · 수용기준(Given-When-Then) · 데이터 모델 · API/이벤트 계약 · NFR · UX writing · 디자인 시스템 연계 · 테스트 시나리오 · Observability · DoR/DoD**.
-- 모든 항목은 `POL-/BIZ-/RSK-/DEC-/FUNC-/AC-/DATA-/API-/NFR-/TEST-` 요구사항 ID 체계로 정책↔기능 cross-link을 강제합니다.
+- **버전:** `0.5.0`
+- **라이선스:** MIT
+- **작성자:** inkwonjung-colosseum
+- **총 Skill 수:** 5 (생성 1 + 리뷰 1 + 감사 1 + 발행 1 + 윤문 1)
 
-## 현재 품질 상태
+## 설계 원칙 — 린(lean) 기획 레벨
 
-2026-05-28 기준 `plugin-eval` 정적 평가에서 0.4.0 플러그인과 4개 스킬 모두 `100/100`, 실패/경고 0건입니다.
+이 플러그인은 PM·기획자가 쓰는 **기획 레벨** 문서만 다룹니다. 구현 상세와 전략 장식은 의도적으로 담지 않습니다.
 
-- `planning-kit`: `100/100`
-- `planning-format`: `100/100`
-- `planning-review`: `100/100`
-- `planning-publish-confluence`: `100/100`
-- `ssot-audit`: `100/100`
+- 정책서: 정책 규칙·상태·역할·권한·예외·연동. 사업 케이스(KPI/OKR)·이해관계자·리스크 레지스터·로드맵 같은 전략 장식은 **다루지 않습니다**.
+- 기능설계서: 화면·흐름·동작·메시지. 데이터 모델·API/이벤트 계약·NFR 수치·테스트 시나리오·페르소나/여정 같은 구현·UX 심화는 **다루지 않습니다** (개발자 몫).
+- 요구사항 ID는 `POL-`(정책 규칙)·`FUNC-`(기능 흐름·동작) **2종만** 씁니다. 두 문서는 헤더 `관련 문서`와 inline 참조로 연결하며, 별도 ID 컬럼·매트릭스를 만들지 않습니다.
 
-검증도 함께 통과해야 최신 상태로 봅니다.
-
-```bash
-python3 -m unittest discover -s tests
-python3 -m json.tool planning-kit/.claude-plugin/plugin.json >/dev/null
-python3 -m json.tool planning-kit/.codex-plugin/plugin.json >/dev/null
-claude plugin validate ./planning-kit
-git diff --check
-```
-
-## 평가 메모
-
-`plugin-eval analyze`의 정적 예산은 플러그인 manifest, `SKILL.md`, bundled reference의 패키지 비용만 봅니다. `plugin-eval benchmark`의 관찰 사용량은 Codex 실행 세션의 전체 시스템/도구/설치 플러그인/작업공간 맥락까지 포함하므로, 두 값은 같은 기준의 토큰 비용이 아닙니다. 기존 benchmark usage log를 `--observed-usage`로 강제 연결하면 이 전체 세션 비용 때문에 estimate drift가 발생할 수 있습니다.
-
-벤치마크는 비용 절대값보다 시나리오별 성공 여부, 잘못된 파일 수정 여부, live write 차단 여부를 우선 신호로 봅니다. 점수 gate는 정적 `plugin-eval analyze`와 구조 검증 명령을 기준으로 판단합니다.
+> 구현 상세·심층 도메인이 필요하면 `logistics-kit` 등 도메인 플러그인이 담당합니다. planning-kit은 그 앞단의 순수 기획 산출물에 집중합니다.
 
 ## Skills
 
 | 스킬 | 목적 |
 |---|---|
-| `planning-format` | 입력을 PM·BA·UX·기술·QA 5층 정책서·기능설계서로 변환하고 기본 저장 파일과 체크해야 할 항목을 출력 |
-| `planning-review` | 산출물을 SSOT 일치성(R1), 수용기준 검증가능성(R2 = Given-When-Then + 측정), 의존성·영향(R3 = 요구사항 ID cross-link)으로 통합 review |
-| `planning-publish-confluence` | context 또는 명시 저장 폴더의 두 문서를 `v0.7` 후보로 발행하고 readback 검증 |
+| `planning-format` | 입력 하나를 기획 레벨 정책서·기능설계서로 변환하고 기본 저장 + 체크 항목을 출력 |
+| `planning-review` | 완성된 2-doc 쌍을 외부 SSOT 교차검증(R1)·링크/의존성 완결성(R2)·교차 일관성(R3), 물류 신호 시 도메인 lens(R4)로 심층 리뷰 (생성·수정 안 함) |
+| `planning-publish-confluence` | context 또는 저장 폴더의 두 문서를 `v0.7` 후보로 발행하고 쓰기 후 readback 검증 |
 | `ssot-audit` | 독립 `SSOT` 표시 폴더 Markdown의 구조·내용과 backlog 감사 |
+| `humanize-korean` | AI가 쓴 한글 텍스트의 번역투·AI 티(10 카테고리 40+ 패턴)를 사람 글처럼 윤문 (의미 불변) |
+
+**파이프라인:** `planning-format`(생성) → `planning-review`(검증) → `planning-publish-confluence`(발행). `ssot-audit`·`humanize-korean`은 독립 보조 스킬입니다.
 
 ## planning-format
 
@@ -48,7 +36,7 @@ git diff --check
 /planning-kit:planning-format ./docs/draft/주문취소.md --no-save
 ```
 
-기본은 저장입니다. `--save`는 no-op alias이고, 저장하지 않으려면 `--no-save`를 사용합니다.
+기본은 저장입니다. `--save`는 no-op alias이고, 저장하지 않으려면 `--no-save`를 씁니다. 기타 옵션: `--no-fetch`, `--no-image`, `--no-self-review`.
 
 ```markdown
 # [기능명]
@@ -67,6 +55,8 @@ git diff --check
 
 `--no-save`와 저장 실패 fallback은 `## 정책서`, `## 기능설계서`, `## 체크해야 할 항목` 순서로 전문을 보여줍니다.
 
+**템플릿 구조** — 정책서는 11섹션(목적·적용 범위·용어 정의·정책 원칙·세부 규칙(`POL-`)·상태 및 처리 기준·역할과 권한·예외 및 승인 기준·외부 연동 정책·미결 사항·AI 검증 제외 사항), 기능설계서는 1–7·10–11 섹션(개요·범위·사용자 흐름(`FUNC-`)·화면과 입력 항목·기능 동작·권한과 데이터 접근·예외와 메시지·미결 사항·AI 검증 제외 사항)으로 **8·9는 결번**입니다.
+
 ## planning-review
 
 ```text
@@ -74,7 +64,9 @@ git diff --check
 /planning-kit:planning-review planning/Zone-관리--2026-05-12-120000/
 ```
 
-인자 없음이면 직전 `planning-format` 출력의 `## 저장 파일`이 정확히 하나의 저장 폴더를 가리킬 때만 두 파일을 읽습니다. 출력은 `## 결론`, `## 검토 결과`, `## 체크해야 할 항목` 순서입니다.
+인자 없음이면 직전 `planning-format` 출력의 `## 저장 파일`이 정확히 하나의 저장 폴더를 가리킬 때만 두 파일을 읽습니다. 정책서 1개 + 기능설계서 1개를 식별하고 모호하면 중단합니다. R1+R2+R3을 한 패스로 돌리고, 물류 신호가 있으면 R4를 추가합니다(병합 우선순위 `R1 > R2 > R3 > R4`). 출력은 `## 결론`, `## 검토 결과`, `## 체크해야 할 항목` 순서입니다.
+
+"미결 사항" 섹션·`(Non-MVP)` 항목·8·9 결번은 검토 제외이며, 구 무거운 구조(GWT·NFR 수치·data/API/event 계약·RACI·로드맵 DoR/DoD)의 부재를 finding으로 만들지 않습니다.
 
 ## planning-publish-confluence
 
@@ -82,18 +74,44 @@ git diff --check
 /planning-kit:planning-publish-confluence planning/Zone-관리--2026-05-12-120000/
 ```
 
-지원 입력은 인자 없음 context memory 또는 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 폴더 1개입니다. URL, 임의 단일 `.md`, 여러 폴더, 중첩 planning 경로는 거부합니다. 쓰기 전 확인과 쓰기 후 readback을 유지합니다.
+지원 입력은 인자 없음 context memory 또는 `planning/[안전기능명]--YYYY-MM-DD-HHMMSS/` 저장 폴더 1개입니다. URL, 임의 단일 `.md`, 여러 폴더, 중첩 planning 경로는 거부합니다. 쓰기 전 확인과 쓰기 후 readback을 유지합니다. publish label `v0.7`은 의도적으로 SSOT cutoff 미만이라 발행 사본은 SSOT corpus로 승격되지 않습니다.
 
 ## ssot-audit
 
-`planning/**`, `.planning-kit/**`, dependency/vendor/build/cache/generated 경로를 제외하고, 독립 `SSOT` 표시 폴더 Markdown만 감사합니다. 0.3.0부터 파일명 basename에서 추출한 버전이 cutoff `>= v0.8` 또는 버전 표기 없음만 corpus 후보입니다. `v0.7` 이하 파일은 `버전 미달`로 별도 집계되며 발견/권고 판단에서 제외됩니다. 버전 비교는 semantic compare(`v0.10 > v0.9`)로 동작합니다.
+`planning/**`, `.planning-kit/**`, dependency/vendor/build/cache/generated 경로를 제외하고, 독립 `SSOT` 표시 폴더 Markdown만 감사합니다. 파일명 basename에서 추출한 버전이 cutoff `>= v0.8`이거나 버전 표기가 없는 파일만 corpus 후보입니다. `v0.7` 이하 파일은 `버전 미달`로 별도 집계되며 발견/권고 판단에서 제외됩니다. 버전 비교는 semantic compare(`v0.10 > v0.9`)로 동작합니다. 옵션: `--ssot-include`, `--exclude`, `--axes <structure,content>`, `--no-follow-links`, `--no-image`.
+
+## humanize-korean
+
+```text
+/planning-kit:humanize-korean ./planning/.../주문취소_정책서.md
+```
+
+AI(ChatGPT·Claude·Gemini)가 쓴 한글 텍스트의 "AI 티"를 한 번의 흐름 안에서 탐지·윤문·자체검증까지 끝내는 단일 자기완결 스킬입니다. 번역투·영어 인용 과다·기계적 병렬·관용구·피동태 남발·접속사 남발·리듬 균일성·이모지/불릿 과다 등 10대 카테고리 40+ 패턴을 다룹니다. **의미 불변**(사실·수치·날짜·고유명사·인용 100% 보존)을 철칙으로 하고, 변경률 30% 초과 시 경고·50% 초과 시 롤백합니다. 기획 산출물 초안의 AI 티를 다듬을 때도 사용합니다.
+
+> [epoko77-ai/im-not-ai](https://github.com/epoko77-ai/im-not-ai)의 `humanize-korean` v1.5 fast-path를 planning-kit용 단일 자기완결 스킬로 인라인한 것입니다. 원본의 strict 5인 파이프라인·웹 서비스·metric 엔진은 이식하지 않았습니다.
 
 ## SSOT 진입 게이트 요약
 
-corpus 진입은 다음 세 조건을 모두 통과해야 합니다.
+`ssot-audit` corpus 진입은 다음 세 조건을 모두 통과해야 합니다.
 
 1. 폴더 path segment에 독립 `SSOT` token (공백·대괄호·소괄호·중괄호·underscore 단위 split, case-insensitive).
 2. `planning/**`·`.planning-kit/**`·기본 제외 경로 밖.
 3. 파일명 basename에서 `v(\d+)\.(\d+)` 마지막 매칭이 없거나, 매칭이 있으면 `(major, minor) >= (0, 8)`.
 
-`planning-publish-confluence`의 publish label `v0.7`은 의도적으로 cutoff 미만이라 Confluence 발행 사본은 SSOT corpus로 승격되지 않습니다.
+## 현재 품질 상태
+
+2026-06-16 기준 `plugin-eval analyze` 정적 평가에서 0.5.0 플러그인과 5개 스킬 모두 `100/100` (Grade A), 실패·경고 0건입니다.
+
+직전 0.5.0 작업에서 해소한 경고: `default-prompt-too-many`(Codex `defaultPrompt` 4→3개 정리), `humanize-korean:description-trigger-weak`(description을 `Use when ...` trigger 리드로 재작성·242자로 축소), `invoke_cost_tokens`/`trigger_cost_tokens`(humanize-korean SKILL.md를 80줄로 lean화 — 출력 위치·요약 포맷·등급·후속·엣지를 단계 5에서만 적재하는 `references/output-contract.md`로 분리).
+
+`plugin-eval analyze`의 정적 예산은 manifest·`SKILL.md`·bundled reference의 패키지 비용만 봅니다. `plugin-eval benchmark`의 관찰 사용량은 Codex 실행 세션 전체 맥락을 포함하므로 두 값은 같은 기준이 아닙니다. 벤치마크는 비용 절대값보다 시나리오 성공 여부·잘못된 파일 수정 여부·live write 차단 여부를 우선 신호로 봅니다.
+
+구조 검증:
+
+```bash
+python3 -m json.tool planning-kit/.claude-plugin/plugin.json >/dev/null
+python3 -m json.tool planning-kit/.codex-plugin/plugin.json >/dev/null
+python3 -m json.tool planning-kit/.cursor-plugin/plugin.json >/dev/null
+claude plugin validate ./planning-kit
+git diff --check
+```
